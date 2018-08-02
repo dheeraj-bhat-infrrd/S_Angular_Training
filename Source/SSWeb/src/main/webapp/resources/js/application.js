@@ -18234,8 +18234,8 @@ function drawStreamPage(streamPostList){
 			}
 		}
 		
-		$('#stream-post-details-cont-'+postId).find('.stream-post-details-text').html(streamPostList[i].textHighlighted);
-		
+		$('#stream-post-details-cont-'+postId).find('.email-reply-text').html(streamPostList[i].textHighlighted);
+
 		if(streamPostList[i].pictures != null && streamPostList[i].pictures != undefined){
 			for(var picI=0; picI<streamPostList[i].pictures.length; picI++){
 				
@@ -18372,7 +18372,7 @@ function drawStreamPage(streamPostList){
 					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
 				}
 				$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');
-				
+
 				if(sortedActionHistory[j].messageType == 'EMAIL_REPLY'){
 					$('#act-cont'+postId+'-'+j).find('.act-action').removeClass('hide');
 					$('#act-cont'+postId+'-'+j).find('.act-details-text').html(sortedActionHistory[j].text);
@@ -21196,7 +21196,7 @@ function drawDuplicatePopupDetails(postDetails,mainPostId){
 			}
 		}
 		
-		$('#stream-dup-cont-'+postId).find('.stream-post-details-text').html(text);
+		$('#stream-dup-cont-'+postId).find('.email-reply-text').html(text);
 		
 		if(pictures != null && pictures != undefined){
 			for(var picI=0; picI<pictures.length; picI++){

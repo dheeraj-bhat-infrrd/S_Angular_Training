@@ -13,6 +13,8 @@ import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.vo.BulkWriteErrorVO;
+
 
 /**
  * @author manish
@@ -29,13 +31,11 @@ public interface SocialFeedService
     public SocialResponseObject<?> saveFeed(SocialResponseObject<?> socialFeed) throws InvalidInputException;
 
     /**
-     * Updates all posts matching given hash and companyId with the given duplicateCount
-     * @param hash
-     * @param companyId
-     * @param id
+     * Updates the duplicate count
+     * @param socialFeeds
      * @return
      */
-    long updateDuplicateCount( int hash, long companyId, String id ) throws InvalidInputException;
+    void updateDuplicateCount( List<SocialResponseObject<?>>  socialFeeds ) throws InvalidInputException;
 
 
     /**
@@ -158,5 +158,19 @@ public interface SocialFeedService
     public void addEmailReplyAsCommentToSocialPost( String postId, String mailFrom, String mailTo, String mailBody,
         String subject );
 
-    
+    /**
+     * Bulk inserts social feeds into mongo
+     * @param socialFeeds
+     */
+    List<BulkWriteErrorVO> saveFeeds( List<SocialResponseObject<?>> socialFeeds ) throws InvalidInputException;
+
+    /**
+     * Updates the duplicate count
+     * @param hash
+     * @param companyId
+     * @param id
+     * @return
+     */
+    long updateDuplicateCount( int hash, long companyId, String id ) throws InvalidInputException;
+
 }

@@ -35,7 +35,7 @@
 					Trusted Source</div>
 			</div>
 		</div>
-		<div class="stream-post-details-text col-lg-11 col-md-11 col-sm-11 col-xs-11 stream-post-text float-right">
-		
-		</div>
+		<pre class="email-reply-text col-lg-11 col-md-11 col-sm-11 col-xs-11 stream-post-text float-right">
+
+		</pre>
 </div>

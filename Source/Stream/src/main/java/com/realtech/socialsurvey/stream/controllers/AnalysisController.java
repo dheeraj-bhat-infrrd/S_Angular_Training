@@ -137,7 +137,7 @@ import io.swagger.annotations.ApiResponses;
 	        @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
 	        @ApiResponse ( code = 503, message = "Service not available") })
 	    @RequestMapping ( value = "/failed/socialposts", method = RequestMethod.GET)
-	    public ResponseEntity<?> queueReportGenerationRequest(  )
+	    public ResponseEntity<?> queueFailedSocialPosts(  )
 	        throws InterruptedException, ExecutionException, TimeoutException
 	    {
 	        LOG.info( "Received request to generate reports in stream" );

@@ -162,9 +162,9 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         responseWrapper.setTotalLikesCount( twitterFeedData.getFavoriteCount() );
         responseWrapper.setRetweetCount( twitterFeedData.getRetweetCount() );
 
-        if ( twitterFeedData.getCreatedAt() != null ) {
-            responseWrapper.setCreatedTime( twitterFeedData.getCreatedAt().getTime() );
-            responseWrapper.setUpdatedTime( twitterFeedData.getCreatedAt().getTime() );
+        if ( twitterFeedData.getCreatedAt() != 0 ) {
+            responseWrapper.setCreatedTime( twitterFeedData.getCreatedAt() );
+            responseWrapper.setUpdatedTime( twitterFeedData.getCreatedAt() );
         }
 
         return responseWrapper;

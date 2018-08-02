@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute;
 
 import com.realtech.socialsurvey.compute.common.EnvConstants;
 import com.realtech.socialsurvey.compute.topology.bolts.monitor.*;
+import com.realtech.socialsurvey.compute.topology.bolts.monitor.BulkSaveToMongo;
 import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 import org.apache.storm.Config;
@@ -62,6 +63,7 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
             Config config = new Config();
             config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 50 );
             config.put( Config.STORM_NIMBUS_RETRY_TIMES, 3 );
+            config.put( Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 60 );
             return config;
         }
     }
@@ -77,12 +79,8 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
         builder.setBolt( "CompanyGroupingBolt", new CompanyGroupingBolt(), 1 ).shuffleGrouping( "SocialPostSpout" );
         builder.setBolt( "FilterSocialPostBolt", new FilterSocialPostBolt(), 1 ).fieldsGrouping( "CompanyGroupingBolt",
             new Fields( "companyId" ) );
-        builder.setBolt( "SaveFeedsToMongoBolt", new SaveFeedsToMongoBolt(), 1 ).shuffleGrouping( "FilterSocialPostBolt" );
-        builder.setBolt("UpdateSocialPostDuplicateCount", new UpdateSocialPostDuplicateCountBolt(), 1)
-            .shuffleGrouping("SaveFeedsToMongoBolt", "SUCCESS_STREAM");
-        builder.setBolt("RetryBolt", new RetryHandlerBolt(), 1)
-            .shuffleGrouping("SaveFeedsToMongoBolt", "RETRY_STREAM")
-            .shuffleGrouping("UpdateSocialPostDuplicateCount", "RETRY_STREAM");
+        builder.setBolt("BulkSaveToMongo", new BulkSaveToMongo(), 1)
+            .shuffleGrouping("FilterSocialPostBolt");
 
         return builder.createTopology();
     }

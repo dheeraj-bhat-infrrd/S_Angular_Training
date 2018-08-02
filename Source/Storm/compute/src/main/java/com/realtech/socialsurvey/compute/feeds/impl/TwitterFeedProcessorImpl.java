@@ -145,7 +145,8 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
     {
         TwitterFeedData feed = new TwitterFeedData();
         feed.setText( status.getText() );
-        feed.setCreatedAt( status.getCreatedAt() );
+        feed.setCreatedAt( status.getCreatedAt().getTime() );
+        
         feed.setId( status.getId() );
 
         if(status.isRetweeted()){

@@ -1,22 +1,5 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.realtech.socialsurvey.compute.dao.RedisCompanyKeywordsDao;
 import com.realtech.socialsurvey.compute.dao.RedisTrustedSourcesDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisCompanyKeywordsDaoImpl;
@@ -29,6 +12,17 @@ import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
 import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
+import org.apache.commons.lang.StringUtils;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
+import org.apache.storm.utils.TupleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -59,38 +53,40 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     @Override
     public void executeTuple( Tuple input )
     {
-        LOG.debug("Executing filter social post bolt");
-        SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField("post");
-        long companyId = input.getLongByField("companyId");
-        if (post != null) {
-            post.setActionHistory(new ArrayList<>());
-            ActionHistory actionHistory;
-            if (post.getText() != null) {
-                String text = post.getText();
-                List<String> foundKeyWords;
-                TrieNode root = getTrieForCompany(companyId);
-                foundKeyWords = findPhrases(root, text);
-                if (!foundKeyWords.isEmpty()) {
-                    post.setFoundKeywords(foundKeyWords);
-                    post.setStatus( SocialFeedStatus.ALERT );
-                    actionHistory = getFlaggedActionHistory(foundKeyWords);
+        if(!TupleUtils.isTick( input )) {
+            LOG.debug( "Executing filter social post bolt" );
+            SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField( "post" );
+            long companyId = input.getLongByField( "companyId" );
+            if ( post != null ) {
+                post.setActionHistory( new ArrayList<>() );
+                ActionHistory actionHistory;
+                if ( post.getText() != null ) {
+                    String text = post.getText();
+                    List<String> foundKeyWords;
+                    TrieNode root = getTrieForCompany( companyId );
+                    foundKeyWords = findPhrases( root, text );
+                    if ( !foundKeyWords.isEmpty() ) {
+                        post.setFoundKeywords( foundKeyWords );
+                        post.setStatus( SocialFeedStatus.ALERT );
+                        actionHistory = getFlaggedActionHistory( foundKeyWords );
+                        post.getActionHistory().add( actionHistory );
+                        post.setUpdatedTime( actionHistory.getCreatedDate() );
+                        addTextHighlight( post );
+                    }
+                }
+
+                // check if post from trusted source
+                if ( isPostFromTrustedSource( post, companyId ) ) {
+                    post.setStatus( SocialFeedStatus.RESOLVED );
+                    post.setFromTrustedSource( true );
+                    actionHistory = getTrustedSourceActionHistory( post.getPostSource() );
                     post.getActionHistory().add( actionHistory );
                     post.setUpdatedTime( actionHistory.getCreatedDate() );
-                    addTextHighlight(post);
                 }
             }
-
-            // check if post from trusted source
-            if (isPostFromTrustedSource(post, companyId)) {
-                post.setStatus(SocialFeedStatus.RESOLVED);
-                post.setFromTrustedSource(true);
-                actionHistory = getTrustedSourceActionHistory(post.getPostSource());
-                post.getActionHistory().add(actionHistory);
-                post.setUpdatedTime( actionHistory.getCreatedDate() );
-            }
+            LOG.debug( "Emitting tuple with post having postId = {} and post = {}", post.getPostId(), post );
+            _collector.emit( input, Arrays.asList( companyId, post ) );
         }
-        LOG.debug("Emitting tuple with post having postId = {} and post = {}", post.getPostId(), post);
-        _collector.emit(input, Arrays.asList(companyId, post));
     }
 
     /**

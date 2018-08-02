@@ -21,7 +21,7 @@ kafka:
     solrTopic: solr-topic
     emailEventsTopic: mail-events-topic
     reportTopic: report-topic
-    socialMonitorTopic: social-monitor-topic
+    socialMonitorTopic: social-post-topic
     batchTopic: batch-topic
     userEventTopic: user-event-topic
     transactionIngestionTopic: transaction-ingestion-topic
@@ -50,7 +50,7 @@ kafka:
     solrTopic: solr-topic-dev
     emailEventsTopic: mail-events-topic-dev
     reportTopic: report-topic-dev
-    socialMonitorTopic: social-monitor-topic-dev
+    socialMonitorTopic: social-post-topic-dev
     batchTopic: batch-topic-dev
     userEventTopic: user-event-topic-dev
     transactionIngestionTopic: transaction-ingestion-topic-dev
@@ -81,7 +81,7 @@ kafka:
     solrTopic: solr-topic-demo
     emailEventsTopic: mail-events-topic-demo
     reportTopic: report-topic-demo
-    socialMonitorTopic: social-monitor-topic-demo
+    socialMonitorTopic: social-post-topic-demo
     batchTopic: batch-topic-demo
     userEventTopic: user-event-topic-demo
     transactionIngestionTopic: transaction-ingestion-topic-demo
@@ -116,7 +116,7 @@ kafka:
     solrTopic: solr-topic-stage
     emailEventsTopic: mail-events-topic-stage
     reportTopic: report-topic-stage
-    socialMonitorTopic: social-monitor-topic-stage
+    socialMonitorTopic: social-post-topic-stage
     batchTopic: batch-topic-stage
     userEventTopic: user-event-topic-stage
     transactionIngestionTopic: transaction-ingestion-topic-stage

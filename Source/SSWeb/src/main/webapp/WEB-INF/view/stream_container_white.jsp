@@ -48,9 +48,9 @@
 				</div>
 			</div>
 		</div>
-		<div class="stream-post-details-text col-lg-10 col-md-10 col-sm-10 col-xs-10 stream-post-text float-right">
-		
-		</div>
+		<pre class="email-reply-text col-lg-10 col-md-10 col-sm-10 col-xs-10 stream-post-text float-right">
+
+		</pre>
 	</div>
 	<div id="action-form-cont" class="action-form-cont col-lg-6 col-md-6 col-sm-6 col-xs-6 bottom-padding-stream">
 		<div class="hide add-action-stream-dash" ></div>

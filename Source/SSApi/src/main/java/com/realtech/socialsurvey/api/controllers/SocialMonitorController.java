@@ -1,44 +1,30 @@
 package com.realtech.socialsurvey.api.controllers;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
-import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
-import com.realtech.socialsurvey.core.entities.Keyword;
-import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
-import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
-import com.realtech.socialsurvey.core.entities.SocialResponseObject;
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.exception.AuthorizationException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
-
+import com.realtech.socialsurvey.core.vo.BulkWriteErrorVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -165,15 +151,15 @@ public class SocialMonitorController
 
     @RequestMapping ( value = "/feeds", method = RequestMethod.POST)
     @ApiOperation ( value = "Save socialpost into mongo")
-    public ResponseEntity<?> saveFeeds( @Valid @RequestBody SocialResponseObject<?> socialFeed,
+    public ResponseEntity<?> saveFeed( @Valid @RequestBody SocialResponseObject<?> socialFeed,
         @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException
     {
         try {
             adminAuthenticationService.validateAuthHeader( authorizationHeader );
             try {
-                LOGGER.info( "SocialMonitorController.saveFeeds started" );
+                LOGGER.info( "SocialMonitorController.saveFeed started" );
                 SocialResponseObject<?> socialFeedResponse = socialFeedService.saveFeed( socialFeed );
-                LOGGER.info( "SocialMonitorController.saveFeeds completed successfully" );
+                LOGGER.info( "SocialMonitorController.saveFeed completed successfully" );
                 return new ResponseEntity<>( socialFeedResponse, HttpStatus.OK );
             } catch ( DuplicateKeyException duplicateKeyException ) {
                 throw new SSApiException( duplicateKeyException.getMessage(), "11000" );
@@ -241,7 +227,7 @@ public class SocialMonitorController
                 LOGGER.info( "SocialMonitorController.getLockedTokens started" );
 
                 Map<String, Long> lockedTokens = organizationManagementService.getFacebookAndTwitterLocks( lockType );
-                LOGGER.info( "SocialMonitorController.updateDuplicateCount completed successfully" );
+                LOGGER.info( "SocialMonitorController.getLockedTokens completed successfully" );
                 return new ResponseEntity<>( lockedTokens, HttpStatus.OK );
             } catch ( InvalidInputException e ) {
                 throw new SSApiException( e.getMessage(), e );
@@ -427,5 +413,62 @@ public class SocialMonitorController
             return new ResponseEntity<>(AUTH_FAILED, HttpStatus.UNAUTHORIZED);
         }
     }
+
+    //@RequestMapping ( value = "/feeds/id/{id}/hash/{hash}/companyId/{companyId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/feeds/saveAndUpdate", method = RequestMethod.POST)
+    @ApiOperation ( value = "saves post and updates duplicateCount field matching the given hash of social feed collection")
+    public ResponseEntity<?> savePostAndUpdateDuplicateCount(  @Valid @RequestBody SocialResponseObject<?> socialFeed,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException
+    {
+        long updatedDocs= 0 ;
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            try {
+                LOGGER.info( "SocialMonitorController.savePostAndUpdateDuplicateCount started" );
+                socialFeedService.saveFeed( socialFeed );
+
+                // updates duplicateCount of social post collection
+                /*if(socialFeed.getHash() != 0 ){
+                    updatedDocs  = socialFeedService.updateDuplicateCount( socialFeed.getHash(), socialFeed.getCompanyId(), socialFeed.getId() );
+                }*/
+                LOGGER.info( "SocialMonitorController.savePostAndUpdateDuplicateCount completed successfully" );
+                return new ResponseEntity<>( updatedDocs, HttpStatus.OK );
+            } catch ( DuplicateKeyException duplicateKeyException ) {
+                throw new SSApiException( duplicateKeyException.getMessage(), "11000" );
+            } catch ( InvalidInputException e ) {
+                throw new SSApiException( e.getMessage(), e );
+            }
+        } catch ( AuthorizationException authoriztionFailure ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+
+    }
+
+
+    @RequestMapping ( value = "/feeds/bulk", method = RequestMethod.POST)
+    @ApiOperation ( value = "saves post in bulk and updates duplicateCount field matching the given hash of social feed collection")
+    public ResponseEntity<?> saveFeeds(  @Valid @RequestBody List<SocialResponseObject<?>> socialFeeds,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException
+    {
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            try {
+                LOGGER.info( "SocialMonitorController.saveFeeds started" );
+                //logic to bulk insert into mongo
+                List<BulkWriteErrorVO> bulkWriteErrors = socialFeedService.saveFeeds( socialFeeds );
+                // updates duplicateCount of social post collection
+                socialFeedService.updateDuplicateCount( socialFeeds );
+
+                LOGGER.info( "SocialMonitorController.savePostAndUpdateDuplicateCount completed successfully" );
+                return new ResponseEntity<>( bulkWriteErrors, HttpStatus.OK );
+            }  catch ( InvalidInputException e ) {
+                throw new SSApiException( e.getMessage(), e );
+            }
+        } catch ( AuthorizationException authoriztionFailure ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+
+    }
+
 
 }
