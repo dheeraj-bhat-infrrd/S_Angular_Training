@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.rest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -405,10 +406,19 @@ public class SurveyManagementController
                 if( survey.getPropertyAddress() != null)
                     propertyAddress = "Property Address : "+survey.getPropertyAddress();
   
+                String fbShareUrlFull = "https://www.facebook.com/dialog/share?app_id=" + facebookAppId + "&href=https://socialsurvey.me/pages/nader-kiarang-24143\"e=him over an over again. &redirect_uri=https://www.facebook.com";
+                String fbShareUrl = socialManagementService.generateFacebookShareUrl(survey, agentSettings);
+                
+               // LOG.info("FB share URL is : " + fbShareUrl);
+               // fbShareUrl = URLEncoder.encode(fbShareUrl);
+                //LOG.info("FB share encoded URL is : " + fbShareUrl);
+                
+                boolean isAddFbShare = surveyHandler.canPostOnSocialMedia(agentSettings, survey.getScore() );
+                
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
                         surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
-                        customerDetail, propertyAddress );
+                        customerDetail, propertyAddress, fbShareUrl, isAddFbShare );
                 }
                 
 
@@ -471,7 +481,7 @@ public class SurveyManagementController
 	    
         StringBuilder customerDetail = new StringBuilder( "<div style=\"margin: 15px 0px 15px 0px;\">" );
    
-        customerDetail.append( "Here are the customer details:" );
+        customerDetail.append( "<p style=\"font-weight:bold\">Here are the customer details:</p>" );
             
         customerDetail.append( "<div style=\"margin: 10px 0px 10px 10px;\">" );
         customerDetail.append( "Customer Name: " );

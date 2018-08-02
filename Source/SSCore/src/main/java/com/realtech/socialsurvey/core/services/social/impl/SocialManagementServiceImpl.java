@@ -2850,8 +2850,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     + organizationUnitSettings.getCompleteProfileUrl() + "/" + survey.get_id();
                 break;
             case CommonConstants.FACEBOOK_LABEL:
-                url += "https://www.facebook.com/dialog/share?app_id=" + fbAppId + "&href="
-                    + organizationUnitSettings.getCompleteProfileUrl() + "/" + survey.get_id() + "&quote=" + reviewText
+                url += "https://www.facebook.com/dialog/share?" + "quote=" + reviewText + "&app_id=" + fbAppId + "&href="
+                    + organizationUnitSettings.getCompleteProfileUrl() + "/" + survey.get_id() 
                     + "&redirect_uri=https://www.facebook.com";
                 break;
         }
@@ -4383,5 +4383,15 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
     }
 
-
+    /**
+     * 
+     * @param survey
+     * @param organizationUnitSettings
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    public String generateFacebookShareUrl(SurveyDetails survey  , OrganizationUnitSettings organizationUnitSettings ) throws InvalidInputException {
+    		return generateSocialSiteUrl(survey, CommonConstants.FACEBOOK_LABEL, organizationUnitSettings);
+    }
 }

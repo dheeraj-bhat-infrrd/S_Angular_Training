@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -352,6 +353,10 @@ public interface SocialManagementService
 
 
     public boolean manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId );
+
+
+	String generateFacebookShareUrl(SurveyDetails survey, OrganizationUnitSettings organizationUnitSettings)
+			throws InvalidInputException;
 
 
 }

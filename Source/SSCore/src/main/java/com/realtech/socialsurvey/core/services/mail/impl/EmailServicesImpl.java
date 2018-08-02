@@ -1357,7 +1357,7 @@ public class EmailServicesImpl implements EmailServices
     @Override
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
         String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
-        String customerDetail, String propertyAddress ) throws InvalidInputException, UndeliveredEmailException
+        String customerDetail, String propertyAddress, String fbShareUrl , boolean isAddFbShare ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1373,6 +1373,9 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "customerDetail parameter is empty or null for sending survey completion mail " );
         }
 
+        if( logoUrl == null || logoUrl.isEmpty() )
+        	logoUrl = appLogoUrl;
+        
         LOG.debug( "Sending survey completion email to : {}", recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SURVEY_COMPLETION_TO_ADMINS_AND_AGENT_MAIL );
@@ -1383,18 +1386,22 @@ public class EmailServicesImpl implements EmailServices
         subjectReplacements.setReplacementArgs( Arrays.asList( rating, agentName, customerName ) );
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements.setFileName(
-            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY );
-        
-        if ( logoUrl == null || logoUrl.isEmpty() ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, customerName, rating,
-                agentName,propertyAddress, customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId,
-                recipientMailId, String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
-        } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,propertyAddress,
-                customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
-                String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
+        if(isAddFbShare) {
+        		messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY_NEW );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, fbShareUrl, propertyAddress,
+                    customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
+                    String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
+        }else {
+        		messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY );
+        		messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,propertyAddress,
+                        customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
+                        String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         }
+        
+        
+        
 
 
         LOG.trace( "Calling email sender to send mail" );
