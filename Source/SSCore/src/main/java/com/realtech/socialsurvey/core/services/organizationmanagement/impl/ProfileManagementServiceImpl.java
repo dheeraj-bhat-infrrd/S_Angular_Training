@@ -1922,17 +1922,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     }
                     OrganizationUnitSettings unitSettings = null;
                     
-                    if( review.getAgentId() > 0 && addAgentInfo ) {
-                        unitSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review.getAgentId() );
-                    } else {
-                        unitSettings = organizationManagementService.getEntitySettings( iden, idenColumnName );
-                    }
-                    
-                    if( unitSettings.getContact_details() != null ) {
-                        review.setAgentTitle( unitSettings.getContact_details().getTitle() );
-                        review.setAgentName( unitSettings.getContact_details().getName() );                        
-                    }
-                    
                     if( addAgentInfo ) {
                         if( review.getAgentId() > 0 ) {
                             unitSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review.getAgentId() );
@@ -1948,7 +1937,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                         review.setAgentProfileImage( unitSettings.getProfileImageUrl() );
                     }
-                    review.setAgentProfileImage( unitSettings.getProfileImageUrl() );
                 }
             }
         }

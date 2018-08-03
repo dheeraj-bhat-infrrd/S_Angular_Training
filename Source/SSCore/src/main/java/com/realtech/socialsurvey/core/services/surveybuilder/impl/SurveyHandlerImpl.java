@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -3601,7 +3602,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             
             //put link in map
             String zillowPostUrl = zillowReviewwPostUrl.replaceAll( "\\[screenName\\]", "" + zillowScreenName );
-            zillowPostUrl = zillowPostUrl.replaceAll( "\\[dateOfService\\]", "" + surveyDetails.getSurveyTransactionDate() );
+            
+            SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT);
+            sdf.setTimeZone(TimeZone.getTimeZone("PST"));
+            zillowPostUrl = zillowPostUrl.replaceAll( "\\[dateOfService\\]", "" + sdf.format(surveyDetails.getSurveyTransactionDate()) );
             surveyAndStage.put( "zillowLink", zillowPostUrl );
             
             //check if adding review text is enabled for zillow review share

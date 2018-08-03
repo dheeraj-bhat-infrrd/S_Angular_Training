@@ -15,7 +15,7 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 macro-form-txt">MonitorType</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-1">
 				<div id="add-mon-type-dropdown" class="float-left add-mon-type-dropdown">
-					<div id="add-mon-type-select" class="bulk-actions-select" data-mon-type=2><div class="float-left" id="add-mon-type-sel-txt">Keyword Monitor, Google Alerts</div> 
+					<div id="add-mon-type-select" class="bulk-actions-select" data-mon-type=2><div class="float-left" id="add-mon-type-sel-txt">Keyword Monitor</div> 
 						<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="add-mon-type-chevron-down" class="float-right bulk-actions-dropdown-img">
 						<img id="add-mon-type-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img">
 					</div>
@@ -25,14 +25,14 @@
 							<img id="add-keyword-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="float-left mon-type-checkbox add-mon-type-checkbox">
 							Keyword Monitor
 						</div>
-						<div id="add-mon-type-ga" class="bulk-mon-option add-mon-type-opt">
+						<!-- <div id="add-mon-type-ga" class="bulk-mon-option add-mon-type-opt">
 							<img id="add-google-alerts-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="hide float-left mon-type-checkbox add-mon-type-uncheckbox">
 							<img id="add-google-alerts-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="float-left mon-type-checkbox add-mon-type-checkbox">
 							Google Alerts
-						</div>
+						</div> -->
 					</div>
 				</div>
-				<input type="hidden" id="monitor-type" name="monitor-type" value=2>
+				<input type="hidden" id="monitor-type" name="monitor-type" value=0>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 stream-actions-btn-container">
 				<div id="add-mon-save-active" class="hide float-right hm-header-right text-center macro-add-btn add-mon-save-btn" onclick="javascript:addMonitor()">
@@ -83,11 +83,11 @@
 							<img id="keyword-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="float-left mon-type-checkbox">
 							Keyword Monitor
 						</div>
-						<div id="mon-type-google-alerts" class="bulk-mon-option mon-type-option">
+						<!-- <div id="mon-type-google-alerts" class="bulk-mon-option mon-type-option">
 							<img id="google-alerts-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="hide float-left mon-type-checkbox">
 							<img id="google-alerts-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="float-left mon-type-checkbox">
 							Google Alerts
-						</div>
+						</div> -->
 					</div>
 				</div>
 			</div>
