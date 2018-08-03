@@ -9,6 +9,16 @@
 	<artifactId>SSWeb</artifactId>
 	<packaging>war</packaging>
 
+	<properties>
+		<jackson.version>2.6.1</jackson.version>
+	
+	    <!-- Swagger version -->
+		<swagger.version>2.6.1</swagger.version>
+		
+		<guava.version>16.0.1</guava.version>
+		<aspectj.version>4.2.5.RELEASE</aspectj.version>
+	</properties>
+
 	<dependencies>
 
 		<!-- Spring MVC -->
@@ -96,6 +106,22 @@
 			<groupId>com.realtech.socialsurvey</groupId>
 			<artifactId>SSCore</artifactId>
 			<version>1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-hibernate4</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<!-- Dependency for Google re-captcha -->
