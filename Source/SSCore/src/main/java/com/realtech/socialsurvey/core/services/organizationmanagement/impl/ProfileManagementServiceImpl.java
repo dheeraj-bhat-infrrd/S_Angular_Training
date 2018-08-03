@@ -5017,7 +5017,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         try {
             date = format.parse( dateString );
         } catch ( ParseException e ) {
-            return null;
+        		DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        		try {
+					date = sdf.parse( dateString );
+				} catch (ParseException e1) {
+					return null;
+				}
         }
         return date;
     }
