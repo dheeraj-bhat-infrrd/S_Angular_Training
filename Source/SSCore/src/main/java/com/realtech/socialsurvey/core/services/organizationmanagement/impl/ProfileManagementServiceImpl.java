@@ -4817,13 +4817,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 //ModifiedOn set to current date
                 Date currentDate = new Date( System.currentTimeMillis() );
                 surveyDetails.setModifiedOn( currentDate );
-                surveyDetails.setCreatedOn( dateOfService );
+                surveyDetails.setCreatedOn( createdDate );
                 surveyDetails.setAgreedToShare( "true" );
                 surveyDetails.setAbusive( isAbusive );
                 surveyDetails.setAbuseRepByUser( false );
                 surveyDetails.setShowSurveyOnUI( true );
-                surveyDetails.setSurveyCompletedDate( dateOfService );
-                surveyDetails.setSurveyUpdatedDate( dateOfService );
+                surveyDetails.setSurveyCompletedDate( createdDate );
+                surveyDetails.setSurveyUpdatedDate( createdDate );
                 surveyDetails.setSurveyTransactionDate( dateOfService );
 
                 // saving zillow review summary
