@@ -7797,21 +7797,7 @@ function paintSurveyPage(jsonData) {
 	}*/
 
 	if (zillowEnabled) {
-		
-		//add rating for zillow post
-		var unProcessedZillowReviewLink = zillowReviewLink + "&rating=" + rating;
-		// add title to zillow post
-		if(subjectContentForZillowPost != null && subjectContentForZillowPost != undefined)
-			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&title=" + subjectContentForZillowPost;
-		//add review footer if given along with review
-		var reviewTextForZillow = reviewText;
-		if(reviewFooterContentForZillowPost != null && reviewFooterContentForZillowPost != undefined )
-			reviewTextForZillow = reviewTextForZillow + " - " + reviewFooterContentForZillowPost;
-		//add review text for zillow post if company enabled
-		if(isAutoFillReviewContentForZillowPost)
-			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&content=" + reviewTextForZillow;
-		
-		$('#zillow-btn').attr("href", returnValidWebAddress(unProcessedZillowReviewLink));
+		$('#zillow-btn').attr("href", returnValidWebAddress(zillowReviewLink));
 	} else {
 		$('#zillow-btn').remove();
 	}
@@ -7848,8 +7834,19 @@ if (zillowEnabled) {
 		//add rating for zillow post
 		var unProcessedZillowReviewLink = zillowReviewLink + "&rating=" + rating;
 		// add title to zillow post
-		if(subjectContentForZillowPost != null && subjectContentForZillowPost != undefined)
+		if(subjectContentForZillowPost != null && subjectContentForZillowPost != undefined){
 			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&title=" + subjectContentForZillowPost;
+		}else{
+			var subject = "";
+			if(reviewText.includes('.')){
+				subject = reviewText.substring(0, reviewText.indexOf('.'));
+		    }else if(reviewText.length > 250){
+		    		subject = reviewText.substring(0, 25);	
+		    }else{
+		    		subject = reviewText;
+		    }   
+			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&title=" + subject;		
+		}
 		//add review footer if given along with review
 		var reviewTextForZillow = reviewText;
 		if(reviewFooterContentForZillowPost != null && reviewFooterContentForZillowPost != undefined )

@@ -76,7 +76,8 @@ public class OrganizationUnitSettings implements Serializable
     private boolean includeForTransactionMonitor; // include a company to transaction monitor
     private String encryptedId;
     private boolean isCopyToClipboard;
-
+    private SocialMediaShareFromMailConfig socialMediaShareFromMailConfig;
+    
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
 
@@ -952,6 +953,16 @@ public class OrganizationUnitSettings implements Serializable
 
 	public void setZillowShareConfig(ZillowShareConfig zillowShareConfig) {
 		this.zillowShareConfig = zillowShareConfig;
+	}
+
+
+	public SocialMediaShareFromMailConfig getSocialMediaShareFromMailConfig() {
+		return socialMediaShareFromMailConfig;
+	}
+
+
+	public void setSocialMediaShareFromMailConfig(SocialMediaShareFromMailConfig socialMediaShareFromMailConfig) {
+		this.socialMediaShareFromMailConfig = socialMediaShareFromMailConfig;
 	}
 
 
