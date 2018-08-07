@@ -406,14 +406,15 @@ public class SurveyManagementController
                 if( survey.getPropertyAddress() != null)
                     propertyAddress = "Property Address : "+survey.getPropertyAddress();
   
-                String fbShareUrlFull = "https://www.facebook.com/dialog/share?app_id=" + facebookAppId + "&href=https://socialsurvey.me/pages/nader-kiarang-24143\"e=him over an over again. &redirect_uri=https://www.facebook.com";
                 String fbShareUrl = socialManagementService.generateFacebookShareUrl(survey, agentSettings);
                 
-               // LOG.info("FB share URL is : " + fbShareUrl);
-               // fbShareUrl = URLEncoder.encode(fbShareUrl);
-                //LOG.info("FB share encoded URL is : " + fbShareUrl);
+                boolean canPostOnSM = surveyHandler.canPostOnSocialMedia(agentSettings, survey.getScore() );
+                boolean isFbShareAllowedForComapny = true;
+                if(companySettings != null && companySettings.getSocialMediaShareFromMailConfig() != null && companySettings.getSocialMediaShareFromMailConfig().isFbSharePrevented())
+                	isFbShareAllowedForComapny = false;
                 
-                boolean isAddFbShare = surveyHandler.canPostOnSocialMedia(agentSettings, survey.getScore() );
+                //get if fbShareButton should be added
+                boolean isAddFbShare = canPostOnSM && isFbShareAllowedForComapny;
                 
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
