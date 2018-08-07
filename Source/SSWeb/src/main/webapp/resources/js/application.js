@@ -7841,7 +7841,7 @@ if (zillowEnabled) {
 			if(reviewText.includes('.')){
 				subject = reviewText.substring(0, reviewText.indexOf('.'));
 		    }else if(reviewText.length > 250){
-		    		subject = reviewText.substring(0, 25);	
+		    		subject = reviewText.substring(0, 249);	
 		    }else{
 		    		subject = reviewText;
 		    }   
