@@ -339,7 +339,7 @@ function bindUserLoginEvent() {
 			"colValue" : $(this).attr('data-iden')
 		};
 		callAjaxGETWithTextData("/loginadminas.do", function(data) {
-			window.location = getLocationOrigin() + '/userlogin.do?eraseCache=true';
+			window.location = getLocationOrigin() + '/userlogin.do';
 		}, true, payload,'.user-login-icn');
 	});
 }
