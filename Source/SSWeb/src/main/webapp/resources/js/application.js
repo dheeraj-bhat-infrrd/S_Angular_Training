@@ -7850,7 +7850,7 @@ if (zillowEnabled) {
 		//add review footer if given along with review
 		var reviewTextForZillow = reviewText;
 		if(reviewFooterContentForZillowPost != null && reviewFooterContentForZillowPost != undefined )
-			reviewTextForZillow = reviewTextForZillow + " - " + reviewFooterContentForZillowPost;
+			reviewTextForZillow = reviewTextForZillow + " " + reviewFooterContentForZillowPost;
 		//add review text for zillow post if company enabled
 		if(isAutoFillReviewContentForZillowPost)
 			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&content=" + reviewTextForZillow;
