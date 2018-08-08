@@ -167,7 +167,7 @@ public class AdminToolsController
                 response = Response.ok( "UserId " + userId + " was successfully restored." ).build();
             } catch ( Exception e ) {
                 LOG.error( "Exception occured while restoring user having userId : " + userId + ". Reason : "
-                    + e.getStackTrace() );
+                    + e.getStackTrace() , e );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while restoring the user" ), e.getMessage(), e );
             }
