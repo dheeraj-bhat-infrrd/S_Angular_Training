@@ -518,7 +518,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;DISTINCT USER_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;FROM user_profile&#xd;&#xa;where status &#x3d; 1 and BRANCH_ID &#x21;&#x3d; 0&#xd;&#xa;group by user_id &#xd;&#xa;order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;DISTINCT USER_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;FROM user_profile&#xd;&#xa;where status &#x3d; 1 and BRANCH_ID &#x21;&#x3d; 0 &#xd;&#xa;order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

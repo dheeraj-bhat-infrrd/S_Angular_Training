@@ -454,4 +454,6 @@ public interface SSApiIntegration
     @GET ( "/v1/getdefaultwidgetconfiguration")
     Response getDefaultWidgetConfiguration( @Query ( "entityId") long entityId, @Query ( "entityType") String entityType );
 
+    @GET( "/v1/mismatched/emailId/{companyId}")
+    Response fetchMismatchedSurveyForEmail(@Path ("companyId") long companyId , @Query ("transactionEmail") String transactionEmail,@Query ("startIndex") int startIndex, @Query ("batchSize") int batchSize, @Query ("count") long count, @Header("authorizationHeader") String authorizationHeader);
 }

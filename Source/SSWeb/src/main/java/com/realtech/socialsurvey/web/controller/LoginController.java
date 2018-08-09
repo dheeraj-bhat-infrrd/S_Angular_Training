@@ -47,6 +47,8 @@ import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDash
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.util.RequestUtils;
+import com.realtech.socialsurvey.web.util.ResponseUtils;
 
 
 @Controller
@@ -77,6 +79,10 @@ public class LoginController
     
     @Value ( "${ENABLE_CAPTCHA}")
     private String enableCaptcha;
+    
+    @Autowired
+    private ResponseUtils responseUtils;
+
 
 
     // Redirects user to Landing Page if session is active
@@ -331,6 +337,8 @@ public class LoginController
         String isDirectRegistration = null;
 
         try {
+            
+            responseUtils.setNoCacheControlHeaders( response );
 
             // Setting the direct registration flag
             isDirectRegistration = request.getParameter( "isDirectRegistration" );

@@ -358,6 +358,20 @@ public interface SocialManagementService
 	String generateFacebookShareUrl(SurveyDetails survey, OrganizationUnitSettings organizationUnitSettings)
 			throws InvalidInputException;
 
+	/**
+     * @param companyId
+     * @param transactionEmail
+     * @param startIndex
+     * @param batchSize
+     * @param count
+     * @return
+     * @throws InvalidInputException
+     */
+    public SurveyPreInitiationList getUnmatchedPreInitiatedSurveysForEmail( long companyId, String transactionEmail , int startIndex, int batchSize, long count) throws InvalidInputException;
+
+
+	void updateAgentIdOfSurveyPreinitiationRecordsForEmailForMismatch(User user, String emailAddress)
+			throws InvalidInputException;
 
 }
 // JIRA SS-34 BY RM02 BOC

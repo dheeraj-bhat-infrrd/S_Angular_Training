@@ -3545,7 +3545,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin, boolean isSocialMonitorAdmin )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin, boolean isSocialMonitorAdmin, String firstName, String lastName )
         throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException
     {
         LOG.debug( "Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId
@@ -3563,7 +3563,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             assigneeUsers.add( assigneeUser );
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list for the email addresses provided" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail, sendMail, isAddedByRealtechOrSSAdmin );
+            if(firstName == null || firstName.isEmpty())
+                userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail, sendMail, isAddedByRealtechOrSSAdmin );
+            else
+                userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail, sendMail, isAddedByRealtechOrSSAdmin, firstName, lastName );
             assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
         }
 
@@ -10766,6 +10769,65 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         profileNameMap.put( CommonConstants.PROFILE_LEVEL_BRANCH, branchProfileNameMap );
         profileNameMap.put( CommonConstants.PROFILE_LEVEL_INDIVIDUAL, userProfileNameMap );
         return profileNameMap;
+    }
+    
+    /**
+     * @param emailIdsArray
+     * @param adminUser
+     * @param holdSendingMail
+     * @param sendMail
+     * @param isAddedByRealtechOrSSAdmin
+     * @param firstName
+     * @param lastName
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser,
+        boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin, String firstName, String lastName  ) throws InvalidInputException
+    {
+        LOG.debug( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
+        List<User> users = new ArrayList<User>();
+        List<User> invalidUsers = new ArrayList<User>();
+        Map<String, List<User>> usersMap = new HashMap<String, List<User>>();
+        for ( String emailId : emailIdsArray ) {
+            if ( emailId.contains( "\"" ) ) {
+                emailId = emailId.replace( "\"", "" );
+            }
+            User user = null;
+            if ( validateEmail( emailId ) ) {
+
+                try {
+                    user = userManagementService.getUserByEmailAddress( emailId );
+                } catch ( NoRecordsFetchedException e ) {
+                    /**
+                     * if no user is present with the specified emailId, send an invite to register
+                     */
+                    try {
+                        user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId,
+                            holdSendingMail, sendMail, false, isAddedByRealtechOrSSAdmin );
+                    } catch ( UserAlreadyExistsException | UndeliveredEmailException | NoRecordsFetchedException e1 ) {
+                        LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(),
+                            e1 );
+                    }
+                }
+            } else {
+                LOG.error( "This email address " + emailId + " is not a valid email" );
+                User invalidUser = new User();
+                invalidUser.setEmailId( emailId );
+                invalidUsers.add( invalidUser );
+            }
+            if ( user != null ) {
+                users.add( user );
+
+            }
+
+
+        }
+        usersMap.put( CommonConstants.VALID_USERS_LIST, users );
+        usersMap.put( CommonConstants.INVALID_USERS_LIST, invalidUsers );
+        LOG.debug( "Method getUsersFromEmailIds executed successfully. Returning users size :" + users.size() );
+        return usersMap;
     }
 
 }

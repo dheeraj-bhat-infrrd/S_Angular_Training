@@ -537,18 +537,18 @@ public interface OrganizationManagementService
 
 
     /**
-     * Method to add a new user or assign existing user under a company/region or branch
      * @param adminUser
      * @param selectedUserId
      * @param branchId
      * @param regionId
      * @param emailIdsArray
      * @param isAdmin
-     * @param holdSendingMail - true value will not send mail to the user till the record is verified.
+     * @param holdSendingMail
      * @param sendMail
      * @param isAddedByRealtechOrSSAdmin
      * @param isSocialMonitorAdmin
-     *
+     * @param firstName
+     * @param lastName
      * @return
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
@@ -556,7 +556,7 @@ public interface OrganizationManagementService
      * @throws UserAssignmentException
      */
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin, boolean isSocialMonitorAdmin )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin, boolean isSocialMonitorAdmin, String firstName, String lastName )
         throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException;
 
 
@@ -1812,5 +1812,20 @@ public interface OrganizationManagementService
 
 
     public Map<String,Map<String,String>> getProfileNameMapForCompany( long iden ) throws InvalidInputException;
+    
+    /**
+     * @param emailIdsArray
+     * @param adminUser
+     * @param holdSendingMail
+     * @param sendMail
+     * @param isAddedByRealtechOrSSAdmin
+     * @param firstName
+     * @param lastName
+     * @return
+     * @throws InvalidInputException
+     */
+    public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail,
+        boolean sendMail, boolean isAddedByRealtechOrSSAdmin, String firstName, String lastName ) throws InvalidInputException;
+
 
 }

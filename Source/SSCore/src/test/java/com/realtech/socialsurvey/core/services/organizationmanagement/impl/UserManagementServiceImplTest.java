@@ -1075,20 +1075,20 @@ public class UserManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testsaveEmailUserMappingForNullEmail() throws InvalidInputException, NoRecordsFetchedException
     {
-        userManagementServiceImpl.saveEmailUserMapping( null, 1l );
+        userManagementServiceImpl.saveEmailUserMapping( null, 1l, null );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testsaveEmailUserMappingForEmptyEmail() throws InvalidInputException, NoRecordsFetchedException
     {
-        userManagementServiceImpl.saveEmailUserMapping( "", 1l );
+        userManagementServiceImpl.saveEmailUserMapping( "", 1l, null );
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testsaveEmailUserMappingForInvalidUserId() throws InvalidInputException, NoRecordsFetchedException
     {
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
-        userManagementServiceImpl.saveEmailUserMapping( "test", 1l );
+        userManagementServiceImpl.saveEmailUserMapping( "test", 1l, null );
     }
     
     @Test ( expected = InvalidInputException.class)

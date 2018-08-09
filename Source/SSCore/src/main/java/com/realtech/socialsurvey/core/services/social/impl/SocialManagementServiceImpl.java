@@ -2398,6 +2398,19 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         LOG.debug( "method getProcessedPreInitiatedSurveys called for agentId id : " + user.getUserId() );
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, emailAddress );
     }
+    
+    @Override
+    public void updateAgentIdOfSurveyPreinitiationRecordsForEmailForMismatch( User user, String emailAddress ) throws InvalidInputException
+    {
+        if ( user == null ) {
+            throw new InvalidInputException( " Wrong parameter passed : user is null " );
+        }
+        if ( emailAddress == null || emailAddress.isEmpty() ) {
+            throw new InvalidInputException( " Wrong parameter passed : emailAddress is null oe empty " );
+        }
+        LOG.debug( "method getProcessedPreInitiatedSurveys called for agentId id : " + user.getUserId() );
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddressForMismatched( user, emailAddress );
+    }
 
 
     @Override
@@ -4394,4 +4407,28 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     public String generateFacebookShareUrl(SurveyDetails survey  , OrganizationUnitSettings organizationUnitSettings ) throws InvalidInputException {
     		return generateSocialSiteUrl(survey, CommonConstants.FACEBOOK_LABEL, organizationUnitSettings);
     }
+    
+    @Transactional
+    @Override
+    public SurveyPreInitiationList getUnmatchedPreInitiatedSurveysForEmail( long companyId, String transactionEmail , int startIndex, int batchSize, long count)
+        throws InvalidInputException
+    {
+        LOG.debug( "method getUnmatchedPreInitiatedSurveysForEmail called for company id : {} and transactionEmail:{}", companyId, transactionEmail );
+        SurveyPreInitiationList surveyPreInitiationListVO = new SurveyPreInitiationList();
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( " Wrong parameter passed : companyId is invalid " );
+        }
+
+        List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.getUnmatchedPreInitiatedSurveysForEmail( companyId,transactionEmail,
+            startIndex, batchSize );
+        surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
+        // function shd be called only once
+        if ( count == -1 ) {
+            surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getUnmatchedPreInitiatedSurveyForEmailCount( companyId , transactionEmail ) );
+        } else {
+            surveyPreInitiationListVO.setTotalRecord( count );
+        }
+        return surveyPreInitiationListVO;
+    }
+    
 }
