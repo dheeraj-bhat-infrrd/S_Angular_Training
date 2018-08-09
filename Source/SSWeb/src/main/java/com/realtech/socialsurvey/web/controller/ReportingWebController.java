@@ -920,6 +920,8 @@ public class ReportingWebController
                break;
            case 4: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForPastMonth(userId ,entityId, entityType, month,year,batchSize);
                    break;
+           case 5: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForPastYears(userId ,entityId, entityType,batchSize);
+                   break;
            default: throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
       }
       
@@ -972,12 +974,14 @@ public class ReportingWebController
        }
        switch(timeFrame){
            case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForThisYear(entityId, entityType, year,batchSize);
-               break;
+                   break;
            case 2: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForThisMonth(entityId, entityType, month,year,batchSize);
-               break;
+                   break;
            case 3:  response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForPastYear(entityId, entityType, year,batchSize);
-               break;
+                   break;
            case 4: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForPastMonth(entityId, entityType, month,year,batchSize);
+                   break;
+           case 5:  response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForPastYears(entityId, entityType, batchSize);
                    break;
            default: throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
       }
@@ -1031,17 +1035,19 @@ public class ReportingWebController
        
        switch(timeFrame){
             case 1: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForThisYear(entityId, entityType, year,startIndex,batchSize);
-                break;
+                    break;
             case 2: 
-                monthStr = request.getParameter("month");
-                month = Integer.parseInt(monthStr);
-                response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForThisMonth(entityId, entityType, month,year,startIndex,batchSize);
-                break;
-            case 3:  response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForPastYear(entityId, entityType, year,startIndex,batchSize);
-                break;
+                    monthStr = request.getParameter("month");
+                    month = Integer.parseInt(monthStr);
+                    response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForThisMonth(entityId, entityType, month,year,startIndex,batchSize);
+                    break;
+            case 3: response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForPastYear(entityId, entityType, year,startIndex,batchSize);
+                    break;
             case 4: monthStr = request.getParameter("month");
                     month = Integer.parseInt(monthStr);
                     response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForPastMonth(entityId, entityType, month,year,startIndex,batchSize);
+                    break;
+            case 5:  response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForPastYears(entityId, entityType, startIndex,batchSize);
                     break;
             default: throw new NonFatalException( "NonFatalException while choosing time frame for leaderboard" );
        }

@@ -53,7 +53,7 @@ public class UserRankingPastYearMainDaoImpl extends GenericReportingDaoImpl<User
         Query query = getSession().createSQLQuery( "SELECT rank FROM user_ranking_past_year_main WHERE user_id = :userId " );
         query.setParameter( "userId", userId  );
         int UserRank = (int) query.uniqueResult();
-        LOG.info( "method to fetch user ranking Main Rank for this year, fetchUserRankingRankForPastYearMain() finished." );
+        LOG.info( "method to fetch user ranking Main Rank for past year, fetchUserRankingRankForPastYearMain() finished." );
         return UserRank;
     }
     

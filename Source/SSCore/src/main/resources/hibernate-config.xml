@@ -146,6 +146,9 @@
 				<value>com.realtech.socialsurvey.core.entities.UserRankingPastMonthBranch</value>
 				<value>com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain</value>
 				<value>com.realtech.socialsurvey.core.entities.UserRankingPastMonthRegion</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearsBranch</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearsMain</value>
+				<value>com.realtech.socialsurvey.core.entities.UserRankingPastYearsRegion</value>
 			</list>
 		</property>
 	</bean>

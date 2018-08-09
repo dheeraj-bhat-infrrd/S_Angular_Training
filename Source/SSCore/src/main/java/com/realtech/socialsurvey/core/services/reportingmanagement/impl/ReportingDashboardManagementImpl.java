@@ -52,6 +52,9 @@ import com.realtech.socialsurvey.core.dao.UserRankingPastMonthRegionDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastYearBranchDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastYearMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastYearRegionDao;
+import com.realtech.socialsurvey.core.dao.UserRankingPastYearsBranchDao;
+import com.realtech.socialsurvey.core.dao.UserRankingPastYearsMainDao;
+import com.realtech.socialsurvey.core.dao.UserRankingPastYearsRegionDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisMonthBranchDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisMonthMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisMonthRegionDao;
@@ -75,6 +78,9 @@ import com.realtech.socialsurvey.core.entities.UserRankingPastMonthRegion;
 import com.realtech.socialsurvey.core.entities.UserRankingPastYearBranch;
 import com.realtech.socialsurvey.core.entities.UserRankingPastYearMain;
 import com.realtech.socialsurvey.core.entities.UserRankingPastYearRegion;
+import com.realtech.socialsurvey.core.entities.UserRankingPastYearsBranch;
+import com.realtech.socialsurvey.core.entities.UserRankingPastYearsMain;
+import com.realtech.socialsurvey.core.entities.UserRankingPastYearsRegion;
 import com.realtech.socialsurvey.core.entities.UserRankingThisMonthBranch;
 import com.realtech.socialsurvey.core.entities.UserRankingThisMonthMain;
 import com.realtech.socialsurvey.core.entities.UserRankingThisMonthRegion;
@@ -181,6 +187,17 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Autowired
     private UserRankingPastMonthBranchDao userRankingPastMonthBranchDao;
+    
+    @Autowired
+    private UserRankingPastYearsMainDao userRankingPastYearsMainDao;
+    
+    @Autowired
+    private UserRankingPastYearsBranchDao userRankingPastYearsBranchDao;
+    
+    @Autowired
+    private UserRankingPastYearsRegionDao userRankingPastYearsRegionDao;
+    
+
     
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -1288,6 +1305,56 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	}   
 	
 	@Override
+    public List<List<Object>> getUserRankingPastYears(String entityType, Long entityId,int startIndex,int batchSize) {
+        List<List<Object>> userRanking = new ArrayList<>();
+        
+        if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+            for(UserRankingPastYearsRegion userRankingPastYearsRegion : userRankingPastYearsRegionDao.fetchUserRankingForPastYearsRegion(entityId,startIndex,batchSize)){
+                List<Object> userRankingPastYearsRegionList = new ArrayList<>();
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getRank());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getFirstName());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getLastName());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getRankingScore());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getTotalReviews());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getAverageRating());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getSps());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.getCompleted());
+                userRankingPastYearsRegionList.add(userRankingPastYearsRegion.isEligible());
+                userRanking.add(userRankingPastYearsRegionList);
+            }
+        }else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)){
+            for(UserRankingPastYearsMain userRankingPastYearsMain : userRankingPastYearsMainDao.fetchUserRankingForPastYearsMain(entityId, startIndex,batchSize)){
+                List<Object> userRankingPastYearsMainList = new ArrayList<>();
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getRank());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getFirstName());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getLastName());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getRankingScore());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getTotalReviews());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getAverageRating());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getSps());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.getCompleted());
+                userRankingPastYearsMainList.add(userRankingPastYearsMain.isEligible());
+                userRanking.add(userRankingPastYearsMainList);
+            }
+        }else if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)){
+            for(UserRankingPastYearsBranch userRankingPastYearsBranch : userRankingPastYearsBranchDao.fetchUserRankingForPastYearsBranch(entityId, startIndex,batchSize)){
+                List<Object> userRankingPastYearsBranchList = new ArrayList<>();
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getRank());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getFirstName());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getLastName());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getRankingScore());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getTotalReviews());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getAverageRating());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getSps());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.getCompleted());
+                userRankingPastYearsBranchList.add(userRankingPastYearsBranch.isEligible());
+                userRanking.add(userRankingPastYearsBranchList);
+            }
+        }
+        return userRanking;
+    } 
+	
+	@Override
     @Transactional(value = "transactionManagerForReporting")
     public Map<String, Object> fetchRankingRankCountThisYear(long userId ,long entityId ,String entityType , int year ,int BatchSize)throws NonFatalException{
 	    Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
@@ -1326,6 +1393,22 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
             RankingCountStartIndex.put( "Count",userRankingPastYearMainDao.fetchUserRankingCountForPastYearMain( entityId, year) );
             int Rank = userRankingPastYearMainDao.fetchUserRankingRankForPastYearMain( userId, entityId, year );
+            //get the mod to determine startIndex
+            int mod = (Rank % BatchSize);
+            int startIndex = Rank - mod;
+            RankingCountStartIndex.put( "startIndex",startIndex);
+
+        }
+        return RankingCountStartIndex;
+     }
+	
+	@Override
+    @Transactional(value = "transactionManagerForReporting")
+    public Map<String, Object> fetchRankingRankCountPastYears(long userId ,long entityId ,String entityType ,int BatchSize)throws NonFatalException{
+        Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
+        if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+            RankingCountStartIndex.put( "Count",userRankingPastYearsMainDao.fetchUserRankingCountForPastYearsMain( entityId) );
+            int Rank = userRankingPastYearsMainDao.fetchUserRankingRankForPastYearsMain( userId, entityId );
             //get the mod to determine startIndex
             int mod = (Rank % BatchSize);
             int startIndex = Rank - mod;
@@ -1391,4 +1474,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return RankingCountStartIndex;
      }
+    
+    @Override
+    @Transactional(value = "transactionManagerForReporting")
+    public Map<String, Object> fetchRankingCountPastYears(long entityId ,String entityType ,int BatchSize)throws NonFatalException{
+        Map<String, Object> RankingCountStartIndex = new HashMap<String,Object>();
+        if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)){
+            RankingCountStartIndex.put( "Count",userRankingPastYearsMainDao.fetchUserRankingCountForPastYearsMain( entityId ) );
+        }
+        return RankingCountStartIndex;
+     }
+    
 }
