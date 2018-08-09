@@ -32,7 +32,7 @@ public class SocialMonitorFeedData implements Serializable {
     private String textHighlighted;
     private boolean fromTrustedSource;
     private String postSource;
-    
+
 	public String getPageLink()
     {
         return pageLink;

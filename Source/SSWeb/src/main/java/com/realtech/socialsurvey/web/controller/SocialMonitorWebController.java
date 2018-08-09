@@ -430,8 +430,9 @@ public class SocialMonitorWebController {
     }
     
     @ResponseBody
-    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.POST)
-    public String getSocialPostsForStream(Model model, HttpServletRequest request) {
+    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public String getSocialPostsForStream(Model model, HttpServletRequest request)
+    {
     	
         LOG.info( "Method to fetch Social Posts for Social Monitor Stream,  getSocialPostsForStream() Started" );
         
@@ -514,8 +515,8 @@ public class SocialMonitorWebController {
        filter.setFromTrustedSource( fromTrustedSource );
        
        Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(filter, authorizationHeader);
-       
-        return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
+
+        return  new String( ( (TypedByteArray) response.getBody() ).getBytes());
        
     }
     

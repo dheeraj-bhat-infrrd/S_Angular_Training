@@ -12478,6 +12478,8 @@ pre.email-reply-text {
 	border: 0px;
 	font-family: inherit;
 	margin-bottom: 0px;
+	white-space:pre-wrap;
+	word-break: break-word;
 }
 
 .alert-fb-policy{
