@@ -325,12 +325,6 @@ function paintWidgetReviews($, reviews, resourcesHost, ssHost) {
 			customerName += lastName;
 		}
 		
-		if(customerName.split(" ")[0].length < 2){
-			if(reviews[i].customerLastName != null && reviews[i].customerLastName != undefined && reviews[i].customerLastName != ''){
-				customerName = customerName.split(" ")[0] + ' ' + reviews[i].customerLastName.split(" ")[0];
-			}
-		}
-		
 		var customerCity = reviews[i].city;
 		var customerState = reviews[i].state;
 		var review = reviews[i].review;
