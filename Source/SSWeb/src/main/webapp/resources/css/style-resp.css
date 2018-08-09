@@ -2160,6 +2160,10 @@
     	right: 0;
     	top: 9px;
 	}
+	
+	.mismatch-popup-body-right{
+		margin-top: 15px;
+	}
 }
 
 @media (min-width: 320px) and (max-width: 580px) and (orientation: portrait) {

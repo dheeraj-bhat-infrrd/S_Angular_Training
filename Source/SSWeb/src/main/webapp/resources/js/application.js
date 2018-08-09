@@ -568,6 +568,11 @@ $(document).on('keyup', function(e) {
 		/*if ($('#summit-popup-body').is(':visible')) {
 			closeSummitPopup();
 		}*/
+		
+		if($('#mismatch-new-popup-main').is(':visible')){
+			$('#mismatch-new-popup-main').addClass('hide');
+			resetMismatchPopup();
+		}
 	}
 });
 
@@ -7797,21 +7802,7 @@ function paintSurveyPage(jsonData) {
 	}*/
 
 	if (zillowEnabled) {
-		
-		//add rating for zillow post
-		var unProcessedZillowReviewLink = zillowReviewLink + "&rating=" + rating;
-		// add title to zillow post
-		if(subjectContentForZillowPost != null && subjectContentForZillowPost != undefined)
-			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&title=" + subjectContentForZillowPost;
-		//add review footer if given along with review
-		var reviewTextForZillow = reviewText;
-		if(reviewFooterContentForZillowPost != null && reviewFooterContentForZillowPost != undefined )
-			reviewTextForZillow = reviewTextForZillow + " - " + reviewFooterContentForZillowPost;
-		//add review text for zillow post if company enabled
-		if(isAutoFillReviewContentForZillowPost)
-			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&content=" + reviewTextForZillow;
-		
-		$('#zillow-btn').attr("href", returnValidWebAddress(unProcessedZillowReviewLink));
+		$('#zillow-btn').attr("href", returnValidWebAddress(zillowReviewLink));
 	} else {
 		$('#zillow-btn').remove();
 	}
@@ -7848,12 +7839,23 @@ if (zillowEnabled) {
 		//add rating for zillow post
 		var unProcessedZillowReviewLink = zillowReviewLink + "&rating=" + rating;
 		// add title to zillow post
-		if(subjectContentForZillowPost != null && subjectContentForZillowPost != undefined)
+		if(subjectContentForZillowPost != null && subjectContentForZillowPost != undefined){
 			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&title=" + subjectContentForZillowPost;
+		}else{
+			var subject = "";
+			if(reviewText.includes('.')){
+				subject = reviewText.substring(0, reviewText.indexOf('.'));
+		    }else if(reviewText.length > 250){
+		    		subject = reviewText.substring(0, 249);	
+		    }else{
+		    		subject = reviewText;
+		    }   
+			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&title=" + subject;		
+		}
 		//add review footer if given along with review
 		var reviewTextForZillow = reviewText;
 		if(reviewFooterContentForZillowPost != null && reviewFooterContentForZillowPost != undefined )
-			reviewTextForZillow = reviewTextForZillow + " - " + reviewFooterContentForZillowPost;
+			reviewTextForZillow = reviewTextForZillow + " " + reviewFooterContentForZillowPost;
 		//add review text for zillow post if company enabled
 		if(isAutoFillReviewContentForZillowPost)
 			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&content=" + reviewTextForZillow;
@@ -21428,3 +21430,590 @@ $(document).on('click','#fb-policy-close',function(e){
 	sessionStorage.setItem("fbPopup",false);
 });
 
+/*new mismatch popup*/
+function fetchMismatchedSurveyForEmail(transactionEmail,startIndex,batchSize){
+	
+	var payload ={
+			"startIndex" : startIndex,
+			"batchSize" : batchSize,
+			"transactionEmail" : transactionEmail
+	};
+	
+	$('#mismatch-new-trans-list').attr('data-startIndex',startIndex);
+	$('#mismatch-new-trans-list').attr('data-batchSize',batchSize);
+	
+	callAjaxGetWithPayloadData("./fetchmismatchedsurveyforemail.do", drawMismatchedList, payload, true);
+}
+
+function drawMismatchedList(data){
+	var mismatchedSurveys = JSON.parse(data);
+	
+	if(mismatchedSurveys == null || mismatchedSurveys == undefined){
+		$('#mismatch-new-trans-list').html('<div class="mis-trans-empty">No trasactions found</div>');
+		return;
+	}else{
+
+		var totalRecords = mismatchedSurveys.totalRecord;
+		var surveyPreInitiationList = mismatchedSurveys.surveyPreInitiationList;
+		
+		if(totalRecords == 0 || surveyPreInitiationList.length == 0 || surveyPreInitiationList == null || surveyPreInitiationList == undefined){
+			$('#mismatch-new-trans-list').html('<div class="mis-trans-empty">No trasactions found</div>');
+			return;
+		}
+		
+		$('#mismatch-new-trans-list').html('');
+		
+		var mismatchRecordDiv ="";
+			
+		for(var i=0;i<surveyPreInitiationList.length;i++){
+			var surveySourceId = ""
+			if(surveyPreInitiationList[i].surveySourceId != null && surveyPreInitiationList[i].surveySourceId != 'NULL' && surveyPreInitiationList[i].surveySourceId != 'null'){
+				surveySourceId = surveyPreInitiationList[i].surveySourceId;
+			}
+			
+			var modifiedOn = (surveyPreInitiationList[i].modifiedOn != 0 ? surveyPreInitiationList[i].modifiedOn : surveyPreInitiationList[i].createdOn);
+			var modifiedOnDate = new Date(modifiedOn);
+			var monthName=new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+			var modifiedOnStr = monthName[modifiedOnDate.getMonth()]+' '+(modifiedOnDate.getDate()%10!=modifiedOnDate.getDate()?modifiedOnDate.getDate():('0'+modifiedOnDate.getDate()))+', '+modifiedOnDate.getFullYear();
+			
+			mismatchRecordDiv = '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mismatch-new-trans">'
+							+ 		'<div class="col-lg-7 col-md-7 col-xs-7 col-sm-7 mismatch-trans-text">'
+							+ 			'<p class="mismatch-trans-p">'+ surveyPreInitiationList[i].customerFirstName +' '+ surveyPreInitiationList[i].customerLastName +'</p>'
+							+ 			'<p>'+ surveySourceId +'</p>'
+							+ 		'</div>'
+							+ 		'<div class="col-lg-5 col-md-5 col-xs-5 col-sm-5 mismatch-trans-date">'+ modifiedOnStr +'</div>'
+							+ '</div>';
+			
+			$('#mismatch-new-trans-list').append(mismatchRecordDiv);
+		}
+		
+		$('#mismatch-new-trans-num').html(totalRecords);
+		$('#mismatch-new-trans-list').attr('data-total',totalRecords);
+		
+		drawPaginationForMismatchedList(totalRecords);
+	}	
+}
+
+function drawPaginationForMismatchedList(totalRecords){
+	
+	var startIndex = parseInt($('#mismatch-new-trans-list').attr('data-startIndex'));
+	var batchSize = parseInt($('#mismatch-new-trans-list').attr('data-batchSize'));
+	
+	if(startIndex == 0 || startIndex < batchSize || totalRecords == 0){
+		$('.mismatch-trans-arrow-up').addClass('hide');
+	}else if(startIndex >= batchSize){
+		$('.mismatch-trans-arrow-up').removeClass('hide');
+	}
+	
+	if(startIndex + batchSize <= totalRecords && totalRecords > batchSize){
+		$('.mismatch-trans-arrow-down').removeClass('hide');
+	}else{
+		$('.mismatch-trans-arrow-down').addClass('hide');
+	}
+	
+}
+
+function bindNewMismatchProcessClicks(user){
+	$(document).on('click','#mismatch-popup-new',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+	});
+	
+	$(document).on('click','#mismatch-new-popup-main',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		$('#mismatch-new-popup-main').addClass('hide');
+		resetMismatchPopup();
+	});
+	
+	$(document).off('click','.mismatch-trans-arrow-up').on('click','.mismatch-trans-arrow-up',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		var startIndex = parseInt($('#mismatch-new-trans-list').attr('data-startIndex'));
+		var batchSize = parseInt($('#mismatch-new-trans-list').attr('data-batchSize'));
+		
+		startIndex = startIndex - batchSize;
+		if(startIndex < 0){
+			startIndex = 0;
+		}
+		
+		var transactionEmail = $('#mismatch-trans-mail').val();
+		
+		fetchMismatchedSurveyForEmail(transactionEmail,startIndex,batchSize);
+	});
+	
+	$(document).off('click','.mismatch-trans-arrow-down').on('click','.mismatch-trans-arrow-down',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		var startIndex = parseInt($('#mismatch-new-trans-list').attr('data-startIndex'));
+		var batchSize = parseInt($('#mismatch-new-trans-list').attr('data-batchSize'));
+		var totalRecords = parseInt($('#mismatch-new-trans-list').attr('data-total'));
+		
+		startIndex = startIndex + batchSize;
+		if(startIndex > totalRecords){
+			return;
+		}
+		
+		var transactionEmail = $('#mismatch-trans-mail').val();
+		
+		fetchMismatchedSurveyForEmail(transactionEmail,startIndex,batchSize);
+	});
+	
+	$(document).off('click','#mismatch-new-assign-btn').on('click','#mismatch-new-assign-btn',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		if($('#mismatch-new-eid').val() == ''){
+			$('#overlay-toast').html('Please choose a valid user.');
+			showToast();
+			return;
+		}
+		
+		$('#mismatch-new-alias-div').removeClass('hide');
+		$('#mismatch-new-body-options').addClass('hide');
+		$('#mismatch-sub-header-txt').html('Please verify');
+		$('#mismatch-new-confirm').removeClass('hide');
+	});
+	
+	$(document).off('click','#mismatch-new-user-btn').on('click','#mismatch-new-user-btn',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		$('#mismatch-new-add-div').removeClass('hide');
+		$('#mismatch-new-body-options').addClass('hide');
+		$('#mismatch-sub-header-txt').html('Please verify');
+		$('#mismatch-new-confirm').removeClass('hide');
+	});
+	
+	$(document).off('click','#mismatch-new-ignore-btn').on('click','#mismatch-new-ignore-btn',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		$('#mismatch-new-archive-div').removeClass('hide');
+		$('#mismatch-new-body-options').addClass('hide');
+		$('#mismatch-sub-header-txt').html('Please verify');
+		$('#mismatch-new-confirm').removeClass('hide');
+	});
+	
+	$(document).off('click','#mismatch-new-back').on('click','#mismatch-new-back',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		if(!$('#mismatch-new-body-options').hasClass('hide')){
+			$('#mismatch-new-popup-main').addClass('hide');
+			enableBodyScroll();
+		}else{
+			$('#mismatch-new-body-options').removeClass('hide');
+		}
+		
+		resetMismatchPopup();
+
+	});
+	
+	$(document).off('click','#mismatch-new-confirm').on('click','#mismatch-new-confirm',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		if(!$('#mismatch-new-alias-div').hasClass('hide')){
+			saveUserMapNew(user,false);
+		}else if(!$('#mismatch-new-archive-div').hasClass('hide')){
+			saveUserMapNew(user,true);
+		}else if(!$('#mismatch-new-add-div').hasClass('hide')){
+			$('#mismatch-new-add-div').addClass('hide');
+			$('#mismatch-new-add-form-div').removeClass('hide');
+			$('#mismatch-sub-header-txt').html('Who would you like to add?');
+			bindAssignToSelectorMismatchClick();
+			bindOfficeSelectorEventsForMismatch();
+			bindRegionSelectorEventsForMismatch();
+		}else{
+			if($('#mis-first-name').val()=='' && $('#mis-last-name').val()=='' ){
+				$('#overlay-toast').html('First name and last name cannot be empty for the new user.');
+				return;
+			}else if($('#mis-first-name').val()==''){
+				$('#overlay-toast').html('First name cannot be empty for the new user.');
+				showToast();
+				return;
+			}
+			addIndividualForMismatch('mismatch-new-add-user-form','#mismatch-new-confirm');
+			$('#mismatch-new-popup-main').addClass('hide');
+			resetMismatchPopup();
+		}
+	});
+}
+
+function resetMismatchPopup(){
+	$('#mismatch-new-archive-div').addClass('hide');
+	$('#mismatch-new-alias-div').addClass('hide');
+	$('#mismatch-new-add-div').addClass('hide');
+	$('#mismatch-sub-header-txt').html('What can we do for you?');
+	$('#mismatch-new-confirm').addClass('hide');
+	$('#mismatch-new-eid').val('');
+	$('#mis-first-name').val('');
+	$('#mis-last-name').val('');
+	$('#bd-region-selector-mis').hide();
+	$('#bd-office-selector-mis').hide();
+	$('#assign-to-txt-mis').val('Company');
+	$("#assign-to-txt-mis").attr("data-assignto", 'company');
+	$('#selected-region-id-hidden-mis').val(0);
+	$('#selected-office-id-hidden-mis').val(0);
+	$('#mismatch-new-add-form-div').addClass('hide');
+	enableBodyScroll();
+}
+
+function addIndividualForMismatch(formId, disableEle) {
+	var url = "./addindividual.do";
+	showOverlay();
+	
+	disable(disableEle);
+	var $form = $("#" + formId);
+	var payLoad = $form.serialize();
+	$.ajax({
+		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
+		type : "POST",
+		data : payLoad,
+		success : addIndividualCallBackForMismatch,
+		complete: function(data){
+			enable(disableEle);
+			updateSurveyForUser();
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+}
+
+function updateSurveyForUser(){
+	var url = "./updatesurveyforuser.do";
+	var emailId = $('#mismatch-trans-mail').val();
+	var payload = {
+			"emailAddress" : emailId
+	};
+	
+	$.ajax({
+		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
+		type : "POST",
+		data : payload,
+		async : true,
+		success : function(data){
+			$('#overlay-toast').html(data);
+			showToast();
+		},
+		complete: function(){
+			hideOverlay();
+			initializeUnmatchedUserPage();
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+}
+
+function addIndividualCallBackForMismatch(data) {
+	hideOverlay();
+	displayMessage(data);
+	resetInputFields("mismatch-new-add-user-form");
+}
+
+function attachAutocompleteAliasMismatchDropdown() {
+	var companyId = $('#cur-company-id').val();
+	$('#mismatch-new-eid').autocomplete({
+		source : function(request, response) {
+			callAjaxGetWithPayloadData("/fetchagentsforadmin.do", function(data) {
+				var responseData = JSON.parse(data);
+				response($.map(responseData, function(item) {
+					return {
+						label : item.displayName + " <" + item.emailId + ">",
+						value : item.displayName + " <" + item.emailId + ">",
+						userId : item.userId,
+						emailId : item.emailId
+					};
+				}));
+			}, {
+				"searchKey" : request.term,
+				"columnName" : "companyId",
+				"columnValue" : companyId
+			}, true);
+		},
+		minLength : 1,
+		select : function(event, ui) {
+			event.stopPropagation();
+			var element = event.target;
+			$(element).attr('agent-id', ui.item.userId);
+			$(element).attr('column-name', colName);
+			$(element).attr('email-id', ui.item.emailId);
+			$(element).attr('val', ui.item.value);
+		},
+		close : function(event, ui) {
+		},
+		create : function(event, ui) {
+			$('.ui-helper-hidden-accessible').remove();
+		},
+		open : function() {
+			$('.ui-autocomplete').addClass('ui-mis-alias-new').perfectScrollbar({
+				suppressScrollX : true
+			});
+			$('.ui-autocomplete').perfectScrollbar('update');
+		}
+	});
+
+	$('#mismatch-new-eid').keyup(function(e) {
+		var oldVal = $(this).attr('val');
+		var cuurentVal = $(this).val();
+		if (oldVal == cuurentVal) {
+			return;
+		}
+		$(this).attr('agent-id', "");
+		$(this).attr('column-name', "");
+		$(this).attr('email-id', "");
+	});
+}
+
+
+function bindAssignToSelectorMismatchClick() {
+	$('#assign-to-selector-mis').click(function(e) {
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		$("#assign-to-droplist-mis").slideToggle(200);
+	});
+
+	$('.mis-assignto-options').click(function(e) {
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		var assignToOption = $(this).attr('data-assign-to-option');
+		$("#assign-to-txt-mis").val($(this).html());
+		$("#assign-to-txt-mis").attr("data-assignto", assignToOption);
+
+		showMismatchSelectorsByAssignToOption(assignToOption);
+		$("#assign-to-droplist-mis").slideToggle(200);
+	});
+}
+
+function showMismatchSelectorsByAssignToOption(assignToOption) {
+	switch (assignToOption) {
+	case 'company':
+		disableMismatchRegionSelector();
+		disableMismatchOfficeSelector();
+		break;
+	case 'region':
+		$("#selected-region-txt-mis").prop("disabled", false);
+		disableMismatchOfficeSelector();
+		$("#bd-region-selector-mis").show();
+		break;
+	case 'office':
+		$("#selected-office-txt-mis").prop("disabled", false);
+		disableMismatchRegionSelector();
+		$("#bd-office-selector-mis").show();
+		break;
+	default:
+		$("#selected-region-txt-mis").prop("disabled", false);
+		$("#selected-office-txt-mis").prop("disabled", false);
+	}
+}
+
+function disableMismatchRegionSelector() {
+	$("#selected-region-txt-mis").prop("disabled", true);
+	$("#selected-region-txt-mis").val("");
+	$('#selected-region-id-hidden-mis').val("");
+	$("#bd-region-selector-mis").hide();
+}
+
+function disableMismatchOfficeSelector() {
+	$("#selected-office-txt-mis").prop("disabled", true);
+	$("#selected-office-txt-mis").val("");
+	$('#selected-office-id-hidden-mis').val("");
+	// $('#selected-region-id-hidden').val("");
+	$("#bd-office-selector-mis").hide();
+}
+
+function bindRegionSelectorEventsForMismatch() {
+	callAjaxGET("/fetchregions.do", function(data) {
+		var regionList = [];
+		if (data != undefined && data != "")
+			regionList = $.parseJSON(data);
+		var searchData = [];
+		for (var i = 0, j = 0; i < regionList.length; i++) {
+			if (regionList[i].isDefaultBySystem == 0) {
+				searchData[j] = {};
+				searchData[j].label = regionList[i].regionName;
+				searchData[j].regionId = regionList[i].regionId;
+				j++;
+			}
+		}
+		$("#selected-region-txt-mis").autocomplete({
+			source : searchData,
+			minLength : 0,
+			delay : 0,
+			autoFocus : true,
+			select : function(event, ui) {
+				$("#selected-region-txt-mis").val(ui.item.label);
+				$('#selected-region-id-hidden-mis').val(ui.item.regionId);
+				return false;
+			},
+			close : function(event, ui) {
+			},
+			create : function(event, ui) {
+				$('.ui-helper-hidden-accessible').remove();
+			},
+			open : function() {
+				$('.ui-autocomplete').addClass('ui-assign-mis-dd').perfectScrollbar({
+					suppressScrollX : true
+				});
+				$('.ui-autocomplete').perfectScrollbar('update');
+			}
+		}).autocomplete("instance")._renderItem = function(ul, item) {
+			return $("<li>").append(item.label).appendTo(ul);
+		};
+		$("#selected-region-txt-mis").off('focus');
+		$("#selected-region-txt-mis").focus(function() {
+			$(this).autocomplete('search');
+		});
+	}, true);
+}
+
+/**
+ * binds the click and keyup of office selector
+ */
+function bindOfficeSelectorEventsForMismatch() {
+	callAjaxGET("/fetchbranches.do", function(data) {
+		var branchList = [];
+		if (data != undefined && data != "")
+			branchList = $.parseJSON(data);
+		var searchData = [];
+		for (var i = 0, j = 0; i < branchList.length; i++) {
+			if (branchList[i].isDefaultBySystem == 0) {
+				searchData[j] = {};
+				searchData[j].label = branchList[i].branchName;
+				searchData[j].branchId = branchList[i].branchId;
+				searchData[j].regionId = branchList[i].regionId;
+				j++;
+			}
+		}
+		$("#selected-office-txt-mis").autocomplete({
+			source : searchData,
+			minLength : 0,
+			delay : 0,
+			autoFocus : true,
+			select : function(event, ui) {
+				$("#selected-office-txt-mis").val(ui.item.label);
+				$('#selected-office-id-hidden-mis').val(ui.item.branchId);
+				$('#selected-region-id-hidden-mis').val(ui.item.regionId);
+				return false;
+			},
+			close : function(event, ui) {
+			},
+			create : function(event, ui) {
+				$('.ui-helper-hidden-accessible').remove();
+			},
+			open : function() {
+				$('.ui-autocomplete').addClass('ui-assign-mis-dd').perfectScrollbar({
+					suppressScrollX : true
+				});
+				$('.ui-autocomplete').perfectScrollbar('update');
+			}
+		}).autocomplete("instance")._renderItem = function(ul, item) {
+			return $("<li>").append(item.label).appendTo(ul);
+		};
+		$("#selected-office-txt-mis").off('focus');
+		$("#selected-office-txt-mis").focus(function() {
+			$(this).autocomplete('search');
+		});
+	}, true);
+}
+
+var insavedNew = false;
+function saveUserMapNew(aliasMail,isIgnore) {
+	if (insavedNew == true) {
+		return;
+	}
+	
+	var agentId = $('#mismatch-new-eid').attr('agent-id');
+	var msg = '';
+	
+	if (isIgnore) {
+		agentId = 0;
+	} else {
+		if (agentId == undefined || agentId <= 0) {
+			$('#overlay-toast').html('Please enter valid alias!');
+			showToast();
+			return;
+		}
+	}
+
+	insavedNew == true;
+	var payload = {
+		"emailAddress" : aliasMail,
+		"agentId" : agentId,
+		"ignoredEmail" : isIgnore
+
+	};
+	
+	var url = './saveemailmapping.do';
+
+	
+	$.ajax({
+		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
+		type : "GET",
+		data : payload,
+		async : true,
+		cache : false,
+		success :  function(data){
+			insavedNew == false;
+			$('#overlay-main').hide();
+			if(isIgnore){
+				$('#overlay-toast').html('Mail address added to the ignore list');
+			}else{
+				$('#overlay-toast').html(data);
+			}
+			showToast();
+			
+			$('#mismatch-new-popup-main').addClass('hide');
+		},
+		complete: function(){
+			hideOverlay();
+			resetMismatchPopup();
+			initializeUnmatchedUserPage();
+			initializeProcesedUserPage();
+			initializeMapped();
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			if(e.status == 0) {
+				return;
+			}
+		}
+	});
+}

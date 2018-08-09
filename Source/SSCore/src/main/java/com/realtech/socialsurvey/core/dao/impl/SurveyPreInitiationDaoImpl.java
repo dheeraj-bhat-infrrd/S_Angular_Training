@@ -680,6 +680,37 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         LOG.info( "Method updateAgentIdOfPreInitiatedSurveys  ended." );
     }
 
+    /**
+     * Method to update agent info when survey moved from one user to another
+     * @throws InvalidInputException
+     * */
+    @Override
+    public void updateAgentIdOfPreInitiatedSurveysByAgentEmailAddressForMismatched( User agent, String agentEmailAddress )
+        throws InvalidInputException
+    {
+        if ( agent == null ) {
+            throw new InvalidInputException( "Null parameter user passed " );
+        }
+
+        if ( agentEmailAddress == null ) {
+            throw new InvalidInputException( "agentEmailAddress passed cannot be null" );
+        }
+        
+        String agentName = "";
+        agentName = agent.getFirstName() + " " + agent.getLastName();
+        LOG.info( "Method to update updateAgentIdOfPreInitiatedSurveys started." );
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET STATUS = "
+            + CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED + ", MODIFIED_ON=?, AGENT_NAME=? WHERE LCASE(AGENT_EMAILID) = LCASE(?) AND STATUS IN ("
+            + CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD + ", "
+            + CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD + ") ";
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameter( 0, new Timestamp( System.currentTimeMillis() ) );
+        query.setParameter( 1, agentName );
+        query.setParameter( 2, agentEmailAddress );
+
+        query.executeUpdate();
+        LOG.info( "Method updateAgentIdOfPreInitiatedSurveys  ended." );
+    }
 
     @Override
     public void updateSurveyPreinitiationRecordsAsIgnored( String agentEmailAddress ) throws InvalidInputException
@@ -960,4 +991,55 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		LOG.debug("query to fetch data for email report : {}", query.toString());
 		return query.list();
 	}
+	
+	@SuppressWarnings ( "unchecked")
+    @Override
+    public List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveysForEmail( long companyId, String transactionEmail,
+        int start, int batch )
+    {
+        LOG.info( "Method getUnmatchedPreInitiatedSurveys() started." );
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
+            criteria.add( Restrictions.eq( CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, transactionEmail ) );
+            criteria.add(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
+            criteria.addOrder( Order.desc( CommonConstants.ENGAGEMENT_CLOSED_TIME ) );
+            if ( start > -1 )
+                criteria.setFirstResult( start );
+            if ( batch > -1 )
+                criteria.setMaxResults( batch );
+            LOG.info( "CRITERIA : {}",criteria );
+            LOG.info( "Method getUnmatchedPreInitiatedSurveys() finished." );
+            return criteria.list();
+        } catch ( HibernateException e ) {
+            LOG.error( "Exception caught in getUnmatchedPreInitiatedSurveys() ", e );
+            throw new DatabaseException( "Exception caught in getUnmatchedPreInitiatedSurveys() ", e );
+        }
+    }
+    
+    // Method to get incomplete survey list for sending reminder mail.
+    @Override
+    public long getUnmatchedPreInitiatedSurveyForEmailCount( long companyId, String transactionEmail )
+    {
+        LOG.info( "Method getUnmatchedPreInitiatedSurveyForEmailCount() started." );
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
+            criteria.add( Restrictions.eq( CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, transactionEmail ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
+                CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
+            criteria.setProjection( Projections.rowCount() );
+            //remove after testing
+            LOG.info( "CRITERIA : {}",criteria );
+            Long count = (Long) criteria.uniqueResult();
+            LOG.info( "Method getUnmatchedPreInitiatedSurveyForEmailCount() finished." );
+            return count.longValue();
+        } catch ( HibernateException e ) {
+            LOG.error( "Exception caught in getUnmatchedPreInitiatedSurveyForEmailCount() ", e );
+            throw new DatabaseException( "Exception caught in getUnmatchedPreInitiatedSurveyForEmailCount() ", e );
+        }
+    }
 }

@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -47,8 +48,10 @@ import com.realtech.socialsurvey.core.services.ftpmanagement.FTPManagement;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -82,6 +85,8 @@ public class OrganizationManagementApiController
     @Autowired
     private SurveyHandler surveyHandler;
 
+    @Autowired
+    private SocialManagementService socialManagementService;
     
     @RequestMapping ( value = "/updateabusivemail", method = RequestMethod.POST)
     @ApiOperation ( value = "Updating abusive mail settings")
@@ -420,4 +425,21 @@ public class OrganizationManagementApiController
             throw new SSApiException( "could not get profile names", e );
         }
     }
+    
+    @RequestMapping ( value = "/mismatched/emailId/{companyId}", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch mismatched survey for emailId")
+    public ResponseEntity<?> fetchMismatchedSurveyForEmail( @PathVariable long companyId, String transactionEmail , int startIndex, int batchSize, long count,  @RequestHeader ( "authorizationHeader") String authorizationHeader) throws  NonFatalException
+    {
+        LOGGER.info( "Fetch mismatched survey for emailId for companyId : {} , transactionEmail : {}",companyId,transactionEmail );
+       
+        //authorize request
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+        } catch ( AuthorizationException e ) {
+        	return new ResponseEntity<>( "AUTHORIZATION FAILED", HttpStatus.UNAUTHORIZED );
+        }
+        SurveyPreInitiationList surveyPreInitiationList = socialManagementService.getUnmatchedPreInitiatedSurveysForEmail( companyId, transactionEmail, startIndex, batchSize, count );
+        return new ResponseEntity<>( surveyPreInitiationList, HttpStatus.OK );
+    }
+ 
 }

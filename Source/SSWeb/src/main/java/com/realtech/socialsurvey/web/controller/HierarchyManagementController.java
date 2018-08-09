@@ -801,6 +801,8 @@ public class HierarchyManagementController
             String isAdminStr = request.getParameter( "isAdmin" );
             String userSelectionType = request.getParameter( "userSelectionType" );
             String isSocialMonitorAdminStr = request.getParameter( "isSocialMonitorAdmin" );
+            String firstName = request.getParameter( "firstName" );
+            String lastName = request.getParameter( "lastName" );
 
             String selectedUserEmail = "";
             if ( userSelectionType != null ) {
@@ -881,7 +883,7 @@ public class HierarchyManagementController
             try {
                 LOG.debug( "Calling service to add/assign invidual(s)" );
                 Map<String, Object> map = organizationManagementService.addIndividual( user, selectedUserId, branchId, regionId,
-                    assigneeEmailIds, isAdmin, false, true, ( adminId != null && adminId > 0 ) ? true : false, isSocialMonitorAdmin );
+                        assigneeEmailIds, isAdmin, false, true, ( adminId != null && adminId > 0 ) ? true : false, isSocialMonitorAdmin, firstName, lastName );
 
                 List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
                 LOG.debug( "Successfully executed service to add a new branch" );

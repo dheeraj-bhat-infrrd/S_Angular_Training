@@ -43,6 +43,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.WidgetTemplateConstants;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
@@ -216,7 +217,9 @@ public class OrganizationManagementController
 
     @Autowired
     private WorkbookData workbookData;
-
+    
+    @Value("${SOCIAL_MONITOR_AUTH_HEADER}")
+    private String authHeader;
 
     /**
      * Method to upload logo image for a company
@@ -3604,6 +3607,11 @@ public class OrganizationManagementController
         String agentIdStr = request.getParameter( "agentId" );
         String ignoredEmailStr = request.getParameter( "ignoredEmail" );
         LOG.info( "Method to saveUserEmailMapping for transientEmail: {} , agentId: {} , ignoreEmailFlag: {}",emailAddress,agentIdStr,ignoredEmailStr );
+        
+        HttpSession session = request.getSession( false );
+        //REALTECH_USER_ID is set only for real tech and SS admin
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        
         try {
             boolean ignoredEmail;
             long agentId;
@@ -3634,7 +3642,14 @@ public class OrganizationManagementController
                     userManagementService.saveIgnoredEmailCompanyMappingAndUpdateSurveyPreinitiation( emailAddress,
                         loggedInUser.getCompany().getCompanyId() );
                 } else {
-                    userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailAddress, agentId );
+                	//if realtech get id of super admin , else logged in user
+                    if ( adminUserid != null ) {
+                        userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailAddress, agentId,
+                            adminUserid.toString() );
+                    } else {
+                        userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailAddress, agentId,
+                            String.valueOf( loggedInUser.getUserId() ) );
+                    }
                 }
             }
 
@@ -3748,6 +3763,9 @@ public class OrganizationManagementController
         long emailMappingId;
         int status;
 
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        
         try {
 
             try {
@@ -3763,8 +3781,17 @@ public class OrganizationManagementController
             if ( user == null || user.getCompany() == null ) {
                 throw new NonFatalException( "Insufficient permission for this process" );
             }
-
-            userManagementService.updateUserEmailMapping( user, emailMappingId, status );
+            
+            User loggedInUser = sessionHelper.getCurrentUser();
+            if ( loggedInUser == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            } 
+            
+            if ( adminUserid != null ) {
+                userManagementService.updateUserEmailMapping( adminUserid.toString(), emailMappingId, status );
+            }else {
+                userManagementService.updateUserEmailMapping( String.valueOf( loggedInUser.getUserId() ), emailMappingId, status ); 
+            }
 
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.UPDATE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
@@ -3786,12 +3813,15 @@ public class OrganizationManagementController
 
     @ResponseBody
     @RequestMapping ( value = "/saveemailmappingsforuser", method = RequestMethod.POST)
-    public String saveUserEmailMappingsForUser( HttpServletRequest request, Model model )
+    public String saveUserEmailMappingsForUser( HttpServletRequest request, Model model ) throws NonFatalException
     {
         LOG.info( "Method to get saveUserEmailMappingsForUser started" );
         String emailIds = request.getParameter( "emailIds" );
         String agentIdStr = request.getParameter( "agentId" );
 
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        
         try {
             long agentId;
 
@@ -3830,16 +3860,25 @@ public class OrganizationManagementController
             }
 
 
-            for ( String emailId : emailIdList ) {
-                try {
-            			//check if there is an agent already in system( User with agent profile)
-                    User existingUser = userManagementService.getActiveAgentByEmailAndCompany(sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailId );
-                    if ( existingUser != null ) {
-                        		throw new UserAlreadyExistsException("The email addresss " + emailId + " is already present in our database." );
-                    }
-                } catch ( NoRecordsFetchedException e ) {
-                    userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailId, agentId );
+          //getting logged in user details
+           User loggedInUser = sessionHelper.getCurrentUser();
+           if ( loggedInUser == null || loggedInUser.getCompany() == null ) {
+               throw new NonFatalException( "Insufficient permission for this process" );
+           }
 
+           for ( String emailId : emailIdList ) {
+               try {
+            			//check if there is an agent already in system( User with agent profile)
+                   User existingUser = userManagementService.getActiveAgentByEmailAndCompany(sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailId );
+                   if ( existingUser != null ) {
+                        		throw new UserAlreadyExistsException("The email addresss " + emailId + " is already present in our database." );
+                   }
+               } catch ( NoRecordsFetchedException e ) {
+                   if ( adminUserid != null ) {
+                       userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailId, agentId, adminUserid.toString());
+                   }else {
+                        userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailId, agentId, String.valueOf( loggedInUser.getUserId() ) );
+                   }
                 }
             }
 
@@ -4524,6 +4563,74 @@ public class OrganizationManagementController
             return "could not get default widget configuration";
         }
     }
+       
+    @ResponseBody
+    @RequestMapping ( value = "/fetchmismatchedsurveyforemail", method = RequestMethod.GET)
+    public String fetchMismatchedSurveyForEmail(Model model, HttpServletRequest request)
+    {
+    	
+    	User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
         
+        String startIndexStr = request.getParameter("startIndex");
+        String batchSizeStr = request.getParameter("batchSize");
+        String countStr = request.getParameter("countStr");
+        String transactionEmail = request.getParameter("transactionEmail");
+        
+        int startIndex=0;
+        int batchSize=10;
+        int count= -1;
+        
+        if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
+        	startIndex = Integer.valueOf( startIndexStr );
+        }
+        
+        if ( batchSizeStr != null && !batchSizeStr.isEmpty() ) {
+        	batchSize = Integer.valueOf( batchSizeStr );
+        }
+        
+        if ( countStr != null && !countStr.isEmpty() ) {
+        	count = Integer.valueOf( countStr );
+        }
+        
+        String authorizationHeader = "Basic " + authHeader;
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().fetchMismatchedSurveyForEmail(companyId, transactionEmail, startIndex, batchSize, count, authorizationHeader);
+    	
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+	@ResponseBody
+    @RequestMapping ( value = "/updatesurveyforuser", method = RequestMethod.POST)
+        public String updateSurveyForUser( HttpServletRequest request, Model model )
+        {
+            LOG.info( "Method to get updateSurveyForUser started" );
+            String emailAddress = request.getParameter( "emailAddress" );
+            
+            LOG.info( "Method to updateSurveyForUser for transientEmail: {}  ",emailAddress );
+            try {
+                if ( emailAddress == null || emailAddress.isEmpty() ) {
+                    throw new InvalidInputException( "Email Id can't be null or empty" );
+                }
+    
+                User loggedInUser = sessionHelper.getCurrentUser();
+                if ( loggedInUser == null || loggedInUser.getCompany() == null ) {
+                    throw new NonFatalException( "Insufficient permission for this process" );
+                }
+    
+                userManagementService.updateAgentIdInSurveyPreinitiation( emailAddress);
+    
+            } catch ( NonFatalException nonFatalException ) {
+                LOG.error( "NonFatalException while fetching posts. Reason :"  + nonFatalException.getMessage(), nonFatalException );
+                if ( nonFatalException.getMessage() != null && !nonFatalException.getMessage().isEmpty() ) {
+                    return nonFatalException.getMessage();
+                }
+                return messageUtils.getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__UNSUCCESSFUL,
+                    DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            }
+            LOG.info( "Method to get posts for the user, updateSurveyForUser() finished" );
+            return messageUtils
+                .getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
+                .getMessage();
+        }
 }
 // JIRA: SS-24 BY RM02 EOC

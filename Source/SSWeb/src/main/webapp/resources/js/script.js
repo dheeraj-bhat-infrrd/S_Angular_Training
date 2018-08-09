@@ -2545,19 +2545,18 @@ function paintUnmatchedUser(usersList) {
 		var untrack = "";
 		if (usersSize > 0) {
 			usersList.surveyPreInitiationList.forEach(function(arrayItem) {
-
 				var engagementClosedate = new Date(arrayItem.engagementClosedTime);
 				var engagementClosedatePart = engagementClosedate.toDateString();
-				untrack += '<div class="un-row">' + '						<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>' + '						</div>';
-
+				//untrack += '<div class="un-row">' + '						<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>' + '						</div>';
+				untrack += '<div class="un-row">' + '<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '	<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>' + '</div>';
 			});
 
 			$('#new').html(untrack);
 			bindClickEventForProcessButton();
-
 		}
 	}
 }
+
 function paintCorruptRecords(usersList) {
 	if (usersList != undefined) {
 		var usersSize = usersList.surveyPreInitiationList.length;
@@ -2621,31 +2620,24 @@ function bindClickEventForProcessButton() {
 		var id = $(this).parent().find(".ss-id").text();
 		var user = $(this).parent().find(".ss-eid").text();
 		var customer = $(this).parent().find(".ss-cname").text();
-
-		var popup = '<div class="bd-hr-form-item clearfix">' + '	     <div class="float-left bd-frm-left-un">ID</div>' + '	      <div class="float-left bd-frm-right-un" title="' + id + '">' + id + '</div>' + '	 </div>' + '	 <div class="bd-hr-form-item clearfix">' + '	     <div class="float-left bd-frm-left-un">User</div>' + '	      <div class="float-left bd-frm-right-un" title="' + user + '">' + user + '</div>' + '	 </div>' + '<div class="bd-hr-form-item clearfix">' + '	     <div class="float-left bd-frm-left-un">Customer</div>' + '	      <div class="float-left bd-frm-right-un" title="' + customer + '">' + customer + '</div>' + '	 </div><div class="bd-hr-form-item clearfix" id="ignore">' + '	     <div class="float-left bd-frm-left-un"></div>' + '	     <div class="float-left bd-frm-right">' + '	         <div class="bd-frm-check-wrapper clearfix bd-check-wrp">' + '	             <div class="float-left bd-check-img bd-check-img-checked"></div>' + '	             <input type="hidden" name="isIgnore" value="false" id="is-ignore" class="ignore-clear">' + '	             <div class="float-left bd-check-txt bd-check-sm">Always Ignore</div>' + '	         </div>' + '	     </div>' + '	 </div>' + '<div id="bd-single" class="bd-hr-form-item clearfix">' + '	    <div class="float-left bd-frm-left-un">Alias</div>' + '	    <div class="float-left bd-frm-left-un pos-relative">' + '	        <input id="match-user-email" class="bd-frm-rt-txt bd-dd-img">' + '	    </div>' + '	</div>';
-
-		e.stopPropagation();
-		$('#overlay-continue').html("Save");
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').html("Match User");
-		$('#overlay-text').html(popup);
-
-		$('#overlay-continue').click(function() {
-			saveUserMap(user);
-			$('#overlay-continue').unbind('click');
+		disableBodyScroll();
+		$('#mismatch-new-popup-main').removeClass('hide');
+		$('#mismatch-new-archive-div').addClass('hide');
+		$('#mismatch-new-alias-div').addClass('hide');
+		$('#mismatch-new-add-div').addClass('hide');
+		$('#mismatch-new-add-form-div').addClass('hide');
+		$('#mismatch-new-body-options').removeClass('hide');
+		
+		$('#mismatch-sel-user-email').val(user);
+		$('#mismatch-trans-mail').val(user);
+		$('.mis-new-mail-id').each(function(){
+			$(this).html(user);
 		});
-		$('#overlay-main').show();
-		bindAdminCheckBoxClick();
-		attachAutocompleteAliasDropdown();
+		
+		bindNewMismatchProcessClicks(user);
+		attachAutocompleteAliasMismatchDropdown();
+		fetchMismatchedSurveyForEmail(user,startIndex,6);
 	});
-	if ($('#is-ignore').val() == true) {
-		if ($('#match-user-email').val() != "") {
-			$('#match-user-email').val('');
-			$('#match-user-email').attr('agent-id', 0);
-			$('#match-user-email').attr("disabled");
-		}
-	}
-
 }
 
 var insaved = false;

@@ -1046,7 +1046,7 @@ public class OrganizationManagementServiceImplTest
     {
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.addIndividual( new User(), 1, 1, 1, TestConstants.TEST_EMPTY_ARRAY, false, true,
-            true, true, false );
+            true, true, false, null, null );
     }
 
 
@@ -1058,7 +1058,7 @@ public class OrganizationManagementServiceImplTest
             .getDefaultRegionForCompany( Mockito.any( Company.class ) );
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( new User() );
         organizationManagementServiceImpl.addIndividual( new User(), 1, 0, 0, TestConstants.TEST_EMPTY_ARRAY, false, true,
-            true, true, false );
+            true, true, false, null, null );
     }
 
 

@@ -295,12 +295,40 @@ function paintWidgetReviews($, reviews, resourcesHost, ssHost) {
 		var title = reviews[i].agentTitle;
 		var rating = reviews[i].score;
 		var customerName = '';
-		if(reviews[i].customerFirstName != null && reviews[i].customerFirstName != undefined && reviews[i].customerFirstName != 'null' && reviews[i].customerFirstName != ' '){
-			customerName = reviews[i].customerFirstName + ' '; 
+		
+		if(reviews[i].customerFirstName != null && reviews[i].customerFirstName != undefined && reviews[i].customerFirstName != ''){
+			
+			var firstNameSplits = reviews[i].customerFirstName.split(" ");
+			
+			customerName += firstNameSplits[0] + ' ';
+			
+			var lastName = '';
+			if(firstNameSplits.length < 2){
+				if(reviews[i].customerLastName != null && reviews[i].customerLastName != undefined && reviews[i].customerLastName != ''){
+					lastName = reviews[i].customerLastName.split("")[0];
+				}
+			}else{
+				lastName = firstNameSplits[1].split("")[0];
+			}
+			customerName += lastName;
+			
+		}else if(reviews[i].customerLastName != null && reviews[i].customerLastName != undefined && reviews[i].customerLastName != ''){
+			
+			var lastNameSplits = reviews[i].customerLastName.split(" ");
+			
+			customerName += lastNameSplits[0] + ' ';
+			
+			var lastName = '';
+			if(lastNameSplits.length > 1){
+				lastName = lastNameSplits[1].split("")[0];
+			}
+			customerName += lastName;
 		}
 		
-		if(reviews[i].customerLastName != null && reviews[i].customerLastName != undefined && reviews[i].customerLastName != 'null' && reviews[i].customerLastName != ' '){
-			customerName += reviews[i].customerLastName; 
+		if(customerName.split(" ")[0].length < 2){
+			if(reviews[i].customerLastName != null && reviews[i].customerLastName != undefined && reviews[i].customerLastName != ''){
+				customerName = customerName.split(" ")[0] + ' ' + reviews[i].customerLastName.split(" ")[0];
+			}
 		}
 		
 		var customerCity = reviews[i].city;
@@ -308,8 +336,9 @@ function paintWidgetReviews($, reviews, resourcesHost, ssHost) {
 		var review = reviews[i].review;
 
 		var reviewDateTimeStamp;
-		
-		if(reviews[i].surveyTransactionDate != null && reviews[i].surveyTransactionDate != undefined && reviews[i].surveyTransactionDate != '' && parseInt(reviews[i].surveyTransactionDate) != 0){
+		if(reviews[i].surveyCompletedDate != null && reviews[i].surveyCompletedDate != undefined && reviews[i].surveyCompletedDate != '' && parseInt(reviews[i].surveyCompletedDate) != 0){
+			reviewDateTimeStamp = parseInt(reviews[i].surveyCompletedDate);
+		}else if(reviews[i].surveyTransactionDate != null && reviews[i].surveyTransactionDate != undefined && reviews[i].surveyTransactionDate != '' && parseInt(reviews[i].surveyTransactionDate) != 0){
 			reviewDateTimeStamp = parseInt(reviews[i].surveyTransactionDate);
 		}else{
 			reviewDateTimeStamp = parseInt(reviews[i].createdOn);
