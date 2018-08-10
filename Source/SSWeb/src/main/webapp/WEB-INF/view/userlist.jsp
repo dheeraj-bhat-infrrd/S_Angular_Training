@@ -95,7 +95,8 @@
 	               		  		<c:when test="${socialMedia == 'facebook'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="fbClass" value="mng-fb-gray" />
+	               		  					<%-- <c:set var="fbClass" value="mng-fb-gray" /> --%>
+	               		  					<c:set var="fbClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="fbClass" value="mng-fb-conn" />
@@ -108,7 +109,8 @@
 	               		  		<c:when test="${socialMedia == 'instagram'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="instaClass" value="mng-insta-gray" />
+	               		  					<%-- <c:set var="instaClass" value="mng-insta-gray" /> --%>
+	               		  					<c:set var="instaClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="instaClass" value="mng-insta-conn" />
@@ -121,7 +123,8 @@
 	               		  		<c:when test="${socialMedia == 'facebookPixel'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="fbpClass" value="mng-fbp-gray" />
+	               		  					<%-- <c:set var="fbpClass" value="mng-fbp-gray" /> --%>
+	               		  					<c:set var="fbpClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="fbpClass" value="mng-fbp-conn" />
@@ -134,7 +137,8 @@
 	               		  		<c:when test="${socialMedia == 'google'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="gpClass" value="mng-gp-gray" />
+	               		  					<%-- <c:set var="gpClass" value="mng-gp-gray" /> --%>
+	               		  					<c:set var="gpClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="gpClass" value="mng-gp-conn" />
@@ -147,7 +151,8 @@
 	               		  		<c:when test="${socialMedia == 'lendingtree'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="ltClass" value="mng-lt-gray" />
+	               		  					<%-- <c:set var="ltClass" value="mng-lt-gray" /> --%>
+	               		  					<c:set var="ltClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="ltClass" value="mng-lt-conn" />
@@ -160,7 +165,8 @@
 	               		  		<c:when test="${socialMedia == 'linkedin'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="linClass" value="mng-lin-gray" />
+	               		  					<%-- <c:set var="linClass" value="mng-lin-gray" /> --%>
+	               		  					<c:set var="linClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="linClass" value="mng-lin-conn" />
@@ -173,7 +179,8 @@
 	               		  		<c:when test="${socialMedia == 'realtor'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="rtClass" value="mng-rt-gray" />
+	               		  					<%-- <c:set var="rtClass" value="mng-rt-gray" /> --%>
+	               		  					<c:set var="rtClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="rtClass" value="mng-rt-conn" />
@@ -186,7 +193,8 @@
 	               		  		<c:when test="${socialMedia == 'twitter'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="twClass" value="mng-tw-gray" />
+	               		  					<%-- <c:set var="twClass" value="mng-tw-gray" /> --%>
+	               		  					<c:set var="twClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="twClass" value="mng-tw-conn" />
@@ -199,7 +207,8 @@
 	               		  		<c:when test="${socialMedia == 'yelp'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="ypClass" value="mng-yp-gray" />
+	               		  					<%-- <c:set var="ypClass" value="mng-yp-gray" /> --%>
+	               		  					<c:set var="ypClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="ypClass" value="mng-yp-conn" />
@@ -212,7 +221,8 @@
 	               		  		<c:when test="${socialMedia == 'zillow'}">
 	               		  			<c:choose>
 	               		  				<c:when test="${status == 'NOT_CONNECTED'}">
-	               		  					<c:set var="ziClass" value="mng-zi-gray" />
+	               		  					<%-- <c:set var="ziClass" value="mng-zi-gray" /> --%>
+	               		  					<c:set var="ziClass" value="hide" />
 	               		  				</c:when>
 	               		  				<c:when test="${status == 'CONNECTED'}">
 	               		  					<c:set var="ziClass" value="mng-zi-conn" />
