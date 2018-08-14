@@ -2245,9 +2245,11 @@ public class SocialManagementController
                //update zillow count
                profileManagementService.modifyZillowCallCount( map );
                List<SurveyDetails> surveyDetailsList =  profileManagementService.buildSurveyDetailFromZillowAgentReviewMap( map );
-               organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
+                if ( surveyDetailsList != null && !surveyDetailsList.isEmpty() ) {
+                    organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
                         user.getCompany().getCompanyId() );
-           }
+                }
+            }
             
             int accountMasterId = accountType.getValue();
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -2533,9 +2535,12 @@ public class SocialManagementController
                	
                    //update zillow count
                    profileManagementService.modifyZillowCallCount( map );
-                   List<SurveyDetails> surveyDetailsList =  profileManagementService.buildSurveyDetailFromZillowAgentReviewMap( map );
-                   organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
+                   List<SurveyDetails> surveyDetailsList = profileManagementService
+                        .buildSurveyDetailFromZillowAgentReviewMap( map );
+                    if ( surveyDetailsList != null && !surveyDetailsList.isEmpty() ) {
+                        organizationManagementService.pushZillowReviews( surveyDetailsList, collectionName, profileSettings,
                             user.getCompany().getCompanyId() );
+                    }
                }
                 
                

@@ -1550,7 +1550,7 @@ public class ProfileManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testFetchZillowFeedsWithNullProfile() throws InvalidInputException, UnavailableException
     {
-        profileManagementServiceImpl.fetchAndSaveZillowFeeds( null, TestConstants.TEST_STRING, 0, false, false );
+        profileManagementServiceImpl.fetchAndPostZillowFeeds( null, TestConstants.TEST_STRING, 0, false );
 
     }
 
@@ -1558,23 +1558,23 @@ public class ProfileManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testFetchZillowFeedsWithNullCollectionName() throws InvalidInputException, UnavailableException
     {
-        profileManagementServiceImpl.fetchAndSaveZillowFeeds( new OrganizationUnitSettings(), null, 0, false, false );
+        profileManagementServiceImpl.fetchAndPostZillowFeeds( new OrganizationUnitSettings(), null, 0, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testFetchZillowFeedsWithEmptyCollectionName() throws InvalidInputException, UnavailableException
     {
-        profileManagementServiceImpl.fetchAndSaveZillowFeeds( new OrganizationUnitSettings(), TestConstants.TEST_EMPTY_STRING,
-            0, false, false );
+        profileManagementServiceImpl.fetchAndPostZillowFeeds( new OrganizationUnitSettings(), TestConstants.TEST_EMPTY_STRING,
+            0, false );
     }
 
 
     @Test
     public void testFetchZillowFeedsWithNullSocialMediaTokens() throws InvalidInputException, UnavailableException
     {
-        List<SurveyDetails> zillowReviewList = profileManagementServiceImpl.fetchAndSaveZillowFeeds( new OrganizationUnitSettings(),
-            TestConstants.TEST_STRING, 0, false, false );
+        List<SurveyDetails> zillowReviewList = profileManagementServiceImpl.fetchAndPostZillowFeeds( new OrganizationUnitSettings(),
+            TestConstants.TEST_STRING, 0, false );
         assertEquals( "Zillow reviews size does not match expected", 0, zillowReviewList.size() );
 
     }
@@ -1585,8 +1585,8 @@ public class ProfileManagementServiceImplTest
     {
         OrganizationUnitSettings profile = new OrganizationUnitSettings();
         profile.setSocialMediaTokens( new SocialMediaTokens() );
-        List<SurveyDetails> zillowReviewList = profileManagementServiceImpl.fetchAndSaveZillowFeeds( profile,
-            TestConstants.TEST_STRING, 0, false, false );
+        List<SurveyDetails> zillowReviewList = profileManagementServiceImpl.fetchAndPostZillowFeeds( profile,
+            TestConstants.TEST_STRING, 0, false );
         assertEquals( "Zillow reviews size does not match expected", 0, zillowReviewList.size() );
 
     }
@@ -1599,8 +1599,8 @@ public class ProfileManagementServiceImplTest
         socialMediaTokens.setZillowToken( new ZillowToken() );
         OrganizationUnitSettings profile = new OrganizationUnitSettings();
         profile.setSocialMediaTokens( socialMediaTokens );
-        List<SurveyDetails> zillowReviewList = profileManagementServiceImpl.fetchAndSaveZillowFeeds( profile,
-            TestConstants.TEST_STRING, 0, false, false );
+        List<SurveyDetails> zillowReviewList = profileManagementServiceImpl.fetchAndPostZillowFeeds( profile,
+            TestConstants.TEST_STRING, 0, false );
         assertEquals( "Zillow reviews size does not match expected", 0, zillowReviewList.size() );
 
     }
@@ -1615,8 +1615,8 @@ public class ProfileManagementServiceImplTest
         socialMediaTokens.setZillowToken( zillowToken );
         OrganizationUnitSettings profile = new OrganizationUnitSettings();
         profile.setSocialMediaTokens( socialMediaTokens );
-        List<SurveyDetails> zillowReviewList = profileManagementServiceImpl.fetchAndSaveZillowFeeds( profile,
-            TestConstants.TEST_STRING, 0, false, false );
+        List<SurveyDetails> zillowReviewList = profileManagementServiceImpl.fetchAndPostZillowFeeds( profile,
+            TestConstants.TEST_STRING, 0, false );
         assertEquals( "Zillow reviews size does not match expected", 0, zillowReviewList.size() );
 
     }
@@ -1646,21 +1646,21 @@ public class ProfileManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testFetchZillowDataWithNullProfile() throws InvalidInputException, UnavailableException
     {
-        profileManagementServiceImpl.fetchAndSaveZillowData( null, TestConstants.TEST_STRING, 0, false, false );
+        profileManagementServiceImpl.fetchAndPostZillowData( null, TestConstants.TEST_STRING, 0, false);
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testFetchZillowDataWithNullCollectionName() throws InvalidInputException, UnavailableException
     {
-        profileManagementServiceImpl.fetchAndSaveZillowData( new OrganizationUnitSettings(), null, 0, false, false );
+        profileManagementServiceImpl.fetchAndPostZillowData( new OrganizationUnitSettings(), null, 0, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testFetchZillowDataWithEmptyCollectionName() throws InvalidInputException, UnavailableException
     {
-        profileManagementServiceImpl.fetchAndSaveZillowData( null, TestConstants.TEST_EMPTY_STRING, 0, false, false );
+        profileManagementServiceImpl.fetchAndPostZillowData( null, TestConstants.TEST_EMPTY_STRING, 0, false );
     }
 
 
@@ -1796,41 +1796,6 @@ public class ProfileManagementServiceImplTest
     public void testGetAgentIdsByProfileLevelWithInvalidProfileLevel() throws InvalidInputException
     {
         profileManagementServiceImpl.getAgentIdsByProfileLevel( TestConstants.TEST_STRING, 1 );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testPushToZillowPostTempWithNullProfile() throws InvalidInputException
-    {
-        profileManagementServiceImpl.pushToZillowPostTemp( null, null, null );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testPushToZillowPostTempWithNullCollectionName() throws InvalidInputException
-    {
-        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), null, null );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testPushToZillowPostTempWithEmptyCollectionName() throws InvalidInputException
-    {
-        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "", null );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testPushToZillowPostTempWithNullSurveyDetails() throws InvalidInputException
-    {
-        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "test", null );
-    }
-
-
-    @Test ( expected = InvalidInputException.class)
-    public void testPushToZillowPostTempWithNullReviewMap() throws InvalidInputException
-    {
-        profileManagementServiceImpl.pushToZillowPostTemp( new OrganizationUnitSettings(), "test", null );
     }
 
 

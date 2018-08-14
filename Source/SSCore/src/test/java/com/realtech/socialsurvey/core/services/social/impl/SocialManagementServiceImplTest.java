@@ -142,7 +142,7 @@ public class SocialManagementServiceImplTest
             .thenReturn( "" );
         socialManagementServiceImpl.postToSocialMedia( TestConstants.TEST_STRING, null, TestConstants.TEST_STRING,
             TestConstants.TEST_STRING, TestConstants.TEST_LONG, TestConstants.TEST_DOUBLE, TestConstants.TEST_MAIL_ID_STRING,
-            TestConstants.TEST_STRING, true, TestConstants.TEST_STRING, true );
+            TestConstants.TEST_STRING, true, TestConstants.TEST_STRING, true, false );
     }
 
 

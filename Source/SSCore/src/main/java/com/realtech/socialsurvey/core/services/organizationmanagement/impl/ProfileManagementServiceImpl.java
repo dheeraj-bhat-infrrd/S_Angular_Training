@@ -61,7 +61,6 @@ import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
-import com.realtech.socialsurvey.core.dao.ZillowTempPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
@@ -110,7 +109,6 @@ import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
-import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -304,10 +302,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
 
-    @Autowired
-    private ZillowTempPostDao zillowTempPostDao;
-
-
+   
     @Override
     public void afterPropertiesSet() throws Exception
     {
@@ -860,7 +855,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         LOG.debug( "Image removed successfully" );
     }
-
 
 
     // vertical
@@ -2284,7 +2278,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 userManagementService.updateUser( user, iden, true );
 
                 updateIndividualEmail( iden, emailVerified );
-                
+
                 //update the corrupted record for newly registered user's email id
                 surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
@@ -3198,7 +3192,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         List<UserProfile> userProfiles = user.getUserProfiles();
         UserProfile userProfile = null;
         for ( UserProfile element : userProfiles ) {
-            if (element.getStatus() == CommonConstants.STATUS_ACTIVE && element.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
+            if ( element.getStatus() == CommonConstants.STATUS_ACTIVE
+                && element.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE ) {
                 userProfile = element;
                 break;
             }
@@ -4580,8 +4575,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @SuppressWarnings ( "unchecked")
-    List<SurveyDetails> fetchAndSaveZillowFeeds( OrganizationUnitSettings profile, String collectionName, long companyId,
-        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException
+    List<SurveyDetails> fetchAndPostZillowFeeds( OrganizationUnitSettings profile, String collectionName, long companyId,
+        boolean fromBatch ) throws InvalidInputException, UnavailableException
     {
         if ( profile == null )
             throw new InvalidInputException( "Profile setting passed cannot be null" );
@@ -4642,8 +4637,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             if ( map != null ) {
                                 surveyDetailsList = buildSurveyDetailFromZillowLenderReviewMap( map );
                                 LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
-                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName, profile,
-                                    companyId, fromBatch, fromPublicPage );
+                                surveyDetailsList = fillSurveyDetailsFromReviewMapAndPost( surveyDetailsList, collectionName, profile,
+                                    companyId, fromBatch );
 
                             }
                         }
@@ -4680,8 +4675,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             if ( map != null ) {
                                 surveyDetailsList = buildSurveyDetailFromZillowLenderReviewMap( map );
                                 LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
-                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName, profile,
-                                    companyId, fromBatch, fromPublicPage );
+                                surveyDetailsList = fillSurveyDetailsFromReviewMapAndPost( surveyDetailsList, collectionName, profile,
+                                    companyId, fromBatch );
 
                             }
                         }
@@ -4733,8 +4728,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 modifyZillowCallCount( map );
                                 surveyDetailsList = buildSurveyDetailFromZillowAgentReviewMap( map );
                                 LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
-                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName, profile,
-                                    companyId, fromBatch, fromPublicPage );
+                                surveyDetailsList = fillSurveyDetailsFromReviewMapAndPost( surveyDetailsList, collectionName, profile,
+                                    companyId, fromBatch );
 
                             }
                         }
@@ -4769,10 +4764,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             for ( Map<String, Object> review : reviews ) {
                 HashMap<String, Object> individualReviewee = (HashMap<String, Object>) review.get( "individualReviewee" );
                 HashMap<String, Object> reviewerName = (HashMap<String, Object>) review.get( "reviewerName" );
-                String displayReviewerName = (String) reviewerName.get("displayName");
+                String displayReviewerName = (String) reviewerName.get( "displayName" );
                 String customerFirstName = null;
-                if ( ! StringUtils.isEmpty(displayReviewerName) ) {
-                		customerFirstName = displayReviewerName;
+                if ( !StringUtils.isEmpty( displayReviewerName ) ) {
+                    customerFirstName = displayReviewerName;
                 } else {
                     customerFirstName = (String) reviewerName.get( "screenName" );
                 }
@@ -4795,6 +4790,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
                 String sourceId = (String) review.get( "reviewId" );
                 String reviewDescription = (String) review.get( "content" );
+                reviewDescription = reviewDescription.replaceAll( "< *br/*>", "\n" );
+                reviewDescription = reviewDescription.replace( "&amp;", "&" );
+                
                 String summary = (String) review.get( "title" );
                 String createdDateStr = (String) review.get( "created" );
                 String dateOfServiceStr = (String) review.get( "dateOfService" );
@@ -4866,6 +4864,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         for ( Map<String, Object> review : reviews ) {
                             String sourceId = (String) review.get( "reviewURL" );
                             String reviewDescription = (String) review.get( "description" );
+                            reviewDescription = reviewDescription.replaceAll( "< *br/*>", "\n" );
+                            reviewDescription = reviewDescription.replace( "&amp;", "&" );
                             String summary = (String) review.get( "reviewSummary" );
                             String reviewDate = (String) review.get( "reviewDate" );
                             String reviewerProfileUrl = (String) review.get( "reviewerLink" );
@@ -4877,6 +4877,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             SurveyDetails surveyDetails = new SurveyDetails();
                             surveyDetails.setCompleteProfileUrl( profileLink );
                             surveyDetails.setCustomerFirstName( customerFirstName );
+                            
                             surveyDetails.setReview( reviewDescription );
                             surveyDetails.setEditable( false );
                             surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
@@ -4897,7 +4898,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
                             // saving zillow review summary
                             surveyDetails.setSummary( summary );
-
+                            LOG.info( "SURVEY DETAILS {}",surveyDetails );
                             surveyDetailsList.add( surveyDetails );
                         }
                     }
@@ -5223,8 +5224,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @throws UnavailableException
      * */
     @Override
-    public List<SurveyDetails> fetchAndSaveZillowData( OrganizationUnitSettings profile, String collection, long companyId,
-        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException
+    public List<SurveyDetails> fetchAndPostZillowData( OrganizationUnitSettings profile, String collection, long companyId,
+        boolean fromBatch ) throws InvalidInputException, UnavailableException
     {
 
         if ( profile == null || collection == null || collection.isEmpty() ) {
@@ -5235,8 +5236,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null ) {
             // fetching zillow feed
             LOG.debug( "Fetching zillow feed for " + profile.getId() + " from " + collection );
-            List<SurveyDetails> surveyDetailsList = fetchAndSaveZillowFeeds( profile, collection, companyId, fromBatch,
-                fromPublicPage );
+            List<SurveyDetails> surveyDetailsList = fetchAndPostZillowFeeds( profile, collection, companyId, fromBatch );
             LOG.debug( "Method to fetch zillow feed finished." );
             return surveyDetailsList;
         } else {
@@ -5331,11 +5331,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    public List<SurveyDetails> fillSurveyDetailsFromReviewMap( List<SurveyDetails> surveyDetailsList, String collectionName,
-        OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage )
+    public List<SurveyDetails> fillSurveyDetailsFromReviewMapAndPost( List<SurveyDetails> surveyDetailsList, String collectionName,
+        OrganizationUnitSettings profile, long companyId, boolean fromBatch )
         throws InvalidInputException
     {
-        LOG.info( "Method fillSurveyDetailsFromReviewMap " + collectionName + " with iden: " + profile.getIden() + " started" );
+        LOG.info( "Method fillSurveyDetailsFromReviewMapAndPost {} with iden:{} started", collectionName, profile.getIden() );
         String idenColumnName = "";
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
             idenColumnName = CommonConstants.COMPANY_ID_COLUMN;
@@ -5350,21 +5350,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         List<String> latestSurveyIdList = new ArrayList<String>();
         queries.put( idenColumnName, profile.getIden() );
 
-        // LOG.debug( "Deleting existing reviews for profile type : " + idenColumnName + " and profile id : " + profile.getIden() );
-        // surveyHandler.deleteExistingZillowSurveysByEntity( idenColumnName, profile.getIden() );
-        // LOG.debug( "Deleted existing reviews for profile type : " + idenColumnName + " and profile id : " + profile.getIden() );
         for ( int i = 0; i < surveyDetailsList.size(); i++ ) {
             SurveyDetails surveyDetails = surveyDetailsList.get( i );
 
-            //            TODO -  need to remove this after fixing zillow issue
-            //queries.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN, sourceId );
             queries.put( CommonConstants.REVIEW_COLUMN, surveyDetails.getReview() );
 
             if ( fromBatch ) {
                 utils.checkReviewForSwearWords( surveyDetails.getReview(), surveyHandler.getSwearList() );
             }
 
-            LOG.info( "checking if survey already exist in database with review : " + surveyDetails.getReview() );
+            LOG.info( "checking if survey already exist in database with review : {}", surveyDetails.getReview() );
             SurveyDetails existingSurveyDetails = surveyDetailsDao.getZillowReviewByQueryMap( queries );
             if ( existingSurveyDetails == null ) {
                 LOG.info( "no survey found in database for current review" );
@@ -5374,33 +5369,34 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
                     surveyDetails.setRegionId( profile.getIden() );
                     surveyDetails.setCompanyId( companyId );
-                    surveyDetails.setRegionName(  profile.getContact_details().getName()  );
+                    surveyDetails.setRegionName( profile.getContact_details().getName() );
                 } else if ( collectionName
                     .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
                     try {
                         Branch branch = branchDao.findById( Branch.class, profile.getIden() );
                         if ( branch != null ) {
                             surveyDetails.setRegionId( branch.getRegion().getRegionId() );
-                            surveyDetails.setRegionName(branch.getRegion().getRegion());
+                            surveyDetails.setRegionName( branch.getRegion().getRegion() );
                         }
                     } catch ( Exception e ) {
                         LOG.error( "Could not find by branch details for id : " + profile.getIden(), e );
                     }
                     surveyDetails.setBranchId( profile.getIden() );
                     surveyDetails.setCompanyId( companyId );
-                    surveyDetails.setBranchName(  profile.getContact_details().getName()  );
+                    surveyDetails.setBranchName( profile.getContact_details().getName() );
                 } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
                     try {
                         Map<String, Long> agentDetailsMap = userProfileDao.findPrimaryUserProfileByAgentId( profile.getIden() );
                         if ( agentDetailsMap != null && agentDetailsMap.size() > 0 ) {
-                        		Branch branch = branchDao.findById( Branch.class,  agentDetailsMap.get( CommonConstants.BRANCH_ID_COLUMN )  );
-                        		Region region = branch.getRegion();
-                        		surveyDetails.setRegionId( agentDetailsMap.get( CommonConstants.REGION_ID_COLUMN ) );
-                        		surveyDetails.setBranchId( agentDetailsMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
-                        		surveyDetails.setBranchName(branch.getBranch());
-                        		surveyDetails.setRegionName(region.getRegion());
+                            Branch branch = branchDao.findById( Branch.class,
+                                agentDetailsMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
+                            Region region = branch.getRegion();
+                            surveyDetails.setRegionId( agentDetailsMap.get( CommonConstants.REGION_ID_COLUMN ) );
+                            surveyDetails.setBranchId( agentDetailsMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
+                            surveyDetails.setBranchName( branch.getBranch() );
+                            surveyDetails.setRegionName( region.getRegion() );
                         }
-                        
+
                     } catch ( Exception e ) {
                         LOG.error( "Could not find by agent hierarchy details for id : " + profile.getIden(), e );
                     }
@@ -5414,19 +5410,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     surveyDetails.setCompanyId( companyId );
                 }
 
-
                 LOG.info( "saving survey to database" );
                 surveyHandler.insertSurveyDetails( surveyDetails );
                 //update surveydetail in list
                 surveyDetailsList.set( i, surveyDetails );
                 latestSurveyIdList.add( surveyDetails.get_id() );
-                // Commented as Zillow reviews are saved in Social Survey, SS-307
-                // if ( zillowReviewScoreTotal == -1 )
-                //    zillowReviewScoreTotal = surveyDetails.getScore();
-                // else
-                //    zillowReviewScoreTotal += surveyDetails.getScore();
-
-
+                
             } else if ( ( existingSurveyDetails.getSummary() == null
                 || existingSurveyDetails.getSummary().trim().length() == 0 )
                 && ( surveyDetails.getSummary() != null && surveyDetails.getSummary().length() > 0 ) ) {
@@ -5447,12 +5436,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyHandler.updateZillowSurveyUpdatedDateInExistingSurveyDetails( existingSurveyDetails );
             }
 
-            //SS-1214: handling Column 'ZILLOW_SURVEY_ID' cannot be null for the Table: ZILLOW_TEMP_POST
             //if survey is new, surveyDetails.get_id() will not be null, coz, a new data entry happened to SURVEY_DETAILS Mongo Collection
             if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) && fromBatch
                 && surveyDetails != null && surveyDetails.get_id() != null ) {
-                LOG.info( "Saving review in temp table" );
-                postToTempTable( collectionName, profile, surveyDetails );
+                LOG.info( "Posting zillow reviews on social media" );
+                try {     
+                    OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                    socialManagementService.postZillowToSocialMedia( profile, surveyDetails, companySettings);
+                    
+                } catch ( NonFatalException e ) {
+                    LOG.error( "Exception occurred while posting Zillow review to Social Media", e );
+                }
             }
         }
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
@@ -5467,7 +5462,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
         }
         try {
-            LOG.info( "Resetting showSurveyOnUI property for review ids not in list :" + latestSurveyIdList );
+            LOG.info( "Resetting showSurveyOnUI property for review ids not in list :{}", latestSurveyIdList );
             surveyDetailsDao.resetShowSurveyOnUIPropertyForNonLatestReviews( idenColumnName, profile.getIden(),
                 latestSurveyIdList );
             LOG.info( "Reset showSurveyOnUI property for review ids not in list successfull." );
@@ -5475,80 +5470,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             LOG.error( "Exception occurred while resetting showSurveyOnUI property for review ids not in list :"
                 + latestSurveyIdList + ". Reason :", e );
         }
-        LOG.info( "Method fillSurveyDetailsFromReviewMap " + collectionName + " with iden: " + profile.getIden() + " ended" );
+        LOG.info( "Method fillSurveyDetailsFromReviewMapAndPost {} with iden:{} ended", collectionName, profile.getIden() );
         return surveyDetailsList;
-    }
-
-
-    /**
-     * 
-     * @param profile
-     * @param collectionName
-     * @param surveyDetails
-     * @throws InvalidInputException
-     */
-    void pushToZillowPostTemp( OrganizationUnitSettings profile, String collectionName, SurveyDetails surveyDetails )
-        throws InvalidInputException
-    {
-        if ( profile == null ) {
-            throw new InvalidInputException( "Profile passed as argument in pushToZillowPostTemp cannot be null" );
-        }
-
-        if ( collectionName == null || collectionName.isEmpty() ) {
-            throw new InvalidInputException(
-                "Collection Name passed as argument in pushToZillowPostTemp cannot be null or empty" );
-        }
-
-        if ( surveyDetails == null ) {
-            throw new InvalidInputException( "Survey Details passed as argument in pushToZillowPostTemp cannot be null" );
-        }
-
-
-        LOG.info( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp started" );
-        String columnName = null;
-        if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
-            columnName = CommonConstants.COMPANY_ID_COLUMN;
-        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
-            columnName = CommonConstants.REGION_ID_COLUMN;
-        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
-            columnName = CommonConstants.BRANCH_ID_COLUMN;
-        } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
-            columnName = CommonConstants.AGENT_ID_COLUMN;
-        }
-
-        // Building Zillow Temp Post Object
-        ZillowTempPost zillowTempPost = new ZillowTempPost();
-        zillowTempPost.setEntityColumnName( columnName );
-        zillowTempPost.setEntityId( profile.getIden() );
-        zillowTempPost.setZillowReviewUrl( surveyDetails.getSourceId() );
-        if ( profile.getSocialMediaTokens() != null && profile.getSocialMediaTokens().getZillowToken() != null
-            && profile.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
-            zillowTempPost.setZillowReviewSourceLink( profile.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
-        } else {
-            zillowTempPost.setZillowReviewSourceLink( "" );
-        }
-        zillowTempPost.setZillowReviewRating( surveyDetails.getScore() );
-        zillowTempPost.setZillowReviewerName( surveyDetails.getCustomerFirstName() );
-        zillowTempPost.setZillowReviewSummary( surveyDetails.getSummary() );
-        zillowTempPost.setZillowReviewDescription( surveyDetails.getReview() );
-        zillowTempPost.setZillowReviewDate( new Timestamp( surveyDetails.getCreatedOn().getTime() ) );
-        zillowTempPost.setZillowSurveyId( surveyDetails.get_id() );
-
-        // Persisting Zillow Temp Post Object
-        zillowTempPostDao.saveOrUpdateZillowTempPost( zillowTempPost );
-
-        LOG.info( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp ended" );
-    }
-
-
-    @Transactional
-    public void postToTempTable( String collectionName, OrganizationUnitSettings profile, SurveyDetails surveyDetails )
-    {
-        try {
-            pushToZillowPostTemp( profile, collectionName, surveyDetails );
-        } catch ( Exception e ) {
-            LOG.error( "Exception occurred while pushing Zillow review into temp table. Reason :", e );
-        }
     }
 
 
@@ -5716,10 +5639,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         return image;
     }
 
+
     @Override
     public String copyImage( String source, String imageName ) throws Exception
     {
-        LOG.info( "Method copyImage called for url {} and imageName {}" , source , imageName );
+        LOG.info( "Method copyImage called for url {} and imageName {}", source, imageName );
         String fileName = null;
         try {
             BufferedImage image = getImageFromUrl( source );
@@ -5737,13 +5661,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     fileName = fileUploadService.uploadProfileImageFile( tempImage, imageName, false );
                     FileUtils
                         .deleteQuietly( new File( CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + imageName ) );
-                    LOG.info( "Successfully retrieved photo of contact with file name {} " , fileName );
+                    LOG.info( "Successfully retrieved photo of contact with file name {} ", fileName );
                 } else {
-                    LOG.warn("Error while creating temp image. Can't able to process image {}" , source);
+                    LOG.warn( "Error while creating temp image. Can't able to process image {}", source );
                     return null;
                 }
             } else {
-                LOG.warn( "error while getting image. Cant able to process image {} " , source );
+                LOG.warn( "error while getting image. Cant able to process image {} ", source );
                 return null;
             }
         } catch ( Exception e ) {
@@ -5887,10 +5811,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             branchProfile, individualProfile, map, true );
 
         // aggregated disclaimer
-            String disclaimer = aggregateDisclaimer( profileUnderConcern, entityId );
-            if ( StringUtils.isNotEmpty( disclaimer ) )
-                profileUnderConcern.setDisclaimer( disclaimer );
-        
+        String disclaimer = aggregateDisclaimer( profileUnderConcern, entityId );
+        if ( StringUtils.isNotEmpty( disclaimer ) )
+            profileUnderConcern.setDisclaimer( disclaimer );
+
 
         //remove sensitive info from profile JSON from company profile 
         removeTokensFromProfile( companyProfile );
@@ -5918,8 +5842,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         // NOTE: It was decided not to show Social posts on the UI. So not fetching anymore.
 
         //set company name
-        profileAggregate.setCompanyName(companyProfile.getContact_details().getName());
-        
+        profileAggregate.setCompanyName( companyProfile.getContact_details().getName() );
+
         // build the individual review aggregate
         profileAggregate.setReviewAggregate( buildReviewAggregate( profileAggregate ) );
 
@@ -6050,8 +5974,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings fetchAppropriateUnitSettings( IndividualReviewAggregate reviewAggregate, SurveyDetails review )
-        throws InvalidInputException, NoRecordsFetchedException
+    private OrganizationUnitSettings fetchAppropriateUnitSettings( IndividualReviewAggregate reviewAggregate,
+        SurveyDetails review ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "fetching appropriate unit settings." );
         if ( review.getAgentId() > 0 ) {
@@ -6269,7 +6193,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         // set agent and company related flags
         profileAggregate.setAgent( isAgent( user ) );
         profileAggregate.setHiddenSection( companyProfile.isHiddenSection() );
-        
+
         //For an agent, if login is prevented, then agent's public page should be hidden and redirected to branch/region/company
         profileAggregate.setHiddenSection( individualProfile.isHidePublicPage() );
 
@@ -6624,12 +6548,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String personalEmailId = null;
         List<MiscValues> others = new ArrayList<>();
 
-        if( contactDetails == null ){
+        if ( contactDetails == null ) {
             LOG.warn( "Contact details is not specified" );
             throw new InvalidInputException( "Contact details is not specified" );
-        } else if( mailIds == null || mailIds.isEmpty() ){
+        } else if ( mailIds == null || mailIds.isEmpty() ) {
             LOG.warn( "New mail IDs not specified" );
-            throw new InvalidInputException( "New mail IDs not specified" );            
+            throw new InvalidInputException( "New mail IDs not specified" );
         }
 
         for ( MiscValues mailId : mailIds ) {
@@ -6649,12 +6573,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         MailIdSettings mailIdSettings = contactDetails.getMail_ids();
-        
-        if( mailIdSettings == null ){
+
+        if ( mailIdSettings == null ) {
             mailIdSettings = new MailIdSettings();
             contactDetails.setMail_ids( mailIdSettings );
         }
-        
+
         // update personal and work and other e-mail IDs
         if ( StringUtils.isNotEmpty( workEmailId ) ) {
 
@@ -6670,9 +6594,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( !others.isEmpty() ) {
             mailIdSettings.setOthers( others );
         }
-        
+
         LOG.info( "method updateEmailIdInContactDetails() finished" );
     }
+
 
     @Override
     public void updateVerifiedEmail( OrganizationUnitSettings unitSettings, boolean isWorkEmailLockedByCompany, long companyId,
@@ -6680,18 +6605,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException, UndeliveredEmailException, UserAlreadyExistsException
     {
         LOG.info( "method updateVerifiedEmail() started" );
-        
-        if( unitSettings == null ){
+
+        if ( unitSettings == null ) {
             LOG.warn( "Settings are not specified" );
             throw new InvalidInputException( "Settings are not specified" );
-        } else if( mailIds == null || mailIds.isEmpty() ){
+        } else if ( mailIds == null || mailIds.isEmpty() ) {
             LOG.warn( "New mail IDs are not specified" );
-            throw new InvalidInputException( "New mail IDs are not specified" );            
-        } else if( StringUtils.isEmpty( collectionType ) ){
+            throw new InvalidInputException( "New mail IDs are not specified" );
+        } else if ( StringUtils.isEmpty( collectionType ) ) {
             LOG.warn( "Target collection not specified" );
             throw new InvalidInputException( "Target collection not specified" );
         }
-        
+
         ContactDetailsSettings contactDetailsSettings = unitSettings.getContact_details();
 
         // Send verification Links

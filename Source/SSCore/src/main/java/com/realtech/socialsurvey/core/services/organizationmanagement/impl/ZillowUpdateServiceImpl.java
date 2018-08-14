@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -14,15 +13,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
-import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.dao.ZillowTempPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -35,7 +30,6 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 
 @Component
@@ -64,20 +58,6 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
 
     @Autowired
     private SolrSearchService solrSearchService;
-
-    @Autowired
-    private ZillowTempPostDao zillowTempPostDao;
-    @Autowired
-    private SurveyHandler surveyHandler;
-
-    @Autowired
-    private SurveyDetailsDao surveyDetailsDao;
-
-    @Autowired
-    private UserProfileDao userProfileDao;
-
-    @Autowired
-    private Utils utils;
 
     @Async
     @Override
@@ -199,7 +179,6 @@ public class ZillowUpdateServiceImpl implements ZillowUpdateService
             LOG.error( "Invalid companyId passed as argument in pushZillowReviews()" );
             throw new InvalidInputException( "Invalid companyId passed as argument in pushZillowReviews()" );
         }
-        profileManagementService.fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName, profileSettings, companyId, false,
-            false );
+        profileManagementService.fillSurveyDetailsFromReviewMapAndPost( surveyDetailsList, collectionName, profileSettings, companyId, false );
     }
 }
