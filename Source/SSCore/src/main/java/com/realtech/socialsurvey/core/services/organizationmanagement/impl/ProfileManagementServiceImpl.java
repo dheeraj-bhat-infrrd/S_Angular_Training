@@ -2603,10 +2603,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         if ( settings != null ) {
-            LOG.debug( "Sending the contact us mail to the agent along with admin" );
+            LOG.debug( "Sending the contact us mail. Add admin as well" );
             recepients.add(settings.getContact_details().getMail_ids().getWork()) ;
-            emailServices.sendContactUsMail( recepients,
-                settings.getContact_details().getName(), senderName, senderMailId, agentSettings.getContact_details().getMail_ids().getWork(), agentSettings.getContact_details().getName(), message );
+            if(agentSettings != null) {
+            		emailServices.sendContactUsMail( recepients,
+                        settings.getContact_details().getName(), senderName, senderMailId, agentSettings.getContact_details().getMail_ids().getWork(), agentSettings.getContact_details().getName(), message );
+                    
+            }else {
+            	emailServices.sendContactUsMail( recepients,
+                        settings.getContact_details().getName(), senderName, senderMailId, "N/A", "N/A", message );                   
+            }
             LOG.debug( "Contact us mail sent!" );
         } else {
             LOG.error( "No records found for profile settings of profile name: {}, profile type: {} in mongo", profileName,
