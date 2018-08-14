@@ -29,7 +29,7 @@ public class LoggingConfig extends WebMvcConfigurerAdapter
     
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(apiTransactionInterceptor).addPathPatterns("/api/*");
+        registry.addInterceptor(apiTransactionInterceptor).addPathPatterns("/v[0-9]/*");
     }
 
 }
