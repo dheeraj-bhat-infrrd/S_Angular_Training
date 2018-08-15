@@ -814,6 +814,7 @@ public interface CommonConstants
     public static final int MAX_SOCIAL_POSTS = 10;
     public static final String DATE_FORMAT = "MM/dd/yyyy";
     public static final String DATE_FORMAT_WITH_TZ = "MM/dd/YYYY HH:MM:SS z";
+    public static final String ZILLOW_SHARE_DATE_FORMAT = "YYYY-MM-dd";
 
     /*
      * Constats for Find a pro
