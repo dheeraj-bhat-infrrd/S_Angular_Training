@@ -3973,7 +3973,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     }
     
-    private boolean validateFacebookToken(FacebookToken facebookToken ) {
+    private boolean validateFacebookToken(FacebookToken facebookToken ) 
+    {
+    		if(facebookToken == null || StringUtils.isEmpty(facebookToken.getFacebookAccessTokenToPost()))
+    			return false;
+    		
         Facebook facebook = new FacebookFactory().getInstance();
         facebook.setOAuthAppId( facebookClientId, facebookAppSecret );
         facebook.setOAuthAccessToken( new AccessToken( facebookToken.getFacebookAccessTokenToPost() ) );
