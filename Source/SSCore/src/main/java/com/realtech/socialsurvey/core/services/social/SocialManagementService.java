@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.services.social;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +8,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
-import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
@@ -25,7 +23,6 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SocialUpdateAction;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.ZillowTempPost;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -149,7 +146,7 @@ public interface SocialManagementService
 
     public boolean postToSocialMedia( String agentName, String agentProfileLink, String custFirstName, String custLastName,
         long agentId, double rating, String surveyId, String feedback, boolean isAbusive, String serverBaseUrl,
-        boolean onlyPostToSocialSurvey ) throws NonFatalException;
+        boolean onlyPostToSocialSurvey, boolean isZillow ) throws NonFatalException;
 
 
     /**
@@ -197,8 +194,7 @@ public interface SocialManagementService
         throws InvalidInputException;
 
 
-    public List<ZillowTempPost> getAllZillowTempPosts();
-
+   
 
     public RegionMediaPostResponseDetails getRMPRDFromRMPRDList(
         List<RegionMediaPostResponseDetails> regionMediaPostResponseDetailsList, long regionId );
@@ -206,18 +202,6 @@ public interface SocialManagementService
 
     public BranchMediaPostResponseDetails getBMPRDFromBMPRDList(
         List<BranchMediaPostResponseDetails> branchMediaPostResponseDetailsList, long branchId );
-
-
-    ExternalSurveyTracker checkExternalSurveyTrackerExist( String entityColumnName, long entityId, String source,
-        String reviewUrl, Timestamp reviewDate );
-
-
-    public void saveExternalSurveyTracker( String entityColumnName, long entityId, String source, String sourceLink,
-        String reviewUrl, double rating, int autoPostStatus, int complaintResolutionStatus, Timestamp reviewDate,
-        String postedOn );
-
-
-    public void removeProcessedZillowTempPosts( List<Long> processedZillowTempPostIds );
 
 
     SurveyPreInitiationList getUnmatchedPreInitiatedSurveys( long companyId, int startIndex, int batchSize , long count )
@@ -354,6 +338,9 @@ public interface SocialManagementService
 
     public boolean manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId );
 
+
+    public void postZillowToSocialMedia( OrganizationUnitSettings profile, SurveyDetails surveyDetails,
+        OrganizationUnitSettings companySettings ) throws NonFatalException;
 
 	String generateFacebookShareUrl(SurveyDetails survey, OrganizationUnitSettings organizationUnitSettings)
 			throws InvalidInputException;
