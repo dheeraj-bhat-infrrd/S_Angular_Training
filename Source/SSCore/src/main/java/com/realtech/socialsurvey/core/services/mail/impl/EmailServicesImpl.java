@@ -2451,11 +2451,22 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_SUBJECT;
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements.setFileName(
-            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_BODY );
+        
+        //DONT ADD UPDATE CONNECTION URL FOR FACEBOOK. INSTEAD OF USE SS LOGIN URL.
+        if(socialMediaType.equalsIgnoreCase(CommonConstants.FACEBOOK_SOCIAL_SITE)) {
+        		messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FACEBOOK_TOKEN_EXPIRY_EMAIL_BODY );
+        		messageBodyReplacements
+                .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, socialMediaType, appLoginUrl ) );
+        }else {
+        		messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_BODY );
+        		messageBodyReplacements
+                .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, socialMediaType, updateConnectionUrl, appLoginUrl ) );
+        }
+        
 
-        messageBodyReplacements
-            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, socialMediaType, updateConnectionUrl, appLoginUrl ) );
+        
 
         LOG.trace( "Calling email sender to send mail" );
         sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );

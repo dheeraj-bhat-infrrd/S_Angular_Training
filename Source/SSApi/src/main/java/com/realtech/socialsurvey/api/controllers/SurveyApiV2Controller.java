@@ -620,7 +620,7 @@ public class SurveyApiV2Controller
         //create vo object
        	SurveyCountVO surveyCountVO = new SurveyCountVO();
        	surveyCountVO.setNoOfReviews(surveyCount);
-       	surveyCountVO.setAvgScore(surveyAvgScore);
+       	surveyCountVO.setAvgScore( Float.valueOf(String.format("%.1f",  surveyAvgScore) ) );
         LOGGER.info( "SurveyApiController.getSurveyTransactionsCouunt completed successfully" );
 
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "surveyStats", surveyCountVO, request,
