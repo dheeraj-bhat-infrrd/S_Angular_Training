@@ -78,8 +78,6 @@
 				<value>com.realtech.socialsurvey.core.entities.BatchTracker</value>
 				<value>com.realtech.socialsurvey.core.entities.CrmBatchTracker</value>
 				<value>com.realtech.socialsurvey.core.entities.UserEmailMapping</value>
-				<value>com.realtech.socialsurvey.core.entities.ZillowTempPost</value>
-				<value>com.realtech.socialsurvey.core.entities.ExternalSurveyTracker</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.UploadStatus</value>
 				<value>com.realtech.socialsurvey.core.entities.ReferralInvitiation</value>

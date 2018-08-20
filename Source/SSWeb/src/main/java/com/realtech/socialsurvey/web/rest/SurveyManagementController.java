@@ -872,7 +872,7 @@ public class SurveyManagementController
 			}
 
 			if (socialManagementService.postToSocialMedia(agentName, agentProfileLink, custFirstName, custLastName, agentId, rating, surveyId,
-					feedback, isAbusive, serverBaseUrl, onlyPostToSocialSurvey)) {
+					feedback, isAbusive, serverBaseUrl, onlyPostToSocialSurvey, false)) {
 				return "Successfully posted to all the places in hierarchy";
 			}
 

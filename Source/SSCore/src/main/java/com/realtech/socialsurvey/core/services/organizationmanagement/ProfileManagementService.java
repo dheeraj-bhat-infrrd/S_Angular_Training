@@ -627,8 +627,8 @@ public interface ProfileManagementService
         String profileLevel, Date startDate, Date endDate ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public List<SurveyDetails> fetchAndSaveZillowData( OrganizationUnitSettings profile, String collection, long companyId,
-        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException;
+    public List<SurveyDetails> fetchAndPostZillowData( OrganizationUnitSettings profile, String collection, long companyId,
+        boolean fromBatch ) throws InvalidInputException, UnavailableException;
 
 
     public double getAverageRatings( long companyId, String profileLevel, boolean aggregateAbusive, boolean includeZillow,
@@ -646,8 +646,8 @@ public interface ProfileManagementService
     public Map<String, Long> getZillowTotalScoreAndReviewCountForProfileLevel( String profileLevel, long iden );
 
 
-    public List<SurveyDetails> fillSurveyDetailsFromReviewMap( List<SurveyDetails> surveyDetailsList, String collectionName,
-        OrganizationUnitSettings profile, long companyId, boolean fromBatch, boolean fromPublicPage )
+    public List<SurveyDetails> fillSurveyDetailsFromReviewMapAndPost( List<SurveyDetails> surveyDetailsList, String collectionName,
+        OrganizationUnitSettings profile, long companyId, boolean fromBatch )
         throws InvalidInputException;
 
 
@@ -762,6 +762,7 @@ public interface ProfileManagementService
      */
     public void disconnectSelectedSocialMedia( String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens,
         String keyToupdate ) throws InvalidInputException;
+
 
 
     public long getSimpleReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive )
