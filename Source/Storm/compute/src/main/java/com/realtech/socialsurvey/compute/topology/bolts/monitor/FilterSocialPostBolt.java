@@ -77,11 +77,11 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
 
                 // check if post from trusted source
                 if ( isPostFromTrustedSource( post, companyId ) ) {
-                    post.setStatus( SocialFeedStatus.RESOLVED );
+                    //post.setStatus( SocialFeedStatus.RESOLVED );
                     post.setFromTrustedSource( true );
-                    actionHistory = getTrustedSourceActionHistory( post.getPostSource() );
-                    post.getActionHistory().add( actionHistory );
-                    post.setUpdatedTime( actionHistory.getCreatedDate() );
+                    //actionHistory = getTrustedSourceActionHistory( post.getPostSource() );
+                    //post.getActionHistory().add( actionHistory );
+                    //post.setUpdatedTime( actionHistory.getCreatedDate() );
                 }
             }
             LOG.debug( "Emitting tuple with post having postId = {} and post = {}", post.getPostId(), post );
