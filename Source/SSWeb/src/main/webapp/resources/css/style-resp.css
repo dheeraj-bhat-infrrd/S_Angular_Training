@@ -2131,11 +2131,11 @@
     	background-image: url(../images/summit_popup_sm.gif);
 	}
 	
-	.close-summit-popup{
+	.close-summit-popup {
 	    width: 20px;
-   		height: 20px;
-    	top: 9px;
-    	right: 4px;
+	    height: 20px;
+	    top: 25px;
+	    right: 0px;
 	}
 	
 	.register-summit-btn{
@@ -2163,6 +2163,72 @@
 	
 	.mismatch-popup-body-right{
 		margin-top: 15px;
+	}
+	
+	.summit-timer-back {
+	    width: 285px;
+	    height: 38px;
+	    background: #216dab;
+	    position: absolute;
+	    top: 36px;
+	    left: 10px;
+	}
+	
+	.summit-timer-img {
+	    margin-left: 6px;
+	    margin-top: 0px;
+	    width: 285px;
+	    height: 38px;
+	}
+	
+	.summit-timer-text {
+	    position: absolute;
+	    color: #ffcd32;
+	    font-size: 16px;
+	    font-weight: bold !important;
+	    top: 8px;
+	}
+	
+	.summit-timer-days {
+    	right: 140px;
+	}
+	
+	.summit-timer-hrs {
+    	right: 85px;
+	}
+	
+	.summit-timer-min {
+    	right: 32px;
+	}
+	
+	.summit-checkbox-cont {
+	    display: flex;
+	    position: absolute;
+	    bottom: 28px;
+	    margin-left: 32px;
+	}
+	
+	.summit-check-contain {
+	    padding-right: 0;
+	    margin-right: 25px;
+	}
+	
+	.summit-check {
+	    width: 10px;
+	    height: 10px;
+	    background-image: url(../images/checkbox-blank.png);
+	    background-position: center;
+	    background-size: contain;
+	    background-repeat: no-repeat;
+	    cursor: pointer;
+	    margin: 7px 0 0 !important;
+	}
+	
+	.summit-check-text {
+	    color: white;
+	    font-weight: bold !important;
+	    margin-left: 7px !important;
+	    font-size: 8px;
 	}
 }
 

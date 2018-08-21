@@ -430,7 +430,7 @@ public class SocialMonitorWebController {
     }
     
     @ResponseBody
-    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.POST)
     public String getSocialPostsForStream(Model model, HttpServletRequest request)
     {
     	

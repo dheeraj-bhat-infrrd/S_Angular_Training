@@ -25,7 +25,7 @@ var socialSurveyJavascriptWidget = {
 		// initialize data-independent drop down
 		autoAppendTextDropdown("#st-dd-wrapper-widget-font-theme", "st-dd-item font-theme-option-item cursor-pointer widget-select-bx", [ "Light", "Dark" ]);
 		autoAppendTextDropdown("#st-dd-wrapper-widget-embedded-font-theme", "st-dd-item embedded-font-theme-option-item cursor-pointer widget-select-bx", [ "Light", "Dark" ]);
-		autoAppendTextDropdown("#st-dd-wrapper-df-rev-ordr", "st-dd-item df-rev-ordr-option-item cursor-pointer widget-select-bx", [ "Newest First", "Highest Rated First", "Oldest First", "Lowest Rated First" ]);
+		autoAppendTextDropdown("#st-dd-wrapper-df-rev-ordr", "st-dd-item df-rev-ordr-option-item cursor-pointer widget-select-bx", [ "Newest First", "Highest Rated First", "Oldest First", "Lowest Rated First", "Featured Reviews" ]);
 
 		// populate widget configuration in input elements
 		this.populateConfiguration();
@@ -84,6 +84,8 @@ var socialSurveyJavascriptWidget = {
 				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSortOrder = "highestRatingFirst";
 			} else if ("Lowest Rated First" == $(this).html()) {
 				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSortOrder = "lowestRatingFirst";
+			}else if ("Featured Reviews" == $(this).html()) {
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSortOrder = "feature";
 			}
 			socialSurveyJavascriptWidget.displayPreview();
 

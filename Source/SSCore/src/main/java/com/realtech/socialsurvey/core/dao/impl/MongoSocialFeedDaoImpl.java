@@ -560,8 +560,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         //update fromTrustedSource 
         update2.set( FROM_TRUSTED_SOURCE, true );
         //update status to RESOLVED
-        update2.set( STATUS, SocialFeedStatus.RESOLVED );
-        update2.push( ACTION_HISTORY, actionHistory );
+        /*update2.set( STATUS, SocialFeedStatus.RESOLVED );
+        update2.push( ACTION_HISTORY, actionHistory );*/
         update2.set( UPDATED_TIME, new Date().getTime() );
         WriteResult result2 = mongoTemplate.updateMulti( updateQuery2, update2, SOCIAL_FEED_COLLECTION );
         updateCount += result2.getN();

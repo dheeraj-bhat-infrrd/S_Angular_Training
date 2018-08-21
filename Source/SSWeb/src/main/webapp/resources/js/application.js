@@ -1,4 +1,3 @@
-
 //Functions to detect browser
 var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
 var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
@@ -22017,3 +22016,27 @@ function saveUserMapNew(aliasMail,isIgnore) {
 		}
 	});
 }
+
+function summitTimer() {
+	var currentDate = new Date();
+	var endDate = new Date(2018,08,5,0,0,0);
+	
+	var ms = endDate.getTime() - currentDate.getTime();
+	
+	var d, h, m, s;
+	s = Math.floor(ms / 1000);
+	m = Math.floor(s / 60);
+	s = s % 60;
+	h = Math.floor(m / 60);
+	
+	m = (Math.floor(Math.floor(m % 60)/10) == 0 )? '0'+Math.floor(m % 60) : Math.floor(m % 60);
+	d = (Math.floor(Math.floor(h / 24)/10) == 0 )? '0'+Math.floor(h / 24) : Math.floor(h / 24);
+	h = (Math.floor(Math.floor(h % 24)/10) == 0 )? '0'+Math.floor(h % 24) : Math.floor(h % 24);
+	
+	m = m <=0 ? 0 : m;
+	d = d <=0 ? 0 : d;
+	h = h <=0 ? 0 : h;
+	
+	return { d: d, h: h, m: m};
+}
+

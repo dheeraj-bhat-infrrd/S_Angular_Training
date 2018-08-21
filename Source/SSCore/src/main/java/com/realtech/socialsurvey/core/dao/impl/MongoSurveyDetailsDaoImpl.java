@@ -1029,9 +1029,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }  else if( CommonConstants.WIDGET_ORDER_OLDEST_FIRST.equals( order ) ) {
             query.with( new Sort( Sort.Direction.ASC, CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ) );
         } else if( CommonConstants.WIDGET_ORDER_HIGEST_RATING_FIRST.equals( order ) ) {
-            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SCORE_COLUMN ) );
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SCORE_COLUMN,CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ) );
         } else if( CommonConstants.WIDGET_ORDER_LOWEST_RATING_FIRST.equals( order ) ) {
             query.with( new Sort( Sort.Direction.ASC, CommonConstants.SCORE_COLUMN ) );
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ) );
         } else {
             query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ) );
         }
