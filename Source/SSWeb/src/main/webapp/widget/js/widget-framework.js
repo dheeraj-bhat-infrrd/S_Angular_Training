@@ -695,6 +695,7 @@ function bindWidgetButtonActions($, widgetDetails, resourcesHost, ssHost) {
 				$('#ss-widget-load-more-btn').show();
 			}else{
 				$('#ss-widget-load-more-btn').hide();
+				getWidgetReviews($, resourcesHost, ssHost);
 			}
 		}
 	});
