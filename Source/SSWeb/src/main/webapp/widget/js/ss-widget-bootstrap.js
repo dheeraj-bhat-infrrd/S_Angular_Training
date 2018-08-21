@@ -72,8 +72,8 @@
 
 		jQuery(document).ready(function($) {
 
-			loadCss($, resourcesHost + "/widget/css/bootstrap.min.css");
-			loadCss($, resourcesHost + "/widget/css/widget.css");
+			loadCss($, resourcesHost + "/widget/css/bootstrap-ss-widget.css");
+			loadCss($, resourcesHost + "/widget/css/widget-iso.css");
 			loadScript(resourcesHost + "/widget/js/widget-framework.js", function() {
 				var companyProfileName = $(currScript).data('company-profile-name');
 				var profileName = $(currScript).data('profile-name');
