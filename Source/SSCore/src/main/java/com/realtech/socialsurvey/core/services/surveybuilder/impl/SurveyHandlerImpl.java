@@ -3174,7 +3174,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String agentProfileLink = serverBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + settings.getProfileUrl();
         socialManagementService.postToSocialMedia( details.getAgentName(), agentProfileLink, details.getCustomerFirstName(),
             details.getCustomerLastName(), details.getAgentId(), details.getScore(), details.get_id(), details.getReview(),
-            false, serverBaseUrl, true );
+            false, serverBaseUrl, true, false );
         //Date currentDate = new Date(System.currentTimeMillis());
         //surveyDetailsDao.updateModifiedDateForSurvey( details.get_id(), currentDate );
         LOG.debug( "Method SurveyHandlerImpl.importSurveyVOToDBs finished" );
@@ -3603,7 +3603,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             //put link in map
             String zillowPostUrl = zillowReviewwPostUrl.replaceAll( "\\[screenName\\]", "" + zillowScreenName );
             
-            SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT);
+            SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.ZILLOW_SHARE_DATE_FORMAT);
             sdf.setTimeZone(TimeZone.getTimeZone("PST"));
             zillowPostUrl = zillowPostUrl.replaceAll( "\\[dateOfService\\]", "" + sdf.format(surveyDetails.getSurveyTransactionDate()) );
             surveyAndStage.put( "zillowLink", zillowPostUrl );

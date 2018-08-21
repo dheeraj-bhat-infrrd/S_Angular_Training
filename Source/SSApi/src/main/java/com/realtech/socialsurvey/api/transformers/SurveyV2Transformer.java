@@ -100,7 +100,7 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
             survey.setReviewId( d.get_id() );
             review.setSummary( d.getSummary() );
             review.setDescription( d.getReview() );
-            review.setRating( String.valueOf( d.getScore() ) );
+            review.setRating( String.format("%.1f",  d.getScore()) );
             review.setReviewCompletedDateTime(
                 CommonUtils.formatDate( d.getSurveyCompletedDate(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
             review.setRetakeSurvey( d.isRetakeSurvey() );
