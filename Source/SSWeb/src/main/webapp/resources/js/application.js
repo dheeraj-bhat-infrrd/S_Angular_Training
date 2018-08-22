@@ -18798,6 +18798,50 @@ function callFormAjaxPostForSocMonBtn(url,formId,postId){
 		},
 		type : "POST",
 		data : payLoad,
+		success : showToastForSocMonActions,
+		complete: function(data){
+			getStreamPosts(startIndex,status);
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$("#overlay-toast").html("Failed to update post. Please Try again");
+			showToast();
+		}
+	});
+}
+
+function showToastForSocMonActions(data){
+	var map = $.parseJSON(data);
+	if (map.status == "success") {
+		
+		var message = 'Record updated successfully';
+		$("#overlay-toast").html(message);
+		showToast();
+			
+	} else {
+		$("#overlay-toast").html("Failed to update post. Please Try again");
+		showToast();
+	}
+}
+
+function callFormAjaxPostForSocMonDupBtn(url,formId,postId){
+	
+	var status = $('#stream-tabs').data('status');
+
+	var startIndex = $('#stream-pagination').data('startIndex');
+	
+	var $form = $('#'+formId);
+	var payLoad = $form.serialize();
+	$.ajax({
+		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
+		type : "POST",
+		data : payLoad,
 		success : showToastForDupActions,
 		complete: function(data){
 			getStreamPosts(startIndex,status);
@@ -20008,7 +20052,7 @@ $(document).on('click','.dup-stream-action-unflag',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 	
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20026,7 +20070,7 @@ $(document).on('click','.dup-stream-action-flag',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('ALERT');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 	
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20053,7 +20097,7 @@ $(document).on('click','.dup-stream-action-esc',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('ESCALATED');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20079,7 +20123,7 @@ $(document).on('click','.dup-stream-action-res',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('RESOLVED');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20104,7 +20148,7 @@ $(document).on('click','.dup-stream-action-submit',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('SUBMIT');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20195,7 +20239,7 @@ $(document).on('click','.dup-macro-opt',function(e){
 	$('#dup-post-action-form-cont').find('.form-status').val(status);
 	
 	var url = './updatepostactionwithmacro.do';
-	callFormAjaxPostForSocMonBtn(url,'macro-form-apply',postId);
+	callFormAjaxPostForSocMonDupBtn(url,'macro-form-apply',postId);
 	
 	$('#duplicate-post-popup').addClass('hide');
 	
