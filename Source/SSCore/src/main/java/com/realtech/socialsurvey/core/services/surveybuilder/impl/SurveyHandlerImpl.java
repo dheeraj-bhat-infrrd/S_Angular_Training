@@ -4633,9 +4633,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             LOG.error( "Agent doesnt have an company associated with it " );
             throw new InvalidInputException(
                 "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
-        } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
-            throw new InvalidInputException(
-                "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
         }
 
 
