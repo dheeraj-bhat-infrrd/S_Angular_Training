@@ -115,7 +115,7 @@
 	</div>
 </div>
 
-<div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
+<!-- <div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left " style="height:  100%;">
@@ -133,7 +133,7 @@
 			</div>
 		</div>
 	</div>
-</div>
+</div> -->
 
 <div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
 	<div class="container summit-ribbon-con">
@@ -410,7 +410,7 @@
 		var fbPopup = sessionStorage.getItem("fbPopup");
 		
 		if(newSession == false || newSession == 'false'){
-			$('#fb-policy-banner').hide();
+			/* $('#fb-policy-banner').hide(); */
 			$('#summit-popup').hide();
 			if(hasRegisteredForSummit == false || hasRegisteredForSummit == 'false'){
 				showSummitRibbon();
@@ -428,11 +428,11 @@
 			}
 		}
 		
-		if(fbPopup == true || fbPopup == 'true'){
+		/* if(fbPopup == true || fbPopup == 'true'){
 			$('#fb-policy-banner').show();
 		}else if(fbPopup == false || fbPopup == 'false'){
 			$('#fb-policy-banner').hide();
-		}
+		} */
 		
 		console.log(hasRegisteredForSummit,'==',newSession,'==',isShowSummitPopup);
 		
