@@ -19,7 +19,7 @@ $(document).ready(function(){
 	    return;
 	}
 
-	showMainContent('./admindashboard.do');	
+	showMainContent('./adminhierarchy.do');	
 });
 </script>
 <jsp:include page="admin_footer.jsp" />
