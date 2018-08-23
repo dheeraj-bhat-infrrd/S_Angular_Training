@@ -5,17 +5,22 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.realtech.socialsurvey.api.exceptions.BadRequestException;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.exceptions.ValidationException;
@@ -83,6 +88,28 @@ public class GlobalControllerExceptionHandler
                 request, companyId );
     }
 
+    
+    
+    @ExceptionHandler ( HttpMessageNotReadableException.class)
+    @ResponseBody
+    public ResponseEntity<?> handleNumberFormatException( HttpMessageNotReadableException hmnre, HttpServletRequest request )
+	{
+
+		LOG.error("HttpMessageNotReadableException occurred", hmnre);
+
+		String exceptionMessage = hmnre.getMessage();
+		String responseMsg = "";
+		if (ExceptionUtils.indexOfType(hmnre, UnrecognizedPropertyException.class) != -1) {
+			responseMsg = "Invalid request body. " + StringUtils.substring(exceptionMessage, 0, StringUtils.indexOf(exceptionMessage, "(class com.realtech.socialsurvey"));
+		} else if (ExceptionUtils.indexOfType(hmnre, JsonMappingException.class) != -1) {
+			responseMsg = "Invalid request body. Not a valid JSON";
+		} else {
+			responseMsg = exceptionMessage;
+		}
+
+		long companyId = 0;
+		return restUtils.getRestResponseEntity(HttpStatus.BAD_REQUEST, responseMsg, null, null, request, companyId);
+	}
 
     private Map<String, Object> createErrorResponse( Errors errors )
     {
