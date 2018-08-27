@@ -655,7 +655,7 @@ public interface UserManagementService
     public List<UserProfile> getAllAgentAdminProfilesForUser( User user ) throws InvalidInputException;
 
 
-    public User getUserByEmailAndCompanyFromUserEmailMappings( long companyId, String emailId )
+    public User getUserByEmailAndCompanyFromUserEmailMappings( Company company, String emailId )
         throws InvalidInputException, NoRecordsFetchedException;
 
 
