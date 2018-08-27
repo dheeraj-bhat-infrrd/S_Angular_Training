@@ -59,7 +59,6 @@ public class EngagementWrapper {
 		wrapper.setEngagements(engagements);
 		wrapper.setNextRecord(4l);
 		String json = new Gson().toJson(wrapper);
-		System.out.println(json);
 	}
 
 }
