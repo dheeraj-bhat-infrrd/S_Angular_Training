@@ -3071,7 +3071,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "method sendSocialMonitorActionMail ended" );
 	}
     
-    //@Async
+    @Async
     @Override
     public boolean sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId,
         User addedUser, OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException

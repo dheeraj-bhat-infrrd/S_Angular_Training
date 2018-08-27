@@ -882,7 +882,6 @@ public class DashboardController
             String searchKey = request.getParameter( "searchKey" );
             if ( searchKey.contains( "<" ) ) {
                 searchKey = searchKey.substring( 0, searchKey.indexOf( "<" ) ).trim();
-                System.out.println( searchKey );
             }
             solrDocuments = solrSearchService.searchBranchRegionOrAgentByName( CommonConstants.USER_DISPLAY_NAME_SOLR,
                 searchKey, idenFieldName, iden );

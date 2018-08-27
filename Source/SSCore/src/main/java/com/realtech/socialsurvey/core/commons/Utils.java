@@ -292,7 +292,6 @@ public class Utils
         LOG.debug( "Encoding of text started." );
         try {
             text = URLEncoder.encode( text, "UTF-8" );
-            System.out.println( "Encoded text : " + text );
         } catch ( UnsupportedEncodingException e ) {
             LOG.warn( "Error occurred while url encoding params. Reason : ", e );
         }

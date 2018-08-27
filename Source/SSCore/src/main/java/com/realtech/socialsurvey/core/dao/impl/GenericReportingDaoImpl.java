@@ -352,7 +352,6 @@ public class GenericReportingDaoImpl<T, ID extends Serializable> implements Gene
                 projections.add( Projections.property( columnName ).as( columnName ) );
             }
             crit.setProjection( projections );
-            System.out.println( projections.toString() );
             for ( Entry<String, Object> query : queries.entrySet() ) {
                 crit.add( Restrictions.eq( query.getKey(), query.getValue() ) );
             }
@@ -379,7 +378,6 @@ public class GenericReportingDaoImpl<T, ID extends Serializable> implements Gene
                 projections.add( Projections.property( columnName ).as( columnName ) );
             }
             crit.setProjection( projections );
-            System.out.println( projections.toString() );
             for ( Entry<String, Object> query : queries.entrySet() ) {
                 crit.add( Restrictions.eq( query.getKey(), query.getValue() ) );
             }

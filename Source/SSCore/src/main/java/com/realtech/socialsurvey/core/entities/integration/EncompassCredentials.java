@@ -28,14 +28,4 @@ public class EncompassCredentials {
 		this.apiKey = apiKey;
 	}
 
-	public static void main(String[] args){
-		EncompassCredentials cred = new EncompassCredentials();
-		cred.setApiKey("ABCDEF");
-		cred.setCompanyId(1);
-		List<EncompassCredentials> creds = new ArrayList<>();
-		creds.add(cred);
-		creds.add(cred);
-		creds.add(cred);
-		System.out.println(new Gson().toJson(creds));
-	}
 }

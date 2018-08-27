@@ -42,7 +42,6 @@ public class ApiLoggingProcessorThread extends Thread
         } catch (InterruptedException e) {
         	LOG.error("Thread interupted " , e);
         }
-        System.out.println(getName() + " is finished");
     }
 
 }
