@@ -22,6 +22,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -657,6 +658,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
      * @throws InvalidInputException
      * */
     @Override
+    @Async
     public void updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( User agent, String agentEmailAddress )
         throws InvalidInputException
     {
