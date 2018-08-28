@@ -586,9 +586,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         String agentTitle = agentContactDetailsSettings.getTitle();
                         String companyName = companySettings.getContact_details().getName();
                         String location = agentContactDetailsSettings.getLocation();
-                        String industry = agentContactDetailsSettings.getIndustry();
-                        if ( industry == null || industry.isEmpty() ) {
-                            industry = companySettings.getContact_details().getIndustry();
+                        String industry = agentSettings.getVertical();
+                        if ( industry == null || industry.isEmpty() || industry.equalsIgnoreCase("null")) {
+                            industry = companySettings.getVertical();
+                        }
+                        if( industry == null || industry.isEmpty() || industry.equalsIgnoreCase("null")) {
+                        	 industry = companySettings.getContact_details().getIndustry();
                         }
 
                         String title = WordUtils.capitalize( agentContactDetailsSettings.getName() ) + ", "
@@ -596,11 +599,15 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             + ( location != null && !location.isEmpty() ? location + ", " : "" ) + industry
                             + " Professional Reviews | " + ( isZillow ? "Zillow" : "SocialSurvey.me" );
 
+                        title = title.replace("null", "");
+                        
                         String description = "Reviews for " + agentContactDetailsSettings.getName() + ". "
                             + agentContactDetailsSettings.getFirstName() + " is a  " + industry + " professional in "
                             + ( location != null && !location.isEmpty() ? location : "" ) + ". "
                             + agentContactDetailsSettings.getFirstName() + " is the "
                             + ( agentTitle != null && !agentTitle.isEmpty() ? agentTitle : "" ) + " of " + companyName + ".";
+                        description = description.replace("null", "");
+                        
 
                         String imageUrl = applicationLogoUrlForLinkedin;
 
