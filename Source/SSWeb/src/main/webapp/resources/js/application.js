@@ -1598,11 +1598,15 @@ function fetchReviewsOnDashboard(isNextBatch) {
 			displayReviewOnDashboard();
 		}
 		isDashboardReviewRequestRunning = false;
-		if ($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
-			fetchReviewsOnDashboard(true);
-		} else if ($('div.dsh-review-cont.hide').length < (2 * batchSizeCmp)) {
-			fetchZillowReviewsBasedOnProfile(colName, colValue, isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp, name);
+		
+		if($('#review-details').length > 0 ){
+			if ($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
+				fetchReviewsOnDashboard(true);
+			} else if ($('div.dsh-review-cont.hide').length < (2 * batchSizeCmp)) {
+				fetchZillowReviewsBasedOnProfile(colName, colValue, isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp, name);
+			}
 		}
+		
 	}, payload, true);
 }
 
