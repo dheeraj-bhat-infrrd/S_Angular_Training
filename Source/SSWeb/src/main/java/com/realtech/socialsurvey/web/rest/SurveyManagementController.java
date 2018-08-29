@@ -697,7 +697,12 @@ public class SurveyManagementController
 			model.addAttribute("source", source);
 
 			User user = userManagementService.getUserByUserId(agentId);
-
+			OrganizationUnitSettings agentSettings = userManagementService.getUserSettings(agentId);
+			//check if manual surveys from public pages are prevented for agent
+			if(agentSettings.isManualCustomerSuurveyPrevented()) {
+				errorMsg = "Public reviews are not allowed for " + agentName;
+				throw new NonFatalException("Public reviews are not allowed for " + agentName);
+			}
 			try {
 				surveyHandler.initiateSurveyRequest(user.getUserId(), customerEmail, firstName, lastName, source);
 			}
