@@ -52,12 +52,14 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -1311,8 +1313,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         boolean isZillow, boolean isAgentsHidden, String surveyId ) throws InvalidInputException
     {
         try {
-
-            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+        		List<String> socialList = mediaPostDetails.getSharedOn();
+            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) && !socialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
                 if ( !isZillow ) {
                     String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId, setting,
                         collectionType );
@@ -1324,7 +1326,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     updatedFacebookMessage = facebookMessage + profileUrlWithMessage;
                 }
                 if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId, profileUrl ) ) {
-                    List<String> socialList = mediaPostDetails.getSharedOn();
                     if ( !socialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
                         socialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                     }
@@ -1488,7 +1489,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         EntityMediaPostResponseDetails mediaPostResponseDetails, String surveyId )
     {
         try {
-            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
+        		List<String> socialList = mediaPostDetails.getSharedOn();
+            if ( surveyHandler.canPostOnSocialMedia( setting, rating ) && !socialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) ) {
                 if ( !isZillow ) {
                     String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia(
                         agentSettings.getIden(), setting, collectionName );
@@ -1505,7 +1507,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                 if ( !updateLinkedin( setting, collectionName, updatedLinkedInMessage, linkedinProfileUrl,
                     linkedinMessageFeedback, companySettings, isZillow, agentSettings, linkedinPostResponse, surveyId ) ) {
-                    List<String> socialList = mediaPostDetails.getSharedOn();
                     if ( !socialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE ) )
                         socialList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
                     mediaPostDetails.setSharedOn( socialList );
@@ -3980,28 +3981,42 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             if ( surveyDetails == null )
                 throw new InvalidInputException( "No survey found with survey id : " + surveyMongoId );
 
+            if(surveyDetails.getSocialMediaPostDetails() == null)
+            		surveyDetails.setSocialMediaPostDetails(new SocialMediaPostDetails());
+            
+            if(surveyDetails.getSocialMediaPostResponseDetails() == null)
+        			surveyDetails.setSocialMediaPostResponseDetails(new SocialMediaPostResponseDetails());
+            
             //get setting
             OrganizationUnitSettings settings = null;
             if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 settings = organizationManagementService.getCompanySettings( entityId );
+                if(surveyDetails.getSocialMediaPostDetails().getCompanyMediaPostDetails() == null)
+                		surveyDetails.getSocialMediaPostDetails().setCompanyMediaPostDetails(new CompanyMediaPostDetails());
                 mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getCompanyMediaPostDetails();
                 entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
                     .getCompanyMediaPostResponseDetails();
                 collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
             } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
                 settings = organizationManagementService.getRegionSettings( entityId );
+                if(surveyDetails.getSocialMediaPostDetails().getRegionMediaPostDetailsList() == null)
+        				surveyDetails.getSocialMediaPostDetails().setRegionMediaPostDetailsList(new ArrayList<RegionMediaPostDetails>());
                 mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getRegionMediaPostDetailsList().get( 0 );
                 entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
                     .getRegionMediaPostResponseDetailsList().get( 0 );
                 collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
             } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 settings = organizationManagementService.getBranchSettingsDefault( entityId );
+                if(surveyDetails.getSocialMediaPostDetails().getBranchMediaPostDetailsList() == null)
+    					surveyDetails.getSocialMediaPostDetails().setBranchMediaPostDetailsList(new ArrayList<BranchMediaPostDetails>());
                 mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getBranchMediaPostDetailsList().get( 0 );
                 entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
                     .getBranchMediaPostResponseDetailsList().get( 0 );
                 collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
             } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
                 settings = userManagementService.getUserSettings( entityId );
+                if(surveyDetails.getSocialMediaPostDetails().getAgentMediaPostDetails() == null)
+            			surveyDetails.getSocialMediaPostDetails().setAgentMediaPostDetails(new AgentMediaPostDetails());
                 mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getAgentMediaPostDetails();
                 entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
                     .getAgentMediaPostResponseDetails();
@@ -4009,7 +4024,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             }
             if ( settings == null )
                 throw new InvalidInputException( "No data found for " + entityType );
-
+            
+            if(mediaPostDetails == null)
+            		mediaPostDetails = new MediaPostDetails();
+            
             double rating = surveyHandler.getFormattedSurveyScore( surveyDetails.getScore() );
             String feedback = surveyDetails.getReview();
             String agentName = surveyDetails.getAgentName();
