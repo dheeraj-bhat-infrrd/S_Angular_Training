@@ -2133,10 +2133,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( companySettings != null && agentSettings != null ) {
             CRMInfo crmInfo = companySettings.getCrm_info();
-            if ( crmInfo != null && crmInfo.isAllowPartnerSurvey() ) {
+            if ( crmInfo != null && crmInfo.getCrm_source().equalsIgnoreCase(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS) && crmInfo.isAllowPartnerSurvey() ) {
                 //check if agent is allowed for partner survey
                 if ( agentSettings.isAllowPartnerSurvey() )
                     return true;
+            }else {
+            		return true;
             }
         }
         return false;
@@ -4631,9 +4633,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         if ( user.getCompany() == null ) {
             LOG.error( "Agent doesnt have an company associated with it " );
-            throw new InvalidInputException(
-                "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
-        } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
             throw new InvalidInputException(
                 "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
         }
