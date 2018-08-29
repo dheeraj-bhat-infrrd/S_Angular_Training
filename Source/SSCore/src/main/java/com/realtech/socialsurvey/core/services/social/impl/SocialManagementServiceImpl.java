@@ -639,6 +639,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             + "\"," + "\"description\": \"" + description + "\"," + "\"submitted-url\": \"" + profileUrl
                             + "\",  " + "\"submitted-image-url\": \"" + imageUrl + "\"},"
                             + "\"visibility\": {\"code\": \"anyone\" }}";
+                        LOG.info("linkedPostJSON is " + linkedPostJSON);
                         StringEntity entity = new StringEntity( linkedPostJSON,  "UTF-8" );
                         post.setEntity( entity );
                         try {
