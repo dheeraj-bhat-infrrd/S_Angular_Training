@@ -107,9 +107,11 @@
 }
 #ss-widget-container .ss-widget-rating-detils-container {
   margin-bottom: 15px;
+  text-align: left;
 }
 #ss-widget-container .ss-widget-opt-text {
   line-height: 25px;
+  text-align: left;
 }
 #ss-widget-container .ss-widget-options-dropdown {
   margin-top: 10px;
@@ -128,13 +130,14 @@
   text-align: right;
 }
 #ss-widget-container .ss-widget-order-text {
-  margin-bottom: 5px;
+  margin: 5px 0;
   cursor: pointer;
 }
 #ss-widget-container .ss-widget-rev-cont {
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 10px;
+  text-align: left;
 }
 #ss-widget-container .ss-widget-rev-head {
   background: #247ac2;
@@ -369,6 +372,10 @@
 
 #ss-widget-container .ss-widget-avg-rating-cont{
 	padding:0;
+}
+
+#ss-widget-container .ss-widget-src-opts {
+    margin: 5px 0;
 }
 
 @media (max-width: 767px) {
