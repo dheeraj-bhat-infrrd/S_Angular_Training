@@ -3073,7 +3073,7 @@ public class EmailServicesImpl implements EmailServices
     
     @Async
     @Override
-    public boolean sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId,
+    public void sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId,
         User addedUser, OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "method sendUserAdditionMail() called" );
@@ -3111,7 +3111,6 @@ public class EmailServicesImpl implements EmailServices
             false );
 
         LOG.debug( "method sendUserAdditionMail() finished" );
-        return true;
     }
 
     //@Async
