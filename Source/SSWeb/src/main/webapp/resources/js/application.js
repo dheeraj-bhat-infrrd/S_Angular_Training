@@ -17841,6 +17841,18 @@ function getStreamPosts(startIndex,status,text){
 	var companyId = $('#segment-data').data('companyId');
 	var feeds = $('#feed-data').val();
 	
+	if(feeds == '' || feeds == null || feeds == undefined){
+		var startFlag = true;
+		$.each($('.feed-unchecked'), function( index, value ) {
+			  if(!$(this).hasClass('hide')){
+				  startFlag = false;
+			  }
+		});
+		
+		if(startFlag){
+			feeds = "FACEBOOK,TWITTER,INSTAGRAM";
+		}
+	}
 	var payload = {
 		"startIndex":startIndex,
 		"batchSize":batchSize,
