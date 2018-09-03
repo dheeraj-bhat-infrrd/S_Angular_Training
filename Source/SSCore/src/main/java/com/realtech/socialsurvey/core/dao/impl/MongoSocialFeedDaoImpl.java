@@ -240,11 +240,14 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
                 ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
         }
 
-        //TRUSTED-SOURCE tab criteria
-        if ( fromTrustedSource ) {
-            criteria.orOperator( ( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
+        //NEW and TRUSTED-SOURCE tab criteria
+        if ( status.equalsIgnoreCase( SocialFeedStatus.NEW.toString() ) ) {
+            //criterias.add( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
+            criteria.andOperator( ( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
+                ,( Criteria.where( STATUS ).is( status.toUpperCase() )  )
                 .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) );
         }
+        
         //Stream, Alerts, Escalation, Resolved criteria
         else if(!criterias.isEmpty() && criterias != null && isCompanySet){
             criteria.orOperator( ( Criteria.where( STATUS ).is( status.toUpperCase() )
