@@ -76,6 +76,33 @@
   <notepads>
   </notepads>
   <connection>
+    <name>Prod_centralized</name>
+    <server>ss-report.c3n1qsdsmjxc.us-west-2.rds.amazonaws.com</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>ss_report</database>
+    <port>3306</port>
+    <username>subhrajit</username>
+    <password>Encrypted 2be98af9b1fc59aa4a917a97ccccafe88</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
@@ -593,7 +620,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>user_ranking_this_month_region</table>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>Y</use_batch>

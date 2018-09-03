@@ -588,7 +588,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>user_ranking_past_year_region</table>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>Y</use_batch>
