@@ -23,9 +23,19 @@ public class SocialFeedFilter implements Serializable
     private String searchText;
     private boolean companySet;
     private boolean fromTrustedSource;
+    private boolean socMonOnLoad;
+
+    public boolean isSocMonOnLoad() {
+		return socMonOnLoad;
+	}
 
 
-    public int getStartIndex()
+	public void setSocMonOnLoad(boolean socMonOnLoad) {
+		this.socMonOnLoad = socMonOnLoad;
+	}
+
+
+	public int getStartIndex()
     {
         return startIndex;
     }

@@ -22,11 +22,12 @@ public interface MongoSocialFeedDao
 
     public List<SocialResponseObject> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
         Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet,
-        boolean fromTrustedSource );
+        boolean fromTrustedSource, boolean isSocMonOnLoad );
 
 	
     public long getAllSocialFeedsCount( String status, List<String> feedtype, Long companyId, List<Long> regionId,
-        List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet, boolean fromTrustedSource );
+        List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet, boolean fromTrustedSource,
+		boolean isSocMonOnLoad);
 
 	
 	public OrganizationUnitSettings getCompanyDetails(Long companyId);
