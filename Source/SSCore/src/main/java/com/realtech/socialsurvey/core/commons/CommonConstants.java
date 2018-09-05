@@ -595,7 +595,7 @@ public interface CommonConstants
     // settings constants
     public static final String CRM_INFO_SOURCE_API = "API";
     public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
-    public static final String CRM_INFO_SOURCE_FTP = "ftp";
+    public static final String CRM_INFO_SOURCE_FTP = "FTP";
     public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
     public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";

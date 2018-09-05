@@ -10924,7 +10924,7 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue) {
 		showMainContent('./showprofilepage.do');
 		editProfileForAchievements = true;
 	} else if (task == 'INSTAGRAM_PRF') {
-		openAuthPageDashboard('Instagram', columnName, columnValue);
+		openAuthPageDashboard('instagram', columnName, columnValue);
 	}
 }
 
