@@ -138,12 +138,12 @@
 <div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
 	<div class="container summit-ribbon-con">
 		<div class="summit-ribbon">
-			<div class="summit-rib-timer-back">
+			<%-- <div class="summit-rib-timer-back">
 				<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown.png" class="summit-rib-timer-img">
     			<div class="summit-rib-text summit-rib-days">23</div>
 			    <div class="summit-rib-text summit-rib-hrs">23</div> 
 			    <div class="summit-rib-text summit-rib-min">23</div> 
-			</div>
+			</div> --%>
 			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
 		</div>
 	</div>
@@ -151,12 +151,12 @@
 
  <div id="summit-popup" class="overlay-login summit-popup-outer hide">
 	<div id="summit-popup-body" class="summit-popup">
-		<div class="summit-timer-back">
+		<%-- <div class="summit-timer-back">
 			<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown_trans.png" class="summit-timer-img">
 			<div class="summit-timer-text summit-timer-days"></div>
 			<div class="summit-timer-text summit-timer-hrs"></div>
 			<div class="summit-timer-text summit-timer-min"></div>
-		</div>		
+		</div> --%>		
 		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
 		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
 		<div class="summit-checkbox-cont clearfix">
