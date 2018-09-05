@@ -17841,6 +17841,22 @@ function getStreamPosts(startIndex,status,text){
 	var companyId = $('#segment-data').data('companyId');
 	var feeds = $('#feed-data').val();
 	
+	/*if(feeds == '' || feeds == null || feeds == undefined){
+		var startFlag = true;
+		$.each($('.feed-unchecked'), function( index, value ) {
+			  if(!$(this).hasClass('hide')){
+				  startFlag = false;
+			  }
+		});
+		
+		if(startFlag){
+			feeds = "FACEBOOK,TWITTER,INSTAGRAM";
+		}
+	}*/
+	
+	var socMonOnLoad = $('#stream-tabs').attr('data-socMonOnLoad');
+	$('#stream-tabs').attr('data-socMonOnLoad',false);
+	
 	var payload = {
 		"startIndex":startIndex,
 		"batchSize":batchSize,
@@ -17851,7 +17867,8 @@ function getStreamPosts(startIndex,status,text){
 		"user":userIds,
 		"feeds": feeds,
 		"text" : text,
-		"fromTrustedSource": fromTrustedSource
+		"fromTrustedSource": fromTrustedSource,
+		"socMonOnLoad": socMonOnLoad
 	};
 	
 	lastgetStreamPostRequestToDelete = $.ajax({

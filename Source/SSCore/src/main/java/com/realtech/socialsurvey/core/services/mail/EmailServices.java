@@ -498,7 +498,7 @@ public interface EmailServices
 			throws InvalidInputException, UndeliveredEmailException;
 
     
-    public boolean sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId, User addedUser,
+    public void sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId, User addedUser,
         OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException;
 
 

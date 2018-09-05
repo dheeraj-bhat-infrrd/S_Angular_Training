@@ -113,7 +113,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
             socialFeedFilter.getLimit(), socialFeedFilter.getStatus(), socialFeedFilter.getFeedtype(),
             socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(), socialFeedFilter.getBranchIds(),
             socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(), socialFeedFilter.isCompanySet(),
-            socialFeedFilter.isFromTrustedSource() );
+            socialFeedFilter.isFromTrustedSource(), socialFeedFilter.isSocMonOnLoad() );
         if ( socialResponseObjects != null && !socialResponseObjects.isEmpty() ) {
             for ( SocialResponseObject socialResponseObject : socialResponseObjects ) {
                 SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
@@ -165,7 +165,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
             socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( socialFeedFilter.getStatus(),
                 socialFeedFilter.getFeedtype(), socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(),
                 socialFeedFilter.getBranchIds(), socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(),
-                socialFeedFilter.isCompanySet(), socialFeedFilter.isFromTrustedSource() ) );
+                socialFeedFilter.isCompanySet(), socialFeedFilter.isFromTrustedSource(), socialFeedFilter.isSocMonOnLoad() ) );
             
             if(socialFeedFilter.isFromTrustedSource()) {
                 socialMonitorResponseData.setStatus( TRUSTED_SOURCE );

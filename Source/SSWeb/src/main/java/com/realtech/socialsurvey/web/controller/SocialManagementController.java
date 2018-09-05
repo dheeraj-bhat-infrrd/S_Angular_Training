@@ -3394,13 +3394,15 @@ public class SocialManagementController
     
     @ResponseBody
     @RequestMapping ( value = "/postonlinkedin", method = RequestMethod.POST)
-    public boolean postToLinkedIn( HttpServletRequest request )
+    public String postToLinkedIn( HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to linkedin started." );
         String entityType = request.getParameter( "entityType" );
         String surveyMongoId = request.getParameter( "surveyMongoId" );
         long entityId = Long.parseLong( request.getParameter( "entityId" ) );
-        return socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
+        Boolean isPosted = socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
+        String isPostedStr = new Gson().toJson(isPosted);
+        return isPostedStr;
     }
 
 }
