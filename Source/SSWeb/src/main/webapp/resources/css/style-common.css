@@ -12133,7 +12133,7 @@ img.lead-img {
     width: 1140px;
     height: 681px;
     margin: 0 auto;
-    background-image: url(../images/CreateWOWSummit_Banners_FinalDay_Banner_Web.png);
+    background-image: url(../images/CreateWOWSummit_Banners_Dayof_web.png);
     background-size:contain;
     background-position:center;
     border-radius: 8px;
@@ -12162,7 +12162,7 @@ img.lead-img {
 }
 
 .summit-ribbon{
-	background-image: url(../images/CreateWowSummit_Ribbon_FinalDay_web.png);
+	background-image: url(../images/CreateWowSummit_Ribbon_Dayof_web.png);
     background-size:contain;
     background-position:center;
     margin-left: -35px;

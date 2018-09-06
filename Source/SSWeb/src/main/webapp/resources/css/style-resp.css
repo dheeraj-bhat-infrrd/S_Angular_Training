@@ -2128,7 +2128,7 @@
 	    width: 100%;
     	height: 230px;
     	top: 50px;
-    	background-image: url(../images/CreateWOWSummit_Banners_FinalDay_mobile.png);
+    	background-image: url(../images/CreateWOWSummit_Banners_Dayof_mobile.png);
 	}
 	
 	.close-summit-popup {
@@ -2151,7 +2151,7 @@
 	
 	.summit-ribbon{
 		margin: 0;
-		background-image: url(../images/CreateWowSummit_Ribbon_FinalDay_mobile.png);
+		background-image: url(../images/CreateWowSummit_Ribbon_Daysof_mobile.png);
 	}
 	
 	.close-summit-ribbon{
