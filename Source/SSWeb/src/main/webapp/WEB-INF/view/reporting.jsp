@@ -412,19 +412,13 @@
 		if(newSession == false || newSession == 'false'){
 			/* $('#fb-policy-banner').hide(); */
 			$('#summit-popup').hide();
-			if(hasRegisteredForSummit == false || hasRegisteredForSummit == 'false'){
-				showSummitRibbon();
-			}
+			showSummitRibbon();
 			enableBodyScroll();
 		}else{
-			if(hasRegisteredForSummit == false || hasRegisteredForSummit == 'false'){
-				if(isShowSummitPopup == 'false' || isShowSummitPopup == false){
-					showSummitPopup();
-				}else{
-					showSummitRibbon();
-				}
+			if(isShowSummitPopup == 'false' || isShowSummitPopup == false){
+				showSummitPopup();
 			}else{
-				$('#summit-ribbon').hide();
+				showSummitRibbon();
 			}
 		}
 		
