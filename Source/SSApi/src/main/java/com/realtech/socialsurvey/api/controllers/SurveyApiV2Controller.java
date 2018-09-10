@@ -148,7 +148,7 @@ public class SurveyApiV2Controller
 
         
         //save the object to database
-        Map<String, Long> surveyIds = new LinkedHashMap<String, Long>();
+        Map<String, Long> surveyIds = new LinkedHashMap<>();
         try {
             for ( SurveyPreInitiation surveyPreInitiation : surveyPreInitiations ) {
                 surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
