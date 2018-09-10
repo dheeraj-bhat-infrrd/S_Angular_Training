@@ -54,9 +54,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-<c:set var="activeSession" value="${activeSession }"></c:set>
+<%-- <c:set var="activeSession" value="${activeSession }"></c:set>
 <c:set var="hasRegisteredForSummit" value="${hasRegisteredForSummit }"></c:set>
-<c:set var="isShowSummitPopup" value="${isShowSummitPopup }"></c:set>
+<c:set var="isShowSummitPopup" value="${isShowSummitPopup }"></c:set> --%>
 
 <div class="overlay-loader hide"></div>
 <input type="hidden"  id="reporting-data-div" data-profile-master-id="${profilemasterid}" data-user-id="${userId}" data-column-name="${columnName}" data-column-value="${columnValue}">
@@ -426,8 +426,6 @@
 		}else if(fbPopup == false || fbPopup == 'false'){
 			$('#fb-policy-banner').hide();
 		} */
-		
-		console.log(hasRegisteredForSummit,'==',newSession,'==',isShowSummitPopup);
 		
 		var diffDays = summitTimer();
 		$('.summit-timer-days').html(diffDays.d);
