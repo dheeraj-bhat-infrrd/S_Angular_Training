@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -147,7 +148,7 @@ public class SurveyApiV2Controller
 
         
         //save the object to database
-        Map<String, Long> surveyIds = new HashMap<String, Long>();
+        Map<String, Long> surveyIds = new LinkedHashMap<>();
         try {
             for ( SurveyPreInitiation surveyPreInitiation : surveyPreInitiations ) {
                 surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
