@@ -152,7 +152,7 @@ public class SurveyApiV2Controller
         try {
             for ( SurveyPreInitiation surveyPreInitiation : surveyPreInitiations ) {
                 surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
-                surveyIds.put( surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getSurveyPreIntitiationId() );
+                surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId() );
             }
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
 

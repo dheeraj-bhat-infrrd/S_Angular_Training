@@ -401,6 +401,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyDetails.setPropertyAddress( surveyPreInitiation.getPropertyAddress() );
         }
 
+        if(surveyPreInitiation.getLoanProcessorEmail() != null) {
+            surveyDetails.setLoanProcessorEmail( surveyPreInitiation.getLoanProcessorEmail() );
+        }
+        
+        if(surveyPreInitiation.getLoanProcessorName() != null) {
+            surveyDetails.setLoanProcessorName( surveyPreInitiation.getLoanProcessorName() );
+        }
+        
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
             // LOG.debug( "Updating modified on column in agent hierarchy fro agent " );
