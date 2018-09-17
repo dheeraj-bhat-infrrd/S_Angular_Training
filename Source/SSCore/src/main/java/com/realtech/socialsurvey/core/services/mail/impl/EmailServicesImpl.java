@@ -1407,7 +1407,7 @@ public class EmailServicesImpl implements EmailServices
     @Override
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
         String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
-        String customerDetail, String propertyAddress, String fbShareUrl , boolean isAddFbShare ) throws InvalidInputException, UndeliveredEmailException
+        String customerDetail, String fbShareUrl , boolean isAddFbShare ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1439,13 +1439,13 @@ public class EmailServicesImpl implements EmailServices
         if(isAddFbShare) {
         		messageBodyReplacements.setFileName(
                     EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY_NEW );
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, fbShareUrl, propertyAddress,
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, fbShareUrl,
                     customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
                     String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         }else {
         		messageBodyReplacements.setFileName(
                     EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY );
-        		messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,propertyAddress,
+        		messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,
                         customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
                         String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         }
