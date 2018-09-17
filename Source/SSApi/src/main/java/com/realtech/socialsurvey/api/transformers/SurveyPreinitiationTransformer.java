@@ -189,4 +189,18 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 	}
 
 
+	public String getParticipantForResponse(int participantType) {
+		switch (participantType) {
+		case CommonConstants.SURVEY_PARTICIPANT_TYPE_BORROWER:
+			return CommonConstants.PARTICIPANT_CUSTOMER_1;
+		case CommonConstants.SURVEY_PARTICIPANT_TYPE_COBORROWER:
+			return CommonConstants.PARTICIPANT_CUSTOMER_2;
+		case CommonConstants.SURVEY_PARTICIPANT_TYPE_BUYER_AGENT:
+			return CommonConstants.PARTICIPANT_BUYER_AGENT;
+		case CommonConstants.SURVEY_PARTICIPANT_TYPE_SELLER_AGENT:
+			return CommonConstants.PARTICIPANT_SELLER_AGENT;
+		default:
+			return CommonConstants.PARTICIPANT_CUSTOMER_1;
+		}
+	}
 }
