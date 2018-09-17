@@ -7924,7 +7924,6 @@ function paintSurveyPageFromJson() {
 	}
 	
 	var questionTextEdited = question.replace(/&lt;/g,'<').replace(/&gt;/g, '>').replace(/&quot;/g,'"');
-	console.log(questionTextEdited);
 	if (questionType == "sb-range-star") {
 		$("div[data-ques-type='stars']").show();
 		$("#ques-text").html(questionTextEdited);
