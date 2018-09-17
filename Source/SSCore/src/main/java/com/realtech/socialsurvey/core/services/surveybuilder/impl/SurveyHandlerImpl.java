@@ -4700,7 +4700,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
 
         if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
-            LOG.error( "Survey request already sent" );
+            LOG.error( "Survey request already sent for agentId:{} and customerEmail:{}", user.getUserId(), survey.getCustomerEmailId() );
             throw new InvalidInputException( "Can not process the record. A survey request for customer "
                 + survey.getCustomerFirstName() + " has already been received." );
         }
