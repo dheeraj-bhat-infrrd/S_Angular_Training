@@ -119,6 +119,8 @@ public class OrganizationUnitSettings implements Serializable
     
     private ZillowShareConfig zillowShareConfig;
     
+    private CustomFieldsNameMapping customFieldsNameMapping;
+    
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
 	}
@@ -974,6 +976,16 @@ public class OrganizationUnitSettings implements Serializable
 
 	public void setManualCustomerSuurveyPrevented(boolean manualCustomerSuurveyPrevented) {
 		this.manualCustomerSuurveyPrevented = manualCustomerSuurveyPrevented;
+	}
+
+
+	public CustomFieldsNameMapping getCustomFieldsNameMapping() {
+		return customFieldsNameMapping;
+	}
+
+
+	public void setCustomFieldsNameMapping(CustomFieldsNameMapping customFieldsNameMapping) {
+		this.customFieldsNameMapping = customFieldsNameMapping;
 	}
 
 
