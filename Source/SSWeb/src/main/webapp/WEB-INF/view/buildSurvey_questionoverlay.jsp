@@ -7,7 +7,7 @@
 			<div class="float-right bd-q-pu-header-rt cursor-pointer"><spring:message code="label.needhelp.key" /></div>
 		</div>
 		<div class="bd-q-pu-txt-wrapper pos-relative">
-			<input type="hidden" id="sb-question-type-1" name="sb-question-type-1" data-state="new"/>
+			<input type="hidden" id="sb-question-type-1" name="sb-question-type-1" data-state="new" value="sb-range-smiles"/>
 			<input id="sb-question-txt-1" name="sb-question-txt-1" class="bd-q-pu-txt" data-nextquest="false" data-qno="1">
 			<div class="bd-q-pu-close hide"></div>
 		</div>

@@ -347,7 +347,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setAgentName( agentName );
         surveyDetails.setAgentEmailId( surveyPreInitiation.getAgentEmailId() );
         surveyDetails.setBranchId( branchId );
-        surveyDetails.setBranchName(branch.getBranch());
+        String branchName = "";
+        if(branch != null && branch.getIsDefaultBySystem() == 0) {
+            branchName = branch.getBranch();
+        }
+        surveyDetails.setBranchName(branchName);
+        
         surveyDetails.setCustomerFirstName( surveyPreInitiation.getCustomerFirstName() );
         String lastName = surveyPreInitiation.getCustomerLastName();
         if ( lastName != null && !lastName.isEmpty() && !lastName.equalsIgnoreCase( "null" ) )
@@ -355,7 +360,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setCompanyId( companyId );
         surveyDetails.setCustomerEmail( surveyPreInitiation.getCustomerEmailId() );
         surveyDetails.setRegionId( regionId );
-        surveyDetails.setRegionName(region.getRegion());
+        
+        String regionName = "";
+        if(region!=null && region.getIsDefaultBySystem() == 0) {
+            regionName = region.getRegion();
+        }
+        surveyDetails.setRegionName(regionName);
         surveyDetails.setStage( CommonConstants.INITIAL_INDEX );
         surveyDetails.setReminderCount( surveyPreInitiation.getReminderCounts() );
         surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
