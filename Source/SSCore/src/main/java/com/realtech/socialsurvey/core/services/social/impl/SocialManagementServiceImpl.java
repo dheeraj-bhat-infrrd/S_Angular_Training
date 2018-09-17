@@ -3178,8 +3178,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         // update access token expiry
         facebookToken.setFacebookAccessTokenCreatedOn( System.currentTimeMillis() );
-        if ( accessToken.getExpires() != null )
-            facebookToken.setFacebookAccessTokenExpiresOn( accessToken.getExpires() );
+        //update facebook access token to be zero always
+        /*if ( accessToken.getExpires() != null )
+           facebookToken.setFacebookAccessTokenExpiresOn( accessToken.getExpires() );*/
+        facebookToken.setFacebookAccessTokenExpiresOn(0);
 
 
         // update facebook token in media token
