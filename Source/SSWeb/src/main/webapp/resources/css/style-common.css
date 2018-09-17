@@ -3181,6 +3181,7 @@ button.paypal.is-active {
 	font-weight: bold !important;
 	text-transform: capitalize;
 	font-size: 16px;
+	margin-bottom: 15px;
 }
 
 .sq-main-link {
@@ -12896,4 +12897,9 @@ pre.email-reply-text {
 
 b{
     font-weight: bold !important;
+}
+
+.hr-survey {
+    width: 50%;
+    border-color: #C8C8C8;
 }
