@@ -171,6 +171,7 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
             surveyPreInitiation.setCity( transactionInfo.getTransactionCity() );
             surveyPreInitiation.setState( transactionInfo.getTransactionState() );
             surveyPreInitiation.setTransactionType( transactionInfo.getTransactionType() );
+            surveyPreInitiation.setPropertyAddress(transactionInfo.getPropertyAddress());
 
             surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
