@@ -8235,11 +8235,10 @@ function showFeedbackPage(mood) {
 function paintMcqAnswer(answer) {
 	var divToPopulate;
 	customerResponse = questionDetails.customerResponse;
-	var answerEdit = answer.replace(/&lt;/g,'<').replace(/&gt;/g, '>').replace(/&quot;/g,'"');
 	if (answer == customerResponse) {
-		divToPopulate = "<div data-answer='" + answer + "' class='sq-mcq-item clearfix'>" + "<div class='sq-mcq-chk-wrapper float-left'>" + "<div class='float-left sq-mcq-chk st-mcq-chk-on'>" + "</div>" + "<div class='float-left sq-mcq-chk st-mcq-chk-off hide'>" + "</div>" + "</div>" + "<div class='sq-mcq-ans-wrapper float-left'>" + answerEdit + "</div></div>";
+		divToPopulate = "<div data-answer='" + answer + "' class='sq-mcq-item clearfix'>" + "<div class='sq-mcq-chk-wrapper float-left'>" + "<div class='float-left sq-mcq-chk st-mcq-chk-on'>" + "</div>" + "<div class='float-left sq-mcq-chk st-mcq-chk-off hide'>" + "</div>" + "</div>" + "<div class='sq-mcq-ans-wrapper float-left'>" + answer + "</div></div>";
 	} else {
-		divToPopulate = "<div data-answer='" + answer + "' class='sq-mcq-item clearfix'>" + "<div class='sq-mcq-chk-wrapper float-left'>" + "<div class='float-left sq-mcq-chk st-mcq-chk-on hide'>" + "</div>" + "<div class='float-left sq-mcq-chk st-mcq-chk-off'>" + "</div>" + "</div>" + "<div class='sq-mcq-ans-wrapper float-left'>" + answerEdit + "</div></div>";
+		divToPopulate = "<div data-answer='" + answer + "' class='sq-mcq-item clearfix'>" + "<div class='sq-mcq-chk-wrapper float-left'>" + "<div class='float-left sq-mcq-chk st-mcq-chk-on hide'>" + "</div>" + "<div class='float-left sq-mcq-chk st-mcq-chk-off'>" + "</div>" + "</div>" + "<div class='sq-mcq-ans-wrapper float-left'>" + answer + "</div></div>";
 	}
 	return divToPopulate;
 }
