@@ -422,7 +422,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
+    <commit>5000</commit>
     <use_batch>N</use_batch>
     <error_ignored>N</error_ignored>
     <ignore_flag_field/>

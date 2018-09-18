@@ -12163,7 +12163,7 @@ img.lead-img {
 }
 
 .summit-ribbon{
-	background-image: url(../images/CreateWowSummit_Ribbon_Dayof_web.png);
+    background-image: url(../images/CreateWowSummit_Ribbon_Dayof_web.png);
     background-size:contain;
     background-position:center;
     margin-left: -35px;
