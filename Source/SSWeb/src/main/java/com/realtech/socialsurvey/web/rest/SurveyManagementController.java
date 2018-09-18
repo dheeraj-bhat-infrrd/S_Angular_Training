@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.web.rest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -48,9 +47,11 @@ import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.CustomFieldsNameMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -291,10 +292,10 @@ public class SurveyManagementController
 	        Response response = ssApiIntergrationBuilder.getIntegrationApi().updateScore(surveyId, mood, feedback, isAbusive, agreedToShare);
 	        /*  surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);*/	
 	        surveyHandler.increaseSurveyCountForAgent(agentId);
-			SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(surveyId);
-			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(surveyDetails.getSurveyPreIntitiationId());
+			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
+			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(survey.getSurveyPreIntitiationId());
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
-
+			
 			// update the modified time of hierarchy for seo
 			surveyHandler.updateModifiedOnColumnForAgentHierachy(agentId);
 			if (mood == null || mood.isEmpty()) {
@@ -303,7 +304,6 @@ public class SurveyManagementController
 			}
 			Map<String, String> emailIdsToSendMail = new HashMap<>();
 			SolrDocument solrDocument = null;
-	        SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
 
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);
@@ -360,6 +360,8 @@ public class SurveyManagementController
 				double surveyScoreValue = survey.getScore();
 				boolean allowCheckBox = true;
 				OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings(agentId);
+				// fetch the company settings
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
 
 				if (mood != null && !mood.equalsIgnoreCase("Great")) {
 					allowCheckBox = false;
@@ -391,10 +393,7 @@ public class SurveyManagementController
                             : " " + survey.getCustomerLastName().trim() ) );
 
                 // Generate the text for customer details in mail 
-                String customerDetail = generateCustomerTextForMail( customerFullName, customerEmail, survey.getSourceId() );
-                
-                // fetch the company settings
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
+                String customerDetail = generateCustomerTextForMail( customerFullName, customerEmail, survey.getSourceId() , survey, companySettings.getCustomFieldsNameMapping());
                 
                 if (companySettings == null)
                     throw new NonFatalException("Company settings cannot be found for id : " + survey.getCompanyId());
@@ -402,10 +401,7 @@ public class SurveyManagementController
                 String surveyScore = String.valueOf( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
                 String agentName = ( agent.getLastName() != null && !agent.getLastName().isEmpty() )
                     ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
-                String propertyAddress = "";
-                if( survey.getPropertyAddress() != null)
-                    propertyAddress = "Property Address : "+survey.getPropertyAddress();
-  
+                
                 String fbShareUrl = socialManagementService.generateFacebookShareUrl(survey, agentSettings);
                 
                 boolean canPostOnSM = surveyHandler.canPostOnSocialMedia(agentSettings, survey.getScore() );
@@ -419,7 +415,7 @@ public class SurveyManagementController
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
                         surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
-                        customerDetail, propertyAddress, fbShareUrl, isAddFbShare );
+                        customerDetail, fbShareUrl, isAddFbShare );
                 }
                 
 
@@ -477,9 +473,9 @@ public class SurveyManagementController
 		return "Survey stored successfully";
 	}
 
-	private String generateCustomerTextForMail( String customerFullName, String customerEmailId, String surveySourceId )
+	private String generateCustomerTextForMail( String customerFullName, String customerEmailId, String surveySourceId,  SurveyDetails survey, CustomFieldsNameMapping fieldNameMappings  )
     {
-	    
+		
         StringBuilder customerDetail = new StringBuilder( "<div style=\"margin: 15px 0px 15px 0px;\">" );
    
         customerDetail.append( "<p style=\"font-weight:bold\">Here are the customer details:</p>" );
@@ -491,6 +487,48 @@ public class SurveyManagementController
         customerDetail.append( customerEmailId == null ? "" : customerEmailId );
         customerDetail.append( "<br/> Transaction Id ( Loan# ): ");
         customerDetail.append( surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId );
+        
+        
+        if( ! StringUtils.isEmpty(survey.getPropertyAddress())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getPropertyAddress()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getPropertyAddress() +": " );
+        		else
+        			customerDetail.append( "<br/> Property Address: " );
+            customerDetail.append( survey.getPropertyAddress() );
+        }
+        
+        if( ! StringUtils.isEmpty(survey.getLoanProcessorEmail())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getLoanProcessorEmail()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getLoanProcessorEmail() +": " );
+        		else
+        			customerDetail.append( "<br/> Loan Processor Email: " );
+    			customerDetail.append( survey.getLoanProcessorEmail() );
+        }
+        
+        if( ! StringUtils.isEmpty(survey.getLoanProcessorName())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getLoanProcessorName()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getLoanProcessorName() +": " );
+        		else
+        			customerDetail.append( "<br/> Loan Processor Name: " );
+    			customerDetail.append( survey.getLoanProcessorName() );
+        }
+        
+        if( ! StringUtils.isEmpty(survey.getCity())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCity()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getCity() +": " );
+    			else
+    				customerDetail.append( "<br/> City: " );
+    			customerDetail.append( survey.getCity() );
+        }
+        
+        if( ! StringUtils.isEmpty(survey.getState())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getState()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getState() +": " );
+			else
+				customerDetail.append( "<br/> State: " );
+			customerDetail.append( survey.getState() );
+        }
+        
         
         customerDetail.append( "</div>" );
         customerDetail.append( "</div>" );

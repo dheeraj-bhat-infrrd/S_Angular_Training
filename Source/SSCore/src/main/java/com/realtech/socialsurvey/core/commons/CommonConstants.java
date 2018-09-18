@@ -1772,5 +1772,11 @@ public interface CommonConstants
     public static final int WIDGET_LOCK_SET_BY_COMPANY = 4;
     public static final int WIDGET_LOCK_SET_BY_REGION = 2;
     public static final int WIDGET_LOCK_SET_BY_BRANCH = 1;
+    
+    //api constants 
+    public static final String PARTICIPANT_CUSTOMER_1 = "customer1";
+    public static final String PARTICIPANT_CUSTOMER_2 = "customer2";
+    public static final String PARTICIPANT_BUYER_AGENT = "buyerAgent";
+    public static final String PARTICIPANT_SELLER_AGENT = "sellerAgent";
 
 }

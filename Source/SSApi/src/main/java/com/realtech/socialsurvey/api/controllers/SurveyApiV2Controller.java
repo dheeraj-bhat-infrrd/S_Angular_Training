@@ -148,11 +148,11 @@ public class SurveyApiV2Controller
 
         
         //save the object to database
-        Map<String, Long> surveyIds = new LinkedHashMap<>();
+        Map<String, Long> surveyIds = new LinkedHashMap<String, Long>();
         try {
             for ( SurveyPreInitiation surveyPreInitiation : surveyPreInitiations ) {
                 surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
-                surveyIds.put( surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getSurveyPreIntitiationId() );
+                surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId() );
             }
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
 

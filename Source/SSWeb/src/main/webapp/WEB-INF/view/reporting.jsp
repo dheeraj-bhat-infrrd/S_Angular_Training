@@ -54,9 +54,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-<c:set var="activeSession" value="${activeSession }"></c:set>
+<%-- <c:set var="activeSession" value="${activeSession }"></c:set>
 <c:set var="hasRegisteredForSummit" value="${hasRegisteredForSummit }"></c:set>
-<c:set var="isShowSummitPopup" value="${isShowSummitPopup }"></c:set>
+<c:set var="isShowSummitPopup" value="${isShowSummitPopup }"></c:set> --%>
 
 <div class="overlay-loader hide"></div>
 <input type="hidden"  id="reporting-data-div" data-profile-master-id="${profilemasterid}" data-user-id="${userId}" data-column-name="${columnName}" data-column-value="${columnValue}">
@@ -135,7 +135,7 @@
 	</div>
 </div> -->
 
-<div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
+<%-- <div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
 	<div class="container summit-ribbon-con">
 		<div class="summit-ribbon">
 			<%-- <div class="summit-rib-timer-back">
@@ -147,9 +147,9 @@
 			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
 		</div>
 	</div>
-</div>
+</div> --%>
 
- <div id="summit-popup" class="overlay-login summit-popup-outer hide">
+ <%-- <div id="summit-popup" class="overlay-login summit-popup-outer hide">
 	<div id="summit-popup-body" class="summit-popup">
 		<%-- <div class="summit-timer-back">
 			<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown_trans.png" class="summit-timer-img">
@@ -158,19 +158,19 @@
 			<div class="summit-timer-text summit-timer-min"></div>
 		</div> --%>		
 		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
-		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
+		<!-- <div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div> -->
 		<div class="summit-checkbox-cont clearfix">
 			<div class="float-left wc-width summit-check-contain" id="">
 				<div id="summit-do-not-show" class="float-left summit-check" data-checked=false></div>
 	     		<div class="float-left wc-dashboard-text summit-check-text">Do not show this again</div>
 			</div>
-			<div class="float-left wc-width summit-popup-check-right summit-check-contain" id="">
+			<!-- <div class="float-left wc-width summit-popup-check-right summit-check-contain" id="">
 				<div id="summit-already-reg" class="float-left summit-check" data-checked=false></div>
 	     		<div class="float-left wc-dashboard-text summit-check-text">I already registered</div>
-			</div>
+			</div> -->
 		</div>
 	</div>
-</div>
+</div> --%>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
@@ -402,7 +402,7 @@
 		
 		hideOverlay();
 		
-		var hasRegisteredForSummit = "${hasRegisteredForSummit}";
+		/* var hasRegisteredForSummit = "${hasRegisteredForSummit}";
 		var activeSession = "${activeSession}";
 		var isShowSummitPopup ="${isShowSummitPopup}";
 		
@@ -410,31 +410,22 @@
 		var fbPopup = sessionStorage.getItem("fbPopup");
 		
 		if(newSession == false || newSession == 'false'){
-			/* $('#fb-policy-banner').hide(); */
 			$('#summit-popup').hide();
-			if(hasRegisteredForSummit == false || hasRegisteredForSummit == 'false'){
-				showSummitRibbon();
-			}
+			showSummitRibbon();
 			enableBodyScroll();
 		}else{
-			if(hasRegisteredForSummit == false || hasRegisteredForSummit == 'false'){
-				if(isShowSummitPopup == 'false' || isShowSummitPopup == false){
-					showSummitPopup();
-				}else{
-					showSummitRibbon();
-				}
+			if(isShowSummitPopup == 'false' || isShowSummitPopup == false){
+				showSummitPopup();
 			}else{
-				$('#summit-ribbon').hide();
+				showSummitRibbon();
 			}
-		}
+		} */
 		
 		/* if(fbPopup == true || fbPopup == 'true'){
 			$('#fb-policy-banner').show();
 		}else if(fbPopup == false || fbPopup == 'false'){
 			$('#fb-policy-banner').hide();
 		} */
-		
-		console.log(hasRegisteredForSummit,'==',newSession,'==',isShowSummitPopup);
 		
 		var diffDays = summitTimer();
 		$('.summit-timer-days').html(diffDays.d);

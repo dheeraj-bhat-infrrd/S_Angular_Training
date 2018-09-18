@@ -3,6 +3,8 @@ package com.realtech.socialsurvey.core.entities;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
+
 
 public class SurveyDetails
 {
@@ -43,6 +45,10 @@ public class SurveyDetails
     private String source;
     private String sourceId;
     private Date surveyTransactionDate;
+    
+    private String propertyAddress;
+   	private String loanProcessorName;
+   	private String loanProcessorEmail;
 
     //review details
     private int stage;
@@ -104,10 +110,6 @@ public class SurveyDetails
 
     //abusive email set
     private boolean abusiveNotify;
-
-    //adding property address to survey details
-    private String propertyAddress;
-
 
     public String getAgentEmailId()
     {
@@ -923,6 +925,26 @@ public class SurveyDetails
     {
         this.agentProfileImage = agentProfileImage;
     }
+
+
+	public String getLoanProcessorName() {
+		return loanProcessorName;
+	}
+
+
+	public void setLoanProcessorName(String loanProcessorName) {
+		this.loanProcessorName = loanProcessorName;
+	}
+
+
+	public String getLoanProcessorEmail() {
+		return loanProcessorEmail;
+	}
+
+
+	public void setLoanProcessorEmail(String loanProcessorEmail) {
+		this.loanProcessorEmail = loanProcessorEmail;
+	}
 
 
 }
