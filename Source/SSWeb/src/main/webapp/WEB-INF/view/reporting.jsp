@@ -115,7 +115,7 @@
 	</div>
 </div>
 
-<!-- <div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
+<%-- <div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left " style="height:  100%;">
@@ -133,41 +133,40 @@
 			</div>
 		</div>
 	</div>
-</div> -->
+</div>
 
-<%-- <div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
+<div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
 	<div class="container summit-ribbon-con">
 		<div class="summit-ribbon">
-			<%-- <div class="summit-rib-timer-back">
+			<div class="summit-rib-timer-back">
 				<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown.png" class="summit-rib-timer-img">
     			<div class="summit-rib-text summit-rib-days">23</div>
 			    <div class="summit-rib-text summit-rib-hrs">23</div> 
 			    <div class="summit-rib-text summit-rib-min">23</div> 
-			</div> --%>
+			</div>
 			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
 		</div>
 	</div>
-</div> --%>
 
- <%-- <div id="summit-popup" class="overlay-login summit-popup-outer hide">
+<div id="summit-popup" class="overlay-login summit-popup-outer hide">
 	<div id="summit-popup-body" class="summit-popup">
-		<%-- <div class="summit-timer-back">
+		<div class="summit-timer-back">
 			<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown_trans.png" class="summit-timer-img">
 			<div class="summit-timer-text summit-timer-days"></div>
 			<div class="summit-timer-text summit-timer-hrs"></div>
 			<div class="summit-timer-text summit-timer-min"></div>
-		</div> --%>		
+		</div>		
 		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
-		<!-- <div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div> -->
+		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
 		<div class="summit-checkbox-cont clearfix">
 			<div class="float-left wc-width summit-check-contain" id="">
 				<div id="summit-do-not-show" class="float-left summit-check" data-checked=false></div>
 	     		<div class="float-left wc-dashboard-text summit-check-text">Do not show this again</div>
 			</div>
-			<!-- <div class="float-left wc-width summit-popup-check-right summit-check-contain" id="">
+			<div class="float-left wc-width summit-popup-check-right summit-check-contain" id="">
 				<div id="summit-already-reg" class="float-left summit-check" data-checked=false></div>
 	     		<div class="float-left wc-dashboard-text summit-check-text">I already registered</div>
-			</div> -->
+			</div>
 		</div>
 	</div>
 </div> --%>
