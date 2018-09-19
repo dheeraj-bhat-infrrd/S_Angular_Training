@@ -864,8 +864,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
                     maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
                 }
+                //if social post reminder is disabled then return  empty list for whole company
+                if( surveySettings.getIsSocialPostReminderDisabled()) {
+                		return incompleteSocialPostCustomers;
+                }
             }
         }
+        
+        
         if ( maxReminders == 0 ) {
             maxReminders = maxSocialpostReminders;
         }
