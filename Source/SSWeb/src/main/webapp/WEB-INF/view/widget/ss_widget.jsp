@@ -115,7 +115,7 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev">
 				<div class="w-100">
 					<div class="float-left ss-widget-rev-date">March 19,2018</div>
-					<div class="float-right ss-widget-prov-by">powered by <img src="${initParam.resourcesPath}/resources/images/ss-verified-customer.png" class="ss-widget-prov-source"></div>
+					<div class="float-right ss-widget-prov-by">powered by <img src="${initParam.resourcesPath}/resources/images/VerifiedPartner_stamp.png" class="ss-widget-prov-source"></div>
 				</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-details">
 					<div class="ss-widget-prof-pic-cont"><img src="${initParam.resourcesPath}/resources/images/image_pt.png" class="ss-widget-prof-pic"></div>
@@ -154,7 +154,7 @@
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev">
 					<div class="w-100">
 						<div class="float-left ss-widget-rev-date">March 19,2018</div>
-						<div class="float-right ss-widget-prov-by">powered by <img src="${initParam.resourcesPath}/resources/images/ss-verified-customer.png" class="ss-widget-prov-source"></div>
+						<div class="float-right ss-widget-prov-by">powered by <img src="${initParam.resourcesPath}/resources/images/VerifiedPartner_stamp.png" class="ss-widget-prov-source"></div>
 					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-details">
 						<div class="ss-widget-prof-pic-cont"><img src="${initParam.resourcesPath}/resources/images/image_pt.png" class="ss-widget-prof-pic"></div>
@@ -193,7 +193,7 @@
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev">
 				<div class="w-100">
 					<div class="float-left ss-widget-rev-date">March 19,2018</div>
-					<div class="float-right ss-widget-prov-by">powered by <img src="${initParam.resourcesPath}/resources/images/ss-verified-customer.png" class="ss-widget-prov-source"></div>
+					<div class="float-right ss-widget-prov-by">powered by <img src="${initParam.resourcesPath}/resources/images/VerifiedPartner_stamp.png" class="ss-widget-prov-source"></div>
 				</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-details">
 					<div class="ss-widget-prof-pic-cont"><img src="${initParam.resourcesPath}/resources/images/image_pt.png" class="ss-widget-prof-pic"></div>

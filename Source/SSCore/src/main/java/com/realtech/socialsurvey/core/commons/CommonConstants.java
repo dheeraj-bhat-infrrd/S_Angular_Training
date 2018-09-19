@@ -1715,6 +1715,9 @@ public interface CommonConstants
     public static final String WIDGET_SEO_TITLE = "seoTitle";
     public static final String WIDGET_SEO_DESCRIPTION = "seoDescription";
     public static final String WIDGET_SEO_KEYWORDS = "seoKeywords";
+    public static final String WIDGET_HIDE_CONTACT = "hideContactBtn";
+    public static final String WIDGET_HIDE_REVIEW = "hideReviewBtn";
+    public static final String WIDGET_MAX_BUTTON_SIZE = "maxWidgetBtnSize";
     
     public static final String WIDGET_ORDER_NEWEST_FIRST = "newestFirst";
     public static final String WIDGET_ORDER_OLDEST_FIRST = "oldestFirst";
@@ -1736,6 +1739,9 @@ public interface CommonConstants
     public static final String WIDGET_DEFAULT_ALLOW_MODEST_BRANDING = "true";
     public static final String WIDGET_DEFAULT_BUTTON1_TEXT = "CONTACT US";
     public static final String WIDGET_DEFAULT_BUTTON1_LINK = "WIDGET_DEFAULT_BUTTON1_LINK";
+    public static final String WIDGET_DEFAULT_HIDE_CONTACT = "false";
+    public static final String WIDGET_DEFAULT_HIDE_REVIEW = "false";
+    public static final String WIDGET_DEFAULT_BUTTON_SIZE = "205";
 
     public static final String WIDGET_DEFAULT_BUTTON1_OPACITY = "0.7";
     public static final String WIDGET_DEFAULT_BUTTON2_TEXT = "WRITE A REVIEW";

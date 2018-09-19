@@ -297,7 +297,7 @@
   letter-spacing: normal;
 }
 #ss-widget-container .ss-wi-verified-badge {
-  background: url(../images/ss-verified-customer.png) no-repeat;
+  background: url(../images/VerifiedPartner_stamp.png) no-repeat;
   cursor: pointer;
   background-size: contain;
   background-position: center;
@@ -376,6 +376,18 @@
 
 #ss-widget-container .ss-widget-src-opts {
     margin: 5px 0;
+}
+
+#ss-widget-container .ss-fb-verified-image{
+	background: url(../images/facebook_logo_review.png) no-repeat;
+	cursor: pointer;
+	background-size: contain;
+}
+
+#ss-widget-container .ss-verify-image-fb{
+	height: 20px;
+   	width: 54px;
+    margin-left: 5px;
 }
 
 @media (max-width: 767px) {
