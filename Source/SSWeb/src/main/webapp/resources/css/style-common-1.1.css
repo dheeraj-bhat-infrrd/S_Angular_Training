@@ -1623,8 +1623,8 @@ span.footer-ul a:hover {
 	color: #2a6496;
 }
 .verify-image{
-	height: 20px;
-    width: 79px;
+	height: 25px;
+    width: 80px;
 }
 .verify-image-zillow{
 	height: 20px;
@@ -2044,4 +2044,15 @@ span.footer-ul a:hover {
 .disable-page-logout {
 	color: #fff;
 	font-weight : bold !important; 
+}
+
+.fb-verified-image{
+	background: url(../images/facebook_logo_review.png) no-repeat;
+	cursor: pointer;
+	background-size: contain;
+}
+
+.verify-image-fb{
+	height: 25px;
+    width: 80px;
 }
