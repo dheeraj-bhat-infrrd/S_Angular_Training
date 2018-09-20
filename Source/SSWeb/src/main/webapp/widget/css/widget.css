@@ -357,15 +357,15 @@
 }
 
 .ss-wi-verified-badge {
-	background: url(../images/ss-verified-customer.png) no-repeat;
+	background: url(../images/VerifiedPartner_stamp.png) no-repeat;
 	cursor: pointer;
 	background-size: contain;
     background-position:center;
 }
 
 .ss-wi-verify-image{
-	height: 14px;
-    width: 50px;
+	height: 17px;
+    width: 60px;
     margin-left: 5px;
 }
 
@@ -443,4 +443,16 @@
 
 .ss-widget-main-rat-cont{
 	margin-right: 7px;
+}
+
+.ss-fb-verified-image{
+	background: url(../images/facebook_logo_review.png) no-repeat;
+	cursor: pointer;
+	background-size: contain;
+}
+
+.ss-verify-image-fb{
+	height: 20px;
+   	width: 54px;
+    margin-left: 5px;
 }

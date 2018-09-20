@@ -264,6 +264,9 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         historyMap.put( CommonConstants.WIDGET_SEO_TITLE, null );
         historyMap.put( CommonConstants.WIDGET_SEO_KEYWORDS, null );
         historyMap.put( CommonConstants.WIDGET_SEO_DESCRIPTION, null );
+        historyMap.put( CommonConstants.WIDGET_HIDE_CONTACT, CommonConstants.WIDGET_DEFAULT_HIDE_CONTACT );
+        historyMap.put( CommonConstants.WIDGET_HIDE_REVIEW, CommonConstants.WIDGET_DEFAULT_HIDE_REVIEW );
+        historyMap.put( CommonConstants.WIDGET_MAX_BUTTON_SIZE, CommonConstants.WIDGET_DEFAULT_BUTTON_SIZE );
 
         return historyMap;
     }
@@ -418,6 +421,15 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
                 widgetConfiguration.setMaxReviewsOnLoadMore( widgetConfigurationRequest.getMaxReviewsOnLoadMore() );
             }
         }
+        
+        if ( StringUtils.isNotEmpty( widgetConfigurationRequest.getMaxWidgetBtnSize() ) ) {
+            if ( !StringUtils.equals( widgetConfigurationRequest.getMaxWidgetBtnSize(),
+                widgetConfiguration.getMaxWidgetBtnSize() ) ) {
+                historyMap.put( CommonConstants.WIDGET_MAX_BUTTON_SIZE,
+                    widgetConfigurationRequest.getMaxWidgetBtnSize() );
+                widgetConfiguration.setMaxWidgetBtnSize( widgetConfigurationRequest.getMaxWidgetBtnSize() );
+            }
+        }
 
         if ( StringUtils.isNotEmpty( widgetConfigurationRequest.getInitialNumberOfReviews() ) ) {
             if ( !StringUtils.equals( widgetConfigurationRequest.getInitialNumberOfReviews(),
@@ -503,7 +515,19 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
             }
         }
 
-
+        if ( StringUtils.isNotEmpty( widgetConfigurationRequest.getHideContactBtn()) ) {
+            if ( !StringUtils.equals( widgetConfigurationRequest.getHideContactBtn(), widgetConfiguration.getHideContactBtn() ) ) {
+                historyMap.put( CommonConstants.WIDGET_HIDE_CONTACT, widgetConfigurationRequest.getHideContactBtn() );
+                widgetConfiguration.setHideContactBtn( widgetConfigurationRequest.getHideContactBtn() );
+            }
+        }
+        
+        if ( StringUtils.isNotEmpty( widgetConfigurationRequest.getHideReviewBtn()) ) {
+            if ( !StringUtils.equals( widgetConfigurationRequest.getHideReviewBtn(), widgetConfiguration.getHideReviewBtn() ) ) {
+                historyMap.put( CommonConstants.WIDGET_HIDE_REVIEW, widgetConfigurationRequest.getHideReviewBtn() );
+                widgetConfiguration.setHideReviewBtn( widgetConfigurationRequest.getHideReviewBtn() );
+            }
+        }
     }
 
 
@@ -572,6 +596,10 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         widgetConfiguration.setHideOptions( CommonConstants.WIDGET_DEFAULT_HIDE_OPTIONS );
         widgetConfiguration.setReviewSortOrder( CommonConstants.WIDGET_DEFAULT_SORT_ORDER );
         widgetConfiguration.setAllowModestBranding( CommonConstants.WIDGET_DEFAULT_ALLOW_MODEST_BRANDING );
+        
+        widgetConfiguration.setHideContactBtn(CommonConstants.WIDGET_DEFAULT_HIDE_CONTACT);
+        widgetConfiguration.setHideReviewBtn(CommonConstants.WIDGET_DEFAULT_HIDE_REVIEW);
+        widgetConfiguration.setMaxWidgetBtnSize(CommonConstants.WIDGET_DEFAULT_BUTTON_SIZE);
         widgetConfiguration.setHistory( history );
 
         LOG.info( "Finished getDefaultWidgetConfiguration() method." );
@@ -697,10 +725,22 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
                 if ( StringUtils.isEmpty( widgetConfiguration.getHideOptions() ) ) {
                     widgetConfiguration.setHideOptions( CommonConstants.WIDGET_DEFAULT_HIDE_OPTIONS );
                 }
+                
+                if ( StringUtils.isEmpty( widgetConfiguration.getHideContactBtn() ) ) {
+                    widgetConfiguration.setHideContactBtn( CommonConstants.WIDGET_DEFAULT_HIDE_CONTACT);
+                }
 
+                
+                if ( StringUtils.isEmpty( widgetConfiguration.getHideReviewBtn()) ) {
+                    widgetConfiguration.setHideReviewBtn( CommonConstants.WIDGET_DEFAULT_HIDE_REVIEW );
+                }
 
                 if ( StringUtils.isEmpty( widgetConfiguration.getAllowModestBranding() ) ) {
                     widgetConfiguration.setAllowModestBranding( CommonConstants.WIDGET_DEFAULT_ALLOW_MODEST_BRANDING );
+                }
+                
+                if ( StringUtils.isEmpty( widgetConfiguration.getMaxWidgetBtnSize() ) ) {
+                    widgetConfiguration.setMaxWidgetBtnSize( CommonConstants.WIDGET_DEFAULT_BUTTON_SIZE );
                 }
 
             }

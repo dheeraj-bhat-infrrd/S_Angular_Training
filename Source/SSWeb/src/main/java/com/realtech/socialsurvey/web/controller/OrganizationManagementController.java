@@ -4512,7 +4512,9 @@ public class OrganizationManagementController
             widgetConfigurationRequest.setSeoDescription( request.getParameter( CommonConstants.WIDGET_SEO_DESCRIPTION ) );
             widgetConfigurationRequest.setOverrideLowerHierarchy( request.getParameter( CommonConstants.WIDGET_OVERRIDE_LOWER_HIERARCHY ) );
             widgetConfigurationRequest.setLockLowerHierarchy( request.getParameter( CommonConstants.WIDGET_LOCK_LOWER_HIERARCHY ) );
-
+            widgetConfigurationRequest.setHideContactBtn( request.getParameter( CommonConstants.WIDGET_HIDE_CONTACT ) );
+            widgetConfigurationRequest.setHideReviewBtn( request.getParameter( CommonConstants.WIDGET_HIDE_REVIEW ) );
+            widgetConfigurationRequest.setMaxWidgetBtnSize( request.getParameter( CommonConstants.WIDGET_MAX_BUTTON_SIZE) );
             
             HttpSession session = request.getSession();
             User user = sessionHelper.getCurrentUser();
