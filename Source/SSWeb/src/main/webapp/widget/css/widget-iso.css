@@ -297,7 +297,7 @@
   letter-spacing: normal;
 }
 #ss-widget-container .ss-wi-verified-badge {
-  background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+  background: url(../images/ss-verified-customer.png) no-repeat;
   cursor: pointer;
   background-size: contain;
   background-position: center;

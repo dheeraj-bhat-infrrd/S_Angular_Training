@@ -357,15 +357,15 @@
 }
 
 .ss-wi-verified-badge {
-	background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+	background: url(../images/ss-verified-customer.png) no-repeat;
 	cursor: pointer;
 	background-size: contain;
     background-position:center;
 }
 
 .ss-wi-verify-image{
-	height: 17px;
-    width: 60px;
+	height: 14px;
+    width: 50px;
     margin-left: 5px;
 }
 
