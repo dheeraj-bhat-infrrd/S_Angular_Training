@@ -3411,9 +3411,7 @@ public class SocialManagementController
         String entityType = request.getParameter( "entityType" );
         String surveyMongoId = request.getParameter( "surveyMongoId" );
         long entityId = Long.parseLong( request.getParameter( "entityId" ) );
-        Boolean isPosted = socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
-        String isPostedStr = new Gson().toJson(isPosted);
-        return isPostedStr;
+        return socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
     }
 
 }
