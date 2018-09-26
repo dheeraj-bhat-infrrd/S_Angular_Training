@@ -1933,6 +1933,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                         review.setAgentProfileImage( unitSettings.getProfileImageUrl() );
                     }
+                    
+                    SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, review.getSurveyPreIntitiationId());
+                    if(surveyPreInitiation != null) {
+                    	int participantType = surveyPreInitiation.getParticipantType();
+                    	if(review.getSource().equals("encompass") || review.getSource().equals("DOTLOOP") || review.getSource().equals("API") || review.getSource().equals("FTP") || review.getSource().equals("LONEWOLF") ) {
+                    		if(participantType == 3 || participantType == 4) {
+                            	review.setSource("verifiedPartner");
+                            }
+                    	}                        
+                    }
+                    
                 }
             }
         }
