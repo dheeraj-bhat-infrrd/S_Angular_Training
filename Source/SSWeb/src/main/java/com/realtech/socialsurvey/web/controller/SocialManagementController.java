@@ -699,7 +699,7 @@ public class SocialManagementController
     	Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
         facebook4j.auth.AccessToken extendedToken;
         try {
-			extendedToken = facebook.extendTokenExpiration(accessToken.getToken());
+			extendedToken = facebook.extendTokenExpiration(selectedAccessFacebookToken);
 			selectedAccessFacebookToken  = extendedToken.getToken();
 		} catch (FacebookException e1) {
 			LOG.error( "Method saveSelectedAccessFacebookToken() has facebook error:",e1);
