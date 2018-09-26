@@ -364,8 +364,8 @@
 }
 
 .ss-wi-verify-image{
-	height: 14px;
-    width: 50px;
+	height: 15px;
+    width: 60px;
     margin-left: 5px;
 }
 
@@ -391,8 +391,8 @@
 }
 
 .ss-wi-verify-image-ss{
-	height: 14px;
-    width: 50px;
+	height: 16px;
+  	width: 75px;
     margin-left: 5px;
 }
 
@@ -425,7 +425,9 @@
 }
 
 .ss-widget-pow-by{
-	line-height: 13px;
+	line-height: 13px;    
+	margin: 0 auto;
+    margin-right: 0;
 }
 
 .cursor-pointer{
@@ -455,4 +457,19 @@
 	height: 20px;
    	width: 54px;
     margin-left: 5px;
+}
+
+.ss-wi-verified-partner-badge{
+    background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+    cursor: pointer;
+    background-size: contain;
+}
+
+.ss-wi-verify-partner-image{
+	height: 25px;
+    width: 60px;
+}
+
+.ss-widget-date-pow-cont{
+	display:flex;
 }
