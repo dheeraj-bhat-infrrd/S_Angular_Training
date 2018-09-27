@@ -4601,7 +4601,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     
                 		//TODO: remove this check
                 		long DAY_IN_MS = 1000 * 60 * 60 * 24;
-                		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (45 * DAY_IN_MS));
+                		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (365 * DAY_IN_MS));
                 		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) 
                 			continue; 
                 		

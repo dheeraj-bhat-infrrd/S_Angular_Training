@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -55,6 +56,8 @@ import com.realtech.socialsurvey.web.common.TokenHandler;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
 import facebook4j.Facebook;
+import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
 
 /**
  * 
@@ -504,7 +507,7 @@ public class SocialMediaTokenController
     
     
     @RequestMapping ( value = "/saveSelectedAccessFacebookTokenForEmail")
-    public String saveSelectedAccessFacebookTokenForEmail( Model model, HttpServletRequest request )
+    public String saveSelectedAccessFacebookTokenForEmail( Model model, HttpServletRequest request ) throws FacebookException
     {
         LOG.info( "Method saveSelectedAccessFacebookToken() called from SocialManagementController" );
         String selectedAccessFacebookToken = request.getParameter( "selectedAccessFacebookToken" );
@@ -522,6 +525,10 @@ public class SocialMediaTokenController
         }
 
         facebook4j.auth.AccessToken accessToken = new Gson().fromJson( fbAccessTokenStr, facebook4j.auth.AccessToken.class );
+        //create extended token for selected
+        String serverBaseUrl = requestUtils.getRequestServerName( request );
+    	Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
+        facebook4j.auth.AccessToken extendedToken = facebook.extendTokenExpiration(accessToken.getToken());
         try {
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -532,7 +539,7 @@ public class SocialMediaTokenController
                 mediaTokens = companySettings.getSocialMediaTokens();
                 mediaTokens = socialManagementService.updateFacebookPages( accessToken, mediaTokens,
                     mediaTokens.getFacebookToken().getFacebookPages() );
-                mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
+                mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( extendedToken.getToken() );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
@@ -559,7 +566,7 @@ public class SocialMediaTokenController
                 mediaTokens = regionSettings.getSocialMediaTokens();
                 mediaTokens = socialManagementService.updateFacebookPages( accessToken, mediaTokens,
                     mediaTokens.getFacebookToken().getFacebookPages() );
-                mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
+                mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( extendedToken.getToken() );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
                     regionSettings, mediaTokens );
@@ -586,7 +593,7 @@ public class SocialMediaTokenController
                 mediaTokens = branchSettings.getSocialMediaTokens();
                 mediaTokens = socialManagementService.updateFacebookPages( accessToken, mediaTokens,
                     mediaTokens.getFacebookToken().getFacebookPages() );
-                mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
+                mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( extendedToken.getToken() );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
                     branchSettings, mediaTokens );
@@ -614,7 +621,7 @@ public class SocialMediaTokenController
                 mediaTokens = agentSettings.getSocialMediaTokens();
                 mediaTokens = socialManagementService.updateFacebookPages( accessToken, mediaTokens,
                     mediaTokens.getFacebookToken().getFacebookPages() );
-                mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
+                mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( extendedToken.getToken() );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 for ( ProfileStage stage : agentSettings.getProfileStages() ) {

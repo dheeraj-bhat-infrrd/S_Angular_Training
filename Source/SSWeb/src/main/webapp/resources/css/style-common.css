@@ -7420,7 +7420,7 @@ tr.u-tbl-header td {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
 .verified-badge {
-	background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+	background: url(../images/ss-verified-customer.png) no-repeat;
 	cursor: pointer;
 	background-size: contain;
 }
@@ -12902,4 +12902,15 @@ b{
 .hr-survey {
     width: 50%;
     border-color: #C8C8C8;
+}
+
+.verified-partner-badge{
+    background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+    cursor: pointer;
+    background-size: contain;
+}
+
+.verify-partner-image{
+	height: 25px;
+    width: 85px;
 }
