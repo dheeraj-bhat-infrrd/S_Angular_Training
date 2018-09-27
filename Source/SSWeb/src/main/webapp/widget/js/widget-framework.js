@@ -43,6 +43,8 @@ function drawWidgetStyleElements($, widgetDetails) {
 	var fontTheme = widgetDetails.widgetConfiguration.fontTheme;
 	var font = widgetDetails.widgetConfiguration.font;
 	$('#ss-widget-container').css('background', bgColor);
+	$('#ss-widget-options').css('background', bgColor);
+	$('#ss-widget-reviews').css('background', bgColor);
 	$('.ss-widget-rev-count').css('color', fontTheme);
 	$('#ss-widget-container').css('color', fontTheme);
 
