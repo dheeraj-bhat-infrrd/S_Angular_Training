@@ -308,6 +308,7 @@
     margin: 0;
     background: white;
     line-height:22px;
+    font-size: 12px;
 }
 
 .ss-widget-half-black-star{
@@ -472,4 +473,8 @@
 
 .ss-widget-date-pow-cont{
 	display:flex;
+}
+
+.ss-widget-review-text{
+	font-size: 12px;
 }

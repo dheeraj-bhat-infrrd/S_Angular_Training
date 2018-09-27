@@ -394,7 +394,7 @@ function paintWidgetReviews($, reviews, resourcesHost, ssHost) {
 		}
 		
 		$('#ss-widget-review-container').removeClass('hide');
-		if ($('#ss-widget-review-container').find('.ss-widget-review-text').height() <= $('#ss-widget-review-container').find('.ss-widget-rev-text').height() + 2) {
+		if ($('#ss-widget-review-container').find('.ss-widget-review-text').height() <= $('#ss-widget-review-container').find('.ss-widget-rev-text').height() + 6) {
 			$('#ss-widget-review-container').find('.ss-widget-read-more').hide();
 		}
 		$('#ss-widget-review-container').addClass('hide');

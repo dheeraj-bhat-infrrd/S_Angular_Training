@@ -151,7 +151,7 @@
   border-bottom: 2px solid #8fbae0;
   padding-top: 10px;
   padding-bottom: 10px;
-  max-height: 240px;
+  max-height: 270px;
 }
 #ss-widget-container .ss-widget-rev-date {
   font-size: 8px;
@@ -258,6 +258,7 @@
   margin: 0;
   background: white;
   line-height: 22px;
+  font-size: 12px;
 }
 #ss-widget-container .ss-widget-half-black-star {
   width: 9px;
@@ -364,6 +365,7 @@
 #ss-widget-container .ss-widget-review-div-container {
   border-left: 1px solid #c9ddef;
   padding: 0;
+  border-right: 1px solid #c9ddef;
 }
 #ss-widget-container .ss-widget-options-container {
   margin-bottom: 10px;
@@ -405,6 +407,10 @@
 
 #ss-widget-container .ss-widget-date-pow-cont{
 	display:flex;
+}
+
+#ss-widget-container .ss-widget-review-text{
+	font-size: 12px;
 }
 
 @media (max-width: 767px) {
