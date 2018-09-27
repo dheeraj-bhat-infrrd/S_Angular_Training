@@ -1484,7 +1484,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    boolean postToLinkedInForAHierarchy( OrganizationUnitSettings setting, String collectionName, Double rating, boolean isZillow,
+    String postToLinkedInForAHierarchy( OrganizationUnitSettings setting, String collectionName, Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
         EntityMediaPostResponseDetails mediaPostResponseDetails, String surveyId )
@@ -1515,10 +1515,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( mediaPostResponseDetails.getLinkedinPostResponseList() == null )
                         mediaPostResponseDetails.setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
                     mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-                    return true;
+                    return "true";
                 }
+            }else if( !surveyHandler.canPostOnSocialMedia( setting, rating )){
+            		LOG.info("Review {} is not allowed to auto posted for {} with iden {}" , surveyId , collectionName , setting.getIden() );
+            		return "Review criteria is not valid for auto post.";
+            }else if(socialList.contains( CommonConstants.LINKEDIN_SOCIAL_SITE )) {
+        		LOG.info("Review {} is already posted for {} with iden {}" , surveyId , collectionName , setting.getIden() );
+            		return "Review is already posted on LinkedIn";
             }
-            return false;
+            return "Cant post on LinkedIn";
         } catch ( Exception e ) {
             // update SocialMediaPostResponse object
             SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
@@ -1530,7 +1536,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
 
             reportBug( "Linkedin", setting.getProfileName(), e );
-            return false;
+            return e.getMessage();
         }
     }
 
@@ -3972,7 +3978,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @return 
      */
     @Override
-    public boolean manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId )
+    public String manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId )
     {
         LOG.info( "Method manualPostToLinkedInForEntity started for entityType {} , entityId , surveyMongoId {} ", entityType,
             entityId, surveyMongoId );
@@ -4057,7 +4063,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 entityMediaPostResponseDetails, surveyMongoId );
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "Could not auto-post to LinkedIn", e );
-            return false;
+            return e.getMessage();
         }
 
     }    
