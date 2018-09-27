@@ -127,6 +127,10 @@
 							<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="${singleReviewItem.source }" data-rating="${singleReviewItem.score}"></div>
 						</div>
 						<c:choose>
+							<c:when test="${singleReviewItem.source == 'verifiedPartner'}">
+								<div class='verified-partner-badge  verify-partner-image float-right'
+									title='Click here to know more'></div>
+							</c:when>
 							<c:when test="${singleReviewItem.source =='encompass'}">
 								<div class='verified-badge  verify-image float-right'
 									title='Click here to know more'></div>

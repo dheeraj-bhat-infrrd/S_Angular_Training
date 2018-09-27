@@ -694,6 +694,17 @@ public class SocialManagementController
         }
 
         facebook4j.auth.AccessToken accessToken = new Gson().fromJson( fbAccessTokenStr, facebook4j.auth.AccessToken.class );
+        //to save facebook access token as extended one
+    	String serverBaseUrl = requestUtils.getRequestServerName( request );
+    	/*Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
+        facebook4j.auth.AccessToken extendedToken;
+        try {
+			extendedToken = facebook.extendTokenExpiration(selectedAccessFacebookToken);
+			selectedAccessFacebookToken  = extendedToken.getToken();
+		} catch (FacebookException e1) {
+			LOG.error( "Method saveSelectedAccessFacebookToken() has facebook error:",e1);
+		}*/
+        
         try {
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -3400,9 +3411,7 @@ public class SocialManagementController
         String entityType = request.getParameter( "entityType" );
         String surveyMongoId = request.getParameter( "surveyMongoId" );
         long entityId = Long.parseLong( request.getParameter( "entityId" ) );
-        Boolean isPosted = socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
-        String isPostedStr = new Gson().toJson(isPosted);
-        return isPostedStr;
+        return socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
     }
 
 }

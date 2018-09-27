@@ -308,6 +308,7 @@
     margin: 0;
     background: white;
     line-height:22px;
+    font-size: 12px;
 }
 
 .ss-widget-half-black-star{
@@ -357,14 +358,14 @@
 }
 
 .ss-wi-verified-badge {
-	background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+	background: url(../images/ss-verified-customer.png) no-repeat;
 	cursor: pointer;
 	background-size: contain;
     background-position:center;
 }
 
 .ss-wi-verify-image{
-	height: 17px;
+	height: 15px;
     width: 60px;
     margin-left: 5px;
 }
@@ -391,8 +392,8 @@
 }
 
 .ss-wi-verify-image-ss{
-	height: 14px;
-    width: 50px;
+	height: 16px;
+  	width: 75px;
     margin-left: 5px;
 }
 
@@ -425,7 +426,9 @@
 }
 
 .ss-widget-pow-by{
-	line-height: 13px;
+	line-height: 13px;    
+	margin: 0 auto;
+    margin-right: 0;
 }
 
 .cursor-pointer{
@@ -455,4 +458,23 @@
 	height: 20px;
    	width: 54px;
     margin-left: 5px;
+}
+
+.ss-wi-verified-partner-badge{
+    background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+    cursor: pointer;
+    background-size: contain;
+}
+
+.ss-wi-verify-partner-image{
+	height: 25px;
+    width: 60px;
+}
+
+.ss-widget-date-pow-cont{
+	display:flex;
+}
+
+.ss-widget-review-text{
+	font-size: 12px;
 }
