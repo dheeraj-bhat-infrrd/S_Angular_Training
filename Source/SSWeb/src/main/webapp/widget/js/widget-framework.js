@@ -477,6 +477,7 @@ function paintWidgetReviewStyles($, widgetDetails) {
 	$('.ss-widget-read-more').css('color', fontTheme);
 	$('.ss-widget-rev-cust-name').css('color', fontTheme);
 	$('.ss-widget-rev-score').css('color', fontTheme);
+	$('.ss-widget-rev-text-quote').css('color', fontTheme);
 	
 	$('.ss-widget-rev-stars').css('color', ratingAndStarColor);
 	$('.ss-widget-zil-rev-star').css('color', '#74c005');
