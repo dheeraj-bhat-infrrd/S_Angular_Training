@@ -13,6 +13,7 @@
   line-height: 25px;
   cursor: pointer;
   box-shadow: 1px 2px rgba(0, 0, 0, 0.08);
+  font-weight: bold !important;
 }
 #ss-widget-container .widget-pad-zero {
   padding: 0;
@@ -53,6 +54,7 @@
   line-height: 22px;
   cursor: pointer;
   margin-top: 15px;
+  font-weight: bold !important;
 }
 #ss-widget-container .ss-widget-rating-cont {
   margin-top: 15px;
@@ -112,6 +114,7 @@
 #ss-widget-container .ss-widget-opt-text {
   line-height: 25px;
   text-align: left;
+  font-weight: bold !important;
 }
 #ss-widget-container .ss-widget-options-dropdown {
   margin-top: 10px;
@@ -146,6 +149,7 @@
   height: 25px;
   line-height: 23px;
   padding: 0 15px;
+  font-weight: bold !important;
 }
 #ss-widget-container .ss-widget-rev {
   border-bottom: 2px solid #8fbae0;
@@ -368,7 +372,7 @@
   border-right: 1px solid #c9ddef;
 }
 #ss-widget-container .ss-widget-options-container {
-  margin-bottom: 10px;
+  padding-bottom: 10px;
 }
 #ss-widget-container .ss-widget-main-rat-cont {
   margin-right: 7px;
@@ -411,6 +415,14 @@
 
 #ss-widget-container .ss-widget-review-text{
 	font-size: 12px;
+}
+
+#ss-widget-container .ss-widget-stars {
+    font-size: 15px;
+}
+
+#ss-widget-container #ss-widget-rev-options{
+	font-weight:bold !important;	
 }
 
 @media (max-width: 767px) {
