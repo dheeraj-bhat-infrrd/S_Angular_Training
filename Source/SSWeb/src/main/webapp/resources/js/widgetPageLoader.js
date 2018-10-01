@@ -650,7 +650,11 @@ var socialSurveyJavascriptWidget = {
 			});
 		} else {
 			initSpectrum($("#widget-bargraph-clr"), socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.barGraphColor, true, function(color) {
-				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.barGraphColor = color.toHexString();
+				if (color == null || color == undefined || color.toHexString() == "") {
+					socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.barGraphColor = null;
+				}else{
+					socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.barGraphColor = color.toHexString();
+				}
 				socialSurveyJavascriptWidget.displayPreview();
 
 			});
