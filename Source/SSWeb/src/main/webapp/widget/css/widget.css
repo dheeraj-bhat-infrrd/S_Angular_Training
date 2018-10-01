@@ -482,3 +482,26 @@
 .ss-widget-review-text{
 	font-size: 12px;
 }
+
+.ss-widget-stars {
+    font-size: 15px;
+}
+
+#ss-widget-rev-options{
+	font-weight:bold !important;	
+}
+
+@media (max-width: 767px) {
+	
+	.ss-widget-stars {
+    	font-size: 12px;
+	}	
+	
+	.ss-widget-rating-perc {
+    	font-size: 9px;
+	}
+	
+	.ss-widget-rating-cont {
+    	padding-left: 5px;
+	}
+}

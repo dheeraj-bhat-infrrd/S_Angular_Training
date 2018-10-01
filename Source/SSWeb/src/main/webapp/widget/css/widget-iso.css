@@ -372,7 +372,7 @@
   border-right: 1px solid #c9ddef;
 }
 #ss-widget-container .ss-widget-options-container {
-  margin-bottom: 10px;
+  padding-bottom: 10px;
 }
 #ss-widget-container .ss-widget-main-rat-cont {
   margin-right: 7px;
@@ -415,6 +415,14 @@
 
 #ss-widget-container .ss-widget-review-text{
 	font-size: 12px;
+}
+
+#ss-widget-container .ss-widget-stars {
+    font-size: 15px;
+}
+
+#ss-widget-container #ss-widget-rev-options{
+	font-weight:bold !important;	
 }
 
 @media (max-width: 767px) {
