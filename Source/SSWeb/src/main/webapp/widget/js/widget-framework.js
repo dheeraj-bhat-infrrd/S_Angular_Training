@@ -36,6 +36,13 @@ function drawWidgetFramework($, widgetOuterContainer, widgetDetails, profileName
 	drawWidgetReviews($, widgetDetails, profileName, profileLevel, companyProfileName, resourcesHost, ssHost);
 	bindWidgetButtonActions($, widgetDetails, resourcesHost, ssHost);
 	setupTags($, widgetDetails);
+	
+	if (widgetOuterContainer.width() <= 270) {
+		$('.ss-widget-stars').css('font-size','10px');
+	}else if (widgetOuterContainer.width() <= 360) {
+		$('.ss-widget-stars').css('font-size','12px');
+	}
+	
 }
 
 function drawWidgetStyleElements($, widgetDetails) {
