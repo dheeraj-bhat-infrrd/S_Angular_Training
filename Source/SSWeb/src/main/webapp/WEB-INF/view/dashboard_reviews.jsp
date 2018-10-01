@@ -51,6 +51,10 @@
 					</div>
 				</div>
 				<c:choose>
+					<c:when test="${feedback.source == 'verifiedPartner'}">
+						<div class='verified-partner-badge  verify-partner-image float-right'
+							title='Click here to know more'></div>
+					</c:when>
 					<c:when test="${feedback.source =='encompass'}">
 						<div class='verified-badge  verify-image float-right'
 							title='Click here to know more'></div>

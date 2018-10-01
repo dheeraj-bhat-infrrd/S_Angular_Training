@@ -151,7 +151,7 @@
   border-bottom: 2px solid #8fbae0;
   padding-top: 10px;
   padding-bottom: 10px;
-  max-height: 240px;
+  max-height: 270px;
 }
 #ss-widget-container .ss-widget-rev-date {
   font-size: 8px;
@@ -258,6 +258,7 @@
   margin: 0;
   background: white;
   line-height: 22px;
+  font-size: 12px;
 }
 #ss-widget-container .ss-widget-half-black-star {
   width: 9px;
@@ -303,8 +304,8 @@
   background-position: center;
 }
 #ss-widget-container .ss-wi-verify-image {
-  height: 14px;
-  width: 50px;
+  height: 15px;
+  width: 60px;
   margin-left: 5px;
 }
 #ss-widget-container .ss-wi-zillow-badge {
@@ -326,8 +327,8 @@
   background-position: center;
 }
 #ss-widget-container .ss-wi-verify-image-ss {
-  height: 14px;
-  width: 50px;
+  height: 16px;
+  width: 75px;
   margin-left: 5px;
 }
 #ss-widget-container .float-right {
@@ -355,6 +356,8 @@
 }
 #ss-widget-container .ss-widget-pow-by {
   line-height: 13px;
+  margin: 0 auto;
+  margin-right: 0;
 }
 #ss-widget-container .cursor-pointer {
   cursor: pointer;
@@ -362,6 +365,7 @@
 #ss-widget-container .ss-widget-review-div-container {
   border-left: 1px solid #c9ddef;
   padding: 0;
+  border-right: 1px solid #c9ddef;
 }
 #ss-widget-container .ss-widget-options-container {
   margin-bottom: 10px;
@@ -388,6 +392,25 @@
 	height: 20px;
    	width: 54px;
     margin-left: 5px;
+}
+
+#ss-widget-container .ss-wi-verified-partner-badge{
+    background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+    cursor: pointer;
+    background-size: contain;
+}
+
+#ss-widget-container .ss-wi-verify-partner-image{
+	height: 25px;
+    width: 60px;
+}
+
+#ss-widget-container .ss-widget-date-pow-cont{
+	display:flex;
+}
+
+#ss-widget-container .ss-widget-review-text{
+	font-size: 12px;
 }
 
 @media (max-width: 767px) {
