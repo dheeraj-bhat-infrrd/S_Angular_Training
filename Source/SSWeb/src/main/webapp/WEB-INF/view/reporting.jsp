@@ -124,7 +124,7 @@
 				</div>
 				
 				<div class="fb-policy-txt align-center col-lg-8 col-sm-8 col-md-8 col-xs-8 fb-policy-ban-cont">
-					Due to recent data breach with Facebook, your Facebook connection might get disconnected with SocialSurvey soon. Please reconnect your account as soon as possible. Facebook's announcement about the issue can be found  <a href="https://developers.facebook.com/blog/post/2018/09/28/security-update/" >here</a>.
+					Due to recent data breach with Facebook, your FB connection might get disconnected with SocialSurvey soon. Please reconnect your account as soon as possible. Facebook's announcement about the issue can be found  <a  target= "_blank" href="https://developers.facebook.com/blog/post/2018/09/28/security-update/" >here</a>.
 				</div>
 				
 				<div class="col-lg-2 col-sm-2 col-md-2 col-xs-2 fb-policy-ban-cont">
