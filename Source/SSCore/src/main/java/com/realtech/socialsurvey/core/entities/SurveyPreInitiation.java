@@ -121,20 +121,7 @@ public class SurveyPreInitiation implements Serializable
 	@Column( name = "LOAN_PROCESSOR_EMAIL")
 	private String loanProcessorEmail;
 	
-	@Column( name = "CUSTOM_FIELD_ONE")
-	private String customFieldOne;
-	
-	@Column( name = "CUSTOM_FIELD_TWO")
-	private String customFieldTwo;
-	
-	@Column( name = "CUSTOM_FIELD_THREE")
-	private String customFieldThree;
-	
-	@Column( name = "CUSTOM_FIELD_FOUR")
-	private String customFieldFour;
-	
-	@Column( name = "CUSTOM_FIELD_FIVE")
-	private String customFieldFive;
+
 	
         
 	@Transient
@@ -506,52 +493,5 @@ public class SurveyPreInitiation implements Serializable
 	}
 
 
-	public String getCustomFieldOne() {
-		return customFieldOne;
-	}
 
-
-	public void setCustomFieldOne(String customFieldOne) {
-		this.customFieldOne = customFieldOne;
-	}
-
-
-	public String getCustomFieldTwo() {
-		return customFieldTwo;
-	}
-
-
-	public void setCustomFieldTwo(String customFieldTwo) {
-		this.customFieldTwo = customFieldTwo;
-	}
-
-
-	public String getCustomFieldThree() {
-		return customFieldThree;
-	}
-
-
-	public void setCustomFieldThree(String customFieldThree) {
-		this.customFieldThree = customFieldThree;
-	}
-
-
-	public String getCustomFieldFour() {
-		return customFieldFour;
-	}
-
-
-	public void setCustomFieldFour(String customFieldFour) {
-		this.customFieldFour = customFieldFour;
-	}
-
-
-	public String getCustomFieldFive() {
-		return customFieldFive;
-	}
-
-
-	public void setCustomFieldFive(String customFieldFive) {
-		this.customFieldFive = customFieldFive;
-	}
 }
