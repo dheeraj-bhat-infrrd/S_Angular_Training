@@ -115,7 +115,7 @@
 	</div>
 </div>
 
-<%-- <div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
+<div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left " style="height:  100%;">
@@ -124,7 +124,7 @@
 				</div>
 				
 				<div class="fb-policy-txt align-center col-lg-8 col-sm-8 col-md-8 col-xs-8 fb-policy-ban-cont">
-					Facebook Policy Change: Be sure to connect your SocialSurvey account to your Facebook Business Page. Beginning August 1st, Facebook will no longer allow Apps such as SocialSurvey to automatically publish posts to Personal Pages.  Click settings above to connect. An exciting update is coming soon.
+					Due to recent data breach with Facebook, your FB connection might get disconnected with SocialSurvey soon. Please reconnect your account as soon as possible. Facebook's announcement about the issue can be found  <a  target= "_blank" href="https://developers.facebook.com/blog/post/2018/09/28/security-update/" >here</a>.
 				</div>
 				
 				<div class="col-lg-2 col-sm-2 col-md-2 col-xs-2 fb-policy-ban-cont">
@@ -134,7 +134,7 @@
 		</div>
 	</div>
 </div>
-
+<%-- 
 <div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
 	<div class="container summit-ribbon-con">
 		<div class="summit-ribbon">

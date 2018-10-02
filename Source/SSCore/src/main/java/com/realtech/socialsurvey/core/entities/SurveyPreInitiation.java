@@ -121,6 +121,8 @@ public class SurveyPreInitiation implements Serializable
 	@Column( name = "LOAN_PROCESSOR_EMAIL")
 	private String loanProcessorEmail;
 	
+
+	
         
 	@Transient
     private String errorCodeDescription;
@@ -489,4 +491,7 @@ public class SurveyPreInitiation implements Serializable
 	public void setLoanProcessorEmail(String loanProcessorEmail) {
 		this.loanProcessorEmail = loanProcessorEmail;
 	}
+
+
+
 }

@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import javax.persistence.Column;
+
 public class EncompassCrmInfo extends CRMInfo
 {
 
@@ -25,6 +27,12 @@ public class EncompassCrmInfo extends CRMInfo
     private String loanProcessorName;
     private String loanProcessorEmail;
 
+	private String customFieldOne;
+	private String customFieldTwo;
+	private String customFieldThree;
+	private String customFieldFour;
+	private String customFieldFive;
+    
 
     public String getVersion()
     {
@@ -229,6 +237,56 @@ public class EncompassCrmInfo extends CRMInfo
 
 	public void setLoanProcessorEmail(String loanProcessorEmail) {
 		this.loanProcessorEmail = loanProcessorEmail;
+	}
+
+
+	public String getCustomFieldOne() {
+		return customFieldOne;
+	}
+
+
+	public void setCustomFieldOne(String customFieldOne) {
+		this.customFieldOne = customFieldOne;
+	}
+
+
+	public String getCustomFieldTwo() {
+		return customFieldTwo;
+	}
+
+
+	public void setCustomFieldTwo(String customFieldTwo) {
+		this.customFieldTwo = customFieldTwo;
+	}
+
+
+	public String getCustomFieldThree() {
+		return customFieldThree;
+	}
+
+
+	public void setCustomFieldThree(String customFieldThree) {
+		this.customFieldThree = customFieldThree;
+	}
+
+
+	public String getCustomFieldFour() {
+		return customFieldFour;
+	}
+
+
+	public void setCustomFieldFour(String customFieldFour) {
+		this.customFieldFour = customFieldFour;
+	}
+
+
+	public String getCustomFieldFive() {
+		return customFieldFive;
+	}
+
+
+	public void setCustomFieldFive(String customFieldFive) {
+		this.customFieldFive = customFieldFive;
 	}
 
 
