@@ -770,7 +770,10 @@ function paintReviews(result){
 		reviewsHtml += '    	<div class="float-left ppl-header-right">';
 		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
 		reviewsHtml += '		</div>';
-			if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP"||reviewItem.source=="API" || reviewItem.source == "FTP" || reviewItem.source=="LONEWOLF"){
+		
+		if(reviewItem.source=="verifiedPartner"){
+			reviewsHtml +=' <div class="verified-partner-badge  verify-partner-image float-right" title="Click here to know more"></div>';
+		}else if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP"||reviewItem.source=="API" || reviewItem.source == "FTP" || reviewItem.source=="LONEWOLF"){
 			reviewsHtml +=' <div class="verified-badge  verify-image float-right" title="Click here to know more"></div>';
 			}
 		else if(reviewItem.source=="Zillow"){

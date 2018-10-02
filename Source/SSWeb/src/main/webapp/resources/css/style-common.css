@@ -12903,3 +12903,14 @@ b{
     width: 50%;
     border-color: #C8C8C8;
 }
+
+.verified-partner-badge{
+    background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+    cursor: pointer;
+    background-size: contain;
+}
+
+.verify-partner-image{
+	height: 25px;
+    width: 85px;
+}
