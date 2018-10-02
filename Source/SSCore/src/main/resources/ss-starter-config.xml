@@ -741,7 +741,7 @@
 	<bean id="socialmediatokenexpirycron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialMediaTokenExpiryJobDetail" />
-		<property name="cronExpression" value="0 01 11 * * ?" />
+		<property name="cronExpression" value="0 25 13 * * ?" />
 	</bean>
 
 	<bean id="imageprocessingcron"
