@@ -354,6 +354,8 @@ public class ReportingWebController
         session.setAttribute( "expiredSocialMediaList", new Gson().toJson( expiredSocialMediaList )   );
 
         //Get the hierarchy details associated with the current profile get all the id's like companyId, regionId , branchId
+        long hasBranch = 1;
+        long hasRegion = 1;
         try {
             LOG.debug( "Getting hierarchy details for entityType {} and entityId {}", entityType, entityId );
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
@@ -361,6 +363,8 @@ public class ReportingWebController
             regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
             companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
             agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
+            hasBranch = hierarchyDetails.get(CommonConstants.HAS_BRANCH);
+            hasRegion = hierarchyDetails.get(CommonConstants.HAS_REGION);
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
             model.addAttribute( MESSAGE, messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -400,6 +404,8 @@ public class ReportingWebController
         
         model.addAttribute( "profileSettings", profileSettings );
         model.addAttribute( "lastSuccessfulRun", lastSuccessfulRun );
+        model.addAttribute( CommonConstants.HAS_BRANCH, hasBranch );
+        model.addAttribute( CommonConstants.HAS_REGION, hasRegion );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
         return JspResolver.REPORTING_DASHBOARD;
     }

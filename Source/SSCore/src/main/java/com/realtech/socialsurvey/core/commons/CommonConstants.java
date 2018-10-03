@@ -1785,4 +1785,7 @@ public interface CommonConstants
     public static final String PARTICIPANT_BUYER_AGENT = "buyerAgent";
     public static final String PARTICIPANT_SELLER_AGENT = "sellerAgent";
 
+    public static final String HAS_REGION = "hasRegion";
+    public static final String HAS_BRANCH = "hasBranch";
+
 }
