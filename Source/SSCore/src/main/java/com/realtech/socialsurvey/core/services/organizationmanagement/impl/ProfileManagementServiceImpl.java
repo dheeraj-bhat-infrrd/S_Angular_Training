@@ -3716,6 +3716,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         long regionId = 0;
         long branchId = 0;
         long agentId = 0;
+        long hasRegion = 1;
+        long hasBranch = 1;
 
         if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
             companyId = entityId;
@@ -3739,12 +3741,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             companyId = company.getCompanyId();
             regionId = region.getRegionId();
             branchId = entityId;
+            if(region.getIsDefaultBySystem() == 1) {
+                hasRegion = 0;
+            }
         } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
             hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( entityId );
             agentId = entityId;
             companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
             regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
             branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+            Region region = regionDao.findById( Region.class, regionId );
+            Branch branch = branchDao.findById( Branch.class, branchId );
+            if(region.getIsDefaultBySystem() == 1) {
+                hasRegion = 0;
+            }
+            if(branch.getIsDefaultBySystem() == 1) {
+                hasBranch = 0;
+            }
         } else {
             throw new InvalidInputException( "Entity Type Is Invalid " );
         }
@@ -3752,6 +3765,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         hierarchyDetials.put( CommonConstants.REGION_ID_COLUMN, regionId );
         hierarchyDetials.put( CommonConstants.BRANCH_ID_COLUMN, branchId );
         hierarchyDetials.put( CommonConstants.AGENT_ID_COLUMN, agentId );
+        hierarchyDetials.put( CommonConstants.HAS_REGION, hasRegion );
+        hierarchyDetials.put( CommonConstants.HAS_BRANCH, hasBranch );
+        
         return hierarchyDetials;
     }
 

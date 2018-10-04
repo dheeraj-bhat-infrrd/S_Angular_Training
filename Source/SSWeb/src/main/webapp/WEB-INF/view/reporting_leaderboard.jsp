@@ -23,6 +23,8 @@
 
 <c:set value="${columnName}" var="columnName"></c:set>
 <c:set value="${columnValue}" var="columnId"></c:set>
+<c:set value="${hasRegion}" var="hasRegion"></c:set>
+<c:set value="${hasBranch}" var="hasBranch"></c:set>
 
 <style>
 .block-display{
@@ -58,8 +60,12 @@
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
 				<option value=1 data-report="company">My Company</option>
-				<option value=2 data-report="region">My Region</option>
-				<option value=3 data-report="branch">My Branch</option>
+				<c:if test="${hasRegion == 1}">
+					<option value=2 data-report="region">My Region</option>
+				</c:if>
+				<c:if test="${hasBranch == 1}">
+					<option value=3 data-report="branch">My Branch</option>
+				</c:if>
 			</select>	
 		</div>
 	</div>
@@ -69,8 +75,12 @@
 		<span class="board-div-span">Filter</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
-				<option value=3 data-report="company">My Branch</option>
-				<option value=2 data-report="region">My Region</option>
+				<c:if test="${hasBranch == 1}">
+					<option value=3 data-report="branch">My Branch</option>
+				</c:if>
+				<c:if test="${hasRegion == 1}">
+					<option value=2 data-report="region">My Region</option>
+				</c:if>
 				<option value=1 data-report="region">My Company</option>
 			</select>	
 		</div>
@@ -81,7 +91,9 @@
 		<span class="board-div-span">Filter</span>
 		<div class="dash-btn-dl-sd-admin board-selector" >
 			<select id="board-selector" class="float-left dash-download-sel-item board-selector-choice">
-				<option value=2 data-report="region">My Region</option>
+				<c:if test="${hasRegion == 1}">
+					<option value=2 data-report="region">My Region</option>
+				</c:if>
 				<option value=1 data-report="region">My Company</option>
 			</select>	
 		</div>
