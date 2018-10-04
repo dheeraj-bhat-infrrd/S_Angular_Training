@@ -115,7 +115,7 @@
 	</div>
 </div>
 
-<div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
+<%--  <div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left " style="height:  100%;">
@@ -134,7 +134,7 @@
 		</div>
 	</div>
 </div>
-<%-- 
+
 <div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
 	<div class="container summit-ribbon-con">
 		<div class="summit-ribbon">
