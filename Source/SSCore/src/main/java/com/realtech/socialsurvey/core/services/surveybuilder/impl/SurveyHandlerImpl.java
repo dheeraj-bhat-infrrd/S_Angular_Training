@@ -334,9 +334,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         companyId = user.getCompany().getCompanyId();
         agentName = user.getFirstName() + " " + user.getLastName();
         for ( UserProfile userProfile : user.getUserProfiles() ) {
-            if ( userProfile.getAgentId() == surveyPreInitiation.getAgentId() ) {
-                branchId = userProfile.getBranchId();
-                regionId = userProfile.getRegionId();
+            if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                //get primary profile if there are  multiple active agent profile for user
+            		if(userProfile.getIsPrimary() == CommonConstants.YES || branchId == 0 ) {
+                		branchId = userProfile.getBranchId();
+                    regionId = userProfile.getRegionId();
+                }
+            		
             }
         }
         Branch branch = userManagementService.getBranchById(branchId);
@@ -407,6 +411,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         
         if(surveyPreInitiation.getLoanProcessorName() != null) {
             surveyDetails.setLoanProcessorName( surveyPreInitiation.getLoanProcessorName() );
+        }
+        
+        if(surveyPreInitiation.getCustomFieldOne() != null) {
+            surveyDetails.setCustomFieldOne( surveyPreInitiation.getCustomFieldOne() );
+        }
+        if(surveyPreInitiation.getCustomFieldTwo() != null) {
+            surveyDetails.setCustomFieldTwo( surveyPreInitiation.getCustomFieldTwo() );
+        }
+        if(surveyPreInitiation.getCustomFieldThree() != null) {
+            surveyDetails.setCustomFieldThree( surveyPreInitiation.getCustomFieldThree() );
+        }
+        if(surveyPreInitiation.getCustomFieldFour() != null) {
+            surveyDetails.setCustomFieldFour( surveyPreInitiation.getCustomFieldFour() );
+        }
+        if(surveyPreInitiation.getCustomFieldFive() != null) {
+            surveyDetails.setCustomFieldFive( surveyPreInitiation.getCustomFieldFive() );
         }
         
         if ( survey == null ) {

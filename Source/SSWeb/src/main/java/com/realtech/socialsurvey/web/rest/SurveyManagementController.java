@@ -513,6 +513,32 @@ public class SurveyManagementController
     			customerDetail.append( survey.getLoanProcessorName() );
         }
         
+        //add custom fields
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldOne()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldOne()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldOne() +": " );
+			customerDetail.append( survey.getCustomFieldOne() );
+        }
+        
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldTwo()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldTwo()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldTwo() +": " );
+			customerDetail.append( survey.getCustomFieldTwo() );
+        }
+    		
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldThree()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldThree()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldThree() +": " );
+			customerDetail.append( survey.getCustomFieldThree() );
+        }
+    		
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldFour()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldFour()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldFour() +": " );
+			customerDetail.append( survey.getCustomFieldFour() );
+        }
+    		
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldFive()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldFive()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldFive() +": " );
+			customerDetail.append( survey.getCustomFieldFive() );
+        }
+        
         if( ! StringUtils.isEmpty(survey.getCity())){
         		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCity()) )
         			customerDetail.append( "<br/> " + fieldNameMappings.getCity() +": " );
