@@ -413,6 +413,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyDetails.setLoanProcessorName( surveyPreInitiation.getLoanProcessorName() );
         }
         
+        if(surveyPreInitiation.getCustomFieldOne() != null) {
+            surveyDetails.setCustomFieldOne( surveyPreInitiation.getCustomFieldOne() );
+        }
+        if(surveyPreInitiation.getCustomFieldTwo() != null) {
+            surveyDetails.setCustomFieldTwo( surveyPreInitiation.getCustomFieldTwo() );
+        }
+        if(surveyPreInitiation.getCustomFieldThree() != null) {
+            surveyDetails.setCustomFieldThree( surveyPreInitiation.getCustomFieldThree() );
+        }
+        if(surveyPreInitiation.getCustomFieldFour() != null) {
+            surveyDetails.setCustomFieldFour( surveyPreInitiation.getCustomFieldFour() );
+        }
+        if(surveyPreInitiation.getCustomFieldFive() != null) {
+            surveyDetails.setCustomFieldFive( surveyPreInitiation.getCustomFieldFive() );
+        }
+        
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
             // LOG.debug( "Updating modified on column in agent hierarchy fro agent " );
