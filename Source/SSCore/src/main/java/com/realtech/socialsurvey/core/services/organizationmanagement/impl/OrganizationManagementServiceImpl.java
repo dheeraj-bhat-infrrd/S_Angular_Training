@@ -3617,13 +3617,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         int flag = 0;
         if ( isSocialMonitorAdmin ) {
             for ( User assigneeUser : assigneeUsers ) {
+                Region region = getDefaultRegionForCompany( adminUser.getCompany() );
+                Branch branch = getDefaultBranchForRegion(region.getRegionId());
                 if ( selectedUserId == 0l ) {
                     LOG.debug( "assigning individual(s) to company in addIndividual" );
-                    Region region = getDefaultRegionForCompany( adminUser.getCompany() );
-                    if ( region == null ) {
-                        throw new NoRecordsFetchedException( "No default region found for company while adding individual" );
-                    }
-
+                   
                     if ( validateUserAssignment( adminUser, assigneeUser, userMap ) ) {
                         assignRegionToUser( adminUser, region.getRegionId(), assigneeUser, isAdmin );
                     }
@@ -3643,9 +3641,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     }
                 }
                 if ( flag == 1 ) {
+                		// create a social monitor profile for user using default branch and region of company
                     UserProfile userProfile = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
-                        assigneeUser.getEmailId(), assigneeUser.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
-                        CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID,
+                        assigneeUser.getEmailId(), assigneeUser.getUserId(), branch.getBranchId(),
+                        region.getRegionId(), CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID,
                         CommonConstants.IS_PRIMARY_FALSE, CommonConstants.PROFILE_STAGES_COMPLETE,
                         CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
                         String.valueOf( adminUser.getUserId() ) );
