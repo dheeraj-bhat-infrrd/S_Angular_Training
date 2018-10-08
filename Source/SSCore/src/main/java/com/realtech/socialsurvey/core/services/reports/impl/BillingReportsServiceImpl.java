@@ -86,7 +86,7 @@ public class BillingReportsServiceImpl implements BillingReportsService
     @Autowired
     private WorkbookData workbookData;
 
-    @Value ( "${BATCH_SIZE}")
+    @Value ( "${BILLING_REPORT_BATCH_SIZE}")
     private int batchSize;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
