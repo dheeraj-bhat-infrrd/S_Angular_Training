@@ -395,7 +395,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
     @Value ( "${AMAZON_DIGEST_BUCKET}")
     private String digestBucket;
 
-    public static final int DIGEST_MAIL_START_INDEX = 4013;
+    public static final int DIGEST_MAIL_START_INDEX = 0;
 
     public static final int DIGEST_MAIL_BATCH_SIZE = 50;
 
@@ -3930,8 +3930,8 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 year = year - 1;
             }
 
-           // generateMonthlyDigestForHierarchy( CommonConstants.PROFILE_LEVEL_COMPANY, month, year );
-           // generateMonthlyDigestForHierarchy( CommonConstants.PROFILE_LEVEL_REGION, month, year );
+            generateMonthlyDigestForHierarchy( CommonConstants.PROFILE_LEVEL_COMPANY, month, year );
+            generateMonthlyDigestForHierarchy( CommonConstants.PROFILE_LEVEL_REGION, month, year );
             generateMonthlyDigestForHierarchy( CommonConstants.PROFILE_LEVEL_BRANCH, month, year );
 
             // updating last run time for batch in database
