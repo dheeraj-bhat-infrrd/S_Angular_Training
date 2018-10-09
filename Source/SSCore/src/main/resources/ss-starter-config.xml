@@ -801,7 +801,7 @@
 	<bean id="monthlydigeststartercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="monthlydigeststarter" />
-        <property name="cronExpression" value="0 20 13 8 * ?" />
+        <property name="cronExpression" value="0 42 12 9 * ?" />
 	</bean>
 
 	<bean id="transactionActivityMonitorCron"
