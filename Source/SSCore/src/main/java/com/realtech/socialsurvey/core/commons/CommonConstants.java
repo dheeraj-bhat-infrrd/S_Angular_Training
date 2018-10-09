@@ -1784,6 +1784,15 @@ public interface CommonConstants
     public static final String PARTICIPANT_CUSTOMER_2 = "customer2";
     public static final String PARTICIPANT_BUYER_AGENT = "buyerAgent";
     public static final String PARTICIPANT_SELLER_AGENT = "sellerAgent";
+    
+    //type of range question
+    public static final String QUESTION_TYPE_SMILE = "sb-range-smiles";
+    public static final String QUESTION_TYPE_SCALE = "sb-range-scale";
+    public static final String QUESTION_TYPE_STAR = "sb-range-star";
+    public static final String QUESTION_TYPE_0TO10 = "sb-range-0to10";
+
+    public static final String HAS_REGION = "hasRegion";
+    public static final String HAS_BRANCH = "hasBranch";
 
     public static final String HAS_REGION = "hasRegion";
     public static final String HAS_BRANCH = "hasBranch";
