@@ -291,6 +291,13 @@ namespace EncompassSocialSurvey
                     string loanProcessorName = null;
                     string loanProcessorEmail = null;
 
+                    string customFieldOne = null;
+                    string customFieldTwo = null;
+                    string customFieldThree = null;
+                    string customFieldFour = null;
+                    string customFieldFive = null;
+
+
                     if (!string.IsNullOrWhiteSpace(credential.propertyAddress))
                     {
                         propertyAddress = loan["Fields." + credential.propertyAddress] as string;
@@ -306,6 +313,30 @@ namespace EncompassSocialSurvey
                         loanProcessorEmail = loan["Fields." + credential.loanProcessorEmail] as string;
                     }
 
+                    if (!string.IsNullOrWhiteSpace(credential.customFieldOne))
+                    {
+                        loanProcessorEmail = loan["Fields." + credential.customFieldOne] as string;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(credential.customFieldTwo))
+                    {
+                        loanProcessorEmail = loan["Fields." + credential.customFieldTwo] as string;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(credential.customFieldThree))
+                    {
+                        loanProcessorEmail = loan["Fields." + credential.customFieldThree] as string;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(credential.customFieldFour))
+                    {
+                        loanProcessorEmail = loan["Fields." + credential.customFieldFour] as string;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(credential.customFieldFive))
+                    {
+                        loanProcessorEmail = loan["Fields." + credential.customFieldFive] as string;
+                    }
 
                     string agentId = "0";
                     string agentName = (loanOfficerName != null) ? loanOfficerName : "";
@@ -344,7 +375,11 @@ namespace EncompassSocialSurvey
                     forLoanVM_Borrower.LoanProcessorName = loanProcessorName;
                     forLoanVM_Borrower.LoanProcessorEmail = loanProcessorEmail;
                     forLoanVM_Borrower.PropertyAddress = propertyAddress;
-
+                    forLoanVM_Borrower.CustomFieldOne = customFieldOne;
+                    forLoanVM_Borrower.CustomFieldTwo = customFieldTwo;
+                    forLoanVM_Borrower.CustomFieldThree = customFieldThree;
+                    forLoanVM_Borrower.CustomFieldFour = customFieldFour;
+                    forLoanVM_Borrower.CustomFieldFive = customFieldFive;
                     returnLoansViewModel.Add(forLoanVM_Borrower);
 
                     //add coborrower
@@ -367,9 +402,14 @@ namespace EncompassSocialSurvey
                         forLoanVM_Co_Borrower.State = subjectPropertyState;
                         forLoanVM_Co_Borrower.City = subjectPropertyCity;
                         forLoanVM_Co_Borrower.ParticipantType = EncompassSocialSurveyConstant.PARTICIPANT_TYPE_CO_BORROWER;
-                        forLoanVM_Borrower.LoanProcessorName = loanProcessorName;
-                        forLoanVM_Borrower.LoanProcessorEmail = loanProcessorEmail;
-                        forLoanVM_Borrower.PropertyAddress = propertyAddress;
+                        forLoanVM_Co_Borrower.LoanProcessorName = loanProcessorName;
+                        forLoanVM_Co_Borrower.LoanProcessorEmail = loanProcessorEmail;
+                        forLoanVM_Co_Borrower.PropertyAddress = propertyAddress;
+                        forLoanVM_Co_Borrower.CustomFieldOne = customFieldOne;
+                        forLoanVM_Co_Borrower.CustomFieldTwo = customFieldTwo;
+                        forLoanVM_Co_Borrower.CustomFieldThree = customFieldThree;
+                        forLoanVM_Co_Borrower.CustomFieldFour = customFieldFour;
+                        forLoanVM_Co_Borrower.CustomFieldFive = customFieldFive;
 
                         returnLoansViewModel.Add(forLoanVM_Co_Borrower);
                     }
@@ -385,7 +425,7 @@ namespace EncompassSocialSurvey
 
 
                         // parse emails
-                        if (string.IsNullOrWhiteSpace(emailDomain))
+                        if (!string.IsNullOrWhiteSpace(emailDomain))
                         {
                             buyerEmail = ReplaceEmailAddress(buyerEmail, emailDomain, emailPrefix);
                             sellerEmail = ReplaceEmailAddress(sellerEmail, emailDomain, emailPrefix);
@@ -413,9 +453,14 @@ namespace EncompassSocialSurvey
                             forLoanVM_buyer_agent.State = subjectPropertyState;
                             forLoanVM_buyer_agent.City = subjectPropertyCity;
                             forLoanVM_buyer_agent.ParticipantType = EncompassSocialSurveyConstant.PARTICIPANT_TYPE_BUYER_AGENT;
-                            forLoanVM_Borrower.LoanProcessorName = loanProcessorName;
-                            forLoanVM_Borrower.LoanProcessorEmail = loanProcessorEmail;
-                            forLoanVM_Borrower.PropertyAddress = propertyAddress;
+                            forLoanVM_buyer_agent.LoanProcessorName = loanProcessorName;
+                            forLoanVM_buyer_agent.LoanProcessorEmail = loanProcessorEmail;
+                            forLoanVM_buyer_agent.PropertyAddress = propertyAddress;
+                            forLoanVM_buyer_agent.CustomFieldOne = customFieldOne;
+                            forLoanVM_buyer_agent.CustomFieldTwo = customFieldTwo;
+                            forLoanVM_buyer_agent.CustomFieldThree = customFieldThree;
+                            forLoanVM_buyer_agent.CustomFieldFour = customFieldFour;
+                            forLoanVM_buyer_agent.CustomFieldFive = customFieldFive;
 
                             returnLoansViewModel.Add(forLoanVM_buyer_agent);
                         }
@@ -443,10 +488,14 @@ namespace EncompassSocialSurvey
                             forLoanVM_seller_agent.State = subjectPropertyState;
                             forLoanVM_seller_agent.City = subjectPropertyCity;
                             forLoanVM_seller_agent.ParticipantType = EncompassSocialSurveyConstant.PARTICIPANT_TYPE_LISTING_AGENT;
-                            forLoanVM_Borrower.LoanProcessorName = loanProcessorName;
-                            forLoanVM_Borrower.LoanProcessorEmail = loanProcessorEmail;
-                            forLoanVM_Borrower.PropertyAddress = propertyAddress;
-
+                            forLoanVM_seller_agent.LoanProcessorName = loanProcessorName;
+                            forLoanVM_seller_agent.LoanProcessorEmail = loanProcessorEmail;
+                            forLoanVM_seller_agent.PropertyAddress = propertyAddress;
+                            forLoanVM_seller_agent.CustomFieldOne = customFieldOne;
+                            forLoanVM_seller_agent.CustomFieldTwo = customFieldTwo;
+                            forLoanVM_seller_agent.CustomFieldThree = customFieldThree;
+                            forLoanVM_seller_agent.CustomFieldFour = customFieldFour;
+                            forLoanVM_seller_agent.CustomFieldFive = customFieldFive;
                             returnLoansViewModel.Add(forLoanVM_seller_agent);
                         }
 
@@ -825,6 +874,32 @@ namespace EncompassSocialSurvey
             {
                 // pick default
                 //fieldIds.Add(EncompassSocialSurveyConstant.LOAN_PROCESSOR_EMAIL_FIELD);
+            }
+
+            //add custom fields
+            if (!string.IsNullOrWhiteSpace(credential.customFieldThree))
+            {
+                fieldIds.Add(credential.customFieldOne);
+            }
+
+            if (!string.IsNullOrWhiteSpace(credential.customFieldTwo))
+            {
+                fieldIds.Add(credential.customFieldTwo);
+            }
+
+            if (!string.IsNullOrWhiteSpace(credential.customFieldThree))
+            {
+                fieldIds.Add(credential.customFieldThree);
+            }
+
+            if (!string.IsNullOrWhiteSpace(credential.customFieldFour))
+            {
+                fieldIds.Add(credential.customFieldFour);
+            }
+
+            if (!string.IsNullOrWhiteSpace(credential.customFieldFive))
+            {
+                fieldIds.Add(credential.customFieldFive);
             }
 
             return fieldIds;
