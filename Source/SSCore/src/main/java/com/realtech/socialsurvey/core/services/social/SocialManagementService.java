@@ -342,6 +342,9 @@ public interface SocialManagementService
     public void postZillowToSocialMedia( OrganizationUnitSettings profile, SurveyDetails surveyDetails,
         OrganizationUnitSettings companySettings ) throws NonFatalException;
 
+    public void postZillowToSocialMedia( OrganizationUnitSettings profile, SurveyDetails surveyDetails,
+        OrganizationUnitSettings companySettings ) throws NonFatalException;
+
 	String generateFacebookShareUrl(SurveyDetails survey, OrganizationUnitSettings organizationUnitSettings)
 			throws InvalidInputException;
 

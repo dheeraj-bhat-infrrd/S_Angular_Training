@@ -31,6 +31,11 @@ namespace EncompassSocialSurvey.Entity
         public string LoanProcessorName { get; set; }
         public string LoanProcessorEmail { get; set; }
 
+        public string CustomFieldOne { get; set; }
+        public string CustomFieldTwo { get; set; }
+        public string CustomFieldThree { get; set; }
+        public string CustomFieldFour { get; set; }
+        public string CustomFieldFive { get; set; }
 
         //
         public DateTime CreatedOn { get; set; }
