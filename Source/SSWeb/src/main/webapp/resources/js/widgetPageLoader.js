@@ -25,7 +25,7 @@ var socialSurveyJavascriptWidget = {
 		// initialize data-independent drop down
 		autoAppendTextDropdown("#st-dd-wrapper-widget-font-theme", "st-dd-item font-theme-option-item cursor-pointer widget-select-bx", [ "Light", "Dark" ]);
 		autoAppendTextDropdown("#st-dd-wrapper-widget-embedded-font-theme", "st-dd-item embedded-font-theme-option-item cursor-pointer widget-select-bx", [ "Light", "Dark" ]);
-		autoAppendTextDropdown("#st-dd-wrapper-df-rev-ordr", "st-dd-item df-rev-ordr-option-item cursor-pointer widget-select-bx", [ "Newest First", "Highest Rated First", "Oldest First", "Lowest Rated First" ]);
+		autoAppendTextDropdown("#st-dd-wrapper-df-rev-ordr", "st-dd-item df-rev-ordr-option-item cursor-pointer widget-select-bx", [ "Newest First", "Highest Rated First", "Oldest First", "Lowest Rated First", "Featured Reviews" ]);
 
 		// populate widget configuration in input elements
 		this.populateConfiguration();
@@ -84,6 +84,8 @@ var socialSurveyJavascriptWidget = {
 				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSortOrder = "highestRatingFirst";
 			} else if ("Lowest Rated First" == $(this).html()) {
 				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSortOrder = "lowestRatingFirst";
+			}else if ("Featured Reviews" == $(this).html()) {
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSortOrder = "feature";
 			}
 			socialSurveyJavascriptWidget.displayPreview();
 
@@ -246,6 +248,23 @@ var socialSurveyJavascriptWidget = {
 			socialSurveyJavascriptWidget.displayPreview();
 
 		});
+		
+		$("#onld-btn-size").on('change', function() {
+			if ($("#onld-btn-size").val() != undefined && $("#onld-btn-size").val() != "") {
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.maxWidgetBtnSize = $("#onld-btn-size").val();
+			} else {
+				$("#overlay-toast").html("Contact and review button sizes must be provided");
+				showToast();
+			}
+
+			if (isNaN($("#init-rvw-cnt").val()) && orcf == false) {
+				orcf = true;
+				$("#overlay-toast").html("size should be a number less than 1000");
+				showToast();
+			}
+			socialSurveyJavascriptWidget.displayPreview();
+
+		});
 
 		$("#flt-ss-chk-box").on('click', function() {
 			var revSources = socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSources;
@@ -386,6 +405,30 @@ var socialSurveyJavascriptWidget = {
 			} else {
 				$('#hide-ot-initly-chk-box').addClass("bd-check-img-checked")
 				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.hideOptions = "false";
+			}
+			socialSurveyJavascriptWidget.displayPreview();
+
+		});
+		
+		$('#hide-con-btn-chk-box').on('click', function() {
+			if ($('#hide-con-btn-chk-box').hasClass("bd-check-img-checked")) {
+				$('#hide-con-btn-chk-box').removeClass("bd-check-img-checked")
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.hideContactBtn = "true";
+			} else {
+				$('#hide-con-btn-chk-box').addClass("bd-check-img-checked")
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.hideContactBtn = "false";
+			}
+			socialSurveyJavascriptWidget.displayPreview();
+
+		});
+		
+		$('#hide-rev-btn-chk-box').on('click', function() {
+			if ($('#hide-rev-btn-chk-box').hasClass("bd-check-img-checked")) {
+				$('#hide-rev-btn-chk-box').removeClass("bd-check-img-checked")
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.hideReviewBtn = "true";
+			} else {
+				$('#hide-rev-btn-chk-box').addClass("bd-check-img-checked")
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.hideReviewBtn = "false";
 			}
 			socialSurveyJavascriptWidget.displayPreview();
 
@@ -607,7 +650,11 @@ var socialSurveyJavascriptWidget = {
 			});
 		} else {
 			initSpectrum($("#widget-bargraph-clr"), socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.barGraphColor, true, function(color) {
-				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.barGraphColor = color.toHexString();
+				if (color == null || color == undefined || color.toHexString() == "") {
+					socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.barGraphColor = null;
+				}else{
+					socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.barGraphColor = color.toHexString();
+				}
 				socialSurveyJavascriptWidget.displayPreview();
 
 			});
@@ -655,6 +702,7 @@ var socialSurveyJavascriptWidget = {
 
 		$('#init-rvw-cnt').val(socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.initialNumberOfReviews);
 		$('#onld-rvw-cnt').val(socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.maxReviewsOnLoadMore);
+		$('#onld-btn-size').val(socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.maxWidgetBtnSize);
 
 		if (socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.seoTitle != undefined && socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.seoTitle != null && socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.seoTitle != "null") {
 			$('#title-tag-text').val(socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.seoTitle);
@@ -686,6 +734,18 @@ var socialSurveyJavascriptWidget = {
 			$('#allw-mdst-brndng-chk-box').removeClass("bd-check-img-checked");
 		}
 
+		if ("false" == socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.hideContactBtn) {
+			$('#hide-con-btn-chk-box').addClass("bd-check-img-checked");
+		} else {
+			$('#hide-con-btn-chk-box').removeClass("bd-check-img-checked");
+		}
+		
+		if ("false" == socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.hideReviewBtn) {
+			$('#hide-rev-btn-chk-box').addClass("bd-check-img-checked");
+		} else {
+			$('#hide-rev-btn-chk-box').removeClass("bd-check-img-checked");
+		}
+		
 		var revsrs = socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSources;
 		reviewSourcesList = [];
 
@@ -821,7 +881,12 @@ var socialSurveyJavascriptWidget = {
 			this.showValidationError("On load review count must be provided");
 			return false;
 
-		} else if ($('#ld-mr-alt').val() == "" || $('#ld-mr-alt').val() == undefined) {
+		} else if ($('#onld-btn-size').val() == "" || $('#onld-btn-size').val() == undefined) {
+
+			this.showValidationError("Widget button size must be provided");
+			return false;
+
+		}else if ($('#ld-mr-alt').val() == "" || $('#ld-mr-alt').val() == undefined) {
 
 			this.showValidationError("Review loader name must be provided");
 			return false;
@@ -856,7 +921,12 @@ var socialSurveyJavascriptWidget = {
 			this.showValidationError("On load review count must be a number less than 1000");
 			return false;
 
-		} else if ($('#button-one-name').val().length > 15) {
+		} else if (isNaN($('#onld-btn-size').val())) {
+
+			this.showValidationError("Button size must be a number less than 1000");
+			return false;
+
+		}else if ($('#button-one-name').val().length > 15) {
 
 			this.showValidationError("Button one name must not have more than 15 characters.");
 			return false;

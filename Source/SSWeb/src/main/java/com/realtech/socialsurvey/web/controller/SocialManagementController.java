@@ -694,6 +694,17 @@ public class SocialManagementController
         }
 
         facebook4j.auth.AccessToken accessToken = new Gson().fromJson( fbAccessTokenStr, facebook4j.auth.AccessToken.class );
+        //to save facebook access token as extended one
+    	String serverBaseUrl = requestUtils.getRequestServerName( request );
+    	/*Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
+        facebook4j.auth.AccessToken extendedToken;
+        try {
+			extendedToken = facebook.extendTokenExpiration(selectedAccessFacebookToken);
+			selectedAccessFacebookToken  = extendedToken.getToken();
+		} catch (FacebookException e1) {
+			LOG.error( "Method saveSelectedAccessFacebookToken() has facebook error:",e1);
+		}*/
+        
         try {
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -3394,7 +3405,7 @@ public class SocialManagementController
     
     @ResponseBody
     @RequestMapping ( value = "/postonlinkedin", method = RequestMethod.POST)
-    public boolean postToLinkedIn( HttpServletRequest request )
+    public String postToLinkedIn( HttpServletRequest request )
     {
         LOG.info( "Method to post feedback of customer to linkedin started." );
         String entityType = request.getParameter( "entityType" );

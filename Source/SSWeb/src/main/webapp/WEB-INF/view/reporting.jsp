@@ -54,9 +54,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
-<c:set var="activeSession" value="${activeSession }"></c:set>
+<%-- <c:set var="activeSession" value="${activeSession }"></c:set>
 <c:set var="hasRegisteredForSummit" value="${hasRegisteredForSummit }"></c:set>
-<c:set var="isShowSummitPopup" value="${isShowSummitPopup }"></c:set>
+<c:set var="isShowSummitPopup" value="${isShowSummitPopup }"></c:set> --%>
 
 <div class="overlay-loader hide"></div>
 <input type="hidden"  id="reporting-data-div" data-profile-master-id="${profilemasterid}" data-user-id="${userId}" data-column-name="${columnName}" data-column-value="${columnValue}">
@@ -115,7 +115,7 @@
 	</div>
 </div>
 
-<div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
+<%--  <div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left " style="height:  100%;">
@@ -124,7 +124,7 @@
 				</div>
 				
 				<div class="fb-policy-txt align-center col-lg-8 col-sm-8 col-md-8 col-xs-8 fb-policy-ban-cont">
-					Facebook Policy Change: Be sure to connect your SocialSurvey account to your Facebook Business Page. Beginning August 1st, Facebook will no longer allow Apps such as SocialSurvey to automatically publish posts to Personal Pages.  Click settings above to connect. An exciting update is coming soon.
+					Due to recent data breach with Facebook, your FB connection might get disconnected with SocialSurvey soon. Please reconnect your account as soon as possible. Facebook's announcement about the issue can be found  <a  target= "_blank" href="https://developers.facebook.com/blog/post/2018/09/28/security-update/" >here</a>.
 				</div>
 				
 				<div class="col-lg-2 col-sm-2 col-md-2 col-xs-2 fb-policy-ban-cont">
@@ -138,27 +138,38 @@
 <div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
 	<div class="container summit-ribbon-con">
 		<div class="summit-ribbon">
+			<div class="summit-rib-timer-back">
+				<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown.png" class="summit-rib-timer-img">
+    			<div class="summit-rib-text summit-rib-days">23</div>
+			    <div class="summit-rib-text summit-rib-hrs">23</div> 
+			    <div class="summit-rib-text summit-rib-min">23</div> 
+			</div>
 			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
 		</div>
 	</div>
-</div>
 
- <div id="summit-popup" class="overlay-login summit-popup-outer hide">
+<div id="summit-popup" class="overlay-login summit-popup-outer hide">
 	<div id="summit-popup-body" class="summit-popup">
+		<div class="summit-timer-back">
+			<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown_trans.png" class="summit-timer-img">
+			<div class="summit-timer-text summit-timer-days"></div>
+			<div class="summit-timer-text summit-timer-hrs"></div>
+			<div class="summit-timer-text summit-timer-min"></div>
+		</div>		
 		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
 		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
 		<div class="summit-checkbox-cont clearfix">
-			<div class="float-left wc-width" id="">
+			<div class="float-left wc-width summit-check-contain" id="">
 				<div id="summit-do-not-show" class="float-left summit-check" data-checked=false></div>
 	     		<div class="float-left wc-dashboard-text summit-check-text">Do not show this again</div>
 			</div>
-			<div class="float-left wc-width summit-popup-check-right" id="">
+			<div class="float-left wc-width summit-popup-check-right summit-check-contain" id="">
 				<div id="summit-already-reg" class="float-left summit-check" data-checked=false></div>
 	     		<div class="float-left wc-dashboard-text summit-check-text">I already registered</div>
 			</div>
 		</div>
 	</div>
-</div>
+</div> --%>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
@@ -390,31 +401,49 @@
 		
 		hideOverlay();
 		
-		var hasRegisteredForSummit = "${hasRegisteredForSummit}";
+		/* var hasRegisteredForSummit = "${hasRegisteredForSummit}";
 		var activeSession = "${activeSession}";
 		var isShowSummitPopup ="${isShowSummitPopup}";
-		
-		if(activeSession == 'false' && activeSession != false){
-			if(hasRegisteredForSummit == 'false' || hasRegisteredForSummit == false){
-				if(isShowSummitPopup == 'false' || isShowSummitPopup == 'false'){
-					showSummitPopup();
-				}else if(isShowSummitPopup == 'true' || isShowSummitPopup == 'true'){
-					showSummitRibbon();
-				}
-			}
-		}
 		
 		var newSession = sessionStorage.getItem("newSession");
 		var fbPopup = sessionStorage.getItem("fbPopup");
 		
 		if(newSession == false || newSession == 'false'){
-			$('#fb-policy-banner').hide();
-		}
+			$('#summit-popup').hide();
+			showSummitRibbon();
+			enableBodyScroll();
+		}else{
+			if(isShowSummitPopup == 'false' || isShowSummitPopup == false){
+				showSummitPopup();
+			}else{
+				showSummitRibbon();
+			}
+		} */
 		
-		if(fbPopup == true || fbPopup == 'true'){
+		/* if(fbPopup == true || fbPopup == 'true'){
 			$('#fb-policy-banner').show();
 		}else if(fbPopup == false || fbPopup == 'false'){
 			$('#fb-policy-banner').hide();
-		}
+		} */
+		
+		var diffDays = summitTimer();
+		$('.summit-timer-days').html(diffDays.d);
+		$('.summit-timer-hrs').html(diffDays.h);
+		$('.summit-timer-min').html(diffDays.m);
+		$('.summit-rib-days').html(diffDays.d);
+		$('.summit-rib-hrs').html(diffDays.h);
+		$('.summit-rib-min').html(diffDays.m);
+		
+		window.setInterval(function(){
+			var diffDays = summitTimer();
+			$('.summit-timer-days').html(diffDays.d);
+			$('.summit-timer-hrs').html(diffDays.h);
+			$('.summit-timer-min').html(diffDays.m);
+			$('.summit-rib-days').html(diffDays.d);
+			$('.summit-rib-hrs').html(diffDays.h);
+			$('.summit-rib-min').html(diffDays.m);
+		}, 60000);
+		
+		sessionStorage.setItem("newSession",false);
 	});
 </script>

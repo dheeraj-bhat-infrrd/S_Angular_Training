@@ -22,7 +22,6 @@ public class BatchUtilityController
 //    @RequestMapping ( value = "/loadBatchUtility")
     public String loadBatchUtility()
     {
-        System.out.println( "In loadBatchUtility" );
         return JspResolver.BATCH_UTILITY;
 
     }
@@ -32,7 +31,6 @@ public class BatchUtilityController
 //    @ResponseBody
     public String startLoneWolfJobDetail()
     {
-        System.out.println( "In startLoneWolfJobDetail" );
         loneWolfReviewProcessorUtility.execute();
         return Response.ok().toString();
     }

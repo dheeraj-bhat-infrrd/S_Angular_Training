@@ -3,6 +3,8 @@ package com.realtech.socialsurvey.core.entities;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
+
 
 public class SurveyDetails
 {
@@ -43,6 +45,16 @@ public class SurveyDetails
     private String source;
     private String sourceId;
     private Date surveyTransactionDate;
+    
+    private String propertyAddress;
+   	private String loanProcessorName;
+   	private String loanProcessorEmail;
+   	
+	private String customFieldOne;	
+	private String customFieldTwo;	
+	private String customFieldThree;	
+	private String customFieldFour;	
+	private String customFieldFive;
 
     //review details
     private int stage;
@@ -104,10 +116,6 @@ public class SurveyDetails
 
     //abusive email set
     private boolean abusiveNotify;
-
-    //adding property address to survey details
-    private String propertyAddress;
-
 
     public String getAgentEmailId()
     {
@@ -923,6 +931,76 @@ public class SurveyDetails
     {
         this.agentProfileImage = agentProfileImage;
     }
+
+
+	public String getLoanProcessorName() {
+		return loanProcessorName;
+	}
+
+
+	public void setLoanProcessorName(String loanProcessorName) {
+		this.loanProcessorName = loanProcessorName;
+	}
+
+
+	public String getLoanProcessorEmail() {
+		return loanProcessorEmail;
+	}
+
+
+	public void setLoanProcessorEmail(String loanProcessorEmail) {
+		this.loanProcessorEmail = loanProcessorEmail;
+	}
+
+
+	public String getCustomFieldOne() {
+		return customFieldOne;
+	}
+
+
+	public void setCustomFieldOne(String customFieldOne) {
+		this.customFieldOne = customFieldOne;
+	}
+
+
+	public String getCustomFieldTwo() {
+		return customFieldTwo;
+	}
+
+
+	public void setCustomFieldTwo(String customFieldTwo) {
+		this.customFieldTwo = customFieldTwo;
+	}
+
+
+	public String getCustomFieldThree() {
+		return customFieldThree;
+	}
+
+
+	public void setCustomFieldThree(String customFieldThree) {
+		this.customFieldThree = customFieldThree;
+	}
+
+
+	public String getCustomFieldFour() {
+		return customFieldFour;
+	}
+
+
+	public void setCustomFieldFour(String customFieldFour) {
+		this.customFieldFour = customFieldFour;
+	}
+
+
+	public String getCustomFieldFive() {
+		return customFieldFive;
+	}
+
+
+	public void setCustomFieldFive(String customFieldFive) {
+		this.customFieldFive = customFieldFive;
+	}
 
 
 }

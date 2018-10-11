@@ -1,4 +1,3 @@
-
 //Functions to detect browser
 var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
 var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
@@ -1599,11 +1598,15 @@ function fetchReviewsOnDashboard(isNextBatch) {
 			displayReviewOnDashboard();
 		}
 		isDashboardReviewRequestRunning = false;
-		if ($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
-			fetchReviewsOnDashboard(true);
-		} else if ($('div.dsh-review-cont.hide').length < (2 * batchSizeCmp)) {
-			fetchZillowReviewsBasedOnProfile(colName, colValue, isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp, name);
+		
+		if($('#review-details').length > 0 ){
+			if ($('div.dsh-review-cont.hide').length <= batchSizeCmp && !doStopPaginationDashboard) {
+				fetchReviewsOnDashboard(true);
+			} else if ($('div.dsh-review-cont.hide').length < (2 * batchSizeCmp)) {
+				fetchZillowReviewsBasedOnProfile(colName, colValue, isZillowReviewsCallRunning, true, startIndexCmp, batchSizeCmp, name);
+			}
 		}
+		
 	}, payload, true);
 }
 
@@ -3759,6 +3762,11 @@ $(document).on('click', '.bd-tab-rat', function() {
 	$(this).addClass('bd-ans-tab-sel');
 	$(this).parent().parent().parent().find('.bd-ans-type-item').hide();
 	$(this).parent().parent().parent().find('.bd-ans-type-rating').show();
+
+	var quesNum = $(this).closest('form').data('quesnum');
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum + '"]').val('sb-range-smiles');
+	showStatus('#bs-question-' + quesNum, 'Edited');
+	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
 
 $(document).on('click', '.bd-tab-rad', function() {
@@ -7914,9 +7922,11 @@ function paintSurveyPageFromJson() {
 		$("#next-radio").addClass("btn-com-disabled");
 		$("#next-radio-nps").addClass("btn-com-disabled");
 	}
+	
+	var questionTextEdited = question.replace(/&lt;/g,'<').replace(/&gt;/g, '>').replace(/&quot;/g,'"');
 	if (questionType == "sb-range-star") {
 		$("div[data-ques-type='stars']").show();
-		$("#ques-text").html(question);
+		$("#ques-text").html(questionTextEdited);
 		$("#sq-stars").show();
 		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
 			var starVal = parseInt(questionDetails.customerResponse);
@@ -7928,7 +7938,7 @@ function paintSurveyPageFromJson() {
 		}
 	} else if (questionType == "sb-range-smiles") {
 		$("div[data-ques-type='smiley']").show();
-		$("#ques-text-smiley").html(question);
+		$("#ques-text-smiley").html(questionTextEdited);
 		$("#sq-smiles").show();
 		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
 			var starVal = parseInt(questionDetails.customerResponse);
@@ -7940,11 +7950,11 @@ function paintSurveyPageFromJson() {
 		}
 	} else if (questionType == "sb-range-scale") {
 		$("div[data-ques-type='scale']").show();
-		$("#ques-text-scale").html(question);
+		$("#ques-text-scale").html(questionTextEdited);
 		$("#sq-stars").show();
 	} else if (questionType == "sb-sel-mcq") {
 		$("div[data-ques-type='mcq']").show();
-		$("#mcq-ques-text").html(question);
+		$("#mcq-ques-text").html(questionTextEdited);
 		$("#skip-ques-mcq").show();
 		$("#next-mcq").show();
 		$("#next-mcq").removeClass("btn-com-disabled");
@@ -7956,7 +7966,7 @@ function paintSurveyPageFromJson() {
 		bindMcqCheckButton();
 	} else if (questionType == "sb-sel-desc") {
 		$("div[data-ques-type='smiley-text-final']").show();
-		$("#ques-text-textarea").html(question);
+		$("#ques-text-textarea").html(questionTextEdited);
 		$("#text-area").show();
 
 		var val = questionDetails.customerResponse;
@@ -7975,10 +7985,10 @@ function paintSurveyPageFromJson() {
 		$("#text-area").hide();
 		$('#text-box-disclaimer').hide();
 		$("#smiles-final").show();
-		$("#ques-text-textarea").html(question);
+		$("#ques-text-textarea").html(questionTextEdited);
 	} else if (questionType == "sb-range-0to10"){
 		if(questionDetails.isNPSQuestion == 0){
-			$("#ques-text-1to10").html(question)
+			$("#ques-text-1to10").html(questionTextEdited)
 			$("div[data-ques-type='sb-range-0to10']").show();
 			$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
 			$('#veryLikelyDiv').html(questionDetails.veryLikely);
@@ -7996,7 +8006,7 @@ function paintSurveyPageFromJson() {
 				$("#next-radio").removeClass("btn-com-disabled");
 			}
 		}else{
-			$("#ques-text-1to10-nps").html(question)
+			$("#ques-text-1to10-nps").html(questionTextEdited)
 			$("div[data-ques-type='sb-range-0to10-nps']").show();
 			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
 			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
@@ -8133,7 +8143,7 @@ function storeCustomerAnswer(customerResponse) {
 	});
 }
 
-function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded) {
+function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded, onlyPostToSocialSurvey) {
 	var success = false;
 
 	var payload = {
@@ -8146,7 +8156,10 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 		"isAbusive" : isAbusive,
 		"agreedToShare" : agreedToShare,
 		"isIsoEncoded" : isIsoEncoded,
-		"surveyId" : surveyId
+		"surveyId" : surveyId,
+		"agentName" : agentName,
+		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey,
+		"agentProfileLink" : agentProfileLink
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -8158,6 +8171,7 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 		success : function(data) {
 			if (data != undefined)
 				success = true;
+			    rating = data;
 		},
 		complete : function(data) {
 			if (success) {
@@ -8190,10 +8204,17 @@ function showFeedbackPage(mood) {
 		var counter = 0;
 		for (var i = 0; i < questions.length; i++) {
 			var currQuestion = questions[i];
-			if ((currQuestion.questionType == 'sb-range-smiles') || (currQuestion.questionType == 'sb-range-scale') || (currQuestion.questionType == 'sb-range-star')) {
+			if ((currQuestion.questionType == 'sb-range-smiles') || (currQuestion.questionType == 'sb-range-scale') || (currQuestion.questionType == 'sb-range-star') || (currQuestion.questionType == 'sb-range-0to10')) {
 				if (!isNaN(parseInt(currQuestion.customerResponse))) {
-					counter++;
-					currResponse += parseInt(currQuestion.customerResponse);
+					var responseCurrQuestion = parseInt(currQuestion.customerResponse);
+					if(currQuestion.questionType == 'sb-range-0to10' &&	currQuestion.considerForScore == true){
+						responseCurrQuestion = 	responseCurrQuestion/2;
+						counter++;
+						currResponse += responseCurrQuestion;
+					}else if(currQuestion.questionType != 'sb-range-0to10'){
+						counter++;
+						currResponse += responseCurrQuestion;
+					}
 				}
 			}
 		}
@@ -8284,7 +8305,7 @@ function showMasterQuestionPage() {
 			return;
 		}
 
-		console.log(swearWords);
+		//console.log(swearWords);
 		var isAbusive = false;
 		var feedbackArr = feedback.split(" ");
 		for (var i = 0; i < feedbackArr.length; i++) {
@@ -8327,7 +8348,7 @@ function showMasterQuestionPage() {
 		}
 
 		// save survey response
-		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded);
+		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded, onlyPostToSocialSurvey);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		if(!hiddenSection){
@@ -8356,7 +8377,7 @@ function showMasterQuestionPage() {
 		// $('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
 		
 		// call method to post the review and update the review count
-		postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
+		//postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
 
 		//paint socialmedia icons on survey thank you page
 		paintSocialMediaIconsOnSurveyCompletion();
@@ -10921,7 +10942,7 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue) {
 		showMainContent('./showprofilepage.do');
 		editProfileForAchievements = true;
 	} else if (task == 'INSTAGRAM_PRF') {
-		openAuthPageDashboard('Instagram', columnName, columnValue);
+		openAuthPageDashboard('instagram', columnName, columnValue);
 	}
 }
 
@@ -17838,6 +17859,22 @@ function getStreamPosts(startIndex,status,text){
 	var companyId = $('#segment-data').data('companyId');
 	var feeds = $('#feed-data').val();
 	
+	/*if(feeds == '' || feeds == null || feeds == undefined){
+		var startFlag = true;
+		$.each($('.feed-unchecked'), function( index, value ) {
+			  if(!$(this).hasClass('hide')){
+				  startFlag = false;
+			  }
+		});
+		
+		if(startFlag){
+			feeds = "FACEBOOK,TWITTER,INSTAGRAM";
+		}
+	}*/
+	
+	var socMonOnLoad = $('#stream-tabs').attr('data-socMonOnLoad');
+	$('#stream-tabs').attr('data-socMonOnLoad',false);
+	
 	var payload = {
 		"startIndex":startIndex,
 		"batchSize":batchSize,
@@ -17848,7 +17885,8 @@ function getStreamPosts(startIndex,status,text){
 		"user":userIds,
 		"feeds": feeds,
 		"text" : text,
-		"fromTrustedSource": fromTrustedSource
+		"fromTrustedSource": fromTrustedSource,
+		"socMonOnLoad": socMonOnLoad
 	};
 	
 	lastgetStreamPostRequestToDelete = $.ajax({
@@ -18785,6 +18823,50 @@ var lastUpdatedDateActionStr;
 var monthName=new Array("January","February","March","April","May","June","July","August","September","October","November","December");
 
 function callFormAjaxPostForSocMonBtn(url,formId,postId){
+	
+	var status = $('#stream-tabs').data('status');
+
+	var startIndex = $('#stream-pagination').data('startIndex');
+	
+	var $form = $('#'+formId);
+	var payLoad = $form.serialize();
+	$.ajax({
+		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
+		type : "POST",
+		data : payLoad,
+		success : showToastForSocMonActions,
+		complete: function(data){
+			getStreamPosts(startIndex,status);
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$("#overlay-toast").html("Failed to update post. Please Try again");
+			showToast();
+		}
+	});
+}
+
+function showToastForSocMonActions(data){
+	var map = $.parseJSON(data);
+	if (map.status == "success") {
+		
+		var message = 'Record updated successfully';
+		$("#overlay-toast").html(message);
+		showToast();
+			
+	} else {
+		$("#overlay-toast").html("Failed to update post. Please Try again");
+		showToast();
+	}
+}
+
+function callFormAjaxPostForSocMonDupBtn(url,formId,postId){
 	
 	var status = $('#stream-tabs').data('status');
 
@@ -20009,7 +20091,7 @@ $(document).on('click','.dup-stream-action-unflag',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 	
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20027,7 +20109,7 @@ $(document).on('click','.dup-stream-action-flag',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('ALERT');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 	
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20054,7 +20136,7 @@ $(document).on('click','.dup-stream-action-esc',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('ESCALATED');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20080,7 +20162,7 @@ $(document).on('click','.dup-stream-action-res',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('RESOLVED');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20105,7 +20187,7 @@ $(document).on('click','.dup-stream-action-submit',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('SUBMIT');
 	
 	var url = './updatepostaction.do';
-	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	callFormAjaxPostForSocMonDupBtn(url,formId,postId);
 
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -20196,7 +20278,7 @@ $(document).on('click','.dup-macro-opt',function(e){
 	$('#dup-post-action-form-cont').find('.form-status').val(status);
 	
 	var url = './updatepostactionwithmacro.do';
-	callFormAjaxPostForSocMonBtn(url,'macro-form-apply',postId);
+	callFormAjaxPostForSocMonDupBtn(url,'macro-form-apply',postId);
 	
 	$('#duplicate-post-popup').addClass('hide');
 	
@@ -22017,3 +22099,27 @@ function saveUserMapNew(aliasMail,isIgnore) {
 		}
 	});
 }
+
+function summitTimer() {
+	var currentDate = new Date();
+	var endDate = new Date(2018,08,5,0,0,0);
+	
+	var ms = endDate.getTime() - currentDate.getTime();
+	
+	var d, h, m, s;
+	s = Math.floor(ms / 1000);
+	m = Math.floor(s / 60);
+	s = s % 60;
+	h = Math.floor(m / 60);
+	
+	m = (Math.floor(Math.floor(m % 60)/10) == 0 )? '0'+Math.floor(m % 60) : Math.floor(m % 60);
+	d = (Math.floor(Math.floor(h / 24)/10) == 0 )? '0'+Math.floor(h / 24) : Math.floor(h / 24);
+	h = (Math.floor(Math.floor(h % 24)/10) == 0 )? '0'+Math.floor(h % 24) : Math.floor(h % 24);
+	
+	m = m <=0 ? 0 : m;
+	d = d <=0 ? 0 : d;
+	h = h <=0 ? 0 : h;
+	
+	return { d: d, h: h, m: m};
+}
+

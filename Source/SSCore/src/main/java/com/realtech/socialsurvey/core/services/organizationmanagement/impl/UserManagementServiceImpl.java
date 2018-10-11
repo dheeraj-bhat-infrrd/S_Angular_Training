@@ -916,23 +916,27 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public User getUserByEmailAndCompanyFromUserEmailMappings( long companyId, String emailId )
+    public User getUserByEmailAndCompanyFromUserEmailMappings( Company company, String emailId )
         throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.debug( "Method getUserByEmailAndCompanyFromUserEmailMappings having emailId : {} companyId:{} started.", emailId,
-            companyId );
-        if ( emailId == null || emailId.isEmpty() ) {
+    	
+    		if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty" );
         }
-
+    		if ( company == null ) {
+                throw new InvalidInputException( "Invalid value passed for comapany" );
+            }
+        LOG.debug( "Method getUserByEmailAndCompanyFromUserEmailMappings having emailId : {} companyId:{} started.", emailId,
+        		company.getCompanyId() );
+        
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.EMAIL_ID, emailId );
-        queries.put( CommonConstants.COMPANY + "." + CommonConstants.COMPANY_ID_COLUMN, companyId );
+        queries.put( CommonConstants.COMPANY + "." + CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
         LOG.info( "List of UserEmailMapping got by getUserByEmailAddress: {} ", userEmailMappings );
         if ( userEmailMappings == null || userEmailMappings.isEmpty() ) {
-            User user = userDao.getActiveUser( emailId );
+            User user = userDao.getActiveUserByEmailAndCompany(emailId, company);
             return user;
         } else {
             return userEmailMappings.get( CommonConstants.INITIAL_INDEX ).getUser();
@@ -1683,9 +1687,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        userProfile.setStatus( CommonConstants.STATUS_DELETE );
-        userProfileDao.delete( userProfile );
-
+        userProfile.setStatus( CommonConstants.STATUS_INACTIVE );
+        userProfileDao.update( userProfile );
         LOG.debug( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
 
@@ -3817,7 +3820,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new NoRecordsFetchedException( "No company found with the id " + companyId );
         }
 
-        User user = getUserByEmailAndCompanyFromUserEmailMappings( companyId, emailId );
+        User user = getUserByEmailAndCompanyFromUserEmailMappings( company, emailId );
         
         List<UserProfile> userProfiles = user.getUserProfiles();
         for(UserProfile profile : userProfiles){
@@ -4598,7 +4601,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     
                 		//TODO: remove this check
                 		long DAY_IN_MS = 1000 * 60 * 60 * 24;
-                		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (45 * DAY_IN_MS));
+                		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (365 * DAY_IN_MS));
                 		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) 
                 			continue; 
                 		

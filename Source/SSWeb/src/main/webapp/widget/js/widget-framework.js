@@ -1,4 +1,4 @@
-var widgetFramework = '<div id="ss-widget-container" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 widget-pad-zero">' + '<div id="ss-widget-dash" class="hide" ></div>' + '<div id="ss-widget-options" class="col-lg-5 col-md-5 col-sm-6 col-xs-12 widget-left-pad-zero widget-right-pad-zero ss-widget-options-container">' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rating-btn-cont">' + '<div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">' + '<div id="ss-widget-rating" class="ss-widget-rating ss-widget-font">0</div>' + '<div id="ss-widget-rating-stars" class="ss-widget-rating-stars">' + '<div class="ss-widget-star-box">' + '<div class="ss-widget-star1 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star2 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star3 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star4 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star5 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '</div>' + '</div>' + '<div id="ss-widget-rev-count" class="ss-widget-rev-count">0 Reviews</div>' + '</div>' + '<div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">' + '<div id="widget-contact-us-btn" class="widget-btns widget-contact-us-btn ss-widget-font" data-link="">CONTACT US</div>' + '<div id="widget-write-rev-btn" class="widget-btns ss-widget-font" data-link="">WRITE A REVIEW</div>' + '</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 widget-pad-zero ss-widget-rating-detils-container">' + '<div id="ss-widget-rating-details" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rating-details ss-widget-font">' + 'Rating Details <span class="float-right" style="font-size:  13px;">&#9662;</span>' + '</div>' + '<div id="ss-widget-rating-cont" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rating-cont">' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-blue">&#9733; &#9733; &#9733; &#9733; &#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-5star-bar" class="ss-widget-rating-bar widget-blue-bar"></div>' + '</div>' + '<div id="ss-widget-5star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-green">&#9733; &#9733; &#9733; &#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-4star-bar" class="ss-widget-rating-bar widget-green-bar"></div>' + '</div>' + '<div id="ss-widget-4star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-yellow">&#9733; &#9733; &#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-3star-bar" class="ss-widget-rating-bar widget-yellow-bar"></div>' + '</div>' + '<div id="ss-widget-3star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-orange">&#9733; &#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-2star-bar" class="ss-widget-rating-bar widget-orange-bar"></div>' + '</div>' + '<div id="ss-widget-2star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-red">&#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-1star-bar" class="ss-widget-rating-bar widget-red-bar"></div>' + '</div>' + '<div id="ss-widget-1star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '</div>' + '</div>' + '<div id="ss-widget-opt" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-opt-cont">' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-opt-text ss-widget-font">Options<span id="ss-widget-options-arrow" class="float-right cursor-pointer hide" style="font-size:  13px;">&#9662;</span></div>' + '<div id="ss-widget-options-dropdown" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-options-dropdown">' + '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ss-widget-opt">' + '<div class="w-100 ss-widget-opt-head-text ss-widget-font">Filter Source</div>' + '<div>' + '<input type="checkbox" id="widget-opt-all" name="filterSource" value="all" checked />' + '<label for="scales" class="ss-widget-font">All</label>' + '</div>' + '<div>' + '<input type="checkbox" id="widget-opt-ss" name="filterSource" value="ss" checked />' + '<label for="scales" class="ss-widget-font">SocialSurvey</label>' + '</div>' + '<div>' + '<input type="checkbox" id="widget-opt-ssv" name="filterSource" value="ssv" checked />' + '<label for="scales" class="ss-widget-font">SocialSurvey Verified</label>' + '</div>'
+var widgetFramework = '<div id="ss-widget-container" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 widget-pad-zero bootstrap-ss-widget">' + '<div id="ss-widget-dash" class="hide" ></div>' + '<div id="ss-widget-options" class="col-lg-5 col-md-5 col-sm-6 col-xs-12 widget-left-pad-zero widget-right-pad-zero ss-widget-options-container">' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rating-btn-cont">' + '<div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 ss-widget-avg-rating-cont">' + '<div id="ss-widget-rating" class="ss-widget-rating ss-widget-font">0</div>' + '<div id="ss-widget-rating-stars" class="ss-widget-rating-stars">' + '<div class="ss-widget-star-box">' + '<div class="ss-widget-star1 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star2 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star3 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star4 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star5 ss-widget-star-container ss-widget-main-rat-cont"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '</div>' + '</div>' + '<div id="ss-widget-rev-count" class="ss-widget-rev-count">0 Reviews</div>' + '</div>' + '<div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 ss-widget-btns-container">' + '<div id="widget-contact-us-btn" class="widget-btns widget-contact-us-btn ss-widget-font" data-link="">CONTACT US</div>' + '<div id="widget-write-rev-btn" class="widget-btns ss-widget-font" data-link="">WRITE A REVIEW</div>' + '</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 widget-pad-zero ss-widget-rating-detils-container">' + '<div id="ss-widget-rating-details" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rating-details ss-widget-font">' + 'Rating Details <span class="float-right" style="font-size:  13px;">&#9662;</span>' + '</div>' + '<div id="ss-widget-rating-cont" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rating-cont">' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-blue">&#9733; &#9733; &#9733; &#9733; &#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-5star-bar" class="ss-widget-rating-bar widget-blue-bar"></div>' + '</div>' + '<div id="ss-widget-5star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-green">&#9733; &#9733; &#9733; &#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-4star-bar" class="ss-widget-rating-bar widget-green-bar"></div>' + '</div>' + '<div id="ss-widget-4star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-yellow">&#9733; &#9733; &#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-3star-bar" class="ss-widget-rating-bar widget-yellow-bar"></div>' + '</div>' + '<div id="ss-widget-3star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-orange">&#9733; &#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-2star-bar" class="ss-widget-rating-bar widget-orange-bar"></div>' + '</div>' + '<div id="ss-widget-2star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-star-cont">' + '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 widget-pad-zero ss-widget-stars widget-star-red">&#9733; </div>' + '<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 widget-pad-zero">' + '<div id="ss-widget-1star-bar" class="ss-widget-rating-bar widget-red-bar"></div>' + '</div>' + '<div id="ss-widget-1star-perc" class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ss-widget-rating-perc ss-widget-font">0%</div>' + '</div>' + '</div>' + '</div>' + '<div id="ss-widget-opt" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-opt-cont">' + '<div id="ss-widget-opt-hdr" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-opt-text ss-widget-font cursor-pointer">Options<span id="ss-widget-options-arrow" class="float-right cursor-pointer" style="font-size:  13px;">&#9662;</span></div>' + '<div id="ss-widget-options-dropdown" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-options-dropdown">' + '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ss-widget-opt">' + '<div class="w-100 ss-widget-opt-head-text ss-widget-font">Filter Source</div>' + '<div>' + '<input type="checkbox" id="widget-opt-all" name="filterSource" value="all" checked />' + '<label for="scales" class="ss-widget-font">All</label>' + '</div>' + '<div>' + '<input type="checkbox" id="widget-opt-ss" name="filterSource" value="ss" checked />' + '<label for="scales" class="ss-widget-font">SocialSurvey</label>' + '</div>' + '<div>' + '<input type="checkbox" id="widget-opt-ssv" name="filterSource" value="ssv" checked />' + '<label for="scales" class="ss-widget-font">SocialSurvey Verified</label>' + '</div>'
 /*
  * + '<div>' + '<input type="checkbox" id="widget-opt-goo" name="filterSource" value="google" checked />' + '<label for="scales" class="ss-widget-font">Google</label>' + '</div>'
  */
@@ -6,9 +6,9 @@ var widgetFramework = '<div id="ss-widget-container" class="col-lg-12 col-md-12 
 /*
  * + '<div>' + '<input type="checkbox" id="widget-opt-fb" name="filterSource" value="fb" checked />' + '<label for="scales" class="ss-widget-font">Facebook</label>' + '</div>' + '<div>' + '<input type="checkbox" id="widget-opt-lin" name="filterSource" value="linkedin" checked />' + '<label for="scales">LinkedIn</label>' + '</div>'
  */
-+ '</div>' + '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ss-widget-order-cont">' + '<div id="ss-widget-order-data" class="w-100 ss-widget-opt-head-text ss-widget-font" data-order="">Order By</div>' + '<div id="ss-widget-newest" class="w-100 ss-widget-order-text  ss-widget-font" data-order=1>Newest First</div>' + '<div id="ss-widget-oldest" class="w-100 ss-widget-order-text  ss-widget-font" data-order=2>Oldest First</div>' + '<div id="ss-widget-highest" class="w-100 ss-widget-order-text  ss-widget-font" data-order=3>Highest Rating</div>' + '<div id="ss-widget-lowest" class="w-100 ss-widget-order-text  ss-widget-font" data-order=4>Lowest Rating</div>' + '</div>' + '</div>' + '</div>' + '</div>' + '<div id="ss-widget-reviews" class="col-lg-7 col-md-7 col-sm-6 col-xs-12 ss-widget-rev-cont">' + '<div class="w-100 ss-widget-rev-head ss-widget-font">Reviews <span id="ss-widget-rev-options" class="float-right cursor-pointer ss-widget-font">Options &#9662;</span></div><div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-review-div-container">' + '<div id="ss-widget-review-div" class="w-100" data-allReviews=[] data-zillow=[] data-initialRev=1 data-maxLoadRev=1 data-startIndex=0 data-batchSize=1 data-index=0 data-nextBatchIndex=0 data-widgetDetails></div>' + '</div><div id="ss-widget-load-more-cont" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">' + '<div id="ss-widget-load-more-btn" class="ss-widget-load-more-btn ss-widget-font">Load More</div>' + '</div>' + '<div id="ss-widget-modest-branding" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-powered-by ss-widget-font hide">' + 'Powered by <span class="ss-widget-text-bold ss-widget-font">SocialSurvey</span>' + '</div>' + '</div>' + '</div>';
++ '</div>' + '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ss-widget-order-cont">' + '<div id="ss-widget-order-data" class="w-100 ss-widget-opt-head-text ss-widget-font" data-order="">Order By</div>' + '<div id="ss-widget-newest" class="w-100 ss-widget-order-text  ss-widget-font" data-order=1>Newest First</div>' + '<div id="ss-widget-oldest" class="w-100 ss-widget-order-text  ss-widget-font" data-order=2>Oldest First</div>' + '<div id="ss-widget-highest" class="w-100 ss-widget-order-text  ss-widget-font" data-order=3>Highest Rating</div>' + '<div id="ss-widget-lowest" class="w-100 ss-widget-order-text  ss-widget-font" data-order=4>Lowest Rating</div>' + '<div id="ss-widget-feature" class="w-100 ss-widget-order-text  ss-widget-font" data-order=5>Featured Reviews</div>' +'</div>' + '</div>' + '</div>' + '</div>' + '<div id="ss-widget-reviews" class="col-lg-7 col-md-7 col-sm-6 col-xs-12 ss-widget-rev-cont">' + '<div class="w-100 ss-widget-rev-head ss-widget-font">Reviews <span id="ss-widget-rev-options" class="float-right cursor-pointer ss-widget-font">Options &#9662;</span></div><div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-review-div-container">' + '<div id="ss-widget-review-div" class="w-100" data-allReviews=[] data-zillow=[] data-initialRev=1 data-maxLoadRev=1 data-startIndex=0 data-batchSize=1 data-index=0 data-nextBatchIndex=0 data-widgetDetails></div>' + '</div><div id="ss-widget-load-more-cont" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">' + '<div id="ss-widget-load-more-btn" class="ss-widget-load-more-btn ss-widget-font">Load More</div>' + '</div>' + '<div id="ss-widget-modest-branding" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-powered-by ss-widget-font hide">' + 'Powered by <span class="ss-widget-text-bold ss-widget-font">SocialSurvey</span>' + '</div>' + '</div>' + '</div>';
 
-var widgetReviewTemplate = '<div id="ss-widget-review-container" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev hide" data-index=0>' + '<div class="w-100">' + '<div class="float-left ss-widget-rev-date ss-widget-rev-font"></div>' + '<div class="float-right ss-widget-prov-by ss-widget-pow-by ss-widget-rev-font">provided by <div class="ss-widget-verified-badge ss-wi-verified-badge  ss-wi-verify-image ss-wi-zillow-badge  ss-wi-verify-image-zillow ss-wi-unverified-badge  ss-wi-verify-image-ss float-right" ></div></div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-details">' + '<div class="ss-widget-prof-pic-cont"><img src="/resources/images/image_pt.png" class="ss-widget-prof-pic"></div>' + '<div class="ss-widget-rev-prof-details">' + '<div class="ss-widget-prov-by  ss-widget-rev-font">In reference to a transaction with</div>' + '<div class="ss-widget-rev-prof-name ss-widget-rev-font"></div>' + '<div class="ss-widget-rev-prof-title ss-widget-rev-font"> | NMLS# </div>' + '</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-stars">' + '<div class="ss-widget-star1 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star2 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star3 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star4 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star5 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-rev-score  ss-widget-rev-font">0.0</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-cust-name  ss-widget-rev-font">Stacey M <span class="ss-widget-rev-cust-addr  ss-widget-rev-font">- Los Angeles, CA</span></div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-text-cont">' + '<div class="ss-widget-rev-text-quote">&#10075;</div>' + '<div class="ss-widget-rev-text-quote">&#10075;</div>' + '<div class="ss-widget-rev-text">' + '<p class="ss-widget-review-text ss-widget-rev-font">Sample</p>' + '<p class="ss-widget-text-bold ss-widget-read-more cursor-pointer ss-widget-rev-font">... read more</p>' + '</div>' + '</div>' + '</div>';
+var widgetReviewTemplate = '<div id="ss-widget-review-container" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev hide" data-index=0>' + '<div class="w-100 ss-widget-date-pow-cont">' + '<div class="float-left ss-widget-rev-date ss-widget-rev-font"></div>' + '<div class="float-right ss-widget-prov-by ss-widget-pow-by ss-widget-rev-font">provided by <div class=" ss-wi-verified-partner-badge ss-wi-verify-partner-image ss-widget-verified-badge ss-wi-verified-badge  ss-wi-verify-image ss-wi-zillow-badge  ss-wi-verify-image-zillow ss-wi-unverified-badge  ss-wi-verify-image-ss ss-fb-verified-image ss-verify-image-fb float-right" ></div></div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-details">' + '<div class="ss-widget-prof-pic-cont"><img src="/resources/images/image_pt.png" class="ss-widget-prof-pic"></div>' + '<div class="ss-widget-rev-prof-details">' + '<div class="ss-widget-prov-by  ss-widget-rev-font">In reference to a transaction with</div>' + '<div class="ss-widget-rev-prof-name ss-widget-rev-font"></div>' + '<div class="ss-widget-rev-prof-title ss-widget-rev-font"> | NMLS# </div>' + '</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-stars">' + '<div class="ss-widget-star1 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star2 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star3 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star4 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star5 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-rev-score  ss-widget-rev-font">0.0</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-cust-name  ss-widget-rev-font">Stacey M <span class="ss-widget-rev-cust-addr  ss-widget-rev-font">- Los Angeles, CA</span></div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-text-cont">' + '<div class="ss-widget-rev-text-quote">&#10075;</div>' + '<div class="ss-widget-rev-text-quote">&#10075;</div>' + '<div class="ss-widget-rev-text">' + '<p class="ss-widget-review-text ss-widget-rev-font">Sample</p>' + '<p class="ss-widget-text-bold ss-widget-read-more cursor-pointer ss-widget-rev-font">... read more</p>' + '</div>' + '</div>' + '</div>';
 
 
 function drawWidgetFramework($, widgetOuterContainer, widgetDetails, profileName, profileLevel, companyProfileName, resourcesHost, ssHost) {
@@ -16,7 +16,7 @@ function drawWidgetFramework($, widgetOuterContainer, widgetDetails, profileName
 	if (widgetOuterContainer.width() < 768) {
 		$('#ss-widget-options').css('width', '100%');
 		$('#ss-widget-reviews').css('width', '100%');
-		$('#ss-widget-options-arrow').removeClass('hide');
+		$('#ss-widget-options-arrow').show();
 		$('#ss-widget-rev-options').addClass('hide');
 	} else if (widgetOuterContainer.width() < 1000) {
 		$('#ss-widget-options').css('width', '50%');
@@ -36,6 +36,13 @@ function drawWidgetFramework($, widgetOuterContainer, widgetDetails, profileName
 	drawWidgetReviews($, widgetDetails, profileName, profileLevel, companyProfileName, resourcesHost, ssHost);
 	bindWidgetButtonActions($, widgetDetails, resourcesHost, ssHost);
 	setupTags($, widgetDetails);
+	
+	if (widgetOuterContainer.width() <= 270) {
+		$('.ss-widget-stars').css('font-size','10px');
+	}else if (widgetOuterContainer.width() <= 360) {
+		$('.ss-widget-stars').css('font-size','12px');
+	}
+	
 }
 
 function drawWidgetStyleElements($, widgetDetails) {
@@ -43,6 +50,8 @@ function drawWidgetStyleElements($, widgetDetails) {
 	var fontTheme = widgetDetails.widgetConfiguration.fontTheme;
 	var font = widgetDetails.widgetConfiguration.font;
 	$('#ss-widget-container').css('background', bgColor);
+	$('#ss-widget-options').css('background', bgColor);
+	$('#ss-widget-reviews').css('background', bgColor);
 	$('.ss-widget-rev-count').css('color', fontTheme);
 	$('#ss-widget-container').css('color', fontTheme);
 
@@ -119,21 +128,21 @@ function drawWidgetDataEntities($, widgetDetails) {
 	if (hideOptions != null && hideOptions != undefined) {
 		if (hideOptions == "true" || hideOptions == true) {
 			if (widgetOuterContainer.width() < 768) {
-				$('#ss-widget-opt').addClass('hide');
-				$('#ss-widget-options-arrow').addClass('hide');
+				$('#ss-widget-opt').hide();
+				$('#ss-widget-options-arrow').hide();
 				$('#ss-widget-rev-options').removeClass('hide');
 			} else {
 				$('#ss-widget-options-dropdown').addClass('hide');
-				$('#ss-widget-options-arrow').removeClass('hide');
+				$('#ss-widget-options-arrow').show();
 			}
 		}else{
-			$('#ss-widget-options-arrow').removeClass('hide');
+			$('#ss-widget-options-arrow').show();
 		}
 	}
 
 	if (hideBarGraph != null && hideBarGraph != undefined) {
 		if (hideBarGraph == "true" || hideBarGraph == true) {
-			$('#ss-widget-rating-cont').addClass('hide');
+			$('#ss-widget-rating-cont').hide();
 		}
 	}
 
@@ -185,6 +194,33 @@ function drawWidgetDataEntities($, widgetDetails) {
 
 	var reviewSortOrder = widgetDetails.widgetConfiguration.reviewSortOrder;
 	drawSortOrder($, reviewSortOrder);
+	
+	var hideContactBtn = widgetDetails.widgetConfiguration.hideContactBtn;
+	var hideReviewBtn = widgetDetails.widgetConfiguration.hideReviewBtn;
+
+	if (hideContactBtn != null && hideContactBtn != undefined) {
+		if (hideContactBtn == "true" || hideContactBtn == true) {
+			$('#widget-contact-us-btn').addClass('hide');
+		}
+	}
+	
+	if (hideReviewBtn != null && hideReviewBtn != undefined) {
+		if (hideReviewBtn == "true" || hideReviewBtn == true) {
+			$('#widget-write-rev-btn').addClass('hide');
+		}
+	}
+	
+	var maxWidgetBtnSize = widgetDetails.widgetConfiguration.maxWidgetBtnSize;
+	if (maxWidgetBtnSize != null && maxWidgetBtnSize != undefined) {
+		
+		maxParentSize = $('.ss-widget-btns-container').width() + parseInt($('.ss-widget-btns-container').css('padding-right').replace(/[^0-9]+/ig,""));
+		
+		if(maxWidgetBtnSize <= maxParentSize){
+			$('.widget-btns').css('max-width', maxWidgetBtnSize+'px');
+		}else{
+			$('.widget-btns').css('max-width', maxParentSize);
+		}
+	}
 }
 
 function drawSortOrder($, reviewSortOrder) {
@@ -196,6 +232,8 @@ function drawSortOrder($, reviewSortOrder) {
 		$('#ss-widget-newest').addClass('ss-widget-order-text-active');
 	} else if (reviewSortOrder == 'oldestFirst') {
 		$('#ss-widget-oldest').addClass('ss-widget-order-text-active');
+	} else if (reviewSortOrder == 'feature'){
+		$('#ss-widget-feature').addClass('ss-widget-order-text-active');
 	}
 	$('#ss-widget-order-data').attr('data-order', reviewSortOrder);
 }
@@ -365,7 +403,7 @@ function paintWidgetReviews($, reviews, resourcesHost, ssHost) {
 		}
 		
 		$('#ss-widget-review-container').removeClass('hide');
-		if ($('#ss-widget-review-container').find('.ss-widget-review-text').height() <= $('#ss-widget-review-container').find('.ss-widget-rev-text').height() + 2) {
+		if ($('#ss-widget-review-container').find('.ss-widget-review-text').height() <= $('#ss-widget-review-container').find('.ss-widget-rev-text').height() + 6) {
 			$('#ss-widget-review-container').find('.ss-widget-read-more').hide();
 		}
 		$('#ss-widget-review-container').addClass('hide');
@@ -398,22 +436,53 @@ function paintWidgetReviews($, reviews, resourcesHost, ssHost) {
 
 function drawWidgetVerifiedBadge($, reviewSource) {
 
-	if (reviewSource == 'encompass' || reviewSource == 'DOTLOOP' || reviewSource == 'API' || reviewSource == 'FTP' || reviewSource == 'LONEWOLF') {
+	if (reviewSource == 'verifiedPartner'){
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verified-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-zillow-badge');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image-zillow');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-unverified-badge');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image-ss');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-fb-verified-image');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-verify-image-fb');
+		
+	}else if (reviewSource == 'encompass' || reviewSource == 'DOTLOOP' || reviewSource == 'API' || reviewSource == 'FTP' || reviewSource == 'LONEWOLF') {
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-zillow-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image-zillow');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-unverified-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image-ss');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-fb-verified-image');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-verify-image-fb');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verified-partner-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-partner-image');
 
 	} else if (reviewSource == 'Zillow') {
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verified-badge');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-unverified-badge');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image-ss');
-	} else {
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-fb-verified-image');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-verify-image-fb');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verified-partner-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-partner-image');
+	} else if(reviewSource == 'facebook'){
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verified-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-unverified-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image-ss');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-zillow-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image-zillow');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verified-partner-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-partner-image');
+	}else {
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verified-badge');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-zillow-badge');
 		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-image-zillow');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-fb-verified-image');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-verify-image-fb');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verified-partner-badge');
+		$('#ss-widget-review-container').find('.ss-widget-verified-badge').removeClass('ss-wi-verify-partner-image');
 	}
 
 }
@@ -428,6 +497,7 @@ function paintWidgetReviewStyles($, widgetDetails) {
 	$('.ss-widget-read-more').css('color', fontTheme);
 	$('.ss-widget-rev-cust-name').css('color', fontTheme);
 	$('.ss-widget-rev-score').css('color', fontTheme);
+	$('.ss-widget-rev-text-quote').css('color', fontTheme);
 	
 	$('.ss-widget-rev-stars').css('color', ratingAndStarColor);
 	$('.ss-widget-zil-rev-star').css('color', '#74c005');
@@ -436,6 +506,14 @@ function paintWidgetReviewStyles($, widgetDetails) {
 	if (font != null && font != '') {
 		$('.ss-widget-rev-font').css('font-family', font);
 	}
+	
+	var foregroundColor = widgetDetails.widgetConfiguration.foregroundColor;
+	var borderColorR = hexToRgb(foregroundColor).r;
+	var borderColorG = hexToRgb(foregroundColor).g;
+	var borderColorB = hexToRgb(foregroundColor).b;
+	var borderOpacity = 0.6;
+	var borderColor = 'rgba('+borderColorR+','+borderColorG+','+borderColorB+','+borderOpacity+')';
+	$('.ss-widget-rev').css('border-color',borderColor);
 	
 }
 
@@ -628,10 +706,16 @@ function bindWidgetButtonActions($, widgetDetails, resourcesHost, ssHost) {
 	$(document).off('click', '#ss-widget-rating-details').on('click', '#ss-widget-rating-details', function(e) {
 		e.stopImmediatePropagation();
 		e.preventDefault();
+		
 		$('#ss-widget-rating-cont').slideToggle();
+		
+		if($('#ss-widget-rating-cont').hasClass('hide')){
+			$('#ss-widget-rating-cont').removeClass('hide');
+		}
+		
 	});
 
-	$(document).off('click', '#ss-widget-options-arrow').on('click', '#ss-widget-options-arrow', function(e) {
+	$(document).off('click', '#ss-widget-opt-hdr').on('click', '#ss-widget-opt-hdr', function(e) {
 		e.stopImmediatePropagation();
 		e.preventDefault();
 
@@ -693,6 +777,7 @@ function bindWidgetButtonActions($, widgetDetails, resourcesHost, ssHost) {
 				$('#ss-widget-load-more-btn').show();
 			}else{
 				$('#ss-widget-load-more-btn').hide();
+				getWidgetReviews($, resourcesHost, ssHost);
 			}
 		}
 	});
@@ -735,6 +820,9 @@ function bindWidgetButtonActions($, widgetDetails, resourcesHost, ssHost) {
 			break;
 		case 4:
 			$('#ss-widget-order-data').attr('data-order', 'lowestRatingFirst');
+			break;
+		case 5:
+			$('#ss-widget-order-data').attr('data-order', 'feature');
 			break;
 		default:
 			$('#ss-widget-order-data').attr('data-order', 'highestRatingFirst');

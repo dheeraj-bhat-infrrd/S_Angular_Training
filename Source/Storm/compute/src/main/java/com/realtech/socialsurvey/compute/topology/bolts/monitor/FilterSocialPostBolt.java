@@ -57,31 +57,30 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
             LOG.debug( "Executing filter social post bolt" );
             SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField( "post" );
             long companyId = input.getLongByField( "companyId" );
+            
             if ( post != null ) {
                 post.setActionHistory( new ArrayList<>() );
                 ActionHistory actionHistory;
+
+                // check if post from trusted source
+                if ( isPostFromTrustedSource( post, companyId ) ) {
+                    post.setFromTrustedSource( true );
+                }
+
                 if ( post.getText() != null ) {
                     String text = post.getText();
                     List<String> foundKeyWords;
                     TrieNode root = getTrieForCompany( companyId );
                     foundKeyWords = findPhrases( root, text );
-                    if ( !foundKeyWords.isEmpty() ) {
-                        post.setFoundKeywords( foundKeyWords );
+                    post.setFoundKeywords( foundKeyWords );
+                    addTextHighlight( post );
+
+                    if ( !foundKeyWords.isEmpty() && !post.isFromTrustedSource() ) {
                         post.setStatus( SocialFeedStatus.ALERT );
                         actionHistory = getFlaggedActionHistory( foundKeyWords );
                         post.getActionHistory().add( actionHistory );
                         post.setUpdatedTime( actionHistory.getCreatedDate() );
-                        addTextHighlight( post );
                     }
-                }
-
-                // check if post from trusted source
-                if ( isPostFromTrustedSource( post, companyId ) ) {
-                    post.setStatus( SocialFeedStatus.RESOLVED );
-                    post.setFromTrustedSource( true );
-                    actionHistory = getTrustedSourceActionHistory( post.getPostSource() );
-                    post.getActionHistory().add( actionHistory );
-                    post.setUpdatedTime( actionHistory.getCreatedDate() );
                 }
             }
             LOG.debug( "Emitting tuple with post having postId = {} and post = {}", post.getPostId(), post );

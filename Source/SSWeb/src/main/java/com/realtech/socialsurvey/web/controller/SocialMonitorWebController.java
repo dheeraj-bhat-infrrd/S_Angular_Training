@@ -430,7 +430,7 @@ public class SocialMonitorWebController {
     }
     
     @ResponseBody
-    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.POST)
     public String getSocialPostsForStream(Model model, HttpServletRequest request)
     {
     	
@@ -451,10 +451,16 @@ public class SocialMonitorWebController {
         String feedsStr = request.getParameter( "feeds" );
         String text = request.getParameter("text");
         String trustedSourceStr = request.getParameter("fromTrustedSource");
+        String socMonOnLoadStr = request.getParameter("socMonOnLoad");
         
         boolean fromTrustedSource = false;
         if(trustedSourceStr != null && trustedSourceStr.equals( "true" )){
             fromTrustedSource = true;
+        }
+        
+        boolean socMonOnLoad = false;
+        if(socMonOnLoadStr != null && socMonOnLoadStr.equals("true")) {
+        	socMonOnLoad = true;
         }
         
         List<String> feedType = new ArrayList<>();
@@ -513,6 +519,7 @@ public class SocialMonitorWebController {
        filter.setSearchText( text );
        filter.setCompanySet( isCompanySet );
        filter.setFromTrustedSource( fromTrustedSource );
+       filter.setSocMonOnLoad(socMonOnLoad);
        
        Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(filter, authorizationHeader);
 

@@ -157,6 +157,14 @@
 				    </div>
 				</div>
 				
+				<div class="widget-conf-cont">
+				    <div class="widget-conf-txt float-left">Maximum Button Width</div>
+				    <div class="float-right" style="padding-top: 1%;">
+						<input type="text" name="onld-btn-size" id="onld-btn-size" class="st-item-row-txt widget-select-bx wid-sel-bxl-num" autocomplete="off" value="" maxlength="3">
+				    </div>
+				    <div class="clear-both">( in pixels )</div>
+				</div>
+				
 				<br/>
 				
 				<div class="widget-conf-cont" style="padding: 3% 0%;">
@@ -230,6 +238,16 @@
 				<div class="widget-conf-cont widget-chk-adj-resp">
    				    <div id="hide-ot-initly-chk-box" class="float-left wid-chk-adj bd-check-img"  style="height: 40px"></div>
    				    <div class="widget-conf-txt float-left">Hide Options Tab Initially</div>
+				</div>
+				
+				<div class="widget-conf-cont widget-chk-adj-resp">
+   				    <div id="hide-con-btn-chk-box" class="float-left wid-chk-adj bd-check-img"  style="height: 40px"></div>
+   				    <div class="widget-conf-txt float-left">Hide Contact Button</div>
+				</div>
+				
+				<div class="widget-conf-cont widget-chk-adj-resp">
+   				    <div id="hide-rev-btn-chk-box" class="float-left wid-chk-adj bd-check-img"  style="height: 40px"></div>
+   				    <div class="widget-conf-txt float-left">Hide Write Review Button</div>
 				</div>
 				
 				<div class="widget-conf-cont widget-chk-adj-resp">

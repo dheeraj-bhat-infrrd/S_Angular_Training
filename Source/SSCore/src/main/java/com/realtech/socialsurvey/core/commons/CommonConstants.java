@@ -595,7 +595,7 @@ public interface CommonConstants
     // settings constants
     public static final String CRM_INFO_SOURCE_API = "API";
     public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
-    public static final String CRM_INFO_SOURCE_FTP = "ftp";
+    public static final String CRM_INFO_SOURCE_FTP = "FTP";
     public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
     public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
@@ -814,6 +814,7 @@ public interface CommonConstants
     public static final int MAX_SOCIAL_POSTS = 10;
     public static final String DATE_FORMAT = "MM/dd/yyyy";
     public static final String DATE_FORMAT_WITH_TZ = "MM/dd/YYYY HH:MM:SS z";
+    public static final String ZILLOW_SHARE_DATE_FORMAT = "YYYY-MM-dd";
 
     /*
      * Constats for Find a pro
@@ -1714,6 +1715,9 @@ public interface CommonConstants
     public static final String WIDGET_SEO_TITLE = "seoTitle";
     public static final String WIDGET_SEO_DESCRIPTION = "seoDescription";
     public static final String WIDGET_SEO_KEYWORDS = "seoKeywords";
+    public static final String WIDGET_HIDE_CONTACT = "hideContactBtn";
+    public static final String WIDGET_HIDE_REVIEW = "hideReviewBtn";
+    public static final String WIDGET_MAX_BUTTON_SIZE = "maxWidgetBtnSize";
     
     public static final String WIDGET_ORDER_NEWEST_FIRST = "newestFirst";
     public static final String WIDGET_ORDER_OLDEST_FIRST = "oldestFirst";
@@ -1735,6 +1739,9 @@ public interface CommonConstants
     public static final String WIDGET_DEFAULT_ALLOW_MODEST_BRANDING = "true";
     public static final String WIDGET_DEFAULT_BUTTON1_TEXT = "CONTACT US";
     public static final String WIDGET_DEFAULT_BUTTON1_LINK = "WIDGET_DEFAULT_BUTTON1_LINK";
+    public static final String WIDGET_DEFAULT_HIDE_CONTACT = "false";
+    public static final String WIDGET_DEFAULT_HIDE_REVIEW = "false";
+    public static final String WIDGET_DEFAULT_BUTTON_SIZE = "205";
 
     public static final String WIDGET_DEFAULT_BUTTON1_OPACITY = "0.7";
     public static final String WIDGET_DEFAULT_BUTTON2_TEXT = "WRITE A REVIEW";
@@ -1771,5 +1778,23 @@ public interface CommonConstants
     public static final int WIDGET_LOCK_SET_BY_COMPANY = 4;
     public static final int WIDGET_LOCK_SET_BY_REGION = 2;
     public static final int WIDGET_LOCK_SET_BY_BRANCH = 1;
+    
+    //api constants 
+    public static final String PARTICIPANT_CUSTOMER_1 = "customer1";
+    public static final String PARTICIPANT_CUSTOMER_2 = "customer2";
+    public static final String PARTICIPANT_BUYER_AGENT = "buyerAgent";
+    public static final String PARTICIPANT_SELLER_AGENT = "sellerAgent";
+    
+    //type of range question
+    public static final String QUESTION_TYPE_SMILE = "sb-range-smiles";
+    public static final String QUESTION_TYPE_SCALE = "sb-range-scale";
+    public static final String QUESTION_TYPE_STAR = "sb-range-star";
+    public static final String QUESTION_TYPE_0TO10 = "sb-range-0to10";
+
+    public static final String HAS_REGION = "hasRegion";
+    public static final String HAS_BRANCH = "hasBranch";
+
+    public static final String HAS_REGION = "hasRegion";
+    public static final String HAS_BRANCH = "hasBranch";
 
 }

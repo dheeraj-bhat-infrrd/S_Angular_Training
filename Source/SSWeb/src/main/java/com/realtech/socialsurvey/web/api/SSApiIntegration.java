@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
+import com.realtech.socialsurvey.core.entities.PostToSocialMedia;
 import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
@@ -456,4 +457,7 @@ public interface SSApiIntegration
 
     @GET( "/v1/mismatched/emailId/{companyId}")
     Response fetchMismatchedSurveyForEmail(@Path ("companyId") long companyId , @Query ("transactionEmail") String transactionEmail,@Query ("startIndex") int startIndex, @Query ("batchSize") int batchSize, @Query ("count") long count, @Header("authorizationHeader") String authorizationHeader);
+
+    @POST ( "/v2/surveys/{surveyId}/socialMedia")
+    Response postToSocialMedia( @Path ( "surveyId") String surveyId, @Body PostToSocialMedia postsToSocialMedia);
 }

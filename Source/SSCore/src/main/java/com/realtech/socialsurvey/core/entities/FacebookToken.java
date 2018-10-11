@@ -17,6 +17,7 @@ public class FacebookToken {
 	private Date tokenExpiryAlertTime;
 	private String tokenExpiryAlertEmail;
 	private long lastTokenExpiryValidationTime;
+	private long facebookAccessTokenExpiresOnTemp;
 	
 	public String getFacebookId() {
 		return facebookId;
@@ -114,15 +115,23 @@ public class FacebookToken {
         this.lastTokenExpiryValidationTime = lastTokenExpiryValidationTime;
     }
 
+	public long getFacebookAccessTokenExpiresOnTemp() {
+		return facebookAccessTokenExpiresOnTemp;
+	}
 
-	@Override public String toString()
-	{
-		return "FacebookToken{" + "facebookId='" + facebookId + '\'' + ", facebookPageLink='" + facebookPageLink + '\''
-			+ ", facebookAccessToken='" + facebookAccessToken + '\'' + ", facebookAccessTokenCreatedOn="
-			+ facebookAccessTokenCreatedOn + ", facebookAccessTokenExpiresOn=" + facebookAccessTokenExpiresOn
-			+ ", facebookPages=" + facebookPages + ", facebookAccessTokenToPost='" + facebookAccessTokenToPost + '\''
-			+ ", tokenExpiryAlertSent=" + tokenExpiryAlertSent + ", tokenExpiryAlertTime=" + tokenExpiryAlertTime
-			+ ", tokenExpiryAlertEmail='" + tokenExpiryAlertEmail + '\'' + ", lastTokenExpiryValidationTime="
-			+ lastTokenExpiryValidationTime + '}';
+	public void setFacebookAccessTokenExpiresOnTemp(long facebookAccessTokenExpiresOnTemp) {
+		this.facebookAccessTokenExpiresOnTemp = facebookAccessTokenExpiresOnTemp;
+	}
+
+	@Override
+	public String toString() {
+		return "FacebookToken [facebookId=" + facebookId + ", facebookPageLink=" + facebookPageLink
+				+ ", facebookAccessToken=" + facebookAccessToken + ", facebookAccessTokenCreatedOn="
+				+ facebookAccessTokenCreatedOn + ", facebookAccessTokenExpiresOn=" + facebookAccessTokenExpiresOn
+				+ ", facebookPages=" + facebookPages + ", facebookAccessTokenToPost=" + facebookAccessTokenToPost
+				+ ", tokenExpiryAlertSent=" + tokenExpiryAlertSent + ", tokenExpiryAlertTime=" + tokenExpiryAlertTime
+				+ ", tokenExpiryAlertEmail=" + tokenExpiryAlertEmail + ", lastTokenExpiryValidationTime="
+				+ lastTokenExpiryValidationTime + ", facebookAccessTokenExpiresOnTemp="
+				+ facebookAccessTokenExpiresOnTemp + "]";
 	}
 }

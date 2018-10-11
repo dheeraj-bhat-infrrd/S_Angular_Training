@@ -245,6 +245,56 @@ public class EmailServicesImpl implements EmailServices
             false );
     }
 
+    private void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
+        FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail,
+        boolean sendMailToSalesLead, String socialPostType ) throws InvalidInputException, UndeliveredEmailException {
+        LOG.debug(
+            "Method sendEmailWithBodyReplacements called for emailEntity : {} subjectFileName : {} and messageBodyReplacements : {}",
+            emailEntity, subjectFileName, messageBodyReplacements );
+        // fill in the details if missing
+        fillEmailEntity( emailEntity );
+        // check if mail needs to be sent
+        if ( sendMail.equals( CommonConstants.YES_STRING ) ) {
+            if ( subjectFileName == null || subjectFileName.isEmpty() ) {
+                throw new InvalidInputException( "Subject file name is null for sending mail" );
+            }
+            if ( messageBodyReplacements == null ) {
+                throw new InvalidInputException( "Email body file name  and replacements are null for sending mail" );
+            }
+
+            // Read the subject template to get the subject and set in emailEntity
+            LOG.trace( "Reading template to set the mail subject" );
+            emailEntity.setSubject( fileOperations.getContentFromFile( subjectFileName ) + "  " + socialPostType + " ]" );
+
+            //Read the mail body template, replace the required contents with arguments provided
+            // and set in emailEntity
+            LOG.trace( "Reading template to set the mail body" );
+            emailEntity.setBody( fileOperations.replaceFileContents( messageBodyReplacements ) );
+
+            // Send the mail
+            if ( queueMails ) {
+                emailEntity.setHoldSendingMail( holdSendingMail );
+                emailEntity.setSendMailToSalesLead( sendMailToSalesLead );
+                try {
+                    streamApiIntegrationBuilder.getStreamApi().streamEmailMessage( emailEntity );
+                } catch ( StreamApiException | StreamApiConnectException e ) {
+                    LOG.error( "Could not stream email", e );
+                    LOG.info( "Saving message into local db" );
+                    saveMessageToStreamLater( emailEntity );
+                }
+
+            } else {
+                if ( isImmediate ) {
+                    emailSender.sendEmailByEmailEntity( emailEntity, sendMailToSalesLead );
+                } else {
+                    saveEmail( emailEntity, holdSendingMail );
+                }
+            }
+
+        }
+
+        LOG.debug( "Method sendEmailWithBodyReplacements completed successfully" );
+    }
 
     private void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
         FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail,
@@ -1357,7 +1407,7 @@ public class EmailServicesImpl implements EmailServices
     @Override
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
         String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
-        String customerDetail, String propertyAddress, String fbShareUrl , boolean isAddFbShare ) throws InvalidInputException, UndeliveredEmailException
+        String customerDetail, String fbShareUrl , boolean isAddFbShare ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1389,13 +1439,13 @@ public class EmailServicesImpl implements EmailServices
         if(isAddFbShare) {
         		messageBodyReplacements.setFileName(
                     EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY_NEW );
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, fbShareUrl, propertyAddress,
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, fbShareUrl,
                     customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
                     String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         }else {
         		messageBodyReplacements.setFileName(
                     EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY );
-        		messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,propertyAddress,
+        		messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,
                         customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
                         String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         }
@@ -2451,11 +2501,22 @@ public class EmailServicesImpl implements EmailServices
             + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_SUBJECT;
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements.setFileName(
-            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_BODY );
+        
+        //DONT ADD UPDATE CONNECTION URL FOR FACEBOOK. INSTEAD OF USE SS LOGIN URL.
+        if(socialMediaType.equalsIgnoreCase(CommonConstants.FACEBOOK_SOCIAL_SITE)) {
+        		messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FACEBOOK_TOKEN_EXPIRY_EMAIL_BODY );
+        		messageBodyReplacements
+                .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, socialMediaType, appLoginUrl ) );
+        }else {
+        		messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIAL_MEDIA_TOKEN_EXPIRY_MAIL_BODY );
+        		messageBodyReplacements
+                .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, socialMediaType, updateConnectionUrl, appLoginUrl ) );
+        }
+        
 
-        messageBodyReplacements
-            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, socialMediaType, updateConnectionUrl, appLoginUrl ) );
+        
 
         LOG.trace( "Calling email sender to send mail" );
         sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
@@ -3005,13 +3066,14 @@ public class EmailServicesImpl implements EmailServices
             Arrays.asList( appLogoUrl, recipientName, message, mailBody, postLinkText ) );
            
         LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false,
+            false, socialResponseObject.getType().toString() );
         LOG.debug( "method sendSocialMonitorActionMail ended" );
 	}
     
-    //@Async
+    @Async
     @Override
-    public boolean sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId,
+    public void sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId,
         User addedUser, OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "method sendUserAdditionMail() called" );
@@ -3049,7 +3111,6 @@ public class EmailServicesImpl implements EmailServices
             false );
 
         LOG.debug( "method sendUserAdditionMail() finished" );
-        return true;
     }
 
     //@Async

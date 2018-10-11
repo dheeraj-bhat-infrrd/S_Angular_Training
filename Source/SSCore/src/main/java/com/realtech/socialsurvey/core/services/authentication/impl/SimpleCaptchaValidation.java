@@ -90,7 +90,6 @@ public class SimpleCaptchaValidation implements CaptchaValidation {
 	}
 
 	public static void main(String[] args) throws InvalidInputException {
-		// System.out.println(new
 		// EncryptionHelper().encryptAES(String.valueOf(System.currentTimeMillis()), ""));
 		new SimpleCaptchaValidation().presentCaptchaQuestion("5f907657d021e2f708cef94fd7c000b8");
 	}

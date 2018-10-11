@@ -185,7 +185,7 @@ public interface EmailServices
      */
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
         String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
-        String customerDetail, String propertyAddress, String fbShareUrl, boolean isAddFbShare ) throws InvalidInputException, UndeliveredEmailException;
+        String customerDetail, String fbShareUrl, boolean isAddFbShare ) throws InvalidInputException, UndeliveredEmailException;
 
 
     /**
@@ -498,7 +498,7 @@ public interface EmailServices
 			throws InvalidInputException, UndeliveredEmailException;
 
     
-    public boolean sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId, User addedUser,
+    public void sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId, User addedUser,
         OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException;
 
 

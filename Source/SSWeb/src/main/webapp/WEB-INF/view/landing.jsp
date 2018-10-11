@@ -15,7 +15,7 @@ var isSocialMediaExpired = '${isSocialMediaExpired}';
 var enableTokenRefresh = '${enableTokenRefresh}';
 
 $(document).ready(function() {
-	sessionStorage.setItem("newSession",false);
+	sessionStorage.setItem("newSession",true);
 	sessionStorage.setItem("fbPopup",true);
 	
 	callAjaxGetWithPayloadData("/ishiddensection.do", function(data) {
@@ -24,6 +24,7 @@ $(document).ready(function() {
 		var activeSessionFound = "${activeSessionFound}";
 		if (activeSessionFound == "true") {
 			showActiveUserLogoutOverlay();
+			sessionStorage.setItem("newSession",false);
 		} else {
 			landingFlow();
 		}

@@ -336,8 +336,11 @@ public interface SocialManagementService
     public boolean checkForLinkedInTokenRefresh( SocialMediaTokens mediaTokens );
 
 
-    public boolean manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId );
+    public String manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId );
 
+
+    public void postZillowToSocialMedia( OrganizationUnitSettings profile, SurveyDetails surveyDetails,
+        OrganizationUnitSettings companySettings ) throws NonFatalException;
 
     public void postZillowToSocialMedia( OrganizationUnitSettings profile, SurveyDetails surveyDetails,
         OrganizationUnitSettings companySettings ) throws NonFatalException;

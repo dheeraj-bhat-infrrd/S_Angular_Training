@@ -71,6 +71,7 @@
 				<div data-ques-type="stars" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt">Survey Question</div>
+					<hr class="hr-survey">
 					<div class="sq-ques">
 						<i><span id="ques-text" class="sq-ques-txt"></span></i>
 					</div>
@@ -92,6 +93,7 @@
 				<div data-ques-type="smiley" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
+					<hr class="hr-survey">
 					<div class="sq-ques">
 						<i><span id="ques-text-smiley" class="sq-ques-txt"></span></i>
 					</div>
@@ -115,6 +117,7 @@
 				<div data-ques-type="scale" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
+					<hr class="hr-survey">
 					<div class="sq-ques">
 						<i><span id="ques-text-scale" class="sq-ques-txt"></span></i>
 					</div>
@@ -144,6 +147,7 @@
 				<!-- Div for 1-10 rating questions -->
 				<div data-ques-type="sb-range-0to10" class="sq-quest-item hide">
 					<div class="sq-main-txt"></div>
+					<hr class="hr-survey">
 					<div class="sq-ques">
 						<i><span id="ques-text-1to10" class="sq-ques-txt"></span></i>
 					</div>
@@ -192,6 +196,7 @@
 				
 				<div data-ques-type="sb-range-0to10-nps" class="sq-quest-item hide">
 					<div class="sq-main-txt"></div>
+					<hr class="hr-survey">
 					<div class="sq-ques">
 						<i><span id="ques-text-1to10-nps" class="sq-ques-txt"></span></i>
 					</div>
@@ -285,6 +290,7 @@
 				<div data-ques-type="smiley-text-final" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
+					<hr class="hr-survey">
 					<div class="sq-ques">
 						<i><span id="ques-text-textarea" class="sq-ques-txt"></span></i>
 					</div>
@@ -331,6 +337,7 @@
 				<div data-ques-type="mcq" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
+					<hr class="hr-survey">
 					<div class="sq-ques">
 						<i><span id="mcq-ques-text" class="sq-ques-txt"></span></i>
 					</div>
@@ -350,6 +357,7 @@
 				<div id="profile-link" class="sq-main-link"></div>
 					
 					<div id="content-head" class="sq-main-txt">Error</div>
+					<hr class="hr-survey">
 					<div class="sq-ques">
 						<i><span id="content" class="sq-ques-txt"></span></i>
 					</div>

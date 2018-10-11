@@ -3181,6 +3181,7 @@ button.paypal.is-active {
 	font-weight: bold !important;
 	text-transform: capitalize;
 	font-size: 16px;
+	margin-bottom: 15px;
 }
 
 .sq-main-link {
@@ -8975,7 +8976,7 @@ input.zillow-input {
 	font-family: 'OpenSansLight';
 }
 
-.review-source, .view-zillow-link {
+.review-source, .view-zillow-link, .view-fb-link {
 	margin-left: 4px;
 	color: #1EBEF0;
 	cursor: pointer;
@@ -12133,7 +12134,7 @@ img.lead-img {
     width: 1140px;
     height: 681px;
     margin: 0 auto;
-    background-image: url(../images/summit_popup_lg.gif);
+    background-image: url(../images/CreateWOWSummit_Banners_Dayof_web.png);
     background-size:contain;
     background-position:center;
     border-radius: 8px;
@@ -12162,7 +12163,7 @@ img.lead-img {
 }
 
 .summit-ribbon{
-	background-image: url(../images/summit_ribbon.jpg);
+    background-image: url(../images/CreateWowSummit_Ribbon_Dayof_web.png);
     background-size:contain;
     background-position:center;
     margin-left: -35px;
@@ -12170,20 +12171,20 @@ img.lead-img {
     height:50px;
 }
 
-.close-summit-ribbon{
-	width: 30px;
+.close-summit-ribbon {
+    width: 30px;
     height: 30px;
     position: relative;
     float: right;
-    right: 22px;
-    top: 10px;
+    right: -1px;
+    top: 2px;
 }
 
 .register-summit-btn{
     width: 130px;
     height: 50px;
     position: absolute;
-    right: 171px;
+    right: 53px;
     bottom: 74px;
 }
 
@@ -12822,3 +12823,94 @@ pre.email-reply-text {
     font-size: 14px;
     font-weight: bold !important;
 } 
+
+.summit-timer-back{
+	    width: 1000px;
+    height: 100px;
+    background: #216dab;
+    position: absolute;
+    top: 25px;
+    left: 50px;
+}
+
+.summit-timer-text{
+	position: absolute;
+    color: #ffcd32;
+    font-size: 40px;
+    font-weight: bold !important;
+    top: 32px;
+}
+
+.summit-timer-days{
+    right: 510px;
+}
+
+.summit-timer-hrs{
+    right: 352px;
+}
+
+.summit-timer-min{
+    right: 195px;
+}
+
+.summit-timer-img{
+	margin-left: 86px;
+    margin-top: 10px;
+}
+
+.summit-ribbon-con{
+	width:1100px;
+}
+
+.summit-rib-timer-back{
+	background: #ffcc32;
+    height: 50px;
+    position:  absolute;
+    width: 438px;
+    font-weight:  bold !important;
+}
+
+.summit-rib-timer-img{
+	 height:  100%;
+    float: right;
+}
+
+.summit-rib-days{
+	left: 205px;
+}
+
+.summit-rib-hrs{
+	left: 283px;
+}
+
+.summit-rib-min{
+	left: 362px;
+}
+
+.summit-rib-text {
+    position: absolute;
+    top: 15px;
+    font-size: 15px;
+    color: #2f69aa;
+    font-weight: bold !important;
+}
+
+b{
+    font-weight: bold !important;
+}
+
+.hr-survey {
+    width: 50%;
+    border-color: #C8C8C8;
+}
+
+.verified-partner-badge{
+    background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+    cursor: pointer;
+    background-size: contain;
+}
+
+.verify-partner-image{
+	height: 25px;
+    width: 85px;
+}

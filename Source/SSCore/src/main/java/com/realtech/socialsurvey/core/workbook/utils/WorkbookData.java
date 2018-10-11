@@ -1387,7 +1387,8 @@ public class WorkbookData
 		for (BranchRankingReportYear branchRankingReport : branchRankingReportYear) {
 			branchRankingReportToPopulate = new ArrayList<Object>();
 
-			branchRankingReportToPopulate.add(branchRankingReport.getRankInCompany());
+            branchRankingReportToPopulate
+                .add( ( branchRankingReport.getIsEligible() == 1 ) ? branchRankingReport.getRankInCompany() : "NR" );
 			branchRankingReportToPopulate.add(branchRankingReport.getBranchId());
 			branchRankingReportToPopulate.add(branchRankingReport.getBranchName());
 			branchRankingReportToPopulate.add(branchRankingReport.getRegionName());
@@ -1416,7 +1417,8 @@ public class WorkbookData
 		for (BranchRankingReportMonth branchRankingReport : branchRankingReportMonth) {
 			branchRankingReportToPopulate = new ArrayList<Object>();
 
-			branchRankingReportToPopulate.add(branchRankingReport.getRankInCompany());
+            branchRankingReportToPopulate
+                .add( ( branchRankingReport.getIsEligible() == 1 ) ? branchRankingReport.getRankInCompany() : "NR" );
 			branchRankingReportToPopulate.add(branchRankingReport.getBranchId());
 			branchRankingReportToPopulate.add(branchRankingReport.getBranchName());
 			branchRankingReportToPopulate.add(branchRankingReport.getRegionName());

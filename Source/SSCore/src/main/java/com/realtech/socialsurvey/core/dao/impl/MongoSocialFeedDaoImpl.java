@@ -206,7 +206,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     @Override
     public List<SocialResponseObject> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
         Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText,
-        boolean isCompanySet, boolean fromTrustedSource )
+        boolean isCompanySet, boolean fromTrustedSource, boolean isSocMonOnLoad )
     {
         LOG.debug( "Fetching All Social Feeds" );
         Query query = new Query();
@@ -219,32 +219,39 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         }
 
         //Common criteria
-        if ( companyId != null ) {
-            criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ).andOperator(
-                ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ) ),
-                ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-        }
-        if ( regionIds != null && !regionIds.isEmpty() ) {
-            criterias.add( ( Criteria.where( CommonConstants.REGION_ID ).in( regionIds ).andOperator(
-                ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.REGION ) ),
-                ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-        }
-        if ( branchIds != null && !branchIds.isEmpty() ) {
-            criterias.add( ( Criteria.where( CommonConstants.BRANCH_ID ).in( branchIds ).andOperator(
-                ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.BRANCH ) ),
-                ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-        }
-        if ( agentIds != null && !agentIds.isEmpty() ) {
-            criterias.add( ( Criteria.where( CommonConstants.AGENT_ID ).in( agentIds ).andOperator(
-                ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.AGENT ) ),
-                ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+        if( isSocMonOnLoad ){
+            criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ) );
+        } else {
+            if ( companyId != null ) {
+                criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ).andOperator(
+                    ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ) ),
+                    ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+            }
+            if ( regionIds != null && !regionIds.isEmpty() ) {
+                criterias.add( ( Criteria.where( CommonConstants.REGION_ID ).in( regionIds ).andOperator(
+                    ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.REGION ) ),
+                    ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+            }
+            if ( branchIds != null && !branchIds.isEmpty() ) {
+                criterias.add( ( Criteria.where( CommonConstants.BRANCH_ID ).in( branchIds ).andOperator(
+                    ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.BRANCH ) ),
+                    ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+            }
+            if ( agentIds != null && !agentIds.isEmpty() ) {
+                criterias.add( ( Criteria.where( CommonConstants.AGENT_ID ).in( agentIds ).andOperator(
+                    ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.AGENT ) ),
+                    ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+            }
         }
 
-        //TRUSTED-SOURCE tab criteria
-        if ( fromTrustedSource ) {
-            criteria.orOperator( ( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
-                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) );
+
+        //NEW and TRUSTED-SOURCE tab criteria
+        if ( status.equalsIgnoreCase( SocialFeedStatus.NEW.toString() ) ) {
+            //criterias.add( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
+            criteria.andOperator( ( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ).and( STATUS ).is( SocialFeedStatus.NEW )
+                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ));
         }
+        
         //Stream, Alerts, Escalation, Resolved criteria
         else if(!criterias.isEmpty() && criterias != null && isCompanySet){
             criteria.orOperator( ( Criteria.where( STATUS ).is( status.toUpperCase() )
@@ -271,14 +278,14 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             query.limit( limit );
         }
 
+        LOG.debug( "Query is : {}", query.toString() );
         return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
     }
 
-
-
     @Override
     public long getAllSocialFeedsCount( String status, List<String> feedtype, Long companyId, List<Long> regionIds,
-        List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet, boolean fromTrustedSource )
+        List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet, boolean fromTrustedSource,
+        boolean isSocMonOnLoad)
     {
         LOG.debug( "Fetching All Social Feeds count" );
         Query query = new Query();
@@ -291,31 +298,37 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         }
 
         //Common criteria
-        if ( companyId != null ) {
-            criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ).andOperator(
-                ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ) ),
-                ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-        }
-        if ( regionIds != null && !regionIds.isEmpty() ) {
-            criterias.add( ( Criteria.where( CommonConstants.REGION_ID ).in( regionIds ).andOperator(
-                ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.REGION ) ),
-                ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-        }
-        if ( branchIds != null && !branchIds.isEmpty() ) {
-            criterias.add( ( Criteria.where( CommonConstants.BRANCH_ID ).in( branchIds ).andOperator(
-                ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.BRANCH ) ),
-                ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-        }
-        if ( agentIds != null && !agentIds.isEmpty() ) {
-            criterias.add( ( Criteria.where( CommonConstants.AGENT_ID ).in( agentIds ).andOperator(
-                ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.AGENT ) ),
-                ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+        if( isSocMonOnLoad ){
+            criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ) );
+        } else {
+            if ( companyId != null ) {
+                criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId )
+                    .andOperator( ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ) ),
+                        ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+            }
+            if ( regionIds != null && !regionIds.isEmpty() ) {
+                criterias.add( ( Criteria.where( CommonConstants.REGION_ID ).in( regionIds )
+                    .andOperator( ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.REGION ) ),
+                        ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+            }
+            if ( branchIds != null && !branchIds.isEmpty() ) {
+                criterias.add( ( Criteria.where( CommonConstants.BRANCH_ID ).in( branchIds )
+                    .andOperator( ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.BRANCH ) ),
+                        ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+            }
+            if ( agentIds != null && !agentIds.isEmpty() ) {
+                criterias.add( ( Criteria.where( CommonConstants.AGENT_ID ).in( agentIds )
+                    .andOperator( ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.AGENT ) ),
+                        ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+            }
         }
 
-        //TRUSTED-SOURCE tab criteria
-        if ( fromTrustedSource ) {
-            criteria.orOperator( ( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
-                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) );
+        //NEW and TRUSTED-SOURCE tab criteria
+        if ( status.equalsIgnoreCase( SocialFeedStatus.NEW.toString() ) ) {
+            //criterias.add( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
+            criteria.andOperator( ( Criteria.where( FROM_TRUSTED_SOURCE )
+                .is( fromTrustedSource ).and( STATUS ).is( SocialFeedStatus.NEW )
+                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ));
         }
         //Stream, Alerts, Escalation, Resolved criteria
         else if(!criterias.isEmpty() && criterias != null && isCompanySet){
@@ -560,8 +573,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         //update fromTrustedSource 
         update2.set( FROM_TRUSTED_SOURCE, true );
         //update status to RESOLVED
-        update2.set( STATUS, SocialFeedStatus.RESOLVED );
-        update2.push( ACTION_HISTORY, actionHistory );
+        /*update2.set( STATUS, SocialFeedStatus.RESOLVED );
+        update2.push( ACTION_HISTORY, actionHistory );*/
         update2.set( UPDATED_TIME, new Date().getTime() );
         WriteResult result2 = mongoTemplate.updateMulti( updateQuery2, update2, SOCIAL_FEED_COLLECTION );
         updateCount += result2.getN();

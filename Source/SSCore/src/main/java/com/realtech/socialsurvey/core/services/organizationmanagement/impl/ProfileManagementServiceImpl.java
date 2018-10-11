@@ -31,6 +31,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -1931,6 +1933,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                         review.setAgentProfileImage( unitSettings.getProfileImageUrl() );
                     }
+                    
+                    SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, review.getSurveyPreIntitiationId());
+                    if(surveyPreInitiation != null) {
+                    	int participantType = surveyPreInitiation.getParticipantType();
+                    	if(review.getSource().equals("encompass") || review.getSource().equals("DOTLOOP") || review.getSource().equals("API") || review.getSource().equals("FTP") || review.getSource().equals("LONEWOLF") ) {
+                    		if(participantType == 3 || participantType == 4) {
+                            	review.setSource("verifiedPartner");
+                            }
+                    	}                        
+                    }
+                    
                 }
             }
         }
@@ -2597,10 +2610,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         if ( settings != null ) {
-            LOG.debug( "Sending the contact us mail to the agent along with admin" );
+            LOG.debug( "Sending the contact us mail. Add admin as well" );
             recepients.add(settings.getContact_details().getMail_ids().getWork()) ;
-            emailServices.sendContactUsMail( recepients,
-                settings.getContact_details().getName(), senderName, senderMailId, agentSettings.getContact_details().getMail_ids().getWork(), agentSettings.getContact_details().getName(), message );
+            if(agentSettings != null) {
+            		emailServices.sendContactUsMail( recepients,
+                        settings.getContact_details().getName(), senderName, senderMailId, agentSettings.getContact_details().getMail_ids().getWork(), agentSettings.getContact_details().getName(), message );
+                    
+            }else {
+            	emailServices.sendContactUsMail( recepients,
+                        settings.getContact_details().getName(), senderName, senderMailId, "N/A", "N/A", message );                   
+            }
             LOG.debug( "Contact us mail sent!" );
         } else {
             LOG.error( "No records found for profile settings of profile name: {}, profile type: {} in mongo", profileName,
@@ -3697,6 +3716,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         long regionId = 0;
         long branchId = 0;
         long agentId = 0;
+        long hasRegion = 1;
+        long hasBranch = 1;
 
         if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
             companyId = entityId;
@@ -3720,12 +3741,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             companyId = company.getCompanyId();
             regionId = region.getRegionId();
             branchId = entityId;
+            if(region.getIsDefaultBySystem() == 1) {
+                hasRegion = 0;
+            }
         } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
             hierarchyMap = userManagementService.getPrimaryUserProfileByAgentId( entityId );
             agentId = entityId;
             companyId = hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN );
             regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
             branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+            Region region = regionDao.findById( Region.class, regionId );
+            Branch branch = branchDao.findById( Branch.class, branchId );
+            if(region.getIsDefaultBySystem() == 1) {
+                hasRegion = 0;
+            }
+            if(branch.getIsDefaultBySystem() == 1) {
+                hasBranch = 0;
+            }
         } else {
             throw new InvalidInputException( "Entity Type Is Invalid " );
         }
@@ -3733,6 +3765,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         hierarchyDetials.put( CommonConstants.REGION_ID_COLUMN, regionId );
         hierarchyDetials.put( CommonConstants.BRANCH_ID_COLUMN, branchId );
         hierarchyDetials.put( CommonConstants.AGENT_ID_COLUMN, agentId );
+        hierarchyDetials.put( CommonConstants.HAS_REGION, hasRegion );
+        hierarchyDetials.put( CommonConstants.HAS_BRANCH, hasBranch );
+        
         return hierarchyDetials;
     }
 
@@ -5916,6 +5951,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( CommonConstants.SURVEY_SOURCE_ZILLOW.equalsIgnoreCase( review.getSource() )
             && StringUtils.isEmpty( review.getSourceId() ) ) {
             review.setSourceId( review.getCompleteProfileUrl() );
+        }
+        
+        SurveyPreInitiation surveyPreInitiation = surveyPreInitiationDao.findById(SurveyPreInitiation.class, review.getSurveyPreIntitiationId());
+        if(surveyPreInitiation != null) {
+        	int participantType = surveyPreInitiation.getParticipantType();
+        	if(review.getSource().equals("encompass") || review.getSource().equals("DOTLOOP") || review.getSource().equals("API") || review.getSource().equals("FTP") || review.getSource().equals("LONEWOLF") ) {
+        		if(participantType == 3 || participantType == 4) {
+                	review.setSource("verifiedPartner");
+                }
+        	}                        
         }
 
         //This is added to get the agent's APP ID and profile URL 

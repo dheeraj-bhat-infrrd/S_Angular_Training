@@ -425,7 +425,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
                 projections.add( Projections.property( columnName ).as( columnName ) );
             }
             crit.setProjection( projections );
-            System.out.println( projections.toString() );
             for ( Entry<String, Object> query : queries.entrySet() ) {
                 crit.add( Restrictions.eq( query.getKey(), query.getValue() ) );
             }
@@ -453,7 +452,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
                 projections.add( Projections.property( columnName ).as( columnName ) );
             }
             crit.setProjection( projections );
-            System.out.println( projections.toString() );
             for ( Entry<String, Object> query : queries.entrySet() ) {
                 crit.add( Restrictions.eq( query.getKey(), query.getValue() ) );
             }

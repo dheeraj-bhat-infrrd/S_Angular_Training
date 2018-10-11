@@ -1,11 +1,28 @@
 (function() {
 
 	var bootstrapSourceRef = document.createElement('a');
-	bootstrapSourceRef.href = document.currentScript.src;
-	var dataContainer =  document.currentScript.getAttribute( "data-container" );
-	var currScript = document.currentScript;
+	
+	var currentScript = document.currentScript || (function() {
+	  var script = document.getElementById('ss-new-widget-js');
+	  return script;
+	})();
+	
+	bootstrapSourceRef.href = currentScript.src;
+	var dataContainer =  currentScript.getAttribute( "data-container" );
+	var currScript = currentScript;
 	
 	var resourcesHost = bootstrapSourceRef.origin;
+	
+	if(!resourcesHost){
+		resourcesHost = bootstrapSourceRef.protocol + "//" + bootstrapSourceRef.hostname;
+		
+		if(bootstrapSourceRef.protocol == 'http:' && bootstrapSourceRef.port !=  80){
+			resourcesHost += ":" + bootstrapSourceRef.port
+		}else if(bootstrapSourceRef.protocol == 'https:' && bootstrapSourceRef.port !=  443){
+			resourcesHost += ":" + bootstrapSourceRef.port;
+		}
+	}
+	
 	var jQuery, $;
 	var ssHost = undefined;
 
@@ -72,8 +89,8 @@
 
 		jQuery(document).ready(function($) {
 
-			loadCss($, resourcesHost + "/widget/css/bootstrap.min.css");
-			loadCss($, resourcesHost + "/widget/css/widget.css");
+			loadCss($, resourcesHost + "/widget/css/bootstrap-ss-widget.css");
+			loadCss($, resourcesHost + "/widget/css/widget-iso.css");
 			loadScript(resourcesHost + "/widget/js/widget-framework.js", function() {
 				var companyProfileName = $(currScript).data('company-profile-name');
 				var profileName = $(currScript).data('profile-name');

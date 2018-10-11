@@ -31,9 +31,42 @@ public class WidgetConfigurationRequest
     private String requestMessage;
     private String overrideLowerHierarchy;
     private String lockLowerHierarchy;
+    private String hideReviewBtn;
+    private String hideContactBtn;
+    private String maxWidgetBtnSize;
 
 
-    public String getFont()
+    public String getMaxWidgetBtnSize() {
+		return maxWidgetBtnSize;
+	}
+
+
+	public void setMaxWidgetBtnSize(String maxWidgetBtnSize) {
+		this.maxWidgetBtnSize = maxWidgetBtnSize;
+	}
+
+
+	public String getHideReviewBtn() {
+		return hideReviewBtn;
+	}
+
+
+	public void setHideReviewBtn(String hideReviewBtn) {
+		this.hideReviewBtn = hideReviewBtn;
+	}
+
+
+	public String getHideContactBtn() {
+		return hideContactBtn;
+	}
+
+
+	public void setHideContactBtn(String hideContactBtn) {
+		this.hideContactBtn = hideContactBtn;
+	}
+
+
+	public String getFont()
     {
         return font;
     }
@@ -369,20 +402,22 @@ public class WidgetConfigurationRequest
     }
 
 
-    @Override
-    public String toString()
-    {
-        return "WidgetConfigurationRequest [font=" + font + ", backgroundColor=" + backgroundColor + ", ratingAndStarColor="
-            + ratingAndStarColor + ", barGraphColor=" + barGraphColor + ", foregroundColor=" + foregroundColor + ", fontTheme="
-            + fontTheme + ", embeddedFontTheme=" + embeddedFontTheme + ", buttonOneName=" + buttonOneName + ", buttonOneLink="
-            + buttonOneLink + ", buttonOneOpacity=" + buttonOneOpacity + ", buttonTwoName=" + buttonTwoName + ", buttonTwoLink="
-            + buttonTwoLink + ", buttonTwoOpacity=" + buttonTwoOpacity + ", reviewLoaderName=" + reviewLoaderName
-            + ", reviewLoaderOpacity=" + reviewLoaderOpacity + ", maxReviewsOnLoadMore=" + maxReviewsOnLoadMore
-            + ", initialNumberOfReviews=" + initialNumberOfReviews + ", hideBarGraph=" + hideBarGraph + ", hideOptions="
-            + hideOptions + ", reviewSortOrder=" + reviewSortOrder + ", reviewSources=" + reviewSources
-            + ", allowModestBranding=" + allowModestBranding + ", seoTitle=" + seoTitle + ", seoKeywords=" + seoKeywords
-            + ", seoDescription=" + seoDescription + ", requestMessage=" + requestMessage + ", overrideLowerHierarchy="
-            + overrideLowerHierarchy + ", lockLowerHierarchy=" + lockLowerHierarchy + "]";
-    }
+	@Override
+	public String toString() {
+		return "WidgetConfigurationRequest [font=" + font + ", backgroundColor=" + backgroundColor
+				+ ", ratingAndStarColor=" + ratingAndStarColor + ", barGraphColor=" + barGraphColor
+				+ ", foregroundColor=" + foregroundColor + ", fontTheme=" + fontTheme + ", embeddedFontTheme="
+				+ embeddedFontTheme + ", buttonOneName=" + buttonOneName + ", buttonOneLink=" + buttonOneLink
+				+ ", buttonOneOpacity=" + buttonOneOpacity + ", buttonTwoName=" + buttonTwoName + ", buttonTwoLink="
+				+ buttonTwoLink + ", buttonTwoOpacity=" + buttonTwoOpacity + ", reviewLoaderName=" + reviewLoaderName
+				+ ", reviewLoaderOpacity=" + reviewLoaderOpacity + ", maxReviewsOnLoadMore=" + maxReviewsOnLoadMore
+				+ ", initialNumberOfReviews=" + initialNumberOfReviews + ", hideBarGraph=" + hideBarGraph
+				+ ", hideOptions=" + hideOptions + ", reviewSortOrder=" + reviewSortOrder + ", reviewSources="
+				+ reviewSources + ", allowModestBranding=" + allowModestBranding + ", seoTitle=" + seoTitle
+				+ ", seoKeywords=" + seoKeywords + ", seoDescription=" + seoDescription + ", requestMessage="
+				+ requestMessage + ", overrideLowerHierarchy=" + overrideLowerHierarchy + ", lockLowerHierarchy="
+				+ lockLowerHierarchy + ", hideReviewBtn=" + hideReviewBtn + ", hideContactBtn=" + hideContactBtn
+				+ ", maxWidgetBtnSize=" + maxWidgetBtnSize + "]";
+	}
 
 }

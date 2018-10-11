@@ -56,8 +56,8 @@ namespace EncompassSocialSurvey
 
         public const int PARTICIPANT_TYPE_BORROWER = 1;
         public const int PARTICIPANT_TYPE_CO_BORROWER = 2;
-        public const int PARTICIPANT_TYPE_LISTING_AGENT = 3;
-        public const int PARTICIPANT_TYPE_BUYER_AGENT = 4;
+        public const int PARTICIPANT_TYPE_LISTING_AGENT = 4;
+        public const int PARTICIPANT_TYPE_BUYER_AGENT = 3;
 
 
         public const int DAYS_BEFORE = 3;

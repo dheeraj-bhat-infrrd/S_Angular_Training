@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.web.rest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -48,9 +47,12 @@ import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.PostToSocialMedia;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.CustomFieldsNameMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -250,8 +252,9 @@ public class SurveyManagementController
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/data/storeFeedback")
-	public String storeFeedbackAndCloseSurvey(HttpServletRequest request) {
+	public double storeFeedbackAndCloseSurvey(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
+		double surveyScoreRes = -1;
 
 		// To store final feedback provided by customer in mongoDB.
 		try {
@@ -263,6 +266,16 @@ public class SurveyManagementController
 			String agreedToShare = request.getParameter("agreedToShare");
 			String strIsIsoEncoded = request.getParameter("isIsoEncoded");
 			String surveyId = request.getParameter("surveyId");
+			
+			//add new feilds to post to social network
+			String agentNameReq = request.getParameter("agentName");
+			String agentProfileLink = request.getParameter("agentProfileLink");
+			String isAbusiveStr = request.getParameter("isAbusive");
+			String serverBaseUrl = requestUtils.getRequestServerName(request);
+			String onlyPostToSocialSurveyStr = request.getParameter("onlyPostToSocialSurvey");
+			boolean onlyPostToSocialSurvey = Boolean.parseBoolean(onlyPostToSocialSurveyStr);
+			
+			//getting additional parameters to incorporate store in social media
 
 			if (surveyId == null || surveyId.isEmpty()) {
 				throw new InvalidInputException("Passed parameter survey id is null or empty");
@@ -289,12 +302,20 @@ public class SurveyManagementController
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			//update gateway question response and score 
 	        Response response = ssApiIntergrationBuilder.getIntegrationApi().updateScore(surveyId, mood, feedback, isAbusive, agreedToShare);
-	        /*  surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);*/	
+	        /*  surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);*/
+	        //get score from the api response
+	        String surveyScoreString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+	        surveyScoreRes = Double.valueOf(surveyScoreString);
+	        //create entity object
+	        PostToSocialMedia postToSocialMedia = createPostToSocialMedia(agentNameReq, agentProfileLink, agentId, firstName, lastName, isAbusive, feedback, onlyPostToSocialSurvey, surveyScoreRes, serverBaseUrl);
+	        //update gateway question response and score 
+	        ssApiIntergrationBuilder.getIntegrationApi().postToSocialMedia(surveyId, postToSocialMedia);
+	        
 	        surveyHandler.increaseSurveyCountForAgent(agentId);
-			SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(surveyId);
-			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(surveyDetails.getSurveyPreIntitiationId());
+			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
+			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(survey.getSurveyPreIntitiationId());
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
-
+			
 			// update the modified time of hierarchy for seo
 			surveyHandler.updateModifiedOnColumnForAgentHierachy(agentId);
 			if (mood == null || mood.isEmpty()) {
@@ -303,7 +324,6 @@ public class SurveyManagementController
 			}
 			Map<String, String> emailIdsToSendMail = new HashMap<>();
 			SolrDocument solrDocument = null;
-	        SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
 
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);
@@ -360,6 +380,8 @@ public class SurveyManagementController
 				double surveyScoreValue = survey.getScore();
 				boolean allowCheckBox = true;
 				OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings(agentId);
+				// fetch the company settings
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
 
 				if (mood != null && !mood.equalsIgnoreCase("Great")) {
 					allowCheckBox = false;
@@ -391,10 +413,7 @@ public class SurveyManagementController
                             : " " + survey.getCustomerLastName().trim() ) );
 
                 // Generate the text for customer details in mail 
-                String customerDetail = generateCustomerTextForMail( customerFullName, customerEmail, survey.getSourceId() );
-                
-                // fetch the company settings
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
+                String customerDetail = generateCustomerTextForMail( customerFullName, customerEmail, survey.getSourceId() , survey, companySettings.getCustomFieldsNameMapping());
                 
                 if (companySettings == null)
                     throw new NonFatalException("Company settings cannot be found for id : " + survey.getCompanyId());
@@ -402,10 +421,7 @@ public class SurveyManagementController
                 String surveyScore = String.valueOf( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
                 String agentName = ( agent.getLastName() != null && !agent.getLastName().isEmpty() )
                     ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
-                String propertyAddress = "";
-                if( survey.getPropertyAddress() != null)
-                    propertyAddress = "Property Address : "+survey.getPropertyAddress();
-  
+                
                 String fbShareUrl = socialManagementService.generateFacebookShareUrl(survey, agentSettings);
                 
                 boolean canPostOnSM = surveyHandler.canPostOnSocialMedia(agentSettings, survey.getScore() );
@@ -419,7 +435,7 @@ public class SurveyManagementController
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
                         surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
-                        customerDetail, propertyAddress, fbShareUrl, isAddFbShare );
+                        customerDetail, fbShareUrl, isAddFbShare );
                 }
                 
 
@@ -468,18 +484,18 @@ public class SurveyManagementController
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ", e);
-			return e.getMessage();
+			return surveyScoreRes;
 		}
 		catch (UnsupportedEncodingException e) {
 			LOG.error("An exception occured while changing the character encoding of the feedback");
 		}
 		LOG.info("Method storeFeedback() finished to store response of customer.");
-		return "Survey stored successfully";
+		return surveyScoreRes;
 	}
 
-	private String generateCustomerTextForMail( String customerFullName, String customerEmailId, String surveySourceId )
+	private String generateCustomerTextForMail( String customerFullName, String customerEmailId, String surveySourceId,  SurveyDetails survey, CustomFieldsNameMapping fieldNameMappings  )
     {
-	    
+		
         StringBuilder customerDetail = new StringBuilder( "<div style=\"margin: 15px 0px 15px 0px;\">" );
    
         customerDetail.append( "<p style=\"font-weight:bold\">Here are the customer details:</p>" );
@@ -491,6 +507,74 @@ public class SurveyManagementController
         customerDetail.append( customerEmailId == null ? "" : customerEmailId );
         customerDetail.append( "<br/> Transaction Id ( Loan# ): ");
         customerDetail.append( surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId );
+        
+        
+        if( ! StringUtils.isEmpty(survey.getPropertyAddress())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getPropertyAddress()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getPropertyAddress() +": " );
+        		else
+        			customerDetail.append( "<br/> Property Address: " );
+            customerDetail.append( survey.getPropertyAddress() );
+        }
+        
+        if( ! StringUtils.isEmpty(survey.getLoanProcessorEmail())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getLoanProcessorEmail()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getLoanProcessorEmail() +": " );
+        		else
+        			customerDetail.append( "<br/> Loan Processor Email: " );
+    			customerDetail.append( survey.getLoanProcessorEmail() );
+        }
+        
+        if( ! StringUtils.isEmpty(survey.getLoanProcessorName())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getLoanProcessorName()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getLoanProcessorName() +": " );
+        		else
+        			customerDetail.append( "<br/> Loan Processor Name: " );
+    			customerDetail.append( survey.getLoanProcessorName() );
+        }
+        
+        //add custom fields
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldOne()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldOne()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldOne() +": " );
+			customerDetail.append( survey.getCustomFieldOne() );
+        }
+        
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldTwo()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldTwo()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldTwo() +": " );
+			customerDetail.append( survey.getCustomFieldTwo() );
+        }
+    		
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldThree()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldThree()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldThree() +": " );
+			customerDetail.append( survey.getCustomFieldThree() );
+        }
+    		
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldFour()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldFour()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldFour() +": " );
+			customerDetail.append( survey.getCustomFieldFour() );
+        }
+    		
+    		if( ! StringUtils.isEmpty(survey.getCustomFieldFive()) && fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCustomFieldFive()) ) {
+    			customerDetail.append( "<br/> " + fieldNameMappings.getCustomFieldFive() +": " );
+			customerDetail.append( survey.getCustomFieldFive() );
+        }
+        
+        if( ! StringUtils.isEmpty(survey.getCity())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getCity()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getCity() +": " );
+    			else
+    				customerDetail.append( "<br/> City: " );
+    			customerDetail.append( survey.getCity() );
+        }
+        
+        if( ! StringUtils.isEmpty(survey.getState())){
+        		if(fieldNameMappings != null &&  ! StringUtils.isEmpty(fieldNameMappings.getState()) )
+        			customerDetail.append( "<br/> " + fieldNameMappings.getState() +": " );
+			else
+				customerDetail.append( "<br/> State: " );
+			customerDetail.append( survey.getState() );
+        }
+        
         
         customerDetail.append( "</div>" );
         customerDetail.append( "</div>" );
@@ -545,7 +629,9 @@ public class SurveyManagementController
 		surveyDetail.append(paragraph).append(tableStart);
 
 		for (SurveyResponse response : survey.getSurveyResponse()) {
-			surveyDetail.append(tableTwoRowStart).append(response.getQuestion()).append( " (" ).append( questionTypeDisplayName.get( response.getQuestionType() ) ).append( ")" )
+			String questionText = response.getQuestion();
+			String replacedQuesText = questionText.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"");
+			surveyDetail.append(tableTwoRowStart).append(replacedQuesText).append( " (" ).append( questionTypeDisplayName.get( response.getQuestionType() ) ).append( ")" )
 			.append(tableRowMiddle).append(response.getAnswer())
 			.append(tableRowEnd);
 		}
@@ -697,7 +783,12 @@ public class SurveyManagementController
 			model.addAttribute("source", source);
 
 			User user = userManagementService.getUserByUserId(agentId);
-
+			OrganizationUnitSettings agentSettings = userManagementService.getUserSettings(agentId);
+			//check if manual surveys from public pages are prevented for agent
+			if(agentSettings.isManualCustomerSuurveyPrevented()) {
+				errorMsg = "Public reviews are not allowed for " + agentName;
+				throw new NonFatalException("Public reviews are not allowed for " + agentName);
+			}
 			try {
 				surveyHandler.initiateSurveyRequest(user.getUserId(), customerEmail, firstName, lastName, source);
 			}
@@ -1949,6 +2040,23 @@ public class SurveyManagementController
 		}
 		LOG.debug("Returning logo url: " + logoUrl);
 		return logoUrl;
+	}
+	
+	private PostToSocialMedia createPostToSocialMedia(String agentName,String agentProfileLink,long agentId,String firstName,String lastName,Boolean isAbusive,
+			String feedback,boolean onlyPostToSocialSurvey,double surveyScore, String serverBaseUrl) {
+		PostToSocialMedia postToSocialMedia = new PostToSocialMedia();
+        postToSocialMedia.setAgentName(agentName);
+        postToSocialMedia.setAgentProfileLink(agentProfileLink);
+        postToSocialMedia.setAgentId(agentId);
+        postToSocialMedia.setCustFirstName(firstName);
+        postToSocialMedia.setCustLastName(lastName);
+        postToSocialMedia.setAbusive(isAbusive);
+        postToSocialMedia.setFeedback(feedback);
+        postToSocialMedia.setOnlyPostToSocialSurvey(onlyPostToSocialSurvey);
+        postToSocialMedia.setRating(surveyScore);
+        postToSocialMedia.setServerBaseUrl(serverBaseUrl);
+        postToSocialMedia.setZillow(false);
+        return postToSocialMedia;
 	}
 
 }

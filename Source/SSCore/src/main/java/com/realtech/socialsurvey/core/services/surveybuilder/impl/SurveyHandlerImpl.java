@@ -334,9 +334,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         companyId = user.getCompany().getCompanyId();
         agentName = user.getFirstName() + " " + user.getLastName();
         for ( UserProfile userProfile : user.getUserProfiles() ) {
-            if ( userProfile.getAgentId() == surveyPreInitiation.getAgentId() ) {
-                branchId = userProfile.getBranchId();
-                regionId = userProfile.getRegionId();
+            if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                //get primary profile if there are  multiple active agent profile for user
+            		if(userProfile.getIsPrimary() == CommonConstants.YES || branchId == 0 ) {
+                		branchId = userProfile.getBranchId();
+                    regionId = userProfile.getRegionId();
+                }
+            		
             }
         }
         Branch branch = userManagementService.getBranchById(branchId);
@@ -347,7 +351,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setAgentName( agentName );
         surveyDetails.setAgentEmailId( surveyPreInitiation.getAgentEmailId() );
         surveyDetails.setBranchId( branchId );
-        surveyDetails.setBranchName(branch.getBranch());
+        String branchName = "";
+        if(branch != null && branch.getIsDefaultBySystem() == 0) {
+            branchName = branch.getBranch();
+        }
+        surveyDetails.setBranchName(branchName);
+        
         surveyDetails.setCustomerFirstName( surveyPreInitiation.getCustomerFirstName() );
         String lastName = surveyPreInitiation.getCustomerLastName();
         if ( lastName != null && !lastName.isEmpty() && !lastName.equalsIgnoreCase( "null" ) )
@@ -355,7 +364,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setCompanyId( companyId );
         surveyDetails.setCustomerEmail( surveyPreInitiation.getCustomerEmailId() );
         surveyDetails.setRegionId( regionId );
-        surveyDetails.setRegionName(region.getRegion());
+        
+        String regionName = "";
+        if(region!=null && region.getIsDefaultBySystem() == 0) {
+            regionName = region.getRegion();
+        }
+        surveyDetails.setRegionName(regionName);
         surveyDetails.setStage( CommonConstants.INITIAL_INDEX );
         surveyDetails.setReminderCount( surveyPreInitiation.getReminderCounts() );
         surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
@@ -391,6 +405,30 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyDetails.setPropertyAddress( surveyPreInitiation.getPropertyAddress() );
         }
 
+        if(surveyPreInitiation.getLoanProcessorEmail() != null) {
+            surveyDetails.setLoanProcessorEmail( surveyPreInitiation.getLoanProcessorEmail() );
+        }
+        
+        if(surveyPreInitiation.getLoanProcessorName() != null) {
+            surveyDetails.setLoanProcessorName( surveyPreInitiation.getLoanProcessorName() );
+        }
+        
+        if(surveyPreInitiation.getCustomFieldOne() != null) {
+            surveyDetails.setCustomFieldOne( surveyPreInitiation.getCustomFieldOne() );
+        }
+        if(surveyPreInitiation.getCustomFieldTwo() != null) {
+            surveyDetails.setCustomFieldTwo( surveyPreInitiation.getCustomFieldTwo() );
+        }
+        if(surveyPreInitiation.getCustomFieldThree() != null) {
+            surveyDetails.setCustomFieldThree( surveyPreInitiation.getCustomFieldThree() );
+        }
+        if(surveyPreInitiation.getCustomFieldFour() != null) {
+            surveyDetails.setCustomFieldFour( surveyPreInitiation.getCustomFieldFour() );
+        }
+        if(surveyPreInitiation.getCustomFieldFive() != null) {
+            surveyDetails.setCustomFieldFive( surveyPreInitiation.getCustomFieldFive() );
+        }
+        
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );
             // LOG.debug( "Updating modified on column in agent hierarchy fro agent " );
@@ -480,15 +518,23 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * SURVEY_DETAILS.
      */
     @Override
-    public void updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
+    public double updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
         String agreedToShare )
     {
         LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
-        surveyDetailsDao.updateFinalScore( surveyId );
-        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare );
+        //surveyDetailsDao.updateFinalScore( surveyId );
+        //modulerising update final score 
+        //fetch survey response
+        List<SurveyResponse> surveyResponse = surveyDetailsDao.getSurveyRatingResponse(surveyId);
+        //calculate score 
+        double score = calScore(surveyResponse);
+        //get nps
+        double npsScore = getNpsScore(surveyResponse);
+        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare, score, npsScore );
         LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
+        return score;
     }
 
 
@@ -846,8 +892,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     reminderInterval = surveySettings.getSocial_post_reminder_interval_in_days();
                     maxReminders = surveySettings.getMax_number_of_social_pos_reminders();
                 }
+                //if social post reminder is disabled then return  empty list for whole company
+                if( surveySettings.getIsSocialPostReminderDisabled()) {
+                		return incompleteSocialPostCustomers;
+                }
             }
         }
+        
+        
         if ( maxReminders == 0 ) {
             maxReminders = maxSocialpostReminders;
         }
@@ -2133,10 +2185,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( companySettings != null && agentSettings != null ) {
             CRMInfo crmInfo = companySettings.getCrm_info();
-            if ( crmInfo != null && crmInfo.isAllowPartnerSurvey() ) {
+            if ( crmInfo != null && crmInfo.getCrm_source().equalsIgnoreCase(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS) && crmInfo.isAllowPartnerSurvey() ) {
                 //check if agent is allowed for partner survey
                 if ( agentSettings.isAllowPartnerSurvey() )
                     return true;
+            }else {
+            		return true;
             }
         }
         return false;
@@ -3603,7 +3657,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             //put link in map
             String zillowPostUrl = zillowReviewwPostUrl.replaceAll( "\\[screenName\\]", "" + zillowScreenName );
             
-            SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT);
+            SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.ZILLOW_SHARE_DATE_FORMAT);
             sdf.setTimeZone(TimeZone.getTimeZone("PST"));
             zillowPostUrl = zillowPostUrl.replaceAll( "\\[dateOfService\\]", "" + sdf.format(surveyDetails.getSurveyTransactionDate()) );
             surveyAndStage.put( "zillowLink", zillowPostUrl );
@@ -4633,9 +4687,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             LOG.error( "Agent doesnt have an company associated with it " );
             throw new InvalidInputException(
                 "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
-        } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
-            throw new InvalidInputException(
-                "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
         }
 
 
@@ -4683,7 +4734,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
 
         if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
-            LOG.error( "Survey request already sent" );
+            LOG.error( "Survey request already sent for agentId:{} and customerEmail:{}", user.getUserId(), survey.getCustomerEmailId() );
             throw new InvalidInputException( "Can not process the record. A survey request for customer "
                 + survey.getCustomerFirstName() + " has already been received." );
         }
@@ -5275,5 +5326,45 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         organizationUnitSettingsDao.updateSwearWords( entityType, entityId , swearWords);
     }
 
+    @Override
+    public double calScore(List<SurveyResponse> surveyResponse) {
+    	 double noOfResponse = 0;
+         double answer = 0;
+    	 for ( SurveyResponse response : surveyResponse ) {
+             if ( response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_SCALE  )
+                 || response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_SMILE )
+                 || response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_STAR )
+                 || response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_0TO10)
+                 && ( response.getAnswer() != null && !response.getAnswer().isEmpty() )) {
+                 //check if question type is 0to10 and divide answer by 2
+                 if(response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_0TO10)){
+                     if(response.isConsiderForScore()){
+                         int npsAnswer = Integer.parseInt( response.getAnswer() );
+                         answer += (double) npsAnswer/2;
+                         noOfResponse++;
+                     }
+                 }else{
+                     answer += Integer.parseInt( response.getAnswer() );
+                     noOfResponse++;
+                 }
+             }
+         }
+    	 if(noOfResponse != 0) {
+    		 return Math.round( answer / noOfResponse * 1000.0 ) / 1000.0;
+    	 } else return -1;
+    }
+    
+    @Override
+	public double getNpsScore(List<SurveyResponse> surveyResponse) {
+		for (SurveyResponse response : surveyResponse) {
+			if (response.getQuestionType().equals(CommonConstants.QUESTION_TYPE_0TO10)
+					&& (response.getAnswer() != null && !response.getAnswer().isEmpty())
+					&& response.getIsNpsQuestion()) {
+				// check if isNpsQuestion and set npsScore
+				return Integer.parseInt(response.getAnswer());
+			}
+		}
+		return -1;
+	}
 }
 

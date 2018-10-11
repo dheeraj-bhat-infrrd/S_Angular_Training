@@ -144,6 +144,11 @@ public class WidgetApiController
                     }
                 }
             }
+            
+            if ( sortCriteria != null && sortCriteria.equals( CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE ) ) {
+            	startScore = unitSettings.getSurvey_settings().getShow_survey_above_score();
+            	limitScore = 5.0;
+            }
 
             List<SurveyDetails> surveyDetails = profileManagementService.getReviews( unitSettings.getIden(), startScore,
                 limitScore, startIndex, numOfRows, profileLevel, fetchAbusive, startDate, endDate, sortCriteria,

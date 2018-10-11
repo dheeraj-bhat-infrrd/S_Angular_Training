@@ -604,7 +604,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
             throw new SolrException( "Exception while performing search for user. Reason : " + e.getMessage(), e );
         }
 
-        LOG.info( "Method searchUsersByLoginNameOrName finished for pattern :" + pattern + " returning : " + results );
+        LOG.info( "Method searchUsersByLoginNameOrName finished for pattern :" + pattern );
         return results;
     }
 

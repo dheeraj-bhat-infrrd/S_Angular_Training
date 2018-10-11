@@ -2128,21 +2128,21 @@
 	    width: 100%;
     	height: 230px;
     	top: 50px;
-    	background-image: url(../images/summit_popup_sm.gif);
+    	background-image: url(../images/CreateWOWSummit_Banners_Dayof_mobile.png);
 	}
 	
-	.close-summit-popup{
+	.close-summit-popup {
 	    width: 20px;
-   		height: 20px;
-    	top: 9px;
-    	right: 4px;
+	    height: 20px;
+	    top: 25px;
+	    right: 0px;
 	}
 	
-	.register-summit-btn{
-	 	right: 50px;
-    	bottom: 27px;
-    	width: 60px;
-    	height: 21px;
+	.register-summit-btn {
+	    right: 11px;
+	    bottom: 37px;
+	    width: 45px;
+	    height: 21px;
 	}
 	
 	.summit-ribbon-con{
@@ -2151,18 +2151,85 @@
 	
 	.summit-ribbon{
 		margin: 0;
-		background-image: url(../images/summit_ribbon_sm.jpg);
+		background-image: url(../images/CreateWowSummit_Ribbon_Daysof_mobile.png);
 	}
 	
 	.close-summit-ribbon{
 		width: 18px;
  	    height: 18px;
     	right: 0;
-    	top: 9px;
+    	top: 11px;
 	}
 	
 	.mismatch-popup-body-right{
 		margin-top: 15px;
+	}
+	
+	.summit-timer-back {
+	    width: 285px;
+	    height: 38px;
+	    background: #216dab;
+	    position: absolute;
+	    top: 36px;
+	    left: 10px;
+	}
+	
+	.summit-timer-img {
+	    margin-left: 6px;
+	    margin-top: 0px;
+	    width: 285px;
+	    height: 38px;
+	}
+	
+	.summit-timer-text {
+	    position: absolute;
+	    color: #ffcd32;
+	    font-size: 16px;
+	    font-weight: bold !important;
+	    top: 8px;
+	}
+	
+	.summit-timer-days {
+    	right: 140px;
+	}
+	
+	.summit-timer-hrs {
+    	right: 85px;
+	}
+	
+	.summit-timer-min {
+    	right: 32px;
+	}
+	
+	.summit-checkbox-cont {
+	    display: flex;
+	    position: absolute;
+	    bottom: 23px;
+	    margin-left: 32px;
+	    width: 100%;
+	}
+	
+	.summit-check-contain {
+	    padding-right: 0;
+	    margin-right: 25px;
+	}
+	
+	.summit-check {
+	    width: 10px;
+	    height: 10px;
+	    background-image: url(../images/checkbox-blank.png);
+	    background-position: center;
+	    background-size: contain;
+	    background-repeat: no-repeat;
+	    cursor: pointer;
+	    margin: 7px 0 0 !important;
+	}
+	
+	.summit-check-text {
+	    color: white;
+	    font-weight: bold !important;
+	    margin-left: 7px !important;
+	    font-size: 8px;
 	}
 }
 

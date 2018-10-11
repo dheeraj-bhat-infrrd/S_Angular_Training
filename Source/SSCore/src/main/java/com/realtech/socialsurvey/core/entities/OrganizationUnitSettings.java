@@ -77,6 +77,7 @@ public class OrganizationUnitSettings implements Serializable
     private String encryptedId;
     private boolean isCopyToClipboard;
     private SocialMediaShareFromMailConfig socialMediaShareFromMailConfig;
+    private boolean manualCustomerSuurveyPrevented;
     
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
@@ -117,6 +118,8 @@ public class OrganizationUnitSettings implements Serializable
     private WidgetConfiguration widgetConfiguration;
     
     private ZillowShareConfig zillowShareConfig;
+    
+    private CustomFieldsNameMapping customFieldsNameMapping;
     
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
@@ -963,6 +966,26 @@ public class OrganizationUnitSettings implements Serializable
 
 	public void setSocialMediaShareFromMailConfig(SocialMediaShareFromMailConfig socialMediaShareFromMailConfig) {
 		this.socialMediaShareFromMailConfig = socialMediaShareFromMailConfig;
+	}
+
+
+	public boolean isManualCustomerSuurveyPrevented() {
+		return manualCustomerSuurveyPrevented;
+	}
+
+
+	public void setManualCustomerSuurveyPrevented(boolean manualCustomerSuurveyPrevented) {
+		this.manualCustomerSuurveyPrevented = manualCustomerSuurveyPrevented;
+	}
+
+
+	public CustomFieldsNameMapping getCustomFieldsNameMapping() {
+		return customFieldsNameMapping;
+	}
+
+
+	public void setCustomFieldsNameMapping(CustomFieldsNameMapping customFieldsNameMapping) {
+		this.customFieldsNameMapping = customFieldsNameMapping;
 	}
 
 
