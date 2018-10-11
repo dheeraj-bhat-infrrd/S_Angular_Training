@@ -183,7 +183,7 @@ namespace EncompassSocialSurvey.Service
                 String filePath = EncompassSocialSurveyConfiguration.TempFolderPath + Path.DirectorySeparatorChar + fileName;
                 // Write header
                 var csv = new System.Text.StringBuilder();
-                var newLine = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10}", "Loan Number", "Customer First Name", "Customer Last Name", "Customer Email Address", "Agent Email Address", "Loan Id", "Engagement Closed Time", "Participant Type","Loan Processor Name", "Loan Processor Email", "Property Address");
+                var newLine = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}", "Loan Number", "Customer First Name", "Customer Last Name", "Customer Email Address", "Agent Email Address", "Loan Id", "Engagement Closed Time", "Participant Type","Loan Processor Name", "Loan Processor Email", "Property Address", "Custom Field One", "Custom Field Two", "Custom Field Three",  "Custom Field Four", "Custom Field Five");
                 csv.AppendLine(newLine);
                 if (null != loansVM)
                 {
@@ -194,7 +194,7 @@ namespace EncompassSocialSurvey.Service
                         String CustomerLastName = loanVM.CustomerLastName.Replace(",", " ");
                         
                         newLine = null;
-                        newLine = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10}", loanVM.LoanNumber, CustomerFirstName, CustomerLastName, loanVM.CustomerEmailId, loanVM.AgentEmailId, loanVM.SurveySourceId, loanVM.EngagementClosedTime, ParticipantType,loanVM.LoanProcessorName,loanVM.LoanProcessorEmail, loanVM.PropertyAddress);
+                        newLine = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}", loanVM.LoanNumber, CustomerFirstName, CustomerLastName, loanVM.CustomerEmailId, loanVM.AgentEmailId, loanVM.SurveySourceId, loanVM.EngagementClosedTime, ParticipantType,loanVM.LoanProcessorName,loanVM.LoanProcessorEmail, loanVM.PropertyAddress, loanVM.CustomFieldOne, loanVM.CustomFieldTwo, loanVM.CustomFieldThree, loanVM.CustomFieldFour, loanVM.CustomFieldFive);
                         csv.AppendLine(newLine);
                     }
                 }
