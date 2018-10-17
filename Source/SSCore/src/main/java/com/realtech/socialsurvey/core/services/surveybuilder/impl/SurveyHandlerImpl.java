@@ -4726,9 +4726,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
 
         if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
-            LOG.error( "Survey request already sent for agentId:{} and customerEmail:{}", user.getUserId(), survey.getCustomerEmailId() );
+        	survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD);
+            /*LOG.error( "Survey request already sent for agentId:{} and customerEmail:{}", user.getUserId(), survey.getCustomerEmailId() );
             throw new InvalidInputException( "Can not process the record. A survey request for customer "
-                + survey.getCustomerFirstName() + " has already been received." );
+                + survey.getCustomerFirstName() + " has already been received." );*/
         }
 
     }

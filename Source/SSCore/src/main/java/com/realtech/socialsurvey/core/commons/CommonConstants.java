@@ -162,6 +162,8 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_MISMATCH_RECORD = 10;
     public static final int STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED = 11;
     public static final int STATUS_SURVEYPREINITIATION_UNSUBSCRIBED = 12;
+    public static final int ERROR_SURVEYPREINITIATION_DUPLICATE_RECORD = -1;
+	public static final int ERROR_SURVEYPREINITIATION_UNSUBSCRIBED = -2;
 
     public static final int SURVEY_PARTICIPANT_TYPE_BORROWER = 1;
     public static final int SURVEY_PARTICIPANT_TYPE_COBORROWER = 2;
