@@ -4727,12 +4727,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 survey.getCustomerEmailId() );
         }
 
-        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
+     // checking the status for unsubscribed before setting it to duplicate.
+        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 && survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_UNSUBSCRIBED) 
         	survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD);
-            /*LOG.error( "Survey request already sent for agentId:{} and customerEmail:{}", user.getUserId(), survey.getCustomerEmailId() );
-            throw new InvalidInputException( "Can not process the record. A survey request for customer "
-                + survey.getCustomerFirstName() + " has already been received." );*/
-        }
 
     }
 
