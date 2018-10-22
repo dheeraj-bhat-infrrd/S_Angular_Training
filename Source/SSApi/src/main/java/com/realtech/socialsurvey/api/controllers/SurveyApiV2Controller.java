@@ -110,6 +110,7 @@ public class SurveyApiV2Controller
     {
         LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
         request.setAttribute( "input", surveyModel );
+        // Space at the end is intentionally given
         String message = "Survey successfully created. ";
         boolean isDuplicate = false;
         boolean isUnsubscribed = false;
@@ -143,8 +144,8 @@ public class SurveyApiV2Controller
         try {
             for ( SurveyPreInitiation surveyPreInitiation : surveyPreInitiations ) {
                 surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
-                if(surveyPreInitiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED) surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()),
-                			surveyPreInitiation.getSurveyPreIntitiationId());
+                if(surveyPreInitiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED) 
+                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD) {
                 	isDuplicate = true;
                 	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), Long.valueOf(CommonConstants.ERROR_SURVEYPREINITIATION_DUPLICATE_RECORD));
