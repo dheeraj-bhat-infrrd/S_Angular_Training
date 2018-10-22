@@ -110,7 +110,7 @@ public class SurveyApiV2Controller
     {
         LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
         request.setAttribute( "input", surveyModel );
-        String message = "Survey successfully created.";
+        String message = "Survey successfully created. ";
         boolean isDuplicate = false;
         boolean isUnsubscribed = false;
         
