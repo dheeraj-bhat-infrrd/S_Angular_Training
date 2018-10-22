@@ -4545,6 +4545,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey , int duplicateSurveyInterval ) throws InvalidInputException
     {
+    	boolean isUnsubscribed = false;
         // null and syntax checks
         checkForSyntaxInSurveyPreInitiationData( survey );
 
@@ -4566,6 +4567,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if(unsubscribeService.isUnsubscribed( survey.getCustomerEmailId(), survey.getCompanyId() )) {
             LOG.debug( "Customer has unsubscribed emails either from social survey or from this company." );
             survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_UNSUBSCRIBED );
+            isUnsubscribed=true;
         }
 
 
@@ -4591,7 +4593,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			//if borrower email is equal to coborrower email , we set the status of the survey to duplicate
 			//but status should change from STATUS_SURVEYPREINITIATION_NOT_PROCESSED to SURVEY_STATUS_PRE_INITIATED
 			//and not from STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD to SURVEY_STATUS_PRE_INITIATED
-			if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD) {
+			if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD && !isUnsubscribed) {
 			  //update status
                 survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);  
 			}

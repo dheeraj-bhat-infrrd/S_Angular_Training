@@ -137,8 +137,6 @@ public class SurveyApiV2Controller
 //        		if(transactionInfo.getCustomer1Email().equalsIgnoreCase(transactionInfo.getCustomer2Email()))
 //        			message += " Skipping duplicate customer email id " + transactionInfo.getCustomer1Email() + ".";
 //        }
-        			
-        
         //validate survey
         try {
         		surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations , companyId );
@@ -174,9 +172,9 @@ public class SurveyApiV2Controller
                 }
             }
             if(isDuplicate)
-            	message += " One or more survey requests were duplicate.";
+            	message += " One or more survey requests were duplicate. ";
             if(isUnsubscribed)
-            	message += " One or more survey requests were unsubscribed.";
+            	message += " One or more survey requests were unsubscribed. ";
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
 
             return restUtils.getRestResponseEntity( HttpStatus.CREATED, message, "surveyId", surveyIds,
