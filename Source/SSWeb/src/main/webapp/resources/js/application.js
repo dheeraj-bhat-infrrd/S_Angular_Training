@@ -8143,7 +8143,7 @@ function storeCustomerAnswer(customerResponse) {
 	});
 }
 
-function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded) {
+function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded, onlyPostToSocialSurvey) {
 	var success = false;
 
 	var payload = {
@@ -8156,7 +8156,10 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 		"isAbusive" : isAbusive,
 		"agreedToShare" : agreedToShare,
 		"isIsoEncoded" : isIsoEncoded,
-		"surveyId" : surveyId
+		"surveyId" : surveyId,
+		"agentName" : agentName,
+		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey,
+		"agentProfileLink" : agentProfileLink
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -8168,6 +8171,7 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 		success : function(data) {
 			if (data != undefined)
 				success = true;
+			    rating = data;
 		},
 		complete : function(data) {
 			if (success) {
@@ -8196,19 +8200,26 @@ function showFeedbackPage(mood) {
 	case "Great":
 		question = happyText;
 		$("#ques-text-textarea").html(question);
-		var currResponse = 0;
-		var counter = 0;
-		for (var i = 0; i < questions.length; i++) {
-			var currQuestion = questions[i];
-			if ((currQuestion.questionType == 'sb-range-smiles') || (currQuestion.questionType == 'sb-range-scale') || (currQuestion.questionType == 'sb-range-star')) {
-				if (!isNaN(parseInt(currQuestion.customerResponse))) {
-					counter++;
-					currResponse += parseInt(currQuestion.customerResponse);
-				}
-			}
-		}
-		rating = currResponse / (counter);
-		rating = parseFloat(rating).toFixed(3);
+//		var currResponse = 0;
+//		var counter = 0;
+//		for (var i = 0; i < questions.length; i++) {
+//			var currQuestion = questions[i];
+//			if ((currQuestion.questionType == 'sb-range-smiles') || (currQuestion.questionType == 'sb-range-scale') || (currQuestion.questionType == 'sb-range-star') || (currQuestion.questionType == 'sb-range-0to10')) {
+//				if (!isNaN(parseInt(currQuestion.customerResponse))) {
+//					var responseCurrQuestion = parseInt(currQuestion.customerResponse);
+//					if(currQuestion.questionType == 'sb-range-0to10' &&	currQuestion.considerForScore == true){
+//						responseCurrQuestion = 	responseCurrQuestion/2;
+//						counter++;
+//						currResponse += responseCurrQuestion;
+//					}else if(currQuestion.questionType != 'sb-range-0to10'){
+//						counter++;
+//						currResponse += responseCurrQuestion;
+//					}
+//				}
+//			}
+//		}
+//		rating = currResponse / (counter);
+//		rating = parseFloat(rating).toFixed(3);
 		$("#pst-srvy-div").show();
 		$('#shr-pst-cb').val('true');
 		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
@@ -8294,7 +8305,7 @@ function showMasterQuestionPage() {
 			return;
 		}
 
-		console.log(swearWords);
+		//console.log(swearWords);
 		var isAbusive = false;
 		var feedbackArr = feedback.split(" ");
 		for (var i = 0; i < feedbackArr.length; i++) {
@@ -8337,7 +8348,7 @@ function showMasterQuestionPage() {
 		}
 
 		// save survey response
-		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded);
+		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded, onlyPostToSocialSurvey);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		if(!hiddenSection){
@@ -8366,7 +8377,7 @@ function showMasterQuestionPage() {
 		// $('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
 		
 		// call method to post the review and update the review count
-		postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
+		//postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
 
 		//paint socialmedia icons on survey thank you page
 		paintSocialMediaIconsOnSurveyCompletion();
