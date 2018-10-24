@@ -162,8 +162,6 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_MISMATCH_RECORD = 10;
     public static final int STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED = 11;
     public static final int STATUS_SURVEYPREINITIATION_UNSUBSCRIBED = 12;
-    public static final int ERROR_SURVEYPREINITIATION_DUPLICATE_RECORD = -1;
-	public static final int ERROR_SURVEYPREINITIATION_UNSUBSCRIBED = -2;
 
     public static final int SURVEY_PARTICIPANT_TYPE_BORROWER = 1;
     public static final int SURVEY_PARTICIPANT_TYPE_COBORROWER = 2;
@@ -1786,6 +1784,12 @@ public interface CommonConstants
     public static final String PARTICIPANT_CUSTOMER_2 = "customer2";
     public static final String PARTICIPANT_BUYER_AGENT = "buyerAgent";
     public static final String PARTICIPANT_SELLER_AGENT = "sellerAgent";
+    
+    //type of range question
+    public static final String QUESTION_TYPE_SMILE = "sb-range-smiles";
+    public static final String QUESTION_TYPE_SCALE = "sb-range-scale";
+    public static final String QUESTION_TYPE_STAR = "sb-range-star";
+    public static final String QUESTION_TYPE_0TO10 = "sb-range-0to10";
 
     public static final String HAS_REGION = "hasRegion";
     public static final String HAS_BRANCH = "hasBranch";

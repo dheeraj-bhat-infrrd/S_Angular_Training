@@ -518,15 +518,23 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * SURVEY_DETAILS.
      */
     @Override
-    public void updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
+    public double updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
         String agreedToShare )
     {
         LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
-        surveyDetailsDao.updateFinalScore( surveyId );
-        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare );
+        //surveyDetailsDao.updateFinalScore( surveyId );
+        //modulerising update final score 
+        //fetch survey response
+        List<SurveyResponse> surveyResponse = surveyDetailsDao.getSurveyRatingResponse(surveyId);
+        //calculate score 
+        double score = calScore(surveyResponse);
+        //get nps
+        double npsScore = getNpsScore(surveyResponse);
+        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare, score, npsScore );
         LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
+        return score;
     }
 
 
@@ -3059,7 +3067,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
         ratingFormat.setMinimumFractionDigits( 1 );
-        ratingFormat.setMaximumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 2 );
         try {
             //get formatted survey score using rating format
             surveyScore = Double.parseDouble( ratingFormat.format( surveyScore ) );
@@ -5318,5 +5326,45 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         organizationUnitSettingsDao.updateSwearWords( entityType, entityId , swearWords);
     }
 
+    @Override
+    public double calScore(List<SurveyResponse> surveyResponse) {
+    	 double noOfResponse = 0;
+         double answer = 0;
+    	 for ( SurveyResponse response : surveyResponse ) {
+             if ( response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_SCALE  )
+                 || response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_SMILE )
+                 || response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_STAR )
+                 || response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_0TO10)
+                 && ( response.getAnswer() != null && !response.getAnswer().isEmpty() )) {
+                 //check if question type is 0to10 and divide answer by 2
+                 if(response.getQuestionType().equals( CommonConstants.QUESTION_TYPE_0TO10)){
+                     if(response.isConsiderForScore()){
+                         int npsAnswer = Integer.parseInt( response.getAnswer() );
+                         answer += (double) npsAnswer/2;
+                         noOfResponse++;
+                     }
+                 }else{
+                     answer += Integer.parseInt( response.getAnswer() );
+                     noOfResponse++;
+                 }
+             }
+         }
+    	 if(noOfResponse != 0) {
+    		 return Math.round( answer / noOfResponse * 1000.0 ) / 1000.0;
+    	 } else return -1;
+    }
+    
+    @Override
+	public double getNpsScore(List<SurveyResponse> surveyResponse) {
+		for (SurveyResponse response : surveyResponse) {
+			if (response.getQuestionType().equals(CommonConstants.QUESTION_TYPE_0TO10)
+					&& (response.getAnswer() != null && !response.getAnswer().isEmpty())
+					&& response.getIsNpsQuestion()) {
+				// check if isNpsQuestion and set npsScore
+				return Integer.parseInt(response.getAnswer());
+			}
+		}
+		return -1;
+	}
 }
 

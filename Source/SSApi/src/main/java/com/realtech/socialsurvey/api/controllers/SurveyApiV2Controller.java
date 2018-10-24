@@ -41,6 +41,7 @@ import com.realtech.socialsurvey.api.transformers.SurveyV2Transformer;
 import com.realtech.socialsurvey.api.transformers.SurveysAndReviewsV2VOTransformer;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.PostToSocialMedia;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -51,6 +52,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
@@ -96,6 +98,9 @@ public class SurveyApiV2Controller
     @Autowired
     private SurveyV2Transformer surveyV2Transformer;
     
+    @Autowired
+    private SocialManagementService socialManagementService;
+    
     private SurveyBuilder surveyBuilder;
 
     @Autowired
@@ -110,13 +115,14 @@ public class SurveyApiV2Controller
     {
         LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
         request.setAttribute( "input", surveyModel );
-        // Space at the end is intentionally given
-        String message = "Survey successfully created. ";
+        
+        String message = "Survey successfully created.";
         boolean isDuplicate = false;
         boolean isUnsubscribed = false;
         
         String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
+        
         //authorize request
         try {
             companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
@@ -132,6 +138,7 @@ public class SurveyApiV2Controller
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request, companyId );
         }
 
+        //validate survey
         try {
         		surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations , companyId );
 		} catch (InvalidInputException e) {
@@ -148,21 +155,23 @@ public class SurveyApiV2Controller
                 	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD) {
                 	isDuplicate = true;
-                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), Long.valueOf(CommonConstants.ERROR_SURVEYPREINITIATION_DUPLICATE_RECORD));
+                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 }
                 else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD) {
                 	message = "Survey requests accepted sucessfully";
                 	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 }
                 else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_UNSUBSCRIBED ) {
-                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), Long.valueOf(CommonConstants.ERROR_SURVEYPREINITIATION_UNSUBSCRIBED));
+                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 	isUnsubscribed = true;
                 }
             }
+            
+            // Extra space in the message is intentionally given
             if(isDuplicate)
-            	message += "One or more survey requests were duplicate. ";
+            	message += " One or more survey requests were duplicate.";
             if(isUnsubscribed)
-            	message += "One or more survey requests were unsubscribed. ";
+            	message += " One or more survey requests were unsubscribed.";
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
 
             return restUtils.getRestResponseEntity( HttpStatus.CREATED, message, "surveyId", surveyIds,
@@ -460,11 +469,11 @@ public class SurveyApiV2Controller
     
     @RequestMapping ( value = "/surveys/{surveyId}/score", method = RequestMethod.POST)
     @ApiOperation ( value = "Get Survey Transaction")
-    public String updateScore(@PathVariable ( "surveyId") String surveyId,String mood,String feedback,boolean isAbusive,String agreedToShare){
+    public double updateScore(@PathVariable ( "surveyId") String surveyId,String mood,String feedback,boolean isAbusive,String agreedToShare){
         LOGGER.info("Method storeScore() started to store score of survey");
-        surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);
+        double score = surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);
         LOGGER.info("Method storeScore() to store score of survey finished successfully");
-        return "Gateway and score updated successfully";
+        return score;
     }
     
     @RequestMapping ( value = "/swearwords",method = RequestMethod.GET)
@@ -904,6 +913,22 @@ public class SurveyApiV2Controller
         return restUtils.getRestResponseEntity( HttpStatus.CREATED, message, "response", bulkSurveyProcessResponseVOs,
                 request, companyId );
     }
-
+    
+    //post to social media api
+    @RequestMapping ( value = "/surveys/{surveyId}/socialMedia", method = RequestMethod.POST)
+    @ApiOperation ( value = "Post to Social media")
+    public ResponseEntity<?> postToSocialMedia(@PathVariable ( "surveyId") String surveyId,@Valid @RequestBody PostToSocialMedia postsToSocialMedia , HttpServletRequest request){
+        LOGGER.info("Method postToSocialMedia() started to post review");
+        try {
+        socialManagementService.postToSocialMedia(postsToSocialMedia.getAgentName(),postsToSocialMedia.getAgentProfileLink(),postsToSocialMedia.getCustFirstName(),postsToSocialMedia.getCustLastName(),
+        		postsToSocialMedia.getAgentId(),postsToSocialMedia.getRating(),surveyId,postsToSocialMedia.getFeedback(),postsToSocialMedia.isAbusive(),postsToSocialMedia.getServerBaseUrl(),
+        		postsToSocialMedia.isOnlyPostToSocialSurvey(),postsToSocialMedia.isZillow());
+        } catch ( NonFatalException e1 ) {
+            return restUtils.getRestResponseEntity( HttpStatus.SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", null, null, request, 0 );
+        }
+        LOGGER.info("Method postToSocialMedia() to post review finished successfully");
+       return restUtils.getRestResponseEntity( HttpStatus.OK, "Posted successfully", null, null, request, 0 );
+    }
+    
 }
 

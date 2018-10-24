@@ -4577,7 +4577,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             
             for ( Company company : organizationManagementService.getAllCompanies() ) {
                 
-                LOG.info( "getting reminder information for company with id " + company.getCompanyId()  );
+                LOG.info( "getting reminder information for company with id {}", company.getCompanyId()  );
                 
                 Map<String, Object> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
                 int reminderInterval = (int) reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
@@ -4588,22 +4588,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
                 Date epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
                
-                
                 //get survey list to send invitation mail
-                LOG.info( "getting survey list to send invitation mail for company with id " + company.getCompanyId()  );
+                LOG.info( "getting survey list to send invitation mail for company with id {}",  company.getCompanyId()  );
                 List<SurveyPreInitiation> surveysForInvitationMail = surveyHandler
                     .getSurveyListToSendInvitationMail( company , epochReminderDate );
-                LOG.info( "Found " + ( surveysForInvitationMail != null ? surveysForInvitationMail.size() : 0 )
-                    + " surveysForInvitationMail for company id " + company.getCompanyId() );
+                LOG.info( "Found {} surveysForInvitationMail for company id {}",( surveysForInvitationMail != null ? surveysForInvitationMail.size() : 0 ), company.getCompanyId() );
                 
-                //iterating throgh the surveys
+                //iterating through the surveys
                 for ( SurveyPreInitiation survey : surveysForInvitationMail ) {
+                    
+                    LOG.info( "iterating through the surveys" );
                     
                 		//TODO: remove this check
                 		long DAY_IN_MS = 1000 * 60 * 60 * 24;
                 		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (365 * DAY_IN_MS));
-                		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) 
-                			continue; 
+                		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) {
+                		    LOG.info( "First loop : skipping survey for survey pre id {}", survey.getSurveyPreIntitiationId() );
+                            continue;
+                		} 
                 		
                 	
                     User user = null;
@@ -4615,19 +4617,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     }
                     //If agent is deleted, mark survey as corrupt and fetch next survey
                     if ( user != null && checkIfSurveyAgentIsDeleted( user, survey ) ) {
-                        LOG.debug( "The agent id : " + survey.getAgentId() + " is deleted. Skipping record." );
+                        LOG.info( "The agent id : {} is deleted. Skipping record.", survey.getAgentId() );
                         continue;
                     }
                     
                     //check if we have send invitation mail already
                     if(survey.getLastReminderTime().compareTo( epochReminderDate )  > 0){
-                        LOG.warn( "We have already send invitation mail for customer " + survey.getCustomerEmailId() );
+                        LOG.warn( "We have already send invitation mail for customer {}", survey.getCustomerEmailId() );
                         continue;
                     }
                     
                     //Check if customer email id is unsubscribed.
                     if ( unsubscribeService.isUnsubscribed( survey.getCustomerEmailId(), survey.getCompanyId() ) ) {
-                        LOG.debug( "Customer has unsubscribed his email {} either for the company {} or for social survey.",
+                        LOG.info( "Customer has unsubscribed his email {} either for the company {} or for social survey.",
                             survey.getCustomerEmailId(), survey.getCompanyId() );
                         continue;
                     }
@@ -4648,7 +4650,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 
                 //Do not send reminder email if it is disabled for company
                 if(isReminderDisabled){
-                    LOG.info( "Auto Reminder is disabled for company : " + company.getCompanyId() );
+                    LOG.info( "Auto Reminder is disabled for company : {}", company.getCompanyId() );
                     continue;
                 }
                 
@@ -4657,25 +4659,26 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 Map<String , Date> lastReminderTimeCriterias = surveyHandler.getMinMaxLastSurveyReminderTime( currentTime, reminderInterval );
                 Date minLastReminderTime = lastReminderTimeCriterias.get( "minLastReminderTime" );
                 Date maxLastReminderTime = lastReminderTimeCriterias.get( "maxLastReminderTime" );
-                LOG.info( "minLastReminderTime is " +  minLastReminderTime + " and maxLastReminderTime is " + maxLastReminderTime + " for company with id " + company.getCompanyId() );
- 
+                LOG.info( "minLastReminderTime is {} and maxLastReminderTime is {} for company with id {}", minLastReminderTime,maxLastReminderTime,  company.getCompanyId() );
                 
                 //get survey list to send survey reminder mail
-                LOG.info( "getting survey list to send survey reminder mail for company with id " + company.getCompanyId()  );
+                LOG.info( "getting survey list to send survey reminder mail for company with id {}", company.getCompanyId()  );
                 List<SurveyPreInitiation> incompleteSurveyCustomers = surveyHandler
                     .getIncompleteSurveyForReminderEmail( company ,minLastReminderTime , maxLastReminderTime ,reminderCount);
-                LOG.info( "Found " + ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 )
-                    + " incompleteSurveyCustomers for company id " + company.getCompanyId() );
+                LOG.info( "Found {} incompleteSurveyCustomers for company id {}",( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 ), company.getCompanyId() );
                 
                 
                 for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
-                    LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
+                    LOG.info( "Processing survey pre initiation id: {}", survey.getSurveyPreIntitiationId() );
 
                   //TODO: remove this check
             		long DAY_IN_MS = 1000 * 60 * 60 * 24;
             		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (15 * DAY_IN_MS));
-            		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) 
-            			continue; 
+            		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) {
+            		    LOG.info( "Second loop skipping survey for survey pre id {}", survey.getSurveyPreIntitiationId() );
+            		    continue; 
+            		}
+            			
             		
                     
                     User user = null;
@@ -4687,18 +4690,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     }
                     //If agent is deleted, mark survey as corrupt and fetch next survey
                     if ( user != null && checkIfSurveyAgentIsDeleted( user, survey ) ) {
-                        LOG.debug( "The agent id : " + survey.getAgentId() + " is deleted. Skipping record." );
+                        LOG.info( "The agent id : {} is deleted. Skipping record.", survey.getAgentId() );
                         continue;
                     }
 
                   //check if we have send reminder mail already
                     if(survey.getReminderCounts() >= reminderCount){
-                        LOG.warn( "We have already send max reminder mail for customer " + survey.getCustomerEmailId() );
+                        LOG.warn( "We have already send max reminder mail for customer {}", survey.getCustomerEmailId() );
                         continue;
                     }
                     
                     try{
                     
+                        LOG.info( "Sending Survey Reminder Email." );
                     // send a survey invitation mail if reminder is false or a reminder mail if reminder is true
                     surveyHandler.sendSurveyReminderEmail( survey );
                     surveyHandler.markSurveyAsSent( survey );
