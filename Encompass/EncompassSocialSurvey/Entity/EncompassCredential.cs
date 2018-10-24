@@ -63,5 +63,26 @@ namespace EncompassSocialSurvey.Entity
         [DataMember(Name = "loanProcessorEmail")]
         public string loanProcessorEmail { get; set; }
 
+        [DataMember(Name = "customFieldOne")]
+        public string customFieldOne { get; set; }
+
+        [DataMember(Name = "customFieldTwo")]
+        public string customFieldTwo { get; set; }
+
+        [DataMember(Name = "customFieldThree")]
+        public string customFieldThree { get; set; }
+
+        [DataMember(Name = "customFieldFour")]
+        public string customFieldFour { get; set; }
+
+        [DataMember(Name = "customFieldFive")]
+        public string customFieldFive { get; set; }
+
+
+
+
+
+
+
     } 
 }

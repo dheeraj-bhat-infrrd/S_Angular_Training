@@ -1793,5 +1793,4 @@ public interface CommonConstants
 
     public static final String HAS_REGION = "hasRegion";
     public static final String HAS_BRANCH = "hasBranch";
-
 }

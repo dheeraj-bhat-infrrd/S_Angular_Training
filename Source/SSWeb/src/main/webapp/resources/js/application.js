@@ -8200,26 +8200,26 @@ function showFeedbackPage(mood) {
 	case "Great":
 		question = happyText;
 		$("#ques-text-textarea").html(question);
-//		var currResponse = 0;
-//		var counter = 0;
-//		for (var i = 0; i < questions.length; i++) {
-//			var currQuestion = questions[i];
-//			if ((currQuestion.questionType == 'sb-range-smiles') || (currQuestion.questionType == 'sb-range-scale') || (currQuestion.questionType == 'sb-range-star') || (currQuestion.questionType == 'sb-range-0to10')) {
-//				if (!isNaN(parseInt(currQuestion.customerResponse))) {
-//					var responseCurrQuestion = parseInt(currQuestion.customerResponse);
-//					if(currQuestion.questionType == 'sb-range-0to10' &&	currQuestion.considerForScore == true){
-//						responseCurrQuestion = 	responseCurrQuestion/2;
-//						counter++;
-//						currResponse += responseCurrQuestion;
-//					}else if(currQuestion.questionType != 'sb-range-0to10'){
-//						counter++;
-//						currResponse += responseCurrQuestion;
-//					}
-//				}
-//			}
-//		}
-//		rating = currResponse / (counter);
-//		rating = parseFloat(rating).toFixed(3);
+		var currResponse = 0;
+		var counter = 0;
+		for (var i = 0; i < questions.length; i++) {
+			var currQuestion = questions[i];
+			if ((currQuestion.questionType == 'sb-range-smiles') || (currQuestion.questionType == 'sb-range-scale') || (currQuestion.questionType == 'sb-range-star') || (currQuestion.questionType == 'sb-range-0to10')) {
+				if (!isNaN(parseInt(currQuestion.customerResponse))) {
+					var responseCurrQuestion = parseInt(currQuestion.customerResponse);
+					if(currQuestion.questionType == 'sb-range-0to10' &&	currQuestion.considerForScore == true){
+						responseCurrQuestion = 	responseCurrQuestion/2;
+						counter++;
+						currResponse += responseCurrQuestion;
+					}else if(currQuestion.questionType != 'sb-range-0to10'){
+						counter++;
+						currResponse += responseCurrQuestion;
+					}
+				}
+			}
+		}
+		rating = currResponse / (counter);
+		rating = parseFloat(rating).toFixed(3);
 		$("#pst-srvy-div").show();
 		$('#shr-pst-cb').val('true');
 		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
