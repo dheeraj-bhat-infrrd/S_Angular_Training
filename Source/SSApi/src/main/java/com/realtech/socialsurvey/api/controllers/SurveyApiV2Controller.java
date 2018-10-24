@@ -110,13 +110,14 @@ public class SurveyApiV2Controller
     {
         LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
         request.setAttribute( "input", surveyModel );
-        // Space at the end is intentionally given
-        String message = "Survey successfully created. ";
+        
+        String message = "Survey successfully created.";
         boolean isDuplicate = false;
         boolean isUnsubscribed = false;
         
         String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
+        
         //authorize request
         try {
             companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
@@ -132,6 +133,7 @@ public class SurveyApiV2Controller
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request, companyId );
         }
 
+        //validate survey
         try {
         		surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations , companyId );
 		} catch (InvalidInputException e) {
@@ -148,21 +150,23 @@ public class SurveyApiV2Controller
                 	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD) {
                 	isDuplicate = true;
-                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), Long.valueOf(CommonConstants.ERROR_SURVEYPREINITIATION_DUPLICATE_RECORD));
+                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 }
                 else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD) {
                 	message = "Survey requests accepted sucessfully";
                 	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 }
                 else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_UNSUBSCRIBED ) {
-                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), Long.valueOf(CommonConstants.ERROR_SURVEYPREINITIATION_UNSUBSCRIBED));
+                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 	isUnsubscribed = true;
                 }
             }
+            
+            // Extra space in the message is intentionally given
             if(isDuplicate)
-            	message += "One or more survey requests were duplicate. ";
+            	message += " One or more survey requests were duplicate.";
             if(isUnsubscribed)
-            	message += "One or more survey requests were unsubscribed. ";
+            	message += " One or more survey requests were unsubscribed.";
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
 
             return restUtils.getRestResponseEntity( HttpStatus.CREATED, message, "surveyId", surveyIds,
