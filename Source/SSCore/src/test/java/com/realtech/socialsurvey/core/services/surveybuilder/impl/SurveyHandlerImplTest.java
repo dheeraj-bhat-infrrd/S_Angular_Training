@@ -182,21 +182,6 @@ public class SurveyHandlerImplTest
     }
 
 
-    //Tests for checkSurveyReminderEligibility
-    /*@Test
-    public void checkIfTimeIntervalHasExpiredTestExpired()
-    {
-        assertTrue( "Test", surveyHandlerImpl.checkSurveyReminderEligibility( 0, 86400000, 0 ) );
-    }
-
-
-    @Test
-    public void checkIfTimeIntervalHasExpiredTestNotExpired()
-    {
-        assertFalse( "Test", surveyHandlerImpl.checkSurveyReminderEligibility( 0, 1, 1 ) );
-    }*/
-
-
     //Tests for initiateSurveyRequest
     @Test ( expected = InvalidInputException.class)
     public void initiateSurveyRequestTestInvalidId() throws DuplicateSurveyRequestException, InvalidInputException,

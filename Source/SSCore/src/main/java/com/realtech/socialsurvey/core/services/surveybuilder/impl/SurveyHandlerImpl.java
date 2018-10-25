@@ -810,8 +810,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         Criterion reminderCountCriteria = Restrictions.lt( CommonConstants.SURVEY_REMINDER_COUNT, maxReminderCount );
 
-        LOG.info( "Criteria to getIncompleteSurveyForReminderEmail is  " + companyCriteria.toString() + " "
-            + statusCriteria.toString() + " " + minLastReminderCriteria.toString() + " " + maxLastReminderCriteria );
+        LOG.info( "Criteria to getIncompleteSurveyForReminderEmail is  {} {} {} {}", companyCriteria.toString(), statusCriteria.toString(), 
+            minLastReminderCriteria.toString(), maxLastReminderCriteria );
 
         incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
             statusCriteria, minLastReminderCriteria, maxLastReminderCriteria, reminderCountCriteria );
@@ -835,8 +835,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         Criterion lastReminderCriteria = Restrictions.le( CommonConstants.SURVEY_LAST_REMINDER_TIME, epochDate );
 
-        LOG.info( "Criteria to getSurveyListToSendInvitationMail is  " + companyCriteria.toString() + " "
-            + statusCriteria.toString() + " " + lastReminderCriteria.toString() );
+        LOG.info( "Criteria to getSurveyListToSendInvitationMail is  {} {} {}", companyCriteria.toString(), 
+            statusCriteria.toString(), lastReminderCriteria.toString() );
 
         incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
             statusCriteria, lastReminderCriteria );
@@ -2444,27 +2444,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Method preInitiateSurvey() finished." );
         return surveyPreInitiation;
     }
-
-
-    @Override
-    public boolean checkSurveyReminderEligibility( long lastRemindedTime, long systemTime, int reminderInterval )
-    {
-        LOG.debug( "Checking time interval expiry: lastRemindedTime " + lastRemindedTime + "\t systemTime: " + systemTime
-            + "\t reminderInterval: " + reminderInterval );
-        long remainingTime = systemTime - lastRemindedTime;
-        int remainingDays = (int) ( remainingTime / ( 1000 * 60 * 60 * 24 ) );
-        if ( remainingDays >= reminderInterval ) {
-            // check if reminder is older than configured value
-            if ( remainingDays <= maxSurveyReminderInterval ) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
 
     @Override
     @Transactional
