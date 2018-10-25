@@ -484,7 +484,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>729</xloc>
+      <xloc>886</xloc>
       <yloc>516</yloc>
       </entry>
     <entry>
@@ -620,6 +620,46 @@
       <nr>0</nr>
       <xloc>180</xloc>
       <yloc>325</yloc>
+      </entry>
+    <entry>
+      <name>Mail</name>
+      <description/>
+      <type>MAIL</type>
+      <server>&#x24;&#x7b;SMTP_ADDRESS&#x7d;</server>
+      <port>&#x24;&#x7b;SMTP_PORT&#x7d;</port>
+      <destination>&#x24;&#x7b;DESTINATION_MAIL_ID&#x7d;</destination>
+      <destinationCc/>
+      <destinationBCc/>
+      <replyto>&#x24;&#x7b;EMAIL_SENDER_ID&#x7d;</replyto>
+      <replytoname>&#x24;&#x7b;EMAIL_SENDER_NAME&#x7d;</replytoname>
+      <subject>&#x24;&#x7b;FAILED_MESSAGE_SUBJECT&#x7d;</subject>
+      <include_date>Y</include_date>
+      <contact_person/>
+      <contact_phone/>
+      <comment/>
+      <include_files>N</include_files>
+      <zip_files>N</zip_files>
+      <zip_name/>
+      <use_auth>Y</use_auth>
+      <use_secure_auth>Y</use_secure_auth>
+      <auth_user>&#x24;&#x7b;AUTH_USER&#x7d;</auth_user>
+      <auth_password>&#x24;&#x7b;AUTH_PASSWORD&#x7d;</auth_password>
+      <only_comment>N</only_comment>
+      <use_HTML>N</use_HTML>
+      <use_Priority>N</use_Priority>
+      <encoding>UTF-8</encoding>
+      <priority>normal</priority>
+      <importance>normal</importance>
+      <sensitivity>normal</sensitivity>
+      <secureconnectiontype>SSL</secureconnectiontype>
+      <replyToAddresses/>
+      <filetypes>      </filetypes>      <embeddedimages>
+      </embeddedimages>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>720</xloc>
+      <yloc>516</yloc>
       </entry>
   </entries>
   <hops>
@@ -777,15 +817,6 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>Error JobLogs</from>
-      <to>Abort job</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>Y</unconditional>
-    </hop>
-    <hop>
       <from>AgentSettings_Main_1</from>
       <to>LinkedIn Job</to>
       <from_nr>0</from_nr>
@@ -856,6 +887,24 @@
       <enabled>Y</enabled>
       <evaluation>N</evaluation>
       <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Error JobLogs</from>
+      <to>Mail</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Mail</from>
+      <to>Abort job</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
     </hop>
   </hops>
   <notepads>

@@ -368,7 +368,9 @@ function paintWidgetReviews($, reviews, resourcesHost, ssHost) {
 		var review = reviews[i].review;
 
 		var reviewDateTimeStamp;
-		if(reviews[i].surveyCompletedDate != null && reviews[i].surveyCompletedDate != undefined && reviews[i].surveyCompletedDate != '' && parseInt(reviews[i].surveyCompletedDate) != 0){
+		if(reviews[i].surveyUpdatedDate != null && reviews[i].surveyUpdatedDate != undefined && reviews[i].surveyUpdatedDate != '' && parseInt(reviews[i].surveyUpdatedDate) != 0){
+			reviewDateTimeStamp = parseInt(reviews[i].surveyUpdatedDate);
+		}else if(reviews[i].surveyCompletedDate != null && reviews[i].surveyCompletedDate != undefined && reviews[i].surveyCompletedDate != '' && parseInt(reviews[i].surveyCompletedDate) != 0){
 			reviewDateTimeStamp = parseInt(reviews[i].surveyCompletedDate);
 		}else if(reviews[i].surveyTransactionDate != null && reviews[i].surveyTransactionDate != undefined && reviews[i].surveyTransactionDate != '' && parseInt(reviews[i].surveyTransactionDate) != 0){
 			reviewDateTimeStamp = parseInt(reviews[i].surveyTransactionDate);
@@ -765,20 +767,7 @@ function bindWidgetButtonActions($, widgetDetails, resourcesHost, ssHost) {
 					break;
 				}
 			}
-			var loadMoreFlag = false;
-			$('#ss-widget-reviews').find('.ss-widget-rev').each(function(){
-				if($(this).hasClass('hide')){
-					loadMoreFlag =  true;
-					return false;
-				}
-			});
 			
-			if(loadMoreFlag){
-				$('#ss-widget-load-more-btn').show();
-			}else{
-				$('#ss-widget-load-more-btn').hide();
-				getWidgetReviews($, resourcesHost, ssHost);
-			}
 		}
 	});
 
@@ -1002,7 +991,9 @@ function paintWidgetReviewsForLoadMore($, reviews, resourcesHost, ssHost) {
 		var review = reviews[i].review;
 
 		var reviewDateTimeStamp;
-		if(reviews[i].surveyCompletedDate != null && reviews[i].surveyCompletedDate != undefined && reviews[i].surveyCompletedDate != '' && parseInt(reviews[i].surveyCompletedDate) != 0){
+		if(reviews[i].surveyUpdatedDate != null && reviews[i].surveyUpdatedDate != undefined && reviews[i].surveyUpdatedDate != '' && parseInt(reviews[i].surveyUpdatedDate) != 0){
+			reviewDateTimeStamp = parseInt(reviews[i].surveyUpdatedDate);
+		}else if(reviews[i].surveyCompletedDate != null && reviews[i].surveyCompletedDate != undefined && reviews[i].surveyCompletedDate != '' && parseInt(reviews[i].surveyCompletedDate) != 0){
 			reviewDateTimeStamp = parseInt(reviews[i].surveyCompletedDate);
 		}else if(reviews[i].surveyTransactionDate != null && reviews[i].surveyTransactionDate != undefined && reviews[i].surveyTransactionDate != '' && parseInt(reviews[i].surveyTransactionDate) != 0){
 			reviewDateTimeStamp = parseInt(reviews[i].surveyTransactionDate);

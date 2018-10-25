@@ -129,6 +129,7 @@ public class WidgetApiController
                 for ( int i = 0; i < sourceList.length; i++ ) {
                     if ( StringUtils.equals( sourceList[i], "SocialSurvey" ) ) {
                         surveySourcesList.addAll( CommonConstants.CRM_UNVERIFIED_SOURCES );
+                        surveySourcesList.add(CommonConstants.SURVEY_SOURCE_3RD_PARTY);
                     } else if ( StringUtils.equals( sourceList[i], "SocialSurvey Verified" ) ) {
                         surveySourcesList.addAll( Arrays.asList( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS,
                             CommonConstants.CRM_SOURCE_LONEWOLF, CommonConstants.CRM_SOURCE_DOTLOOP,

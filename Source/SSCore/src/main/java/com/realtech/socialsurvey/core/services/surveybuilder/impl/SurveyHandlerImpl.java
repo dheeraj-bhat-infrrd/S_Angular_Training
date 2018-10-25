@@ -3067,7 +3067,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         DecimalFormat ratingFormat = CommonConstants.SOCIAL_RANKING_FORMAT;
         ratingFormat.setMinimumFractionDigits( 1 );
-        ratingFormat.setMaximumFractionDigits( 1 );
+        ratingFormat.setMaximumFractionDigits( 2 );
         try {
             //get formatted survey score using rating format
             surveyScore = Double.parseDouble( ratingFormat.format( surveyScore ) );
@@ -4553,6 +4553,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey , int duplicateSurveyInterval ) throws InvalidInputException
     {
+    	boolean isUnsubscribed = false;
         // null and syntax checks
         checkForSyntaxInSurveyPreInitiationData( survey );
 
@@ -4574,6 +4575,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if(unsubscribeService.isUnsubscribed( survey.getCustomerEmailId(), survey.getCompanyId() )) {
             LOG.debug( "Customer has unsubscribed emails either from social survey or from this company." );
             survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_UNSUBSCRIBED );
+            isUnsubscribed=true;
         }
 
 
@@ -4599,7 +4601,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			//if borrower email is equal to coborrower email , we set the status of the survey to duplicate
 			//but status should change from STATUS_SURVEYPREINITIATION_NOT_PROCESSED to SURVEY_STATUS_PRE_INITIATED
 			//and not from STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD to SURVEY_STATUS_PRE_INITIATED
-			if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD) {
+			if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD && !isUnsubscribed) {
 			  //update status
                 survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);  
 			}
@@ -4733,11 +4735,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 survey.getCustomerEmailId() );
         }
 
-        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
-            LOG.error( "Survey request already sent for agentId:{} and customerEmail:{}", user.getUserId(), survey.getCustomerEmailId() );
-            throw new InvalidInputException( "Can not process the record. A survey request for customer "
-                + survey.getCustomerFirstName() + " has already been received." );
-        }
+     // checking the status for unsubscribed before setting it to duplicate.
+        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 && survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_UNSUBSCRIBED) 
+        	survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD);
 
     }
 
