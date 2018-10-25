@@ -18,6 +18,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -32,6 +33,10 @@ import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInit
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 
 
+/**
+ * @author sandra
+ *
+ */
 public interface SurveyHandler
 {
 
@@ -68,7 +73,7 @@ public interface SurveyHandler
      * Method to update customer review and final score on the basis of rating questions in
      * SURVEY_DETAILS.
      */
-    public void updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
+    public double updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
         String agreedToShare );
 
 
@@ -431,5 +436,17 @@ public interface SurveyHandler
         throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 	SurveyPreInitiation getPreInitiatedSurveyByCustomer(String customerEmailId);
+
+	/**
+	 * @param surveyResponse
+	 * @return
+	 */
+	double calScore(List<SurveyResponse> surveyResponse);
+
+	/**
+	 * @param surveyResponse
+	 * @return
+	 */
+	double getNpsScore(List<SurveyResponse> surveyResponse);
 
 }

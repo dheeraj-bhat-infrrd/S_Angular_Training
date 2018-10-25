@@ -108,7 +108,7 @@
 						</c:otherwise>
 					</c:choose>
 					<div class="review-author">${author}</div>
-					<div class="review-date"><fmt:formatDate value="${reviewItem.modifiedOn}" pattern="MMMM d, yyyy"/></div>
+					<div class="review-date"><fmt:formatDate value="${reviewItem.surveyUpdatedDate}" pattern="MMMM d, yyyy"/></div>
 					<div class="review-body review-widget" id="review-${ loop.index }">${reviewItem.review}</div>
 				</div>
 			</c:forEach>

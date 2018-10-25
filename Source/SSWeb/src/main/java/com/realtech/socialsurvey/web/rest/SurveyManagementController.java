@@ -49,6 +49,7 @@ import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.PostToSocialMedia;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.CustomFieldsNameMapping;
@@ -251,8 +252,9 @@ public class SurveyManagementController
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/data/storeFeedback")
-	public String storeFeedbackAndCloseSurvey(HttpServletRequest request) {
+	public double storeFeedbackAndCloseSurvey(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
+		double surveyScoreRes = -1;
 
 		// To store final feedback provided by customer in mongoDB.
 		try {
@@ -264,6 +266,16 @@ public class SurveyManagementController
 			String agreedToShare = request.getParameter("agreedToShare");
 			String strIsIsoEncoded = request.getParameter("isIsoEncoded");
 			String surveyId = request.getParameter("surveyId");
+			
+			//add new feilds to post to social network
+			String agentNameReq = request.getParameter("agentName");
+			String agentProfileLink = request.getParameter("agentProfileLink");
+			String isAbusiveStr = request.getParameter("isAbusive");
+			String serverBaseUrl = requestUtils.getRequestServerName(request);
+			String onlyPostToSocialSurveyStr = request.getParameter("onlyPostToSocialSurvey");
+			boolean onlyPostToSocialSurvey = Boolean.parseBoolean(onlyPostToSocialSurveyStr);
+			
+			//getting additional parameters to incorporate store in social media
 
 			if (surveyId == null || surveyId.isEmpty()) {
 				throw new InvalidInputException("Passed parameter survey id is null or empty");
@@ -290,7 +302,15 @@ public class SurveyManagementController
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			//update gateway question response and score 
 	        Response response = ssApiIntergrationBuilder.getIntegrationApi().updateScore(surveyId, mood, feedback, isAbusive, agreedToShare);
-	        /*  surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);*/	
+	        /*  surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);*/
+	        //get score from the api response
+	        String surveyScoreString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+	        surveyScoreRes = Double.valueOf(surveyScoreString);
+	        //create entity object
+	        PostToSocialMedia postToSocialMedia = createPostToSocialMedia(agentNameReq, agentProfileLink, agentId, firstName, lastName, isAbusive, feedback, onlyPostToSocialSurvey, surveyScoreRes, serverBaseUrl);
+	        //update gateway question response and score 
+	        ssApiIntergrationBuilder.getIntegrationApi().postToSocialMedia(surveyId, postToSocialMedia);
+	        
 	        surveyHandler.increaseSurveyCountForAgent(agentId);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
 			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(survey.getSurveyPreIntitiationId());
@@ -464,13 +484,13 @@ public class SurveyManagementController
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ", e);
-			return e.getMessage();
+			return surveyScoreRes;
 		}
 		catch (UnsupportedEncodingException e) {
 			LOG.error("An exception occured while changing the character encoding of the feedback");
 		}
 		LOG.info("Method storeFeedback() finished to store response of customer.");
-		return "Survey stored successfully";
+		return surveyScoreRes;
 	}
 
 	private String generateCustomerTextForMail( String customerFullName, String customerEmailId, String surveySourceId,  SurveyDetails survey, CustomFieldsNameMapping fieldNameMappings  )
@@ -2020,6 +2040,23 @@ public class SurveyManagementController
 		}
 		LOG.debug("Returning logo url: " + logoUrl);
 		return logoUrl;
+	}
+	
+	private PostToSocialMedia createPostToSocialMedia(String agentName,String agentProfileLink,long agentId,String firstName,String lastName,Boolean isAbusive,
+			String feedback,boolean onlyPostToSocialSurvey,double surveyScore, String serverBaseUrl) {
+		PostToSocialMedia postToSocialMedia = new PostToSocialMedia();
+        postToSocialMedia.setAgentName(agentName);
+        postToSocialMedia.setAgentProfileLink(agentProfileLink);
+        postToSocialMedia.setAgentId(agentId);
+        postToSocialMedia.setCustFirstName(firstName);
+        postToSocialMedia.setCustLastName(lastName);
+        postToSocialMedia.setAbusive(isAbusive);
+        postToSocialMedia.setFeedback(feedback);
+        postToSocialMedia.setOnlyPostToSocialSurvey(onlyPostToSocialSurvey);
+        postToSocialMedia.setRating(surveyScore);
+        postToSocialMedia.setServerBaseUrl(serverBaseUrl);
+        postToSocialMedia.setZillow(false);
+        return postToSocialMedia;
 	}
 
 }
