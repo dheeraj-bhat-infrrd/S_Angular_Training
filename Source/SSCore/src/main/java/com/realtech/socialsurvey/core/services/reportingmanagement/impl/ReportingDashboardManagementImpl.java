@@ -648,18 +648,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
     public int getMaxQuestionForSurveyResultsReport( String entityType, Long entityId, Timestamp startDate, Timestamp endDate )
     {
         LOG.debug( "method getMaxQuestionForSurveyResultsReport started for entityId : {}", entityId );
-
-        if ( entityType.equals( CommonConstants.COMPANY_ID ) ) {
-            return surveyResponseTableDao.getMaxResponseForCompanyId( entityId, startDate, endDate );
-        } else if ( entityType.equals( CommonConstants.REGION_ID ) ) {
-            return surveyResponseTableDao.getMaxResponseForRegionId( entityId, startDate, endDate );
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID ) ) {
-            return surveyResponseTableDao.getMaxResponseForBranchId( entityId, startDate, endDate );
-        } else if ( entityType.equals( CommonConstants.AGENT_ID ) ) {
-            return surveyResponseTableDao.getMaxResponseForUserId( entityId, startDate, endDate );
-        }
-        return 0;
-
+        return surveyResponseTableDao.getMaxQuestion( entityId, entityType, startDate, endDate );
     }
 
 
@@ -676,7 +665,6 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         List<SurveyResultsReportVO> surveyResultsReportVOList = new ArrayList<SurveyResultsReportVO>();
         SurveyResultsCompanyReport surveyResultsCompanyReport = null;
         for ( Entry<String, ?> entry : surveyResultsReportObject.entrySet() ) {
-            String surveyDetailsId = entry.getKey();
             SurveyResultsReportVO surveyResultsReportVO = new SurveyResultsReportVO();
             surveyResultsCompanyReport = (SurveyResultsCompanyReport) entry.getValue();
             surveyResultsReportVO.setSurveyDetailsId( surveyResultsCompanyReport.getSurveyDetailsId() );
