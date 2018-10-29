@@ -186,6 +186,39 @@
     </step>
 
   <step>
+    <name>Calculator</name>
+    <type>Calculator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+       <calculation><field_name>TIME_INTERVAL</field_name>
+<calc_type>DATE_DIFF</calc_type>
+<field_a>SURVEY_COMPLETED_DATE</field_a>
+<field_b>SURVEY_SENT_DATE</field_b>
+<field_c/>
+<value_type>Integer</value_type>
+<value_length>-1</value_length>
+<value_precision>-1</value_precision>
+<remove>N</remove>
+<conversion_mask>&#x23;,&#x23;&#x23;0.&#x23;&#x23;&#x23;</conversion_mask>
+<decimal_symbol/>
+<grouping_symbol/>
+<currency_symbol/>
+</calculation>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>158</xloc>
+      <yloc>411</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Click through</name>
     <type>ScriptValueMod</type>
     <description/>
@@ -405,6 +438,178 @@
     </step>
 
   <step>
+    <name>If field value is null</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <replaceAllByValue/>
+      <replaceAllMask/>
+      <selectFields>N</selectFields>
+      <selectValuesType>Y</selectValuesType>
+      <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      <valuetype>
+        <name>String</name>
+        <value/>
+        <mask/>
+        <set_type_empty_string>N</set_type_empty_string>
+        </valuetype>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>BRANCH_NAME</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>CLICK_THROUGH_FOR_AGENT</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>CLICK_THROUGH_FOR_BRANCH</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>CLICK_THROUGH_FOR_REGION</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>CLICK_THROUGH_FOR_COMPANY</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>USER_FIRST_NAME</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>USER_LAST_NAME</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>AGENT_EMAILID</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>STATE</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>CITY</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>CUSTOMER_FIRST_NAME</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>CUSTOMER_LAST_NAME</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>CUSTOMER_EMAIL_ID</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>SURVEY_SOURCE</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>SURVEY_SOURCE_ID</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>SURVEY_SCORE</name>
+        <value>0.0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>GATEWAY</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>AGREED_TO_SHARE</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>PARTICIPANT_TYPE</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>AGENT_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>COMPANY_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>CUSTOMER_COMMENTS</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      <field>
+        <name>SURVEY_SENT_DATE</name>
+        <value/>
+        <mask/>
+        <set_empty_string>Y</set_empty_string>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>275</xloc>
+      <yloc>411</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Merge Join</name>
     <type>MergeJoin</type>
     <description/>
@@ -549,6 +754,60 @@
     </step>
 
   <step>
+    <name>Merge Rows &#x28;diff&#x29;</name>
+    <type>MergeRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <keys>
+      <key>SURVEY_DETAILS_ID</key>
+    </keys>
+    <values>
+      <value>BRANCH_NAME</value>
+      <value>CLICK_THROUGH_FOR_AGENT</value>
+      <value>CLICK_THROUGH_FOR_BRANCH</value>
+      <value>CLICK_THROUGH_FOR_REGION</value>
+      <value>CLICK_THROUGH_FOR_COMPANY</value>
+      <value>USER_FIRST_NAME</value>
+      <value>USER_LAST_NAME</value>
+      <value>AGENT_EMAILID</value>
+      <value>STATE</value>
+      <value>CITY</value>
+      <value>CUSTOMER_FIRST_NAME</value>
+      <value>CUSTOMER_LAST_NAME</value>
+      <value>CUSTOMER_EMAIL_ID</value>
+      <value>SURVEY_SENT_DATE</value>
+      <value>SURVEY_COMPLETED_DATE</value>
+      <value>SURVEY_SOURCE</value>
+      <value>SURVEY_SOURCE_ID</value>
+      <value>SURVEY_SCORE</value>
+      <value>GATEWAY</value>
+      <value>AGREED_TO_SHARE</value>
+      <value>PARTICIPANT_TYPE</value>
+      <value>AGENT_ID</value>
+      <value>COMPANY_ID</value>
+      <value>CUSTOMER_COMMENTS</value>
+      <value>TIME_INTERVAL</value>
+    </values>
+<flag_field>flagfield</flag_field>
+<reference>survey results report input</reference>
+<compare>Sort rows 7</compare>
+    <compare>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>543</xloc>
+      <yloc>411</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Region Input</name>
     <type>TableInput</type>
     <description/>
@@ -596,339 +855,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>410</xloc>
       <yloc>18</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Social media post details input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xa;  SOCIAL_MEDIA_POST_DETAILS_ID&#xa;, SURVEY_DETAILS_ID&#xa;, ENTITY_TYPE&#xa;, ENTITY_ID&#xa;, SHARED_ON_FACEBOOK&#xa;, SHARED_ON_TWITTER&#xa;, SHARED_ON_LINKEDIN&#xa;, SHARED_ON_SOCIAL_SURVEY&#xa;FROM social_media_post_details&#xa;order by SURVEY_DETAILS_ID&#x3b;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>639</xloc>
-      <yloc>18</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort rows</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>SURVEY_PRE_INTITIATION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>305</xloc>
-      <yloc>137</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort rows 2</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>SURVEY_DETAILS_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>523</xloc>
-      <yloc>137</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort rows 3</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>ENTITY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>ENTITY_TYPE</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>759</xloc>
-      <yloc>137</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort rows 4</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>ENTITY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>ENTITY_TYPE</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>641</xloc>
-      <yloc>303</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort rows 5</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>SURVEY_DETAILS_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>ENTITY_TYPE</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>314</xloc>
-      <yloc>303</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>User input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xa;  USER_ID&#xa;, EMAIL_ID&#xa;, FIRST_NAME&#xa;, LAST_NAME&#xa;FROM users order by USER_ID&#x3b;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>202</xloc>
-      <yloc>18</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>survey_details_input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, AGENT_ID&#xa;, BRANCH_ID&#xa;, COMPANY_ID&#xa;, REGION_ID&#xa;, SURVEY_PRE_INTITIATION_ID&#xa;, CUSTOMER_EMAIL&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, SOURCE&#xa;, SOURCE_ID&#xa;, STAGE&#xa;, STATE&#xa;, MOOD&#xa;, AGREED_TO_SHARE&#xa;, CITY&#xa;, REVIEW&#xa;, SCORE&#xa;, SURVEY_COMPLETED_DATE_EST&#xa;FROM survey_details &#xa;where STAGE&#x3d;-1 AND COMPANY_ID &#x3c;&#x3e; 0&#xa;&#x23;AND modified_on &#x3e; &#x24;&#x7b;lastModifiedOn&#x7d;&#xa;order by AGENT_ID&#x3b;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>62</xloc>
-      <yloc>137</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort rows 6</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>SURVEY_DETAILS_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>38</xloc>
-      <yloc>303</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Calculator</name>
-    <type>Calculator</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-       <calculation><field_name>TIME_INTERVAL</field_name>
-<calc_type>DATE_DIFF</calc_type>
-<field_a>SURVEY_COMPLETED_DATE</field_a>
-<field_b>SURVEY_SENT_DATE</field_b>
-<field_c/>
-<value_type>Integer</value_type>
-<value_length>-1</value_length>
-<value_precision>-1</value_precision>
-<remove>N</remove>
-<conversion_mask>&#x23;,&#x23;&#x23;0.&#x23;&#x23;&#x23;</conversion_mask>
-<decimal_symbol/>
-<grouping_symbol/>
-<currency_symbol/>
-</calculation>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>158</xloc>
-      <yloc>411</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1329,61 +1255,7 @@
     </step>
 
   <step>
-    <name>Merge Rows &#x28;diff&#x29;</name>
-    <type>MergeRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <keys>
-      <key>SURVEY_DETAILS_ID</key>
-    </keys>
-    <values>
-      <value>BRANCH_NAME</value>
-      <value>CLICK_THROUGH_FOR_AGENT</value>
-      <value>CLICK_THROUGH_FOR_BRANCH</value>
-      <value>CLICK_THROUGH_FOR_REGION</value>
-      <value>CLICK_THROUGH_FOR_COMPANY</value>
-      <value>USER_FIRST_NAME</value>
-      <value>USER_LAST_NAME</value>
-      <value>AGENT_EMAILID</value>
-      <value>STATE</value>
-      <value>CITY</value>
-      <value>CUSTOMER_FIRST_NAME</value>
-      <value>CUSTOMER_LAST_NAME</value>
-      <value>CUSTOMER_EMAIL_ID</value>
-      <value>SURVEY_SENT_DATE</value>
-      <value>SURVEY_COMPLETED_DATE</value>
-      <value>SURVEY_SOURCE</value>
-      <value>SURVEY_SOURCE_ID</value>
-      <value>SURVEY_SCORE</value>
-      <value>GATEWAY</value>
-      <value>AGREED_TO_SHARE</value>
-      <value>PARTICIPANT_TYPE</value>
-      <value>AGENT_ID</value>
-      <value>COMPANY_ID</value>
-      <value>CUSTOMER_COMMENTS</value>
-      <value>TIME_INTERVAL</value>
-    </values>
-<flag_field>flagfield</flag_field>
-<reference>survey results report input</reference>
-<compare>Sort rows 7</compare>
-    <compare>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>543</xloc>
-      <yloc>411</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>survey results report input</name>
+    <name>Social media post details input</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -1394,7 +1266,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, BRANCH_NAME&#xa;, CLICK_THROUGH_FOR_AGENT&#xa;, CLICK_THROUGH_FOR_BRANCH&#xa;, CLICK_THROUGH_FOR_REGION&#xa;, CLICK_THROUGH_FOR_COMPANY&#xa;, USER_FIRST_NAME&#xa;, USER_LAST_NAME&#xa;, AGENT_EMAILID&#xa;, STATE&#xa;, CITY&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, CUSTOMER_EMAIL_ID&#xa;, SURVEY_SENT_DATE&#xa;, SURVEY_COMPLETED_DATE&#xa;, SURVEY_SOURCE&#xa;, SURVEY_SOURCE_ID&#xa;, SURVEY_SCORE&#xa;, GATEWAY&#xa;, AGREED_TO_SHARE&#xa;, PARTICIPANT_TYPE&#xa;, AGENT_ID&#xa;, COMPANY_ID&#xa;, CUSTOMER_COMMENTS&#xa;, TIME_INTERVAL&#xa;FROM survey_results_company_report_1&#xa;order by survey_details_id&#x3b;&#xa;</sql>
+    <sql>SELECT&#xa;  SOCIAL_MEDIA_POST_DETAILS_ID&#xa;, SURVEY_DETAILS_ID&#xa;, ENTITY_TYPE&#xa;, ENTITY_ID&#xa;, SHARED_ON_FACEBOOK&#xa;, SHARED_ON_TWITTER&#xa;, SHARED_ON_LINKEDIN&#xa;, SHARED_ON_SOCIAL_SURVEY&#xa;FROM social_media_post_details&#xa;order by SURVEY_DETAILS_ID&#x3b;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1402,8 +1274,230 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>733</xloc>
-      <yloc>411</yloc>
+      <xloc>639</xloc>
+      <yloc>18</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>SURVEY_PRE_INTITIATION_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>305</xloc>
+      <yloc>137</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>SURVEY_DETAILS_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>523</xloc>
+      <yloc>137</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 3</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>ENTITY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>ENTITY_TYPE</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>759</xloc>
+      <yloc>137</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 4</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>ENTITY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>ENTITY_TYPE</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>641</xloc>
+      <yloc>303</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 5</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>SURVEY_DETAILS_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>ENTITY_TYPE</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>314</xloc>
+      <yloc>303</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 6</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>SURVEY_DETAILS_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>38</xloc>
+      <yloc>303</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1750,8 +1844,8 @@
     </step>
 
   <step>
-    <name>If field value is null</name>
-    <type>IfNull</type>
+    <name>User input</name>
+    <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1760,163 +1854,69 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <replaceAllByValue/>
-      <replaceAllMask/>
-      <selectFields>N</selectFields>
-      <selectValuesType>Y</selectValuesType>
-      <setEmptyStringAll>N</setEmptyStringAll>
-    <valuetypes>
-      <valuetype>
-        <name>String</name>
-        <value/>
-        <mask/>
-        <set_type_empty_string>N</set_type_empty_string>
-        </valuetype>
-      </valuetypes>
-    <fields>
-      <field>
-        <name>BRANCH_NAME</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>CLICK_THROUGH_FOR_AGENT</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>CLICK_THROUGH_FOR_BRANCH</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>CLICK_THROUGH_FOR_REGION</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>CLICK_THROUGH_FOR_COMPANY</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>USER_FIRST_NAME</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>USER_LAST_NAME</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>AGENT_EMAILID</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>STATE</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>CITY</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>CUSTOMER_FIRST_NAME</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>CUSTOMER_LAST_NAME</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>CUSTOMER_EMAIL_ID</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>SURVEY_SOURCE</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>SURVEY_SOURCE_ID</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>SURVEY_SCORE</name>
-        <value>0.0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
-        </field>
-      <field>
-        <name>GATEWAY</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>AGREED_TO_SHARE</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>PARTICIPANT_TYPE</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>AGENT_ID</name>
-        <value>0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
-        </field>
-      <field>
-        <name>COMPANY_ID</name>
-        <value>0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
-        </field>
-      <field>
-        <name>CUSTOMER_COMMENTS</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      <field>
-        <name>SURVEY_SENT_DATE</name>
-        <value/>
-        <mask/>
-        <set_empty_string>Y</set_empty_string>
-        </field>
-      </fields>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xa;  USER_ID&#xa;, EMAIL_ID&#xa;, FIRST_NAME&#xa;, LAST_NAME&#xa;FROM users order by USER_ID&#x3b;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>275</xloc>
+      <xloc>202</xloc>
+      <yloc>18</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey results report input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, BRANCH_NAME&#xa;, CLICK_THROUGH_FOR_AGENT&#xa;, CLICK_THROUGH_FOR_BRANCH&#xa;, CLICK_THROUGH_FOR_REGION&#xa;, CLICK_THROUGH_FOR_COMPANY&#xa;, USER_FIRST_NAME&#xa;, USER_LAST_NAME&#xa;, AGENT_EMAILID&#xa;, STATE&#xa;, CITY&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, CUSTOMER_EMAIL_ID&#xa;, SURVEY_SENT_DATE&#xa;, SURVEY_COMPLETED_DATE&#xa;, SURVEY_SOURCE&#xa;, SURVEY_SOURCE_ID&#xa;, SURVEY_SCORE&#xa;, GATEWAY&#xa;, AGREED_TO_SHARE&#xa;, PARTICIPANT_TYPE&#xa;, AGENT_ID&#xa;, COMPANY_ID&#xa;, CUSTOMER_COMMENTS&#xa;, TIME_INTERVAL&#xa;FROM survey_results_company_report_1&#xa;order by survey_details_id&#x3b;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>733</xloc>
       <yloc>411</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey_details_input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, AGENT_ID&#xa;, BRANCH_ID&#xa;, COMPANY_ID&#xa;, REGION_ID&#xa;, SURVEY_PRE_INTITIATION_ID&#xa;, CUSTOMER_EMAIL&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, SOURCE&#xa;, SOURCE_ID&#xa;, STAGE&#xa;, STATE&#xa;, MOOD&#xa;, AGREED_TO_SHARE&#xa;, CITY&#xa;, REVIEW&#xa;, SCORE&#xa;, SURVEY_COMPLETED_DATE_EST&#xa;FROM survey_details &#xa;where STAGE&#x3d;-1 AND COMPANY_ID &#x3c;&#x3e; 0&#xa;AND modified_on &#x3e; &#x24;&#x7b;modifiedOnSettings&#x7d;&#xa;order by AGENT_ID&#x3b;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>Y</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>62</xloc>
+      <yloc>137</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
