@@ -71,8 +71,6 @@ import com.realtech.socialsurvey.core.dao.SurveyInvitationEmailDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
-import com.realtech.socialsurvey.core.dao.SurveyResultsReportBranchDao;
-import com.realtech.socialsurvey.core.dao.SurveyResultsReportRegionDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
 import com.realtech.socialsurvey.core.dao.UserAdoptionReportDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -126,8 +124,6 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
 import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
-import com.realtech.socialsurvey.core.entities.SurveyResultsReportBranch;
-import com.realtech.socialsurvey.core.entities.SurveyResultsReportRegion;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.entities.SurveyTransactionReport;
@@ -207,12 +203,6 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 
     @Autowired
     private SurveyResultsCompanyReportDao surveyResultsCompanyReportDao;
-
-    @Autowired
-    private SurveyResultsReportRegionDao surveyResultsReportRegionDao;
-
-    @Autowired
-    private SurveyResultsReportBranchDao surveyResultsReportBranchDao;
 
     @Autowired
     private SurveyResponseTableDao surveyResponseTableDao;
@@ -681,128 +671,56 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
      * @param type
      * @return
      */
-    private Map<String, SurveyResultsReportVO> assignToVO( Map<String, ?> surveyResultsReportObject, String type )
+    private List<SurveyResultsReportVO> assignToVO( Map<String, SurveyResultsCompanyReport> surveyResultsReportObject, String type )
     {
-        Map<String, SurveyResultsReportVO> surveyResultsReportVOMap = new HashMap<String, SurveyResultsReportVO>();
+        List<SurveyResultsReportVO> surveyResultsReportVOList = new ArrayList<SurveyResultsReportVO>();
         SurveyResultsCompanyReport surveyResultsCompanyReport = null;
-        SurveyResultsReportRegion surveyResultsReportRegion = null;
-        SurveyResultsReportBranch surveyResultsReportBranch = null;
         for ( Entry<String, ?> entry : surveyResultsReportObject.entrySet() ) {
             String surveyDetailsId = entry.getKey();
             SurveyResultsReportVO surveyResultsReportVO = new SurveyResultsReportVO();
-            if ( type.equals( CommonConstants.COMPANY_ID ) || type.equals( CommonConstants.AGENT_ID ) ) {
-                surveyResultsCompanyReport = (SurveyResultsCompanyReport) entry.getValue();
-                surveyResultsReportVO.setSurveyDetailsId( surveyResultsCompanyReport.getSurveyDetailsId() );
-                surveyResultsReportVO.setUserFirstName( surveyResultsCompanyReport.getUserFirstName() );
-                surveyResultsReportVO.setUserLastName( surveyResultsCompanyReport.getUserLastName() );
-                surveyResultsReportVO.setCustomerFirstName( surveyResultsCompanyReport.getCustomerFirstName() );
-                surveyResultsReportVO.setCustomerLastName( surveyResultsCompanyReport.getCustomerLastName() );
-                surveyResultsReportVO.setSurveySentDate( surveyResultsCompanyReport.getSurveySentDate() );
-                surveyResultsReportVO.setSurveyCompletedDate( surveyResultsCompanyReport.getSurveyCompletedDate() );
-                surveyResultsReportVO.setTimeInterval( surveyResultsCompanyReport.getTimeInterval() );
-                surveyResultsReportVO.setSurveySource( surveyResultsCompanyReport.getSurveySource() );
-                surveyResultsReportVO.setSurveySourceId( surveyResultsCompanyReport.getSurveySourceId() );
-                surveyResultsReportVO.setSurveyScore( surveyResultsCompanyReport.getSurveyScore() );
-                surveyResultsReportVO.setGateway( surveyResultsCompanyReport.getGateway() );
-                surveyResultsReportVO.setCustomerComments( surveyResultsCompanyReport.getCustomerComments() );
-                surveyResultsReportVO.setAgreedToShare( surveyResultsCompanyReport.getAgreedToShare() );
-                surveyResultsReportVO.setBranchName( surveyResultsCompanyReport.getBranchName() );
-                surveyResultsReportVO.setClickTroughForCompany( surveyResultsCompanyReport.getClickTroughForCompany() );
-                surveyResultsReportVO.setClickTroughForAgent( surveyResultsCompanyReport.getClickTroughForAgent() );
-                surveyResultsReportVO.setClickTroughForRegion( surveyResultsCompanyReport.getClickTroughForRegion() );
-                surveyResultsReportVO.setClickTroughForBranch( surveyResultsCompanyReport.getClickTroughForBranch() );
-                surveyResultsReportVO.setSurveyResponseList( surveyResultsCompanyReport.getSurveyResponseList() );
-                surveyResultsReportVO.setParticipantType( surveyResultsCompanyReport.getParticipantType() );
-                surveyResultsReportVO.setAgentEmailId( surveyResultsCompanyReport.getAgentEmailId() );
-                surveyResultsReportVO.setCustomerEmailId( surveyResultsCompanyReport.getCustomerEmailId() );
-                surveyResultsReportVO.setState( surveyResultsCompanyReport.getState() );
-                surveyResultsReportVO.setCity( surveyResultsCompanyReport.getCity() );
-            } else if ( type.equals( CommonConstants.REGION_ID ) ) {
-                surveyResultsReportRegion = (SurveyResultsReportRegion) entry.getValue();
-                surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportRegion.getSurveyDetailsId() );
-                surveyResultsReportVO.setUserFirstName( surveyResultsReportRegion.getUserFirstName() );
-                surveyResultsReportVO.setUserLastName( surveyResultsReportRegion.getUserLastName() );
-                surveyResultsReportVO.setCustomerFirstName( surveyResultsReportRegion.getCustomerFirstName() );
-                surveyResultsReportVO.setCustomerLastName( surveyResultsReportRegion.getCustomerLastName() );
-                surveyResultsReportVO.setSurveySentDate( surveyResultsReportRegion.getSurveySentDate() );
-                surveyResultsReportVO.setSurveyCompletedDate( surveyResultsReportRegion.getSurveyCompletedDate() );
-                surveyResultsReportVO.setTimeInterval( surveyResultsReportRegion.getTimeInterval() );
-                surveyResultsReportVO.setSurveySource( surveyResultsReportRegion.getSurveySource() );
-                surveyResultsReportVO.setSurveySourceId( surveyResultsReportRegion.getSurveySourceId() );
-                surveyResultsReportVO.setSurveyScore( surveyResultsReportRegion.getSurveyScore() );
-                surveyResultsReportVO.setGateway( surveyResultsReportRegion.getGateway() );
-                surveyResultsReportVO.setCustomerComments( surveyResultsReportRegion.getCustomerComments() );
-                surveyResultsReportVO.setAgreedToShare( surveyResultsReportRegion.getAgreedToShare() );
-                surveyResultsReportVO.setBranchName( surveyResultsReportRegion.getBranchName() );
-                surveyResultsReportVO.setClickTroughForCompany( surveyResultsReportRegion.getClickTroughForCompany() );
-                surveyResultsReportVO.setClickTroughForAgent( surveyResultsReportRegion.getClickTroughForAgent() );
-                surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportRegion.getClickTroughForRegion() );
-                surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportRegion.getClickTroughForBranch() );
-                surveyResultsReportVO.setSurveyResponseList( surveyResultsReportRegion.getSurveyResponseList() );
-                surveyResultsReportVO.setParticipantType( surveyResultsReportRegion.getParticipantType() );
-                surveyResultsReportVO.setAgentEmailId( surveyResultsReportRegion.getAgentEmailId() );
-                surveyResultsReportVO.setCustomerEmailId( surveyResultsReportRegion.getCustomerEmailId() );
-                surveyResultsReportVO.setState( surveyResultsReportRegion.getState() );
-                surveyResultsReportVO.setCity( surveyResultsReportRegion.getCity() );
-            } else if ( type.equals( CommonConstants.BRANCH_ID ) ) {
-                surveyResultsReportBranch = (SurveyResultsReportBranch) entry.getValue();
-                surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportBranch.getSurveyDetailsId() );
-                surveyResultsReportVO.setUserFirstName( surveyResultsReportBranch.getUserFirstName() );
-                surveyResultsReportVO.setUserLastName( surveyResultsReportBranch.getUserLastName() );
-                surveyResultsReportVO.setCustomerFirstName( surveyResultsReportBranch.getCustomerFirstName() );
-                surveyResultsReportVO.setCustomerLastName( surveyResultsReportBranch.getCustomerLastName() );
-                surveyResultsReportVO.setSurveySentDate( surveyResultsReportBranch.getSurveySentDate() );
-                surveyResultsReportVO.setSurveyCompletedDate( surveyResultsReportBranch.getSurveyCompletedDate() );
-                surveyResultsReportVO.setTimeInterval( surveyResultsReportBranch.getTimeInterval() );
-                surveyResultsReportVO.setSurveySource( surveyResultsReportBranch.getSurveySource() );
-                surveyResultsReportVO.setSurveySourceId( surveyResultsReportBranch.getSurveySourceId() );
-                surveyResultsReportVO.setSurveyScore( surveyResultsReportBranch.getSurveyScore() );
-                surveyResultsReportVO.setGateway( surveyResultsReportBranch.getGateway() );
-                surveyResultsReportVO.setCustomerComments( surveyResultsReportBranch.getCustomerComments() );
-                surveyResultsReportVO.setAgreedToShare( surveyResultsReportBranch.getAgreedToShare() );
-                surveyResultsReportVO.setBranchName( surveyResultsReportBranch.getBranchName() );
-                surveyResultsReportVO.setClickTroughForCompany( surveyResultsReportBranch.getClickTroughForCompany() );
-                surveyResultsReportVO.setClickTroughForAgent( surveyResultsReportBranch.getClickTroughForAgent() );
-                surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportBranch.getClickTroughForRegion() );
-                surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportBranch.getClickTroughForBranch() );
-                surveyResultsReportVO.setSurveyResponseList( surveyResultsReportBranch.getSurveyResponseList() );
-                surveyResultsReportVO.setParticipantType( surveyResultsReportBranch.getParticipantType() );
-                surveyResultsReportVO.setAgentEmailId( surveyResultsReportBranch.getAgentEmailId() );
-                surveyResultsReportVO.setCustomerEmailId( surveyResultsReportBranch.getCustomerEmailId() );
-                surveyResultsReportVO.setState( surveyResultsReportBranch.getState() );
-                surveyResultsReportVO.setCity( surveyResultsReportBranch.getCity() );
-            }
-            surveyResultsReportVOMap.put( surveyDetailsId, surveyResultsReportVO );
+            surveyResultsCompanyReport = (SurveyResultsCompanyReport) entry.getValue();
+            surveyResultsReportVO.setSurveyDetailsId( surveyResultsCompanyReport.getSurveyDetailsId() );
+            surveyResultsReportVO.setUserFirstName( surveyResultsCompanyReport.getUserFirstName() );
+            surveyResultsReportVO.setUserLastName( surveyResultsCompanyReport.getUserLastName() );
+            surveyResultsReportVO.setCustomerFirstName( surveyResultsCompanyReport.getCustomerFirstName() );
+            surveyResultsReportVO.setCustomerLastName( surveyResultsCompanyReport.getCustomerLastName() );
+            surveyResultsReportVO.setSurveySentDate( surveyResultsCompanyReport.getSurveySentDate() );
+            surveyResultsReportVO.setSurveyCompletedDate( surveyResultsCompanyReport.getSurveyCompletedDate() );
+            surveyResultsReportVO.setTimeInterval( surveyResultsCompanyReport.getTimeInterval() );
+            surveyResultsReportVO.setSurveySource( surveyResultsCompanyReport.getSurveySource() );
+            surveyResultsReportVO.setSurveySourceId( surveyResultsCompanyReport.getSurveySourceId() );
+            surveyResultsReportVO.setSurveyScore( surveyResultsCompanyReport.getSurveyScore() );
+            surveyResultsReportVO.setGateway( surveyResultsCompanyReport.getGateway() );
+            surveyResultsReportVO.setCustomerComments( surveyResultsCompanyReport.getCustomerComments() );
+            surveyResultsReportVO.setAgreedToShare( surveyResultsCompanyReport.getAgreedToShare() );
+            surveyResultsReportVO.setBranchName( surveyResultsCompanyReport.getBranchName() );
+            surveyResultsReportVO.setClickTroughForCompany( surveyResultsCompanyReport.getClickTroughForCompany() );
+            surveyResultsReportVO.setClickTroughForAgent( surveyResultsCompanyReport.getClickTroughForAgent() );
+            surveyResultsReportVO.setClickTroughForRegion( surveyResultsCompanyReport.getClickTroughForRegion() );
+            surveyResultsReportVO.setClickTroughForBranch( surveyResultsCompanyReport.getClickTroughForBranch() );
+            surveyResultsReportVO.setSurveyResponseList( surveyResultsCompanyReport.getSurveyResponseList() );
+            surveyResultsReportVO.setParticipantType( surveyResultsCompanyReport.getParticipantType() );
+            surveyResultsReportVO.setAgentEmailId( surveyResultsCompanyReport.getAgentEmailId() );
+            surveyResultsReportVO.setCustomerEmailId( surveyResultsCompanyReport.getCustomerEmailId() );
+            surveyResultsReportVO.setState( surveyResultsCompanyReport.getState() );
+            surveyResultsReportVO.setCity( surveyResultsCompanyReport.getCity() );
+            surveyResultsReportVOList.add(surveyResultsReportVO );
         }
-        return surveyResultsReportVOMap;
+        return surveyResultsReportVOList;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public Map<String, SurveyResultsReportVO> getSurveyResultsReport( String entityType, Long entityId, Timestamp startDate,
+    public List<SurveyResultsReportVO> getSurveyResultsReport( String entityType, Long entityId, Timestamp startDate,
         Timestamp endDate, int startIndex, int batchSize )
     {
         LOG.debug( " getSurveyResultsReport method started for entityId : {} ", entityId );
-        Map<String, SurveyResultsReportVO> surveyResultsReportVO = null;
-        if ( entityType.equals( CommonConstants.COMPANY_ID ) ) {
-            Map<String, SurveyResultsCompanyReport> surveyResultsCompanyReport = surveyResultsCompanyReportDao
-                .getSurveyResultForCompanyId( entityId, startDate, endDate, startIndex, batchSize );
-            surveyResultsReportVO = assignToVO( surveyResultsCompanyReport, entityType );
-        } else if ( entityType.equals( CommonConstants.REGION_ID ) ) {
-            Map<String, SurveyResultsReportRegion> surveyResultsReportRegion = surveyResultsReportRegionDao
-                .getSurveyResultForRegionId( entityId, startDate, endDate, startIndex, batchSize );
-            surveyResultsReportVO = assignToVO( surveyResultsReportRegion, entityType );
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID ) ) {
-            Map<String, SurveyResultsReportBranch> surveyResultsReportBranch = surveyResultsReportBranchDao
-                .getSurveyResultForBranchId( entityId, startDate, endDate, startIndex, batchSize );
-            surveyResultsReportVO = assignToVO( surveyResultsReportBranch, entityType );
-        } else if ( entityType.equals( CommonConstants.AGENT_ID ) ) {
-            Map<String, SurveyResultsCompanyReport> surveyResultsReportUser = surveyResultsCompanyReportDao
-                .getSurveyResultForUserId( entityId, startDate, endDate, startIndex, batchSize );
-            surveyResultsReportVO = assignToVO( surveyResultsReportUser, entityType );
-        }
-        return surveyResultsReportVO;
+        List<SurveyResultsReportVO> surveyResultsReportVOList = null;
+        Map<String, SurveyResultsCompanyReport> surveyResultsCompanyReport = surveyResultsCompanyReportDao
+            .getSurveyResultForEntityTypeId( entityType, entityId, startDate, endDate, startIndex, batchSize );
+        surveyResultsReportVOList = assignToVO( surveyResultsCompanyReport, entityType );
+        return surveyResultsReportVOList;
     }
 
 
@@ -2028,7 +1946,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         // create workbook data
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
 
-        Map<String, SurveyResultsReportVO> surveyResultsReportVO = null;
+        List<SurveyResultsReportVO> surveyResultsReportVO = null;
         do {
             surveyResultsReportVO = getSurveyResultResponse( entityType, entityId, startDate, endDate, startIndex, batchSize );
             if ( surveyResultsReportVO != null && !surveyResultsReportVO.isEmpty() ) {
@@ -2050,19 +1968,19 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
     }
 
 
-    public Map<String, SurveyResultsReportVO> getSurveyResultResponse( String entityType, Long companyId, Timestamp startDate,
+    public List<SurveyResultsReportVO> getSurveyResultResponse( String entityType, Long companyId, Timestamp startDate,
         Timestamp endDate, int startIndex, int batchSize )
     {
         Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsReport( entityType, companyId,
             startDate, endDate, startIndex, batchSize );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        Map<String, SurveyResultsReportVO> surveyResultsReportVO = null;
+        List<SurveyResultsReportVO> surveyResultsReportVO = null;
         if ( responseString != null ) {
             // since the string has ""abc"" an extra quote
             responseString = responseString.substring( 1, responseString.length() - 1 );
             // Escape characters
             responseString = StringEscapeUtils.unescapeJava( responseString );
-            Type listType = new TypeToken<Map<String, SurveyResultsReportVO>>() {}.getType();
+            Type listType = new TypeToken<List<SurveyResultsReportVO>>() {}.getType();
             surveyResultsReportVO = new Gson().fromJson( responseString, listType );
 
         }

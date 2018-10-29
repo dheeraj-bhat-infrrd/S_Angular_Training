@@ -36,7 +36,6 @@ import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDash
 import io.swagger.annotations.ApiOperation;
 import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
-import io.swagger.annotations.ApiOperation;
 
 
 @RestController
@@ -193,7 +192,7 @@ public class ReportingController
                                           int startIndex, int batchSize )
     {
         LOGGER.info( "Fetch Survey Results Report For Entity Type." );
-        Map<String, SurveyResultsReportVO> surveyResultsReportList = reportingDashboardManagement
+        List<SurveyResultsReportVO> surveyResultsReportList = reportingDashboardManagement
                 .getSurveyResultsReport( entityType, entityId, startDate, endDate, startIndex, batchSize );
         return new Gson().toJson( surveyResultsReportList );
     }
