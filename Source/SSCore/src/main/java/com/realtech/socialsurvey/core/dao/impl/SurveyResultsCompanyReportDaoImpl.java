@@ -129,9 +129,11 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
                     surveyResultsCompanyReport.setUserLastName( String.valueOf( row[3] ) );
                     surveyResultsCompanyReport.setCustomerFirstName( String.valueOf( row[4] ) );
                     surveyResultsCompanyReport.setCustomerLastName( String.valueOf( row[5] ) );
-                    surveyResultsCompanyReport.setSurveySentDate( (Timestamp) ( row[6] ) );
+                    if(row[6]!= null) {
+                        surveyResultsCompanyReport.setSurveySentDate( (Timestamp) ( row[6] ) );
+                        surveyResultsCompanyReport.setTimeInterval( (Integer) ( row[8] ) );
+                    }
                     surveyResultsCompanyReport.setSurveyCompletedDate( (Timestamp) ( row[7] ) );
-                    surveyResultsCompanyReport.setTimeInterval( (Integer) ( row[8] ) );
                     surveyResultsCompanyReport.setSurveySource( String.valueOf( row[9] ) );
                     surveyResultsCompanyReport.setSurveySourceId( String.valueOf( row[10] ) );
                     surveyResultsCompanyReport.setSurveyScore( ( (BigDecimal) ( row[11] ) ).doubleValue() );

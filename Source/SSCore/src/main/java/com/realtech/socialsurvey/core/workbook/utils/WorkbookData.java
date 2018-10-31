@@ -809,7 +809,12 @@ public class WorkbookData
                     surveyResultsReportToPopulate.add(completedDate);
                 }
                     
-                surveyResultsReportToPopulate.add(row.getTimeInterval());
+                if (row.getSurveySentDate()!=null){
+                    surveyResultsReportToPopulate.add(row.getTimeInterval());
+                } else {
+                    surveyResultsReportToPopulate.add("");
+                }
+                
                 surveyResultsReportToPopulate.add(row.getSurveySource());
                 String surveySourceId = row.getSurveySourceId();
                 if(surveySourceId != null && !surveySourceId.equals(null) && !surveySourceId.equals("null")){
