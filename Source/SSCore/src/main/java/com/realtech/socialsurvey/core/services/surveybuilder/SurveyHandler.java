@@ -165,10 +165,7 @@ public interface SurveyHandler
 
 
     public Map<String, Object> getReminderInformationForCompany( long companyId );
-
-
-    public boolean checkSurveyReminderEligibility( long lastRemindedTime, long systemTime, int reminderInterval );
-
+    
 
     void insertSurveyDetails( SurveyDetails surveyDetails );
 
