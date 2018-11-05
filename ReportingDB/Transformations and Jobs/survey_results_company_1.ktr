@@ -1447,7 +1447,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
-    <table>survey_results_company_report_1</table>
+    <table>survey_results_company_report</table>
     <commit>10000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
@@ -1595,7 +1595,7 @@
     <ignore_flag_field/>
     <lookup>
       <schema/>
-      <table>survey_results_company_report_1</table>
+      <table>survey_results_company_report</table>
       <key>
         <name>SURVEY_DETAILS_ID</name>
         <field>SURVEY_DETAILS_ID</field>
