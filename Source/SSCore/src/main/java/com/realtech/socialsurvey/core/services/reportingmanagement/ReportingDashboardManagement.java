@@ -215,7 +215,7 @@ public interface ReportingDashboardManagement
      * @param batchSize
      * @return
      */
-    public Map<String, SurveyResultsReportVO> getSurveyResultsReport( String entityType, Long entityId, Timestamp startDate,
+    public List<SurveyResultsReportVO> getSurveyResultsReport( String entityType, Long entityId, Timestamp startDate,
         Timestamp endDate, int startIndex, int batchSize );
 
 	/**

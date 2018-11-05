@@ -7,8 +7,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
-import javax.persistence.Column;
-
 /**
  * @author Subhrajit
  *
@@ -38,8 +36,6 @@ public class SurveyResultsReportVO implements Serializable {
 	private String clickTroughForAgent;
 	private String clickTroughForRegion;
 	private String clickTroughForBranch;
-	private Timestamp reportModifiedOn;
-    private boolean isDeleted;
     private List<SurveyResponseTable> surveyResponseList;
     //SS-1505 ADD FEILDS
     private String participantType;
@@ -163,18 +159,6 @@ public class SurveyResultsReportVO implements Serializable {
 	public void setClickTroughForBranch(String clickTroughForBranch) {
 		this.clickTroughForBranch = clickTroughForBranch;
 	}
-	public Timestamp getReportModifiedOn() {
-		return reportModifiedOn;
-	}
-	public void setReportModifiedOn(Timestamp reportModifiedOn) {
-		this.reportModifiedOn = reportModifiedOn;
-	}
-	public boolean isDeleted() {
-		return isDeleted;
-	}
-	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
-	}
 	public List<SurveyResponseTable> getSurveyResponseList() {
 		return surveyResponseList;
 	}
@@ -233,8 +217,7 @@ public class SurveyResultsReportVO implements Serializable {
             + ", surveyScore=" + surveyScore + ", gateway=" + gateway + ", customerComments=" + customerComments
             + ", agreedToShare=" + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany="
             + clickTroughForCompany + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion="
-            + clickTroughForRegion + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn
-            + ", isDeleted=" + isDeleted + ", surveyResponseList=" + surveyResponseList + ", participantType=" + participantType
+            + clickTroughForRegion + ", clickTroughForBranch=" + clickTroughForBranch + ", surveyResponseList=" + surveyResponseList + ", participantType=" + participantType
             + ", agentEmailId=" + agentEmailId + ", customerEmailId=" + customerEmailId + ", state=" + state + ", city=" + city
             + "]";
     }
