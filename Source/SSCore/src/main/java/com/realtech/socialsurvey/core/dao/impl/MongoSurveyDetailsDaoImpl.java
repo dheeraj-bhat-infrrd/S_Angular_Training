@@ -339,6 +339,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, true );
         update.set( CommonConstants.IS_ABUSIVE_REPORTED_BY_USER_COLUMN, true );
         update.set( CommonConstants.SURVEY_LAST_ABUSE_REPORTED_DATE, new Date() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
@@ -360,6 +361,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, false );
         update.set( CommonConstants.IS_UNMARKED_ABUSIVE_COLUMN, true );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         query = new Query();
@@ -1860,6 +1862,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         Date date = new Date();
         update.set( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST, date );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, date );
         update.push( CommonConstants.REMINDERS_FOR_SOCIAL_POSTS, date );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method to increase reminder count by 1, updateReminderCountForSocialPost() finished." );
@@ -2448,6 +2451,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         Update update = new Update();
         update.set( CommonConstants.ABUSIVE_NOTIFY_COLUMN, true );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyAsUnderResolution() to mark survey as under resolution finished." );
     }
@@ -2870,6 +2874,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 .exists( true ) );
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
             + ".0." + CommonConstants.REGION_ID_COLUMN, toUserProfile.getRegionId() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
 
@@ -2885,6 +2890,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 .exists( true ) );
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN
             + "." + CommonConstants.COMPANY_ID_COLUMN, toUserProfile.getCompany().getCompanyId() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
 
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
@@ -3006,6 +3012,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
                 Update update = new Update();
                 update.set( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN, false );
+                update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
 
                 mongoTemplate.updateFirst( updateQuery, update, SURVEY_DETAILS_COLLECTION );
             }
@@ -3021,6 +3028,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
                 Update update = new Update();
                 update.set( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN, true );
+                update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
 
                 mongoTemplate.updateFirst( updateQuery, update, SURVEY_DETAILS_COLLECTION );
             }
@@ -3040,6 +3048,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.SUMMARY_COLUMN, surveyDetails.getSummary() );
         update.set( CommonConstants.REVIEW_COLUMN, surveyDetails.getReview() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
     }
@@ -3054,6 +3063,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
         update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveyDetails.getSourceId() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails finished." );
     }
@@ -3068,6 +3078,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
         update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, surveyDetails.getSurveyUpdatedDate() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateZillowSurveyUpdatedDateInExistingSurveyDetails finished." );
     }
@@ -3468,6 +3479,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN ).is( survey.getSurveyPreIntitiationId() ) );
         Update update = new Update();
         update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, survey.getSourceId() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
     }
 
@@ -3481,6 +3493,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
         update.set( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN, surveyDetails.getSurveyTransactionDate() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateTransactionDateInExistingSurveyDetails finished." );
     }
@@ -3532,6 +3545,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update = new Update();
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
             + ".0." + CommonConstants.REGION_ID_COLUMN, regionId );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
 
@@ -3569,6 +3583,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update = new Update();
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN
             + ".0." + CommonConstants.BRANCH_ID_COLUMN, branchId );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         //update region media post details
@@ -3586,6 +3601,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update = new Update();
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
             + ".0." + CommonConstants.REGION_ID_COLUMN, regionId );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
 
@@ -3604,6 +3620,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update = new Update();
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN
             + "." + CommonConstants.COMPANY_ID_COLUMN, regionId );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
 
@@ -3620,6 +3637,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         Update update = new Update();
         update.set( CommonConstants.AGENT_ID_COLUMN, surveyDetails.getAgentId() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
 
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateAgentIdInSurveyDetail() to update agentId of survey finished." );
@@ -3647,6 +3665,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( branchId ) );
         Update update = new Update();
         update.set( CommonConstants.REGION_ID_COLUMN, regionId );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
 
@@ -3665,6 +3684,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update = new Update();
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
             + ".0." + CommonConstants.REGION_ID_COLUMN, regionId );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         LOG.debug( "Method updateRegionIdForAllSurveysOfBranch() finished for branchId + " + branchId );
@@ -3724,6 +3744,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveyDetails.getSourceId() );
         update.set( CommonConstants.SURVEY_SOURCE_COLUMN, surveyDetails.getSource() );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails finished." );
     }
@@ -3736,6 +3757,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         Update update = new Update();
         update.set( CommonConstants.ABUSIVE_NOTIFY_COLUMN, true );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark survey as abusive notify finished." );
 	
