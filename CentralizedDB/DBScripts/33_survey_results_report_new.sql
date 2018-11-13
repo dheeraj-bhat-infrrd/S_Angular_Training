@@ -1,9 +1,9 @@
-DROP TABLE IF EXISTS `survey_results_company_report_1`;
+DROP TABLE IF EXISTS `survey_results_company_report`;
 DROP TABLE IF EXISTS `survey_results_company_report_bkp`;
 DROP TABLE IF EXISTS `survey_results_report_branch`;
 DROP TABLE IF EXISTS `survey_results_report_region`;
 
-CREATE TABLE `survey_results_company_report_1` (
+CREATE TABLE `survey_results_company_report` (
   `SURVEY_DETAILS_ID` varchar(36) NOT NULL,
   `COMPANY_ID` int(10) DEFAULT NULL,
   `AGENT_ID` int(10) DEFAULT NULL,
