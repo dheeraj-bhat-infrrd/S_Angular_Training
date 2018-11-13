@@ -161,6 +161,9 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         request.setSeoDescription( widgetConfigurationRequest.getSeoDescription() );
         request.setSeoKeywords( widgetConfigurationRequest.getSeoKeywords() );
         request.setSeoTitle( widgetConfigurationRequest.getSeoTitle() );
+        request.setHideContactBtn(widgetConfigurationRequest.getHideContactBtn());
+        request.setHideReviewBtn(widgetConfigurationRequest.getHideReviewBtn());
+        request.setMaxWidgetBtnSize(widgetConfigurationRequest.getMaxWidgetBtnSize());
         return request;
     }
 
