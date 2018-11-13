@@ -2103,6 +2103,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 errorCode = SurveyErrorCode.CORRUPT_RECORD_CUSTOMER_EMAIL_ID_NULL.name();
                 customersWithoutEmailId.add( survey );
                 companies.add( survey.getCompanyId() );
+            } else if(!Utils.validateCustomerEmail( survey.getCustomerEmailId() )){
+                LOG.error( "Invalid customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
+                status = CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD;
+                errorCode = SurveyErrorCode.CORRUPT_RECORD_CUSTOMER_EMAIL_ID_INVALID.name();
+                companies.add( survey.getCompanyId() );
             } else if ( user == null ) {
                 LOG.error( "no agent found with this email id" );
                 status = CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD;
@@ -2485,7 +2490,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             throw new InvalidInputException( "Agent id is invalid" );
         }
         if ( recipientEmailId == null || recipientEmailId.isEmpty()
-            || !organizationManagementService.validateEmail( recipientEmailId ) ) {
+            || !Utils.validateCustomerEmail( recipientEmailId ) ) {
             LOG.warn( "Recipent email id should be passed." );
             throw new InvalidInputException( "Recipent email id is invalid" );
         }
@@ -4627,7 +4632,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 "Can not process the record. Invalid Service provider email id : " + survey.getAgentEmailId() + "" );
         }
 
-        if ( !organizationManagementService.validateEmail( survey.getCustomerEmailId() ) ) {
+        if ( !Utils.validateCustomerEmail( survey.getCustomerEmailId() ) ) {
             LOG.error( "Invalid Customer Email Id " );
             throw new InvalidInputException(
                 "Can not process the record. Invalid Customer email id : " + survey.getCustomerEmailId() + "" );

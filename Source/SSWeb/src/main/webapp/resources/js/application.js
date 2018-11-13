@@ -12311,7 +12311,7 @@ $(document).on('click', '#wc-send-survey', function() {
 			}
 
 			if (emailId != "") {
-				if (emailRegex.test(emailId)) {
+				if (customerEmailRegex.test(emailId.trim())) {
 					var receiver = new Object();
 					receiver.firstname = firstname;
 					receiver.lastname = lastname;

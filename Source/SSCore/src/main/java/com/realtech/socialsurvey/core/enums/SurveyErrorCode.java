@@ -14,7 +14,8 @@ public enum SurveyErrorCode
     NOT_KNOWN( "Reason not found." ),
     USER_DELETED( "Agent is deleted" ),
     SURVEY_NOT_ALLOWED( "Survey is not allowed for agent."),
-    UNSUBSCRIBED_CUSTOMER_EMAIL( "Customer has unsubscribed emails either from company or from SocialSurvey Application." );
+    UNSUBSCRIBED_CUSTOMER_EMAIL( "Customer has unsubscribed emails either from company or from SocialSurvey Application." ),
+    CORRUPT_RECORD_CUSTOMER_EMAIL_ID_INVALID( "Customer email id is invalid " );
 
     private String value;
 

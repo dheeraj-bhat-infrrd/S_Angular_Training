@@ -442,4 +442,12 @@ public class Utils
             }
         }
     }
+
+    public static boolean validateCustomerEmail( String emailId )
+    {
+        LOG.info( "Method validateCustomerEmail called" );
+        Pattern pattern = Pattern.compile( CommonConstants.CUSTOMER_EMAIL_REGEX, Pattern.CASE_INSENSITIVE );
+        Matcher matcher = pattern.matcher( emailId.trim() );
+        return matcher.matches();
+    }
 }
