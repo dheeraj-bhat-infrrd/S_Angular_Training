@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -19,10 +17,6 @@ public class SurveyResultsCompanyReport implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "SURVEY_RESULTS_COMPANY_REPORT_ID")
-	private String surveyStatsReportId;
-
 	@Column(name = "SURVEY_DETAILS_ID")
 	private String surveyDetailsId;
 	
@@ -86,12 +80,6 @@ public class SurveyResultsCompanyReport implements Serializable {
 	@Column(name = "CLICK_THROUGH_FOR_BRANCH")
 	private String clickTroughForBranch;
 	
-	@Column(name = "REPORT_MODIFIED_ON")
-	private Timestamp reportModifiedOn;
-	
-    @Column(name = "IS_DELETED")
-    private boolean isDeleted;
-    
     @Transient
     private List<SurveyResponseTable> surveyResponseList;
     
@@ -112,13 +100,6 @@ public class SurveyResultsCompanyReport implements Serializable {
     @Column(name = "CITY")
     private String city;
   
-	public String getSurveyStatsReportId() {
-		return surveyStatsReportId;
-	}
-
-	public void setSurveyStatsReportId(String surveyStatsReportId) {
-		this.surveyStatsReportId = surveyStatsReportId;
-	}
 
 	public String getSurveyDetailsId() {
 		return surveyDetailsId;
@@ -288,23 +269,6 @@ public class SurveyResultsCompanyReport implements Serializable {
 		this.clickTroughForBranch = clickTroughForBranch;
 	}
 
-	public Timestamp getReportModifiedOn() {
-		return reportModifiedOn;
-	}
-
-	public void setReportModifiedOn(Timestamp reportModifiedOn) {
-		this.reportModifiedOn = reportModifiedOn;
-	}
-
-	public boolean isDeleted() {
-		return isDeleted;
-	}
-
-	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
-	}
-
-   
     public List<SurveyResponseTable> getSurveyResponseList()
     {
         return surveyResponseList;
@@ -369,18 +333,16 @@ public class SurveyResultsCompanyReport implements Serializable {
     @Override
     public String toString()
     {
-        return "SurveyResultsCompanyReport [surveyStatsReportId=" + surveyStatsReportId + ", surveyDetailsId=" + surveyDetailsId
-            + ", companyId=" + companyId + ", agentId=" + agentId + ", userFirstName=" + userFirstName + ", userLastName="
-            + userLastName + ", customerFirstName=" + customerFirstName + ", customerLastName=" + customerLastName
-            + ", surveySentDate=" + surveySentDate + ", surveyCompletedDate=" + surveyCompletedDate + ", timeInterval="
-            + timeInterval + ", surveySource=" + surveySource + ", surveySourceId=" + surveySourceId + ", surveyScore="
-            + surveyScore + ", gateway=" + gateway + ", customerComments=" + customerComments + ", agreedToShare="
-            + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
-            + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
-            + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn + ", isDeleted="
-            + isDeleted + ", surveyResponseList=" + surveyResponseList + ", participantType=" + participantType
-            + ", agentEmailId=" + agentEmailId + ", customerEmailId=" + customerEmailId + ", state=" + state + ", city=" + city
-            + "]";
+        return "SurveyResultsCompanyReport [surveyDetailsId=" + surveyDetailsId + ", companyId=" + companyId + ", agentId="
+            + agentId + ", userFirstName=" + userFirstName + ", userLastName=" + userLastName + ", customerFirstName="
+            + customerFirstName + ", customerLastName=" + customerLastName + ", surveySentDate=" + surveySentDate
+            + ", surveyCompletedDate=" + surveyCompletedDate + ", timeInterval=" + timeInterval + ", surveySource="
+            + surveySource + ", surveySourceId=" + surveySourceId + ", surveyScore=" + surveyScore + ", gateway=" + gateway
+            + ", customerComments=" + customerComments + ", agreedToShare=" + agreedToShare + ", branchName=" + branchName
+            + ", clickTroughForCompany=" + clickTroughForCompany + ", clickTroughForAgent=" + clickTroughForAgent
+            + ", clickTroughForRegion=" + clickTroughForRegion + ", clickTroughForBranch=" + clickTroughForBranch
+            + ", surveyResponseList=" + surveyResponseList + ", participantType=" + participantType + ", agentEmailId="
+            + agentEmailId + ", customerEmailId=" + customerEmailId + ", state=" + state + ", city=" + city + "]";
     }
 
 	

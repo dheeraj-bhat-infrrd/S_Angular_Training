@@ -627,6 +627,7 @@ public interface CommonConstants
     public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
     public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]+$";
     public static final String EMAIL_REGEX = "^[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    String CUSTOMER_EMAIL_REGEX = "^[a-zA-Z0-9][\\._a-zA-Z0-9_+‘`-]*@(?!.*?\\.\\.)[a-zA-Z0-9][\\._a-zA-Z0-9_+‘`-]*\\.[a-zA-Z0-9-]{2,}$";
     public static final String FIRST_NAME_REGEX = "[a-zA-Z ]+";
     public static final String LAST_NAME_REGEX = "[a-zA-Z0-9 ]+";
     public static final String FINDAPRO_FIRST_NAME_REGEX = "^[a-zA-Z][a-zA-Z\\s]{2,}$";

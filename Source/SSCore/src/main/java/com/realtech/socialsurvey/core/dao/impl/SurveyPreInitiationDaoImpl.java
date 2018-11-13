@@ -539,7 +539,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
+            //criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
             criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
                 CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
             criteria.addOrder( Order.desc( CommonConstants.ENGAGEMENT_CLOSED_TIME ) );
@@ -564,7 +564,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
+            //criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
             criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
                 CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
             criteria.setProjection( Projections.rowCount() );

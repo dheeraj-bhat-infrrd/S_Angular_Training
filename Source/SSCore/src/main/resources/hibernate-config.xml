@@ -163,8 +163,6 @@
 				<value>com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats</value>
-				<value>com.realtech.socialsurvey.core.entities.SurveyResultsReportBranch</value>
-				<value>com.realtech.socialsurvey.core.entities.SurveyResultsReportRegion</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyDetailsReport</value>
 				<value>com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation</value>
 				<value>com.realtech.socialsurvey.core.entities.NpsReportWeek</value>

@@ -85,6 +85,12 @@ namespace EncompassSocialSurvey.DAL
                                         , PROPERTY_ADDRESS
                                         , LOAN_PROCESSOR_NAME
                                         , LOAN_PROCESSOR_EMAIL
+                                        , LOAN_PROCESSOR_EMAIL
+                                        , CUSTOM_FIELD_ONE
+                                        , CUSTOM_FIELD_TWO
+                                        , CUSTOM_FIELD_THREE
+                                        , CUSTOM_FIELD_FOUR
+                                        , CUSTOM_FIELD_FIVE
                                           )
                                         VALUES(
                                           ?SURVEY_SOURCE
@@ -110,6 +116,11 @@ namespace EncompassSocialSurvey.DAL
                                         , ?PROPERTY_ADDRESS
                                         , ?LOAN_PROCESSOR_NAME
                                         , ?LOAN_PROCESSOR_EMAIL
+                                        , ?CUSTOM_FIELD_ONE
+                                        , ?CUSTOM_FIELD_TWO
+                                        , ?CUSTOM_FIELD_THREE
+                                        , ?CUSTOM_FIELD_FOUR
+                                        , ?CUSTOM_FIELD_FIVE
                                         ) ;";
 
         
@@ -270,6 +281,11 @@ namespace EncompassSocialSurvey.DAL
                         commandToInsert.Parameters.Add("?PROPERTY_ADDRESS", MySqlDbType.VarChar, 250).Value = loan.PropertyAddress;
                         commandToInsert.Parameters.Add("?LOAN_PROCESSOR_NAME", MySqlDbType.VarChar, 250).Value = loan.LoanProcessorName;
                         commandToInsert.Parameters.Add("?LOAN_PROCESSOR_EMAIL", MySqlDbType.VarChar, 250).Value = loan.LoanProcessorEmail;
+                        commandToInsert.Parameters.Add("?CUSTOM_FIELD_ONE", MySqlDbType.VarChar, 250).Value = loan.CustomFieldOne;
+                        commandToInsert.Parameters.Add("?CUSTOM_FIELD_TWO", MySqlDbType.VarChar, 250).Value = loan.CustomFieldTwo;
+                        commandToInsert.Parameters.Add("?CUSTOM_FIELD_THREE", MySqlDbType.VarChar, 250).Value = loan.CustomFieldThree;
+                        commandToInsert.Parameters.Add("?CUSTOM_FIELD_FOUR", MySqlDbType.VarChar, 250).Value = loan.CustomFieldFour;
+                        commandToInsert.Parameters.Add("?CUSTOM_FIELD_FIVE", MySqlDbType.VarChar, 250).Value = loan.CustomFieldFive;
                         //
                         commandToInsert.ExecuteNonQuery();
                         noOfRecordsInserted++;
