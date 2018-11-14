@@ -64,6 +64,13 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
             config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 50 );
             config.put( Config.STORM_NIMBUS_RETRY_TIMES, 3 );
             config.put( Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 60 );
+            /* The maximum amount of time given to the topology to
+               fully process a message emitted by a spout. If the
+               message is not acked within this time frame,
+               Storm will fail the message on the spout.
+               Some spouts implementations will then replay the
+               message at a later time. */
+            config.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 300);
             return config;
         }
     }
