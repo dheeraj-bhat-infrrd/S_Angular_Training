@@ -242,4 +242,14 @@ public class UserController
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }
     }
+    
+    @RequestMapping( value = "users/{comanyId}/owner")
+    @ApiOperation(value = "get the adminId based on companyId") 
+    public ResponseEntity<Long> getOwnerForCompany(@PathVariable("comanyId") Long companyId) throws SSApiException {
+        try {
+            return new ResponseEntity<>(userService.getOwnerByCompanyId(companyId), HttpStatus.OK);
+        } catch (NonFatalException e) {
+            throw new SSApiException(e.getMessage());
+        }
+    }
 }

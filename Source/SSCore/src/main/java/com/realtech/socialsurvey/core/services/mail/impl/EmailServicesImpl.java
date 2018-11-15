@@ -3046,6 +3046,9 @@ public class EmailServicesImpl implements EmailServices
         String senderEmailAddress = "post-"+ socialResponseObject.getId() +"@" + defaultSendGridMeEmailDomain;
         emailEntity.setSenderEmailId(senderEmailAddress);
         
+        // Setting default name
+        emailEntity.setSenderName( defaultSendName );
+        
         emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_SUBJECT;

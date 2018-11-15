@@ -79,6 +79,15 @@ public interface UserDao extends GenericDao<User, Long>
 
 
     public Map<Long, Long> getCompanyIdsForUserIds( List<Long> userIds );
+    
+    /**
+     * Method to fetch admin of the company based on the companyId
+     * @param companyId
+     * @return adminId
+     */    
+    public Long getOwnerForCompany(Long companyId);
+    
+    
 
 
 }

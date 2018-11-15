@@ -1827,5 +1827,12 @@ public interface OrganizationManagementService
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail,
         boolean sendMail, boolean isAddedByRealtechOrSSAdmin, String firstName, String lastName ) throws InvalidInputException;
 
+    /**
+     * Updates the allowPartner survey field for given unit settings
+     * @param unitSettings
+     * @param allowPartnerSurvey
+     */
+    void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey );
+
 
 }

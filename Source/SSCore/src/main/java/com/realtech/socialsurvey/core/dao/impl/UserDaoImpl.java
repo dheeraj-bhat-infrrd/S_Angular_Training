@@ -619,5 +619,27 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         }
     }
     
+    /**
+     * Method to fetch admin of the company based on the companyId
+     * @param companyId
+     * @throws InvalidInputException
+     * @return adminId
+     */
+    @Override
+    public Long getOwnerForCompany(Long companyId) {        
+        LOG.debug("Method to get the owner of the company, getOwnerForCompany() started.");
+        Criteria criteria = getSession().createCriteria(User.class);
+        try {
+            criteria.add(Restrictions.and((
+                    Restrictions.eq(CommonConstants.COMPANY + "." + CommonConstants.COMPANY_ID_COLUMN, companyId)),
+                    Restrictions.eq(CommonConstants.IS_OWNER_COLUMN, CommonConstants.IS_OWNER)));
+        } catch (HibernateException hibernateException) {
+            throw new DatabaseException("Exception caught in getOwnerForCompany() ", hibernateException);
+        }
+        LOG.debug("Method to get the owner of the company, getOwnerForCompany() finished.");
+        Long userId = (Long) criteria.setProjection(Projections.property(CommonConstants.USER_ID)).uniqueResult();      
+        return userId;
+    }
+    
 }
 // JIRA SS-42 By RM-05 EOC

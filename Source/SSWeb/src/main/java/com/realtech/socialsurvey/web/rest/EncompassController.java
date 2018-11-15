@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfoVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +92,9 @@ public class EncompassController extends AbstractController
             	if( companies.contains(company.getIden() ) ) {
 	                CompanyEncompassInfo companyEncompassInfo = new CompanyEncompassInfo();
 	                companyEncompassInfo.setCompanyName( company.getProfileName() );
-	                companyEncompassInfo.setEncompassCrmInfo( (EncompassCrmInfo) company.getCrm_info() );
+	                EncompassCrmInfoVO encompassCrmInfoVO = EncompassCrmInfoVO.encompassCrmInfoVOMapper(
+                        (EncompassCrmInfo) company.getCrm_info() , company.isAllowPartnerSurvey());
+	                companyEncompassInfo.setEncompassCrmInfo( encompassCrmInfoVO );
 	                crmInfoList.add( companyEncompassInfo );
             	}
             }

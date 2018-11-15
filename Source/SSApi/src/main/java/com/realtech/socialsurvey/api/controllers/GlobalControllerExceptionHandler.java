@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.api.exceptions.BadRequestException;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.exceptions.ValidationException;
 import com.realtech.socialsurvey.api.utils.RestUtils;
+import com.realtech.socialsurvey.core.exception.AuthorizationException;
 
 
 @ControllerAdvice
@@ -64,6 +65,16 @@ public class GlobalControllerExceptionHandler
     	LOG.error("SSAPI Exception occurred", ssapiException);
         long companyId = 0;
 		return restUtils.getRestResponseEntity( HttpStatus.INTERNAL_SERVER_ERROR, ssapiException.getMessage(), null, null,
+                request, companyId );
+    }
+    
+    @ExceptionHandler ( AuthorizationException.class)
+    @ResponseBody
+    public ResponseEntity<?> handleAuthorizationException( AuthorizationException authorizationException, HttpServletRequest request )
+    {
+        LOG.error("Authorization Exception ", authorizationException);
+        long companyId = 0;
+        return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, authorizationException.getMessage(), null, null,
                 request, companyId );
     }
 

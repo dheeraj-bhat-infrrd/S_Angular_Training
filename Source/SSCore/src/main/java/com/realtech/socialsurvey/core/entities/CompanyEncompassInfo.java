@@ -3,7 +3,7 @@ package com.realtech.socialsurvey.core.entities;
 public class CompanyEncompassInfo
 {
     String companyName;
-    EncompassCrmInfo encompassCrmInfo;
+    EncompassCrmInfoVO encompassCrmInfo;
     /**
      * @return the companyName
      */
@@ -21,14 +21,14 @@ public class CompanyEncompassInfo
     /**
      * @return the encompassCrmInfo
      */
-    public EncompassCrmInfo getEncompassCrmInfo()
+    public EncompassCrmInfoVO getEncompassCrmInfo()
     {
         return encompassCrmInfo;
     }
     /**
      * @param encompassCrmInfo the encompassCrmInfo to set
      */
-    public void setEncompassCrmInfo( EncompassCrmInfo encompassCrmInfo )
+    public void setEncompassCrmInfo( EncompassCrmInfoVO encompassCrmInfo )
     {
         this.encompassCrmInfo = encompassCrmInfo;
     }

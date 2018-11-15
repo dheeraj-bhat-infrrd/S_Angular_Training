@@ -119,6 +119,7 @@ public class SurveyApiV2Controller
         String message = "Survey successfully created.";
         boolean isDuplicate = false;
         boolean isUnsubscribed = false;
+        boolean isPartnerSurveyAllowed = true;
         
         String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
@@ -151,19 +152,21 @@ public class SurveyApiV2Controller
         try {
             for ( SurveyPreInitiation surveyPreInitiation : surveyPreInitiations ) {
                 surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
-                if(surveyPreInitiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED) 
-                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
-                else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD) {
+
+                surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()),
+                    surveyPreInitiation.getSurveyPreIntitiationId());
+
+                if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD) {
                 	isDuplicate = true;
-                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 }
                 else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD) {
                 	message = "Survey requests accepted sucessfully";
-                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 }
                 else if(surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_UNSUBSCRIBED ) {
-                	surveyIds.put( surveyPreinitiationTransformer.getParticipantForResponse(surveyPreInitiation.getParticipantType()), surveyPreInitiation.getSurveyPreIntitiationId());
                 	isUnsubscribed = true;
+                }
+                else if( surveyPreInitiation.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED ) {
+                    isPartnerSurveyAllowed = false;
                 }
             }
             
@@ -172,6 +175,8 @@ public class SurveyApiV2Controller
             	message += " One or more survey requests were duplicate.";
             if(isUnsubscribed)
             	message += " One or more survey requests were unsubscribed.";
+            if(!isPartnerSurveyAllowed)
+                message += " Partner survey not allowd for one or more requests.";
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
 
             return restUtils.getRestResponseEntity( HttpStatus.CREATED, message, "surveyId", surveyIds,
