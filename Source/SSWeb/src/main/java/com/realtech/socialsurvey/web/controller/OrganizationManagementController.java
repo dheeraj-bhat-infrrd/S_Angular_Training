@@ -848,8 +848,8 @@ public class OrganizationManagementController
 
             //set allow parter survey
             boolean allowPartnerSurvey = false;
-            if ( unitSettings.getCrm_info() != null )
-                allowPartnerSurvey = unitSettings.getCrm_info().isAllowPartnerSurvey();
+            if(unitSettings != null)
+                allowPartnerSurvey = unitSettings.isAllowPartnerSurvey();
 
             model.addAttribute( "allowPartnerSurvey", allowPartnerSurvey );
             model.addAttribute( "includeForTransactionMonitor", unitSettings.getIncludeForTransactionMonitor() );
@@ -4093,16 +4093,8 @@ public class OrganizationManagementController
             if ( companySettings == null )
                 throw new Exception();
 
-            if ( companySettings.getCrm_info() == null ) {
-                return "No crm connected to company";
-            }
-
             try {
-                EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
-                encompassCrmInfo.setAllowPartnerSurvey( allowPartnerSurvey );
-
-                organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
-                    "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
+                organizationManagementService.updateAllowPartnerSurvey( companySettings, allowPartnerSurvey );
             } catch ( ClassCastException e ) {
                 return "Encompass is not connected for company";
             }

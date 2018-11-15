@@ -8,19 +8,6 @@ public abstract class CRMInfo {
 	private String crm_source;
 	private boolean connection_successful;
     private long companyId;
-    
-    private boolean allowPartnerSurvey;
-
-
-    public boolean isAllowPartnerSurvey()
-    {
-        return allowPartnerSurvey;
-    }
-
-    public void setAllowPartnerSurvey( boolean allowPartnerSurvey )
-    {
-        this.allowPartnerSurvey = allowPartnerSurvey;
-    }
    
     public String getCrm_source() {
 		return crm_source;

@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -424,7 +423,8 @@ public interface SurveyHandler
     public SurveysAndReviewsVO getIncompelteSurveysByFilterCriteria( Long startSurveyID, Date startTransactionDate,
         List<Long> userIds, int startIndex, int count, long companyId );
 
-	public void validateAndProcessSurveyPreInitiation(SurveyPreInitiation survey , int duplicateSurveyInterval) throws InvalidInputException;
+	public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey, int duplicateSurveyInterval,
+        boolean allowPartnerSurveyForCompany ) throws InvalidInputException;
 
 	public void updateSurveyAsAbusiveNotify(String get_id);
 	

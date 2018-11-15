@@ -9002,8 +9002,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         if ( companySettings != null ) {
-            if ( companySettings.getCrm_info() != null ) {
-                if ( companySettings.getCrm_info().isAllowPartnerSurvey() )
+            if ( companySettings.isAllowPartnerSurvey() ) {
                     return true;
             }
         }
@@ -10822,6 +10821,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         usersMap.put( CommonConstants.INVALID_USERS_LIST, invalidUsers );
         LOG.debug( "Method getUsersFromEmailIds executed successfully. Returning users size :" + users.size() );
         return usersMap;
+    }
+
+
+    @Override public void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey )
+    {
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
+            allowPartnerSurvey, unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
     }
 
 }

@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.core.entities;
 
-import javax.persistence.Column;
-
 public class EncompassCrmInfo extends CRMInfo
 {
 

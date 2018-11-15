@@ -156,6 +156,19 @@ public class OrganizationUnitSettings implements Serializable
     //alert details
     private EntityAlertDetails entityAlertDetails;
 
+    private boolean allowPartnerSurvey;
+
+
+    public boolean isAllowPartnerSurvey()
+    {
+        return allowPartnerSurvey;
+    }
+
+    public void setAllowPartnerSurvey( boolean allowPartnerSurvey )
+    {
+        this.allowPartnerSurvey = allowPartnerSurvey;
+    }
+
     public boolean isSendEmailFromCompany()
     {
         return sendEmailFromCompany;
@@ -1021,7 +1034,7 @@ public class OrganizationUnitSettings implements Serializable
             + ", isAgentProfileDisabled=" + isAgentProfileDisabled + ", swearWords=" + Arrays.toString( swearWords )
             + ", hasRegisteredForSummit=" + hasRegisteredForSummit + ", isShowSummitPopup=" + isShowSummitPopup
             + ", transactionSourceFtpList=" + transactionSourceFtpList + ", entityAlertDetails=" + entityAlertDetails
-            + ", widgetConfiguration=" + widgetConfiguration + "]";
+            + ", widgetConfiguration=" + widgetConfiguration + ", allowPartnerSurvey=" + allowPartnerSurvey + "]";
     }
 
 }

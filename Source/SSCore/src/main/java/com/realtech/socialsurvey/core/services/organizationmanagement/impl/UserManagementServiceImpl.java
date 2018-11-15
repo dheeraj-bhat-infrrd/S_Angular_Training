@@ -2736,7 +2736,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //get company setting
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
-        if(companySettings != null && companySettings.getCrm_info() != null && companySettings.getCrm_info().isAllowPartnerSurvey() ){
+        if(companySettings != null && companySettings.isAllowPartnerSurvey() ){
             agentSettings.setAllowPartnerSurvey(true);
         }
         

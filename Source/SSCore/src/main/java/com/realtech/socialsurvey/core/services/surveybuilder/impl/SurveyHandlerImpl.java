@@ -69,7 +69,6 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
-import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
@@ -2189,13 +2188,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
 
         if ( companySettings != null && agentSettings != null ) {
-            CRMInfo crmInfo = companySettings.getCrm_info();
-            if ( crmInfo != null && crmInfo.getCrm_source().equalsIgnoreCase(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS) && crmInfo.isAllowPartnerSurvey() ) {
+            if(companySettings.isAllowPartnerSurvey()){
                 //check if agent is allowed for partner survey
                 if ( agentSettings.isAllowPartnerSurvey() )
                     return true;
-            }else {
-            		return true;
+
             }
         }
         return false;
@@ -4509,10 +4506,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord started " );
 
         int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany(companyId);
-        
+
+        //fetch company settingd companysettings
+        final OrganizationUnitSettings companySettings = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsById( companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         for ( SurveyPreInitiation survey : surveyPreInitiations ) {
             // validate, verify, cross-verify and setup the survey pre-initiation object
-            validateAndProcessSurveyPreInitiation( survey , duplicateSurveyInterval);
+            validateAndProcessSurveyPreInitiation( survey , duplicateSurveyInterval, companySettings.isAllowPartnerSurvey());
+
         }
 
         LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord finished " );
@@ -4532,12 +4534,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     /**
      * @param survey
+     * @param allowPartnerSurveyForCompany
      * @throws InvalidInputException
      */
     @Override
-    public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey , int duplicateSurveyInterval ) throws InvalidInputException
+    public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey, int duplicateSurveyInterval,
+        boolean allowPartnerSurveyForCompany ) throws InvalidInputException
     {
     	boolean isUnsubscribed = false;
+    	boolean isPartnerSurveyAllowed = true;
         // null and syntax checks
         checkForSyntaxInSurveyPreInitiationData( survey );
 
@@ -4577,6 +4582,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			// set the agent ID
 			survey.setAgentId(user.getUserId());
 
+			//check if partnerSurvey is allowed if participant type is buyeragent or selleragent
+            final AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( survey.getAgentId() );
+            if ( survey.getParticipantType() == CommonConstants.SURVEY_PARTICIPANT_TYPE_BUYER_AGENT
+                || survey.getParticipantType() == CommonConstants.SURVEY_PARTICIPANT_TYPE_SELLER_AGENT ) {
+                if ( !allowPartnerSurveyForCompany || !agentSettings.isAllowPartnerSurvey() ) {
+                    survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED );
+                    isPartnerSurveyAllowed = false;
+                }
+            }
+
 			// set up survey pre-initiation object for further processing
 			if (StringUtils.isEmpty(survey.getAgentName())) {
 				survey.setAgentName(user.getFirstName() + user.getLastName() == null ? "" : " " + user.getLastName());
@@ -4585,7 +4600,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			//if borrower email is equal to coborrower email , we set the status of the survey to duplicate
 			//but status should change from STATUS_SURVEYPREINITIATION_NOT_PROCESSED to SURVEY_STATUS_PRE_INITIATED
 			//and not from STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD to SURVEY_STATUS_PRE_INITIATED
-			if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD && !isUnsubscribed) {
+			if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD && !isUnsubscribed && isPartnerSurveyAllowed) {
 			  //update status
                 survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);  
 			}
@@ -5110,7 +5125,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
                     // perform all the necessary checks for the SPI object 
                     int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany(csvInfo.getCompanyId());
-                    validateAndProcessSurveyPreInitiation( survey , duplicateSurveyInterval );
+                    final OrganizationUnitSettings companySettings = organizationUnitSettingsDao
+                        .fetchOrganizationUnitSettingsById( csvInfo.getCompanyId(),
+                            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                    validateAndProcessSurveyPreInitiation( survey , duplicateSurveyInterval, companySettings.isAllowPartnerSurvey() );
 
 
                     // depending on the hierarchy at which the file was uploaded, start the survey process
