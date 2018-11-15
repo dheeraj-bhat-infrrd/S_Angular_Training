@@ -100,6 +100,9 @@ public interface SSApiIntegration
     @POST ( "/v1/companies/{companyId}/hierarchy")
     Response generateDefaultHierarchy( @Path ( "companyId") String companyId );
 
+    @GET ( "/v1/companyhierarchy")
+    Response companyhierarchy( @Query ( "companyId") long companyId, @Header ( "authorizationHeader") String authorizationHeader );
+
 
     @POST ( "/v1/companies/{companyId}/plan/{planId}/payment")
     Response makePayment( @Path ( "companyId") String companyId, @Path ( "planId") String planId, @Body Payment payment );
@@ -460,4 +463,7 @@ public interface SSApiIntegration
 
     @POST ( "/v2/surveys/{surveyId}/socialMedia")
     Response postToSocialMedia( @Path ( "surveyId") String surveyId, @Body PostToSocialMedia postsToSocialMedia);
+    
+    @GET("/v1/users/{companyId}/owner")
+    public Response getOwnerForCompany(@Path("companyId") Long companyId);
 }

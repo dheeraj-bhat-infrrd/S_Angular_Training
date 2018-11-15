@@ -14,9 +14,11 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,8 +54,12 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 @Controller
@@ -91,6 +97,12 @@ public class AdminController
 
     @Autowired
     private RequestUtils requestUtils;
+    
+    @Autowired
+    private SSApiIntergrationBuilder apiBuilder;
+    
+    @Value("${SOCIAL_MONITOR_AUTH_HEADER}")
+    private String authHeader;
 
 
     @RequestMapping ( value = "/admindashboard")
@@ -173,7 +185,6 @@ public class AdminController
     @RequestMapping ( value = "/admindownloadreports")
     public String adminDownloadReports( Model model, HttpServletRequest request )
     {
-
         LOG.info( "Inside downloadreports() method in admin controller" );
         return JspResolver.ADMIN_DOWNLOAD_REPORTS;
     }
@@ -186,7 +197,16 @@ public class AdminController
         return JspResolver.ADMIN_TRANSACTION_MONITOR;
     }
     
-    @RequestMapping ( value = "/companyhierarchy")
+    @RequestMapping ( value = "/companyhierarchy", method = RequestMethod.GET)
+    @ResponseBody
+    public String companyHierarchyView( long companyId)
+    {
+        String authorizationHeader = "Basic " + authHeader;
+        Response response = apiBuilder.getIntegrationApi().companyhierarchy( companyId, authorizationHeader );
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+    @RequestMapping ( value = "/companyhierarchy11")
     public String companyHierarchyView( Model model, HttpServletRequest request )
     {
 
@@ -488,28 +508,31 @@ public class AdminController
 
     @ResponseBody
     @RequestMapping ( value = "/loginadminas", method = RequestMethod.GET)
-    public String loginAdminAsUser( Model model, HttpServletRequest request )
+    public String loginAdminAsUser(@RequestParam("colName") String columnName, @RequestParam("colValue") String columnValue, HttpServletRequest request )
     {
-
         LOG.info( "Inside loginAdminAsUser() method in admin controller" );
-
-        String columnName = request.getParameter( "colName" );
-        String columnValue = request.getParameter( "colValue" );
 
         try {
 
-            if ( columnName == null || columnName.isEmpty() ) {
+            if ( StringUtils.isEmpty(columnName)) {
                 throw new InvalidInputException( "Column name passed null/empty" );
             }
-
-            if ( columnValue == null || columnValue.isEmpty() ) {
+            if ( StringUtils.isEmpty(columnValue)) {
                 throw new InvalidInputException( "Column value passed null/empty" );
+            }    
+            
+            String userId = null;
+            if(columnName.equals("companyId")) {
+                Response response = apiBuilder.getIntegrationApi().getOwnerForCompany(Long.parseLong(columnValue));
+                userId  = new String(((TypedByteArray)response.getBody()).getBytes());
             }
-
+            else if(columnName.equals("userId"))
+                userId = columnValue;
+            
             long id = 01;
 
             try {
-                id = Long.parseLong( columnValue );
+                id = Long.parseLong( userId );
             } catch ( NumberFormatException e ) {
                 throw new InvalidInputException( "Invalid id was passed", e );
             }

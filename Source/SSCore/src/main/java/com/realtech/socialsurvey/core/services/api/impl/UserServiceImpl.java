@@ -480,4 +480,13 @@ public class UserServiceImpl implements UserService
         updateUserDetailsInMySql( userId, user );
         LOGGER.info( "Method to save password finished for userId : " + userId );
     }
+    
+    @Override
+    public Long getOwnerByCompanyId(Long companyId) throws NonFatalException {
+        LOGGER.debug("Method to get owner called for companyId : "+companyId);
+        Long userId = null;
+        userId = userDao.getOwnerForCompany(companyId);
+        LOGGER.debug("Method to get owner finished for companyId : "+companyId);
+        return userId;
+    }
 }

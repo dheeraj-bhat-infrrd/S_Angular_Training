@@ -4963,22 +4963,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( company == null ) {
             throw new InvalidInputException( "company is null in getUsersUnderCompanyFromSolr" );
         }
-        LOG.debug( "Method getUsersUnderCompanyFromSolr called for company:" + company + " and start:" + start );
-        List<UserFromSearch> users = null;
+        LOG.debug( "Method getUsersUnderCompanyFromSolr called for company:{} and start:{}",company, start);
         Region defaultRegion = getDefaultRegionForCompany( company );
         Branch defaultBranch = getDefaultBranchForRegion( defaultRegion.getRegionId() );
         int usersCount = (int) solrSearchService.getUsersCountByIden( defaultBranch.getBranchId(),
             CommonConstants.BRANCHES_SOLR, false );
         Collection<UserFromSearch> usersResult = solrSearchService.searchUsersByIden( defaultBranch.getBranchId(),
             CommonConstants.BRANCHES_SOLR, false, start, usersCount );
-        String usersJson = new Gson().toJson( usersResult );
-        LOG.debug( "Solr result returned for users of company is:" + usersJson );
-        /**
-         * convert users to Object
-         */
-        Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
-        users = new Gson().fromJson( usersJson, searchedUsersList );
-
+        List<UserFromSearch> users = new ArrayList<>(usersResult);
+        LOG.debug( "Solr result returned for users of company is: {}",users );
         LOG.debug( "Method getUsersUnderRegionFromSolr executed successfully" );
         return users;
     }

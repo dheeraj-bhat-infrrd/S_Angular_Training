@@ -39,4 +39,6 @@ public interface UserService
 
 
     public void savePassword( long userId, String password ) throws InvalidInputException;
+    
+    public Long getOwnerByCompanyId(Long companyId) throws NonFatalException;
 }

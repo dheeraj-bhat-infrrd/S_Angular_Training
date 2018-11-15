@@ -202,18 +202,187 @@ function searchAdminCompanies (element) {
 }
 
 function showSelectedCompanyHierarchy(companyId) {
-	$('#tr-spinner-'+companyId).show();
-	callAjaxGET("/companyhierarchy.do?companyId="+companyId, function(data) {
-		$('.comp-hr-cont[data-iden="'+companyId+'"]').html(data).show();
-		bindAdminRegionListClicks();
-/*	    $('.v-tbl-icn').click(function(e){
-	        e.stopPropagation();
-	    });*/
-	    bindAdminBranchListClicks();
-	    bindUserEditClicks();
-	    $('#tr-spinner-'+companyId).hide();
-	}, true);
+	$.ajax({
+		url : "./companyhierarchy.do",
+		type : "GET",
+		cache : false,
+		dataType: "json",
+		data : {"companyId" : companyId},
+		beforeSend: function(){
+			$('#tr-spinner-'+companyId).show();
+		},
+		success : function(data) {
+			if(data.companyNotRegistered){
+				$('.comp-hr-cont[data-iden="'+companyId+'"]').html(createCompanyNotRegisteredHierarchyTable(data)).show();
+			} else if(data.msg){
+				$('.comp-hr-cont[data-iden="'+companyId+'"]').html(createErrorMessageCompanyHierarchyTable(data)).show();
+			} else {
+				$('.comp-hr-cont[data-iden="'+companyId+'"]').html(createCompanyHierarchyTable(data)).show();
+				bindUserLoginEvent();
+			}
+			bindAdminRegionListClicks();
+		    bindAdminBranchListClicks();
+		    bindUserEditClicks();
+		    $('#tr-spinner-'+companyId).hide();
+		},
+		complete : function(data) {
+			$('#tr-spinner-'+companyId).hide();
+		},
+		error : function(e) {
+			
+		}
+	});
 }
+
+function createErrorMessageCompanyHierarchyTable(data){
+	var errorMessage = 
+		'<div class="display-message">'
+		+'<div class="error-wrapper clearfix">'
+		+'    <div class="float-left error-message" id="common-message-header"></div>'
+		+'  <div class="float-left msg-txt-area">'
+		+'      <div class="msg-area">'
+		+'          <div id="display-msg-div" class="msg-con error-message">'+data.msg.message+'</div>'
+		+'      </div>'
+		+'  </div>'
+		+'</div>'
+		+'</div>';
+	return errorMessage;
+}
+
+
+function createCompanyNotRegisteredHierarchyTable(data){
+	var companyNotRegistered = 
+		'<div class="v-hr-tbl-wrapper">'
+		+'<table class="v-hr-tbl" style="margin-top: 0">'
+		+'	<tbody><tr id="user-row-86" clicked="false" class="v-tbl-row v-tbl-row-sel v-tbl-row-ind sel-u86" data-userid="86">'
+		+'		<td class="v-tbl-line" style="width: 5% !important;"><div class="v-line-ind v-line-comp-ind"></div></td>'
+		+'		<td class="v-tbl-name" style="width: 16% !important;">'+data.companyNotRegistered.message+'</td>'
+		+'		<td class="v-tbl-add" style="width: 37% !important;">'+ data.companyNotRegistered.userName+' - '+data.companyNotRegistered.workMailId+'</br> '+data.companyNotRegistered.workContactNo+'</td>'
+		+'		<td class="v-tbl-spacer"></td>'
+		+'			</tr>'
+		+'	</tbody>'
+		+'</table>'
+		+'</div>';
+	return companyNotRegistered;
+}
+
+
+function createCompanyHierarchyTable(data){
+	var hierarchyWrapper = '<div class="v-hr-tbl-wrapper"><table class="v-hr-tbl" style="margin-top: 0">'
+	+ createRegionHierarchyRow(data.regions)
+	+ createBranchHierarchyRow(data.branches)
+	+ createUserHierarchyRow(data.users)
+	+ '</table></div>';
+	return hierarchyWrapper;
+}
+
+function createRegionHierarchyRow(regions){
+	// create Region row
+	var regionRow = '';
+	if(regions){
+		for (var i = 0; i < regions.length; i++) {
+		
+			var region = regions[i];
+		regionRow += 
+			'<tr id="tr-region-'+region.regionId+'" clicked="false" class="v-tbl-row v-tbl-row-sel region-row" data-regionid="'+region.regionId+'">'
+				+'<td class="v-tbl-line"><div class="v-line-rgn"></div>'
+					+'<i id="tr-spinner-${region.regionId}"  class="fa fa-spinner fa-pulse fa-2x fa-fw" aria-hidden="true" style="display:none;margin:7px 0px;"></i>'
+				+'</td>'
+				+'<td class="v-tbl-name">'+region.region+'</td>'
+				+'<td class="v-tbl-add">'+region.address1+'</c:if>&nbsp;'+region.address2+'</td>'
+				+'<td class="v-tbl-role"></td><td class="v-tbl-btns"><div class="clearfix v-tbl-icn-wraper">'
+					+'<div class="float-left v-tbl-icn v-icn-close region-del-icn vis-hidden" data-regionid="'+region.regionId+'"></div>'
+					+'<div class="float-right v-tbl-icn v-icn-edit region-edit-icn vis-hidden" clicked="false" data-regionid="'+region.regionId+'"></div>'
+					+'</div></td><td class="v-tbl-spacer"></td>'
+			+'</tr>'
+			+'<tr class="v-tbl-row v-tbl-row-sel tr-region-edit hide">'
+				+'<td colspan="7" id="td-region-edit-'+region.regionId+'" class="td-region-edit">'
+				+'</td>'
+			+'</tr>';
+		}
+	}
+	return regionRow;
+} 
+
+
+function createBranchHierarchyRow(branches){
+    // create Branch row
+	var branchRow = '';
+	if(branches){
+		for (var i = 0; i < branches.length; i++) {
+			var branch = branches[i];
+			branchRow += 
+				'<tr id="tr-branch-row-'+branch.branchId+'" clicked="false" class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row comp-branch-row sel-b'
+				+branch.branchId+'" data-branchid="'+branch.branchId+'">'
+					+'<td class="v-tbl-line">'
+					+'<div class="v-line-brnch v-line-comp-brnch"></div>'
+					+'</td>'
+					+'<td class="v-tbl-name">'+branch.branch+'</td>'
+					+'<td class="v-tbl-add">'+branch.address1+'&nbsp;'+branch.address2+'</td>'
+					+'<td class="v-tbl-role"></td>'
+					+'<td class="v-tbl-btns">'
+					+'<div class="clearfix v-tbl-icn-wraper">'
+					+'<div'
+					+'class="float-left v-tbl-icn v-icn-close branch-del-icn vis-hidden"'
+					+'data-branchid="'+branch.branchId+'"></div>'
+					+'<div'
+					+'class="float-right v-tbl-icn v-icn-edit branch-edit-icn vis-hidden"'
+					+'clicked="false" data-branchid="'+branch.branchId+'"></div>'
+					+'</div>'
+					+'</td>'
+					+'<td class="v-tbl-spacer"></td>'
+				+'</tr>'
+				+'<tr class="v-tbl-row v-tbl-row-sel tr-branch-edit hide">'
+					+'<td colspan="7" id="td-branch-edit-'+branch.branchId+'"'
+					+'class="td-branch-edit">'
+					+'</td>'
+				+'</tr>'
+		}
+	}
+	return branchRow;
+} 
+
+
+function createUserHierarchyRow(users){
+	// Create User row
+	var userRow = '';
+	if(users){
+		for (var i = 0; i < users.length; i++) {
+			var user = users[i];
+			var roleString = '';
+			if((user.regionAdmin || user.branchAdmin) && user.agent) {
+				roleString = globalStrings['label.admin.key'] + "&#44;&nbsp;"  + globalStrings['label.user.key'];
+			} else if(user.regionAdmin || user.branchAdmin){
+				roleString = globalStrings['label.admin.key'];
+			} else if(user.agent) {
+				roleString = globalStrings['label.user.key'];
+			}
+			
+			userRow += 
+				'<tr id="user-row-'+user.userId+'" clicked="false" class="v-tbl-row v-tbl-row-sel v-tbl-row-ind sel-u'+user.userId+'" '
+				+'data-userid="'+user.userId+'">'
+				+'<td class="v-tbl-line"><div class="v-line-ind v-line-comp-ind"></div></td>'
+				+'<td class="v-tbl-name">'+user.displayName+'</td>'
+				+'<td class="v-tbl-add">'+user.emailId+'</td>'
+				+'<td class="v-tbl-role">'+roleString+'</td>'
+				+'<td class="v-tbl-btns">'
+				+'<div class="clearfix v-tbl-icn-wraper">'
+				+'<div class="float-left v-tbl-icn v-icn-close user-del-icn hidden" data-userid="'+user.userId+'"></div>'
+				+'<div class="float-right v-tbl-icn v-icn-login user-login-icn" data-iden="'+user.userId+'" title="login as"></div>'
+				+'<div class="float-right v-tbl-icn v-icn-edit user-edit-icn vis-hidden" clicked="false" data-userid="'+user.userId+'" data-iscom-admin="'+user.isOwner+'"></div></div>'
+				+'</td>'
+				+'<td class="v-tbl-spacer"></td>'
+				+'</tr>'
+				+'<tr id="user-edit-row-'+user.userId+'"'
+				+'class="v-tbl-row v-tbl-row-sel tr-user-edit user-edit-row hide">'
+				+'<td id="user-details-and-assignments-'+user.userId+'"'
+				+'	colspan="7" class="td-user-edit user-assignment-edit-div">'
+				+'</td>'
+				+'</tr>'
+		}
+	}
+	return userRow;
+} 
 
 function bindAdminRegionListClicks() {
 	$(".region-row").click(function(e){
@@ -330,14 +499,24 @@ $(document).on('click', '.comp-row', function(e) {
 });
 
 function bindUserLoginEvent() {
-	console.log("inside admin");
+	console.log("inside admin login");
 	$('.user-login-icn').on('click', function(e) {
 		$( '.user-login-icn').unbind( "click" );
 		e.stopImmediatePropagation();
-		var payload = {
-			"colName" : "userId",
-			"colValue" : $(this).attr('data-iden')
-		};
+		var companyId = $(this).attr('data-company-iden')
+		if(companyId){
+			var payload = {
+					"colName" : "companyId",
+					"colValue" : companyId
+				};
+		}
+		else {
+			var userId = $(this).attr('data-iden')
+			var payload = {
+					"colName" : "userId",
+					"colValue" : userId
+				};
+		}
 		callAjaxGETWithTextData("/loginadminas.do", function(data) {
 			window.location = getLocationOrigin() + '/userlogin.do';
 		}, true, payload,'.user-login-icn');
