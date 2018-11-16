@@ -553,6 +553,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Getting SEO Optimized count for collection " + collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).nin( excludedEntityIds ) );
         long count = mongoTemplate.count( query, collectionName );
         LOG.debug( "Returning count " + count );
