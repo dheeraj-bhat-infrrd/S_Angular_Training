@@ -147,7 +147,7 @@
 			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
 		</div>
 	</div> --%>
-
+<c:if test="${profilemasterid == 1}">
 <div id="summit-popup" class="overlay-login summit-popup-outer">
 	<div id="summit-popup-body" class="summit-popup">
 		<%-- <div class="summit-timer-back">
@@ -170,6 +170,7 @@
 		</div> -->
 	</div>
 </div>
+</c:if>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
