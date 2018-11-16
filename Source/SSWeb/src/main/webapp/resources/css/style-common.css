@@ -12134,7 +12134,7 @@ img.lead-img {
     width: 1140px;
     height: 681px;
     margin: 0 auto;
-    background-image: url(../images/CreateWOWSummit_Banners_Dayof_web.png);
+    background-image: url(../images/WOWworthy_EmmaM_Web_Banner.png);
     background-size:contain;
     background-position:center;
     border-radius: 8px;
@@ -12180,12 +12180,12 @@ img.lead-img {
     top: 2px;
 }
 
-.register-summit-btn{
-    width: 130px;
-    height: 50px;
+.register-summit-btn {
+    width: 306px;
+    height: 65px;
     position: absolute;
-    right: 53px;
-    bottom: 74px;
+    left: 278px;
+    bottom: 125px;
 }
 
 .summit-ribbon-outer{

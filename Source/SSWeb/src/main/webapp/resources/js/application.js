@@ -564,9 +564,9 @@ $(document).on('keyup', function(e) {
 			$('#macro-action-chevron-down').toggle();
 			$('#macro-action-chevron-up').toggle();
 		}
-		/*if ($('#summit-popup-body').is(':visible')) {
+		if ($('#summit-popup-body').is(':visible')) {
 			closeSummitPopup();
-		}*/
+		}
 		
 		if($('#mismatch-new-popup-main').is(':visible')){
 			$('#mismatch-new-popup-main').addClass('hide');
@@ -20595,11 +20595,7 @@ function showSummitPopup(){
 
 function closeSummitPopup( doSendclickedEventInfo ){
 	$('#summit-popup').hide();
-	showSummitRibbon();
 	enableBodyScroll();
-	if( doSendclickedEventInfo != false ){
-		sendClickedEventInfo( "home.dashboard.summit.popup.close" );
-	}
 }
 
 
@@ -20619,8 +20615,7 @@ $(document).on('click','#register-summit-btn',function(e){
 	e.preventDefault();
 	
 	closeSummitPopup( false );
-	sendClickedEventInfo( "home.dashboard.summit.popup.register" );
-	window.open('http://www.createwowsummit.com', '_blank');
+	window.open('https://facebook.com/SocialSurveybusiness/videos/710505045999294/', '_blank');
 	
 });
 
