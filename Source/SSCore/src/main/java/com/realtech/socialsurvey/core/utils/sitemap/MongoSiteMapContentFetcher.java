@@ -44,7 +44,7 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
     private String changeFrequency;
     private List<Long> excludedEntityIds = new ArrayList<Long>();
 
-    private int limit = 50;
+    private int limit = 1000;
     private long count;
     private int recordsFetched;
     private boolean areMoreRecordsPresent;

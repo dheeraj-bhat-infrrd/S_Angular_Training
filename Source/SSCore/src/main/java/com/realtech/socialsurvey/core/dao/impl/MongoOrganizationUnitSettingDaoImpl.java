@@ -542,7 +542,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( numOfRecords > 0 ) {
             query.limit( numOfRecords );
         }
-        profileUrls = mongoTemplate.find( query, ProfileUrlEntity.class, collectionName );
+        try {
+            profileUrls = mongoTemplate.find( query, ProfileUrlEntity.class, collectionName );
+        } catch(Exception e) {
+            LOG.error( "Failed to fetch records from mongo.",e );
+        }
+        
         return profileUrls;
     }
 
