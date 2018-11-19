@@ -1749,7 +1749,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, BRANCH_NAME&#xa;, CLICK_THROUGH_FOR_AGENT&#xa;, CLICK_THROUGH_FOR_BRANCH&#xa;, CLICK_THROUGH_FOR_REGION&#xa;, CLICK_THROUGH_FOR_COMPANY&#xa;, USER_FIRST_NAME&#xa;, USER_LAST_NAME&#xa;, AGENT_EMAILID&#xa;, STATE&#xa;, CITY&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, CUSTOMER_EMAIL_ID&#xa;, SURVEY_SENT_DATE&#xa;, SURVEY_COMPLETED_DATE&#xa;, SURVEY_SOURCE&#xa;, SURVEY_SOURCE_ID&#xa;, SURVEY_SCORE&#xa;, GATEWAY&#xa;, AGREED_TO_SHARE&#xa;, PARTICIPANT_TYPE&#xa;, AGENT_ID&#xa;, COMPANY_ID&#xa;, CUSTOMER_COMMENTS&#xa;, TIME_INTERVAL&#xa;FROM survey_results_company_report_1&#xa;order by survey_details_id&#x3b;&#xa;</sql>
+    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, BRANCH_NAME&#xa;, CLICK_THROUGH_FOR_AGENT&#xa;, CLICK_THROUGH_FOR_BRANCH&#xa;, CLICK_THROUGH_FOR_REGION&#xa;, CLICK_THROUGH_FOR_COMPANY&#xa;, USER_FIRST_NAME&#xa;, USER_LAST_NAME&#xa;, AGENT_EMAILID&#xa;, STATE&#xa;, CITY&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, CUSTOMER_EMAIL_ID&#xa;, SURVEY_SENT_DATE&#xa;, SURVEY_COMPLETED_DATE&#xa;, SURVEY_SOURCE&#xa;, SURVEY_SOURCE_ID&#xa;, SURVEY_SCORE&#xa;, GATEWAY&#xa;, AGREED_TO_SHARE&#xa;, PARTICIPANT_TYPE&#xa;, AGENT_ID&#xa;, COMPANY_ID&#xa;, CUSTOMER_COMMENTS&#xa;, TIME_INTERVAL&#xa;FROM survey_results_company_report&#xa;order by survey_details_id&#x3b;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1775,11 +1775,11 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, AGENT_ID&#xa;, BRANCH_ID&#xa;, COMPANY_ID&#xa;, REGION_ID&#xa;, SURVEY_PRE_INTITIATION_ID&#xa;, CUSTOMER_EMAIL&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, SOURCE&#xa;, SOURCE_ID&#xa;, STAGE&#xa;, STATE&#xa;, MOOD&#xa;, AGREED_TO_SHARE&#xa;, CITY&#xa;, REVIEW&#xa;, SCORE&#xa;, SURVEY_COMPLETED_DATE_EST&#xa;FROM survey_details &#xa;where STAGE&#x3d;-1 AND COMPANY_ID &#x3c;&#x3e; 0&#xa;AND modified_on &#x3e; &#x24;&#x7b;modifiedOnSettings&#x7d;&#xa;order by AGENT_ID&#x3b;&#xa;</sql>
+    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, AGENT_ID&#xa;, BRANCH_ID&#xa;, COMPANY_ID&#xa;, REGION_ID&#xa;, SURVEY_PRE_INTITIATION_ID&#xa;, CUSTOMER_EMAIL&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, SOURCE&#xa;, SOURCE_ID&#xa;, STAGE&#xa;, STATE&#xa;, MOOD&#xa;, AGREED_TO_SHARE&#xa;, CITY&#xa;, REVIEW&#xa;, SCORE&#xa;, SURVEY_COMPLETED_DATE_EST&#xa;FROM survey_details &#xa;where STAGE&#x3d;-1 AND COMPANY_ID &#x3c;&#x3e; 0&#xa;AND modified_on &#x3e; &#x28;SELECT JOB_START_TIME as lastModifiedTime&#xa;	FROM job_log_details &#xa;	where &#x28;JOB_NAME &#x3d; &#x27;CentralizedMainJob&#x27; or JOB_NAME &#x3d; &#x27;Dummy Job&#x27; or JOB_NAME &#x3d; &#x27;ParentMainJob&#x27;&#x29; &#xa;	and &#x28; STATUS &#x3d; &#x27;Finished&#x27; or STATUS &#x3d; &#x27;Dummy&#x27;&#x29; order by JOB_LOG_ID desc limit 2,1&#x29;&#xa;order by AGENT_ID&#x3b;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
-    <variables_active>Y</variables_active>
+    <variables_active>N</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
