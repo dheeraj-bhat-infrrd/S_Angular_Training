@@ -542,7 +542,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( numOfRecords > 0 ) {
             query.limit( numOfRecords );
         }
-        profileUrls = mongoTemplate.find( query, ProfileUrlEntity.class, collectionName );
+        try {
+            profileUrls = mongoTemplate.find( query, ProfileUrlEntity.class, collectionName );
+        } catch(Exception e) {
+            LOG.error( "Failed to fetch records from mongo.",e );
+        }
+        
         return profileUrls;
     }
 
@@ -553,6 +558,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Getting SEO Optimized count for collection " + collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).nin( excludedEntityIds ) );
         long count = mongoTemplate.count( query, collectionName );
         LOG.debug( "Returning count " + count );
