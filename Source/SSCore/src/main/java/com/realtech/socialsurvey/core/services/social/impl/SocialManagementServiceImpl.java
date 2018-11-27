@@ -635,6 +635,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         message = message.replace( "&lmnlf;", "\\n" );
                         message = message.replace( "&dash;", "\\u2014" );
                         
+                        
                         String linkedPostJSON = "{\"comment\": \"" + message + "\",\"content\": {" + "\"title\": \"" + title
                             + "\"," + "\"description\": \"" + description + "\"," + "\"submitted-url\": \"" + profileUrl
                             + "\",  " + "\"submitted-image-url\": \"" + imageUrl + "\"},"
@@ -1534,7 +1535,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             if ( mediaPostResponseDetails.getLinkedinPostResponseList() == null )
                 mediaPostResponseDetails.setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
             mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
-
+            
+            LOG.error("Found error while posting to LinkedIn for a hierarchy", e);
+            
             reportBug( "Linkedin", setting.getProfileName(), e );
             return e.getMessage();
         }
@@ -4062,7 +4065,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, mediaPostDetails,
                 entityMediaPostResponseDetails, surveyMongoId );
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "Could not auto-post to LinkedIn", e );
+        	
+            LOG.error("Found error while manually posting to LinkedIn for entity", e);
+            
             return e.getMessage();
         }
 

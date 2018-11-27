@@ -684,7 +684,7 @@ public class AdminToolsController
 			try {
 				entityId = Long.parseLong(entityIdStr);
 			} catch (NumberFormatException e) {
-				throw new InvalidInputException("Wrong value passed for parameter entityId ");
+				throw new InvalidInputException("Wrong value passed for parameter entityId: " + entityIdStr);
 			}
 
 			if (StringUtils.isEmpty(surveyMongoId))
@@ -698,10 +698,14 @@ public class AdminToolsController
 			return Response.status(Response.Status.CREATED)
 					.tag("Successfully posted to Linkedin for " + entityType + " with id  " + entityId).build();
 		}catch(InvalidInputException e) {
-			LOG.error("Error in manualPostToLinkedin " , e);
+			
+            LOG.error("Invalid input while trying to post to LinkedIn" , e);
+            
 			return Response.status(Response.Status.BAD_REQUEST ).tag(e.getMessage()).build();
 		}catch(Exception e) {
-			LOG.error("Error in manualPostToLinkedin " , e);
+	
+			LOG.error("Error while manually posting To LinkedIn" , e);
+			
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR ).tag(e.getMessage()).build();
 		}
 	}

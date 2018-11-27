@@ -630,9 +630,13 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         LOG.debug("Method to get the owner of the company, getOwnerForCompany() started.");
         Criteria criteria = getSession().createCriteria(User.class);
         try {
-            criteria.add(Restrictions.and((
+            Criterion criterion1 = Restrictions.and((
                     Restrictions.eq(CommonConstants.COMPANY + "." + CommonConstants.COMPANY_ID_COLUMN, companyId)),
-                    Restrictions.eq(CommonConstants.IS_OWNER_COLUMN, CommonConstants.IS_OWNER)));
+                    Restrictions.eq(CommonConstants.IS_OWNER_COLUMN, CommonConstants.IS_OWNER));
+            Criterion criterion2 = Restrictions.or(
+            		Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
+            		Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_UNDER_PROCESSING));
+            criteria.add(Restrictions.and(criterion1, criterion2));
         } catch (HibernateException hibernateException) {
             throw new DatabaseException("Exception caught in getOwnerForCompany() ", hibernateException);
         }

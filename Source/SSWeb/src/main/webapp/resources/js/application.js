@@ -3257,6 +3257,8 @@ $(document).on('click', '.da-dd-item', function(e) {
 			showOrHideVendastaProductSettings( vendastaAccess );
 		});
 	});
+	
+	sessionStorage.setItem("newSession",true);
 });
 
 function setUpListenerForSortCriteriaDropdown(){
@@ -20593,7 +20595,7 @@ function showSummitPopup(){
 	disableBodyScroll();
 }
 
-function closeSummitPopup( doSendclickedEventInfo ){
+function closeSummitPopup(){
 	$('#summit-popup').hide();
 	enableBodyScroll();
 }

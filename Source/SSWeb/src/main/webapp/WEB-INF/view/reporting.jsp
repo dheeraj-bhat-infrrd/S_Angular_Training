@@ -403,12 +403,14 @@
 		hideOverlay();
 		
 		var newSession = sessionStorage.getItem("newSession");
-		if(newSession == false || newSession == 'false'){
-			$('#summit-popup').hide();
-			enableBodyScroll();
-		}else{
-			showSummitPopup();
+		if(parseInt(profileMasterIdLead)==1){
+			if(newSession == false || newSession == 'false'){
+				closeSummitPopup();
+			}else{
+				showSummitPopup();
+			}
 		}
+		
 		/* var hasRegisteredForSummit = "${hasRegisteredForSummit}";
 		var activeSession = "${activeSession}";
 		var isShowSummitPopup ="${isShowSummitPopup}";
