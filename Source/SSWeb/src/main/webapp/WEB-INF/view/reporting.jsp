@@ -147,15 +147,15 @@
 			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
 		</div>
 	</div> --%>
-<c:if test="${profilemasterid == 1}">
+<%-- <c:if test="${profilemasterid == 1}">
 <div id="summit-popup" class="overlay-login summit-popup-outer">
 	<div id="summit-popup-body" class="summit-popup">
-		<%-- <div class="summit-timer-back">
+		<div class="summit-timer-back">
 			<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown_trans.png" class="summit-timer-img">
 			<div class="summit-timer-text summit-timer-days"></div>
 			<div class="summit-timer-text summit-timer-hrs"></div>
 			<div class="summit-timer-text summit-timer-min"></div>
-		</div>	 --%>	
+		</div>		
 		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
 		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
 		<!-- <div class="summit-checkbox-cont clearfix">
@@ -170,7 +170,7 @@
 		</div> -->
 	</div>
 </div>
-</c:if>
+</c:if> --%>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
@@ -402,14 +402,14 @@
 		
 		hideOverlay();
 		
-		var newSession = sessionStorage.getItem("newSession");
+		/* var newSession = sessionStorage.getItem("newSession");
 		if(parseInt(profileMasterIdLead)==1){
 			if(newSession == false || newSession == 'false'){
 				closeSummitPopup();
 			}else{
 				showSummitPopup();
 			}
-		}
+		} */
 		
 		/* var hasRegisteredForSummit = "${hasRegisteredForSummit}";
 		var activeSession = "${activeSession}";
