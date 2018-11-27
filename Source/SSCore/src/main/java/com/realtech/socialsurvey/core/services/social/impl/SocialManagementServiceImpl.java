@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -84,6 +85,9 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInContent;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInRequest;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInVisibility;
 import com.realtech.socialsurvey.core.enums.HierarchyType;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -629,19 +633,30 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                                 + agentSettings.getProfileUrl();
                         }
                         
-                        message = message.replace( "\\", "\\\\" );
-                        message = message.replace( "\n", "\\n" );
-                        message = message.replace( "<br>", "\\n" );
-                        message = message.replace( "&lmnlf;", "\\n" );
-                        message = message.replace( "&dash;", "\\u2014" );
+                        //setting and parsing data in json format using gson library.
+                       
+                        
+                        LinkedInRequest linkedInRequest = new LinkedInRequest();
+                        linkedInRequest.setComment(message);
+                        
+                        LinkedInContent content = new LinkedInContent();
+                        content.setDescription(description);
+                        content.setSubmittedImageUrl(imageUrl);
+                        content.setSubmittedUrl(profileUrl);
+                        content.setTitle(title);
+                        
+                        LinkedInVisibility visibility = new LinkedInVisibility();
+                        visibility.setCode("anyone");
+                        
+                        linkedInRequest.setContent(content);
+                        linkedInRequest.setVisibility(visibility);
+                        
+                        String linkedInPostson = new Gson().toJson(linkedInRequest);
+                        
+                        linkedInPostson = linkedInPostson.replace("\\n", " ");
                         
                         
-                        String linkedPostJSON = "{\"comment\": \"" + message + "\",\"content\": {" + "\"title\": \"" + title
-                            + "\"," + "\"description\": \"" + description + "\"," + "\"submitted-url\": \"" + profileUrl
-                            + "\",  " + "\"submitted-image-url\": \"" + imageUrl + "\"},"
-                            + "\"visibility\": {\"code\": \"anyone\" }}";
-                        LOG.info("linkedPostJSON is " + linkedPostJSON);
-                        StringEntity entity = new StringEntity( linkedPostJSON,  "UTF-8" );
+                        StringEntity entity = new StringEntity( linkedInPostson,  "UTF-8" );
                         post.setEntity( entity );
                         try {
                             HttpResponse response = client.execute( post );
@@ -2445,8 +2460,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         // + "-star review on" + ( isZillow ? " Zillow via " : " " ) +
         // "SocialSurvey saying : \"" + linkedInComment
         // + "\". View this and more at " + linkUrl;
-        String linkedinMessage = rating + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" ) + " &dash; "
-            + linkedInComment + " by " + customerDisplayName + " for " + agentName + "&lmnlf;" + ( isZillow ? linkUrl : "" );
+        String linkedinMessage = rating + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" ) + " \u2014 "
+            + linkedInComment + " by " + customerDisplayName + " for " + agentName + "\n" + ( isZillow ? linkUrl : "" );
         return linkedinMessage;
     }
 
@@ -4134,6 +4149,5 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             surveyPreInitiationListVO.setTotalRecord( count );
         }
         return surveyPreInitiationListVO;
-    }
-    
+    }   
 }
