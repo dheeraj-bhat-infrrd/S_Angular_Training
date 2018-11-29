@@ -668,6 +668,8 @@ public interface UserManagementService
 
 
 	void updateAgentIdInSurveyPreinitiation(String emailId) throws InvalidInputException, NoRecordsFetchedException;
+	
+	public void updateSurveyDetails();
 
 }
 // JIRA SS-34 BY RM02 BOC

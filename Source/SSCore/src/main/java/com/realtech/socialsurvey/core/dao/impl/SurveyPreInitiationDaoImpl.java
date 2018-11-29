@@ -16,7 +16,10 @@ import javax.annotation.Resource;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -258,8 +261,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         criteria.add( Restrictions.in( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, incompleteSurveyIds ) );
         return criteria.list();
     }
-
-
+    
     @SuppressWarnings ( "unchecked")
     @Override
     public long getIncompleteSurveyCount( long companyId, long agentId, int[] status, Timestamp startDate, Timestamp endDate,
@@ -1044,4 +1046,48 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             throw new DatabaseException( "Exception caught in getUnmatchedPreInitiatedSurveyForEmailCount() ", e );
         }
     }
+    
+    //one time run job
+    @SuppressWarnings("unused")
+	@Override
+	public long surveyPreInitiationCount(List<Integer> status) throws DatabaseException {
+
+		Criteria criteria;
+		LOG.debug("Method surveyPreInitiationCount() started");
+		try {
+			if (!status.isEmpty() || status != null) {
+				criteria = getSession().createCriteria(SurveyPreInitiation.class);
+				criteria.add( Restrictions.in(CommonConstants.STATUS_COLUMN, status));
+				return (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
+			}
+		} catch (HibernateException e) {
+			LOG.error("HibernateException caught in surveyPreInitiationCount()");
+			throw new DatabaseException("HibernateException caught in surveyPreInitiationCount()");
+		}
+		LOG.debug("Method surveyPreInitiationCount() finished");
+		return 0;
+	}
+    
+	// one time run job
+	@SuppressWarnings({ "unused", "unchecked" })
+	@Override
+	public List<SurveyPreInitiation> fetchSurveysByStatus(List<Integer> status, int startingIndex, int limit)
+			throws DatabaseException {
+		Criteria criteria;
+		LOG.debug("Method fetchSurveysByStatus() started");
+		try {
+			if (!status.isEmpty() || status != null) {
+				criteria = getSession().createCriteria(SurveyPreInitiation.class);
+				criteria.add( Restrictions.in(CommonConstants.STATUS_COLUMN, status));
+				criteria.setFirstResult(startingIndex);
+				criteria.setMaxResults(limit);
+				return criteria.list();
+			}
+		} catch (HibernateException e) {
+			LOG.error("HibernateException caught in fetchSurveysByStatus()");
+			throw new DatabaseException("HibernateException caught in fetchSurveysByStatus()");
+		}
+		LOG.debug("Method fetchSurveysByStatus() finished");
+		return null;
+	}
 }

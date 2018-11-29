@@ -399,5 +399,7 @@ public interface SurveyDetailsDao
 	 * @return
 	 */
 	public List<SurveyResponse> getSurveyRatingResponse(String surveyId);
+	
+	public int updateSurveyDetailsFields( long surveyPreIntitiationId, int participantType, Date surveySentDate);
 
 }

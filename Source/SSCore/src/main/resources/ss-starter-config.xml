@@ -75,6 +75,17 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<!-- Updating survey details in mongo (ONE TIME RUN JOB) --> 
+	<bean id="updatesurveyjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.UpdateSurveyDetails" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="userManagementService" value-ref="userManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- Setting update subscription price job detail -->
 	<bean id="updatesubscriptionpricejobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -592,6 +603,15 @@
 		<property name="jobDetail" ref="incompletesurveyjobdetail" />
 		<property name="cronExpression" value="0 43 * * * ?" />
 	</bean>
+	
+	<!-- setting cron for survey details update in mongo (ONE TIME RUN JOB)-->
+	<bean id="updatesurveydetailcron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="updatesurveyjobdetail" />
+		<property name="startDelay" value="20000" />
+		<property name="repeatCount" value="0" />
+	</bean>
+	
 
 	<!-- setting cron for update subscription price -->
 	<bean id="updatesubscriptionpricecron"
@@ -888,6 +908,7 @@
 				<!-- <ref bean="failedstreammsgprocessorjobdetail" />  -->
 				<ref bean="archiveSocialFeedCollectionJob" />
 				<ref bean="ftpfileuploader" />
+				<ref bean="updatesurveyjobdetail"/>
 			</list>
 		</property>
 
@@ -932,6 +953,7 @@
 				<!--  <ref bean="failedstreammsgprocessorceron" />  -->
 				<ref bean="archiveSocialFeedCollectionCronTrigger" />
 				<ref bean="ftpfileuploadercron" />
+				<ref bean="updatesurveydetailcron"/>
 			</list>
 		</property>
 		<property name="quartzProperties">

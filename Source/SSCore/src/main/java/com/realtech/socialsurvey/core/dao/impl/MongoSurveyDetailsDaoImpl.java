@@ -35,6 +35,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -3778,5 +3779,26 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public List<String> getDistinctValues( String queryKey, Object value, String field )
     {
         return mongoTemplate.getCollection( SURVEY_DETAILS_COLLECTION ).distinct(field, new Query( Criteria.where( queryKey ).is( value ) ).getQueryObject() );
+    }
+    
+    //One time run job
+    @Override
+    public int updateSurveyDetailsFields( long surveyPreIntitiationId, int participantType, Date surveySentDate)
+    {
+    	LOG.debug( "Method updateSurveyDetailsFields() to update participantType and surveySentDate started." );
+    	if(surveyPreIntitiationId > 0) {
+    		Query query = new Query();
+    		query.addCriteria( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN ).is( surveyPreIntitiationId ) );
+    		Update update = new Update();
+    		update.set( CommonConstants.PARTICIPANT_TYPE_COLUMN, participantType );
+    		if(surveySentDate != null)
+    			update.set( CommonConstants.SURVEY_SENT_DATE_COLUMN, surveySentDate );
+    		WriteResult updatedDocs =  mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+    		LOG.debug("Updated for spi {}",surveyPreIntitiationId);
+    		return updatedDocs.getN();
+    		
+    	}
+    	LOG.debug( "Method updateSurveyDetailsFields() to update participantType and surveySentDate finished." );
+    	return 0;
     }
 }
