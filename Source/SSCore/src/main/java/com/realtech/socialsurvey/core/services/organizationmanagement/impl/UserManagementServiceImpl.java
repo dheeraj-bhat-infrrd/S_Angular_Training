@@ -5131,4 +5131,44 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = userDao.getActiveUser(emailId);
         socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmailForMismatch( user, emailId );
     }
+    
+    
+    
+    //one time run job
+    @Override
+	public void updateSurveyDetails() {
+		int startingIndex = 0, limit = 2000, finalCount=0, notFound=0, updated;
+		
+		try {
+			LOG.info("Batch one time run job updateSurveyDetails started.");
+
+			// setting the status value
+			List<Integer> status = new ArrayList<>();
+			status.add(CommonConstants.SURVEY_STATUS_INITIATED);
+			status.add(CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE);
+			long recordCount = surveyPreInitiationDao.surveyPreInitiationCount(status);
+			LOG.info("Fetched rows {}",recordCount);
+			while (startingIndex <= recordCount) {
+				for (SurveyPreInitiation survey : surveyPreInitiationDao.fetchSurveysByStatus(status, startingIndex,
+						limit)) {
+					LOG.debug( "Updating participantType and surveySentDate for spi id {} "
+							+ survey.getSurveyPreIntitiationId());
+					updated=surveyDetailsDao.updateSurveyDetailsFields(survey.getSurveyPreIntitiationId(),
+							survey.getParticipantType(), survey.getCreatedOn());
+					finalCount++;
+					if(updated==0)
+					{
+						notFound++;
+					}
+				}
+				startingIndex += limit;
+			}
+			LOG.info("NotFound {}",notFound);
+			LOG.info("Final count {}",finalCount);
+		} catch (Exception e) {
+			LOG.error(" Error occured in updateSurveyDetails()");
+			e.printStackTrace();
+		}
+		LOG.info("Batch one time run job updateSurveyDetails finished.");
+	}
 }

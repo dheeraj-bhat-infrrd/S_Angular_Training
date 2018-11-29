@@ -390,6 +390,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setSurveyTransactionDate( surveyPreInitiation.getEngagementClosedTime() );
         surveyDetails.setState( surveyPreInitiation.getState() );
         surveyDetails.setCity( surveyPreInitiation.getCity() );
+        
+        //adding participantType and surveySentDate to mongo
+        surveyDetails.setParticipantType(surveyPreInitiation.getParticipantType());
+        surveyDetails.setSurveySentDate(surveyPreInitiation.getCreatedOn());
 
         SurveyDetails survey = null;
         //if survey request is old get survey by agent id and customer email

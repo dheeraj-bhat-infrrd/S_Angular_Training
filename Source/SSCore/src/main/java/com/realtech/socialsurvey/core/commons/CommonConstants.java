@@ -172,6 +172,10 @@ public interface CommonConstants
     /**
      * Hibernate entities and column name constants
      */
+    
+    public static final String PARTICIPANT_TYPE_COLUMN = "participantType";
+    public static final String SURVEY_SENT_DATE_COLUMN = "surveySentDate";
+    
     public static final String USER_INVITE_INVITATION_PARAMETERS_COLUMN = "invitationParameters";
     public static final String STATUS_COLUMN = "status";
     public static final String INVITATION_EMAIL_ID_COLUMN = "invitationEmailId";

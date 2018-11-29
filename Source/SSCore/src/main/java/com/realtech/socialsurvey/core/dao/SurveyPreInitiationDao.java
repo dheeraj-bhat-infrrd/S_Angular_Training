@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.dao;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -180,4 +179,16 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 	void updateAgentIdOfPreInitiatedSurveysByAgentEmailAddressForMismatched(User agent, String agentEmailAddress)
 			throws InvalidInputException;
+	
+	
+	public long surveyPreInitiationCount(List<Integer> status) throws DatabaseException;
+	
+	
+	/**
+     * @param status
+     * @return surveyPreinitiationList
+     */
+	
+	public List<SurveyPreInitiation> fetchSurveysByStatus(List<Integer> status, int startingIndex, int limit) throws DatabaseException;
+	
 }

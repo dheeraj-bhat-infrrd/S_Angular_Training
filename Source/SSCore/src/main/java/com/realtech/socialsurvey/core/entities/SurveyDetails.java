@@ -3,8 +3,6 @@ package com.realtech.socialsurvey.core.entities;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-
 
 public class SurveyDetails
 {
@@ -116,6 +114,18 @@ public class SurveyDetails
 
     //abusive email set
     private boolean abusiveNotify;
+    
+	//update survey details
+    private int participantType;
+
+    
+	public int getParticipantType() {
+		return participantType;
+	}
+
+	public void setParticipantType(int participantType) {
+		this.participantType = participantType;
+	}
 
     public String getAgentEmailId()
     {
