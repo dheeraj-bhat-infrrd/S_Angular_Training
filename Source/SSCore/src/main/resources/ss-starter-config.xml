@@ -908,7 +908,7 @@
 				<!-- <ref bean="failedstreammsgprocessorjobdetail" />  -->
 				<ref bean="archiveSocialFeedCollectionJob" />
 				<ref bean="ftpfileuploader" />
-				<ref bean="updatesurveyjobdetail"/>
+				<!-- <ref bean="updatesurveyjobdetail"/> -->
 			</list>
 		</property>
 
