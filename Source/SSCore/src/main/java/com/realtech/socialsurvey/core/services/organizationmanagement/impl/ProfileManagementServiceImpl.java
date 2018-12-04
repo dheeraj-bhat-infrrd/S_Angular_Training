@@ -4799,10 +4799,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             for ( Map<String, Object> review : reviews ) {
                 HashMap<String, Object> individualReviewee = (HashMap<String, Object>) review.get( "individualReviewee" );
                 HashMap<String, Object> reviewerName = (HashMap<String, Object>) review.get( "reviewerName" );
-                String displayReviewerName = (String) reviewerName.get( "displayName" );
+                Object displayReviewerName = reviewerName.get( "displayName" );
                 String customerFirstName = null;
-                if ( !StringUtils.isEmpty( displayReviewerName ) ) {
-                    customerFirstName = displayReviewerName;
+                if (displayReviewerName!=null &&  !StringUtils.isEmpty((String) displayReviewerName ) ) {
+                    customerFirstName = (String) displayReviewerName;
                 } else {
                     customerFirstName = (String) reviewerName.get( "screenName" );
                 }
