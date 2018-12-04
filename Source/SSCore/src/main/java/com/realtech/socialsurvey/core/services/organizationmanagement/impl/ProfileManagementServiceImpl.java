@@ -4789,54 +4789,54 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @SuppressWarnings ( "unchecked")
     public List<SurveyDetails> buildSurveyDetailFromZillowLenderReviewMap( Map<String, Object> map )
     {
-
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
-
         List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-
         reviews = (List<HashMap<String, Object>>) map.get( "reviews" );
         if ( reviews != null ) {
             for ( Map<String, Object> review : reviews ) {
+
                 HashMap<String, Object> individualReviewee = (HashMap<String, Object>) review.get( "individualReviewee" );
                 HashMap<String, Object> reviewerName = (HashMap<String, Object>) review.get( "reviewerName" );
-                Object displayReviewerName = reviewerName.get( "displayName" );
-                String customerFirstName = null;
-                if (displayReviewerName!=null &&  !StringUtils.isEmpty((String) displayReviewerName ) ) {
-                    customerFirstName = (String) displayReviewerName;
-                } else {
-                    customerFirstName = (String) reviewerName.get( "screenName" );
-                }
 
+                String customerFirstName = null;
+                if ( reviewerName != null ) {
+                    Object displayReviewerName = reviewerName.get( "displayName" );
+                    if ( displayReviewerName != null && !StringUtils.isEmpty( (String) displayReviewerName ) ) {
+                        customerFirstName = (String) displayReviewerName;
+                    } else {
+                        customerFirstName = (String) reviewerName.get( "screenName" );
+                    }
+                }
 
                 String profileName = null;
                 String zillowProfileUrl = CommonConstants.ZILLOW_PROFILE_URL;
                 if ( individualReviewee != null ) {
                     profileName = (String) individualReviewee.get( "screenName" );
-
                     //SS-1226 : Zillow reviews' social posts are displaying broken link 
                     //empty space replaced by %20 for FaceBook posts
                     if ( profileName != null && profileName.contains( " " ) ) {
                         profileName = profileName.replace( " ", "%20" );
                     }
-
                     zillowProfileUrl += profileName;
                 }
 
+                String sourceId = ( review.get( "reviewId" ) != null ) ? (String) review.get( "reviewId" ) : null;
+                String reviewDescription = ( review.get( "content" ) != null ) ? (String) review.get( "content" ) : null;
+                if ( reviewDescription != null ) {
+                    reviewDescription = reviewDescription.replaceAll( "< *br/*>", "\n" );
+                    reviewDescription = reviewDescription.replace( "&amp;", "&" );
+                }
 
-                String sourceId = (String) review.get( "reviewId" );
-                String reviewDescription = (String) review.get( "content" );
-                reviewDescription = reviewDescription.replaceAll( "< *br/*>", "\n" );
-                reviewDescription = reviewDescription.replace( "&amp;", "&" );
-                
-                String summary = (String) review.get( "title" );
-                String createdDateStr = (String) review.get( "created" );
-                String dateOfServiceStr = (String) review.get( "dateOfService" );
-                String completeProfileUrl = (String) review.get( "reviewerLink" );
-                Double score = ( (Integer) review.get( "rating" ) ).doubleValue();
+                String summary = ( review.get( "title" ) != null ) ? (String) review.get( "title" ) : null;
+                String createdDateStr = ( review.get( "created" ) != null ) ? (String) review.get( "created" ) : null;
+                String dateOfServiceStr = ( review.get( "dateOfService" ) != null ) ? (String) review.get( "dateOfService" )
+                    : null;
+                String completeProfileUrl = ( review.get( "reviewerLink" ) != null ) ? (String) review.get( "reviewerLink" )
+                    : null;
+                Double score = (review.get( "rating" )!=null) ?  ( (Integer) review.get( "rating" ) ).doubleValue(): null;
                 boolean isAbusive = false;
                 Date createdDate = convertStringToDateForZillowLenders( createdDateStr );
                 Date dateOfService = convertStringToDateForZillowLenders( dateOfServiceStr );
-
                 SurveyDetails surveyDetails = new SurveyDetails();
                 surveyDetails.setCompleteProfileUrl( completeProfileUrl );
                 surveyDetails.setCustomerFirstName( customerFirstName );
@@ -4858,14 +4858,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setSurveyCompletedDate( createdDate );
                 surveyDetails.setSurveyUpdatedDate( createdDate );
                 surveyDetails.setSurveyTransactionDate( dateOfService );
-
                 // saving zillow review summary
                 surveyDetails.setSummary( summary );
-
                 surveyDetailsList.add( surveyDetails );
             }
         }
-
         return surveyDetailsList;
     }
 
