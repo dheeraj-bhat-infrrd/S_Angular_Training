@@ -254,6 +254,8 @@ public class SurveyManagementController
 	@RequestMapping(value = "/data/storeFeedback")
 	public double storeFeedbackAndCloseSurvey(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
+		
+		
 		double surveyScoreRes = -1;
 
 		// To store final feedback provided by customer in mongoDB.
@@ -274,6 +276,8 @@ public class SurveyManagementController
 			String serverBaseUrl = requestUtils.getRequestServerName(request);
 			String onlyPostToSocialSurveyStr = request.getParameter("onlyPostToSocialSurvey");
 			boolean onlyPostToSocialSurvey = Boolean.parseBoolean(onlyPostToSocialSurveyStr);
+			
+	        LOG.info("Inside method storeFeedbackAndCloseSurvey with mood {}, surveyid {}", mood,surveyId);
 			
 			//getting additional parameters to incorporate store in social media
 
@@ -478,7 +482,7 @@ public class SurveyManagementController
 				
 			}
 			catch (InvalidInputException e) {
-				LOG.error("Exception occurred while trying to send survey completion mail to : " + customerEmail);
+				LOG.error("Exception occurred while trying to send survey completion mail to : {}", customerEmail);
 				throw e;
 			}
 		}
