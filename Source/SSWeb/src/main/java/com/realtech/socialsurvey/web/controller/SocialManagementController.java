@@ -2083,6 +2083,7 @@ public class SocialManagementController
 	                }
 	            }
             } catch (Exception e) {
+                LOG.error( "Error processing zillow reviews,", e );
             	return "invalid-nmls";
             }
         } else {
