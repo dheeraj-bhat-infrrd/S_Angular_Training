@@ -54,7 +54,7 @@
 				<div id="icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="icn-sur-popup-cont"></div>
 				<div class="mult-sur-icn-wrapper">
 					<div id="resend-mult-sur-icn" class="mult-sur-icn resend-mult-sur-icn float-left" title="Resend"></div>
-					<div id="del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right" title="Delete"></div>
+					<%-- <div id="del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right" title="Delete"></div> --%>
 				</div>
 			</div>
 			<div class="paginate-buttons-survey clearfix">
