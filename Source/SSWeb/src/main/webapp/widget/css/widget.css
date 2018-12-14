@@ -318,7 +318,8 @@
 
 .ss-widget-half-black-star{
     width: 9px;
-    overflow:  hidden;
+    overflow: hidden;
+    margin-left: -1px;
 }
 
 .ss-widget-half-white-star{
@@ -327,7 +328,8 @@
 
 .ss-widget-quat-black-star{
     width: 7px;
-    overflow:  hidden;
+    overflow: hidden;
+    margin-left: -1px;
 }
 
 .ss-widget-quat-white-star{
@@ -335,12 +337,13 @@
 }
 
 .ss-widget-3quat-black-star{
-    width: 9px;
-    overflow:  hidden;
+    width: 10px;
+    overflow: hidden;
+    margin-left: -1px;
 }
 
 .ss-widget-3quat-white-star{
-   	margin-left: -9px;
+   	margin-left: -10px;
 }
 
 .ss-widget-star-container{
@@ -443,6 +446,7 @@
 .ss-widget-review-div-container{
 	border-left: 1px solid #c9ddef;
     padding: 0;
+    border-right: 1px solid #c9ddef;
 }
 
 .ss-widget-options-container{
