@@ -446,6 +446,7 @@
 .ss-widget-review-div-container{
 	border-left: 1px solid #c9ddef;
     padding: 0;
+    border-right: 1px solid #c9ddef;
 }
 
 .ss-widget-options-container{
