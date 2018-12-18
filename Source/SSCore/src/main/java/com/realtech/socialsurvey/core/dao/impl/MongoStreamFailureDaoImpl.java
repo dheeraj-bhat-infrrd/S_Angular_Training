@@ -75,7 +75,7 @@ public class MongoStreamFailureDaoImpl implements StreamFailureDao
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_STREAM_RETRY_FAILED ).ne( true ) );
 
-        query.addCriteria( Criteria.where( CommonConstants.MONGO_CLASS_COLUMN ).is( EmailEntity.class.getName() ) );
+        query.addCriteria( Criteria.where( "messageType" ).is( "EMAIL_MESSAGES" ) );
 
         if ( start > 0 )
             query.skip( start );
