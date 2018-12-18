@@ -83,6 +83,7 @@ public class MongoStreamFailureDaoImpl implements StreamFailureDao
         if ( batchSize > 0 )
             query.limit( batchSize );
 
+        LOG.info("Query is " + query);
         List<EmailEntity> failedStreamMsgs = mongoTemplate.find( query, EmailEntity.class, FAILED_STREAM_MESSAGES_COLLECTION );
         LOG.debug( "Method getAllFailedStreamMessages() finished for start index {} and batch size {}", start, batchSize );
         return failedStreamMsgs;
