@@ -905,7 +905,7 @@
 				<ref bean="surveycsvuploadjobdetail" />
 				<ref bean="surveyInvitationEmailCountJobPastMonth" />
 				<ref bean="surveyInvitationEmailCountJobThisMonth" />
-				<!-- <ref bean="failedstreammsgprocessorjobdetail" />  -->
+				<ref bean="failedstreammsgprocessorjobdetail" /> 
 				<ref bean="archiveSocialFeedCollectionJob" />
 				<ref bean="ftpfileuploader" />
 				<!-- <ref bean="updatesurveyjobdetail"/> -->
@@ -950,7 +950,7 @@
 				<ref bean="surveycsvuploadcron" />
 				<ref bean="surveyInvitationEmailCountCronPastMonth" />
 				<ref bean="surveyInvitationEmailCountCronThisMonth" />
-				<!--  <ref bean="failedstreammsgprocessorceron" />  -->
+				<ref bean="failedstreammsgprocessorceron" />
 				<ref bean="archiveSocialFeedCollectionCronTrigger" />
 				<ref bean="ftpfileuploadercron" />
 				<ref bean="updatesurveydetailcron"/>
