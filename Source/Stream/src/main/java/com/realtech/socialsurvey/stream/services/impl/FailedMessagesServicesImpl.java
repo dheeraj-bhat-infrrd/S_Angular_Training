@@ -149,6 +149,7 @@ import java.util.concurrent.TimeoutException;
 					if (failedMessage.getData() != null) {
 						failedMessage.getData().setIsRetried(true);
 						failedMessage.setMessageType("EMAIL_MESSAGES_PROCESSED"); 
+						LOG.info("Processing message with id {}", failedMessage.getData().getRandomUUID());
 						kafkaEmailMessageTemplate.send(new GenericMessage<>(failedMessage.getData())).get(60,
 								TimeUnit.SECONDS);
 						failedEmailMessageRepository.save(failedMessage);
