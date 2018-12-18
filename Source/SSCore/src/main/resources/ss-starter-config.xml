@@ -953,7 +953,7 @@
 				<ref bean="failedstreammsgprocessorceron" />
 				<ref bean="archiveSocialFeedCollectionCronTrigger" />
 				<ref bean="ftpfileuploadercron" />
-				<ref bean="updatesurveydetailcron"/>
+				<!-- <ref bean="updatesurveydetailcron"/> -->
 			</list>
 		</property>
 		<property name="quartzProperties">
