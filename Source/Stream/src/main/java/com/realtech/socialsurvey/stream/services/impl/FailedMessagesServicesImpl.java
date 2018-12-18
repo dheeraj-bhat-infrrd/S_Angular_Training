@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.stream.services.impl;
 
 import com.realtech.socialsurvey.stream.common.FailedMessageConstants;
 import com.realtech.socialsurvey.stream.entities.FailedEmailMessage;
+import com.realtech.socialsurvey.stream.entities.FailedSocialPost;
 import com.realtech.socialsurvey.stream.repositories.FailedEmailMessageRepository;
 import com.realtech.socialsurvey.stream.services.FailedMessagesService;
 
@@ -9,11 +10,18 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -26,6 +34,15 @@ import java.util.List;
     private static final String MESSAGE_FAILURE_TEMPORARY = "temp";
     private static final String MESSAGE_FAILURE_PERMANENT = "perm";
     private FailedEmailMessageRepository failedEmailMessageRepository;
+    private KafkaTemplate<String, String> kafkaEmailMessageTemplate;
+    
+    
+    @Autowired
+    @Qualifier ( "emailMessageTemplate")
+    public void setKafkaEmailMessageTemplate( KafkaTemplate<String, String> kafkaEmailMessageTemplate )
+    {
+        this.kafkaEmailMessageTemplate = kafkaEmailMessageTemplate;
+    }
     
     @Autowired public void setFailedEmailMessageRepository( FailedEmailMessageRepository failedEmailMessageRepository )
     {
@@ -102,6 +119,47 @@ import java.util.List;
 			}
 		}
 		return failedMessages;
+	}
+	
+	
+	@Override
+	public void processFailedEmailMessaged(String filter) throws InterruptedException, ExecutionException, TimeoutException 
+	{
+
+		LOG.info("processFailedEmailMessaged started with filter {} ", filter);
+
+		int pageNum = 0;
+		List<FailedEmailMessage> failedEmailMessages = null;
+		Pageable numberOfRecords = null;
+		int batchNo = 1;
+		do {
+			LOG.info("Fetching data for batch {}", batchNo );
+			numberOfRecords = new PageRequest(pageNum, 500);
+			if (filter.equalsIgnoreCase(MESSAGE_FAILURE_TEMPORARY)) {
+				failedEmailMessages = failedEmailMessageRepository.findByMessageTypeAndPermanentFailure(
+						FailedMessageConstants.EMAIL_MESSAGES, false, numberOfRecords);
+			} else if (filter.equalsIgnoreCase(MESSAGE_FAILURE_PERMANENT)) {
+				LOG.debug("Getting 10 permanently failed messages");
+				failedEmailMessages = failedEmailMessageRepository.findByMessageTypeAndPermanentFailure(
+						FailedMessageConstants.EMAIL_MESSAGES, true, numberOfRecords);
+			}
+			if(failedEmailMessages != null) {
+				LOG.info("Fetch message count {} for batch {}" , failedEmailMessages.size() , batchNo++ );
+				for (FailedEmailMessage failedMessage : failedEmailMessages) {
+					if (failedMessage.getData() != null) {
+						failedMessage.getData().setIsRetried(true);
+						failedMessage.setMessageType("EMAIL_MESSAGES_PROCESSED"); 
+						kafkaEmailMessageTemplate.send(new GenericMessage<>(failedMessage.getData())).get(60,
+								TimeUnit.SECONDS);
+						failedEmailMessageRepository.save(failedMessage);
+					}
+				}
+			}else {
+				LOG.info("No more message to process");
+			}
+			
+		} while (failedEmailMessages != null && failedEmailMessages.size() == 500);
+		LOG.info( "processFailedEmailMessaged finished with filter {} ", filter );
 	}
 	
 	   
