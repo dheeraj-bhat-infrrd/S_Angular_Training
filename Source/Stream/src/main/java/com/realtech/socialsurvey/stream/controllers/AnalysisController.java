@@ -131,6 +131,26 @@ import io.swagger.annotations.ApiResponses;
 	}
 	
 	
+	@ApiOperation ( value = "Queue failed email messages.", response = String.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully queued failed email messages."),
+        @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse ( code = 503, message = "Service not available") })
+    @RequestMapping (value = "/messages/email/failed/process", method = RequestMethod.GET) 
+	public ResponseEntity<?> queueFailedEmailMessages(
+        @RequestParam ("filter") String type, @RequestParam ("offset") int offset )
+    {
+        LOG.info( "Received request to process failed email messages in stream of type {} ", type );
+        try {
+			failedMessagesService.processFailedEmailMessaged(type);
+			return new ResponseEntity<>( HttpStatus.CREATED );   	
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			LOG.error("ERROR occured while processing failed email messages " , e);
+			return new ResponseEntity<>( e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR ); 
+		}
+        
+    }
+	
 	 @ApiOperation ( value = "Queues failed social posts to social monitor.", response = Void.class)
 	    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Successfully queued failed social posts."),
 	        @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
