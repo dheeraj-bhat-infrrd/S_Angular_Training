@@ -385,7 +385,7 @@ public class EncompassCrmInfoVO implements Serializable
         encompassCrmInfoVO.setBuyerAgentEmail( encompassCrmInfo.getBuyerAgentEmail() );
         encompassCrmInfoVO.setBuyerAgentName( encompassCrmInfo.getBuyerAgentName() );
         encompassCrmInfoVO.setSellerAgentEmail( encompassCrmInfo.getSellerAgentEmail() );
-        encompassCrmInfoVO.setSellerAgentName( encompassCrmInfo.getBuyerAgentName() );
+        encompassCrmInfoVO.setSellerAgentName( encompassCrmInfo.getSellerAgentName() );
         encompassCrmInfoVO.setPropertyAddress( encompassCrmInfo.getPropertyAddress() );
         encompassCrmInfoVO.setLoanProcessorEmail( encompassCrmInfo.getLoanProcessorEmail() );
         encompassCrmInfoVO.setLoanProcessorName( encompassCrmInfo.getLoanProcessorName() );
