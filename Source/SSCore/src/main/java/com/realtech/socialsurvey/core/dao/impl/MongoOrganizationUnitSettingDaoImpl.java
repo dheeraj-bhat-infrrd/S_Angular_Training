@@ -1938,9 +1938,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			operations.add(Aggregation
 					.match(Criteria.where(KEY_SURVEY_STATS_AVG_SCORE).gte(advancedSearchVO.getRatingCriteria())));
 		// add operation based on review
-		if (advancedSearchVO.getReviewCountCriteria() != 0)
+		if (advancedSearchVO.getReviewCountCriteria() != 0) {
 			operations.add(Aggregation.match(
 					Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria())));
+		} else {
+			operations.add(Aggregation.match(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1)));
+		}
 		// add operation if category given
 		if (advancedSearchVO.getCategoryFilterList() != null && !advancedSearchVO.getCategoryFilterList().isEmpty())
 			operations
@@ -2040,9 +2043,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			operations.add(Aggregation
 					.match(Criteria.where(KEY_SURVEY_STATS_AVG_SCORE).gte(advancedSearchVO.getRatingCriteria())));
 		// add operation based on review
-		if (advancedSearchVO.getReviewCountCriteria() != 0)
+		if (advancedSearchVO.getReviewCountCriteria() != 0) {
 			operations.add(Aggregation.match(
 					Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria())));
+		} else {
+			operations.add(Aggregation.match(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1)));
+		}
 		// add operation if category given
 		if (advancedSearchVO.getCategoryFilterList() != null && !advancedSearchVO.getCategoryFilterList().isEmpty())
 			operations
