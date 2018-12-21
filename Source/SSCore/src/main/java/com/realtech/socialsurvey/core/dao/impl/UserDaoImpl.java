@@ -632,7 +632,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
     {
         LOG.debug( "Method getZipCodesByStateId called to fetch the list of cities and zipcodes in the state" );
         Criteria criteria = getSession().createCriteria(ZipCodeLookup.class);
-        Criterion criterion = Restrictions.or(Restrictions.like(CommonConstants.COUNTY_NAME, searchString+"%"),Restrictions.like(CommonConstants.CITY_NAME, searchString+"%"));
+        Criterion criterion = Restrictions.like(CommonConstants.CITY_STATE_NAME, searchString+"%");
         if(onlyUsFilter)
         	criteria.add(Restrictions.not(Restrictions.in(CommonConstants.STATE_LOOKUP, getStatesNotInUs())));
         criteria.add( criterion );

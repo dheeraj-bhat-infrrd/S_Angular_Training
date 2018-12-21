@@ -444,6 +444,14 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 			Integer.parseInt(searchString);
 			return userDao.getZipcodeSuggestion(searchString, startIndex, batchSize, onlyUsFilter);
 		}catch(NumberFormatException exception) {
+			if (searchString.contains(",")) {
+				String[] commaSeparatedArr = searchString.split(",");
+				if (commaSeparatedArr.length > 1) {
+					searchString = commaSeparatedArr[0].trim() + "," + commaSeparatedArr[1].trim();
+				} else {
+					searchString = commaSeparatedArr[0].trim();
+				}
+			}
 			return userDao.getCityAndCountySuggestion(searchString,startIndex,batchSize,onlyUsFilter);
 		}
 		
