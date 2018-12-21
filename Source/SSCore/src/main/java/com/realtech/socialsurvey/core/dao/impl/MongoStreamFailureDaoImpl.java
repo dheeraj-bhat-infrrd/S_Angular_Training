@@ -75,7 +75,7 @@ public class MongoStreamFailureDaoImpl implements StreamFailureDao
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_STREAM_RETRY_FAILED ).ne( true ) );
 
-        query.addCriteria( Criteria.where( CommonConstants.MONGO_CLASS_COLUMN ).is( EmailEntity.class.getName() ) );
+        query.addCriteria( Criteria.where( "messageType" ).is( "EMAIL_MESSAGES" ) );
 
         if ( start > 0 )
             query.skip( start );
@@ -83,6 +83,7 @@ public class MongoStreamFailureDaoImpl implements StreamFailureDao
         if ( batchSize > 0 )
             query.limit( batchSize );
 
+        LOG.info("Query is " + query);
         List<EmailEntity> failedStreamMsgs = mongoTemplate.find( query, EmailEntity.class, FAILED_STREAM_MESSAGES_COLLECTION );
         LOG.debug( "Method getAllFailedStreamMessages() finished for start index {} and batch size {}", start, batchSize );
         return failedStreamMsgs;

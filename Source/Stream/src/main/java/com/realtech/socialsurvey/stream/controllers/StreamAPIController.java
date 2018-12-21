@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.stream.entities.TransactionIngestionMessage;
 import com.realtech.socialsurvey.stream.entities.ReportRequest;
+import com.realtech.socialsurvey.stream.entities.SurveyProcessData;
 import com.realtech.socialsurvey.stream.messages.EmailMessage;
 import com.realtech.socialsurvey.stream.messages.SendgridEvent;
 import com.realtech.socialsurvey.stream.messages.UserEvent;
@@ -55,6 +56,8 @@ public class StreamAPIController
     private AuthenticationService authenticationService;
     
     private KafkaTemplate<String, String> kafkaTransactionIngestionTemplate;
+    
+    private KafkaTemplate<String, String> kafkaSurveyProcessorTemplate;
     
     @Value ( "${kafka.topic.solrTopic}")
     private String solrTopic;
@@ -122,7 +125,13 @@ public class StreamAPIController
         this.kafkaTransactionIngestionTemplate = kafkaTransactionIngestionTemplate;
     }
 
-
+    @Autowired
+    @Qualifier ( "kafkaSurveyProcessorTemplate")
+    public void setKafkaSurveyProcessorTemplate(KafkaTemplate<String, String> kafkaSurveyProcessorTemplate)
+    {
+        this.kafkaSurveyProcessorTemplate = kafkaSurveyProcessorTemplate;
+    }
+    
     @ApiOperation ( value = "Queues an email message.", response = Void.class)
     @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Successfully queued the message"),
         @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
@@ -234,6 +243,21 @@ public class StreamAPIController
         LOG.info( "Received request to upload surveys transaction request in stream" );
         LOG.debug( "Transaction request {}", transactionIngestionMessage );
         kafkaTransactionIngestionTemplate.send( new GenericMessage<>( transactionIngestionMessage ) ).get( 60, TimeUnit.SECONDS );
+        return new ResponseEntity<>( HttpStatus.OK );
+    }
+    
+    @ApiOperation ( value = "Process survey request.", response = Void.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Upload survey processor requested."),
+        @ApiResponse ( code = 401, message = "You are not authorized to access the resource"),
+        @ApiResponse ( code = 403, message = "Accessing the resource, you were trying to reach is forbidden"),
+        @ApiResponse ( code = 503, message = "Service not available") })
+    @RequestMapping ( value = "/survey/process", method = RequestMethod.POST)
+    public ResponseEntity<?> queueSurveyProcessRequest( @RequestBody SurveyProcessData surveyData )
+        throws InterruptedException, ExecutionException, TimeoutException
+    {
+        LOG.info( "Received request to process survey request in stream" );
+        LOG.debug( "survey request {}", surveyData );
+        kafkaSurveyProcessorTemplate.send( new GenericMessage<>( surveyData ) ).get( 60, TimeUnit.SECONDS );
         return new ResponseEntity<>( HttpStatus.OK );
     }
 

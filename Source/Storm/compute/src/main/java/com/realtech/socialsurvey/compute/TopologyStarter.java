@@ -62,5 +62,12 @@ public class TopologyStarter
             ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? TransactionIngestionTopologyStarterHelper.TRANSACTION_INGESTION_TOPOLOGY
                     : ChararcterUtils.appendWithHypen( TransactionIngestionTopologyStarterHelper.TRANSACTION_INGESTION_TOPOLOGY,
                     EnvConstants.getProfile() ) );
+        
+      //Transaction ingestion topology
+        new TransactionIngestionTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SurveyProcessorTopologyStarterHelper.SURVEY_PROCESSOR_TOPOLOGY
+                    : ChararcterUtils.appendWithHypen( SurveyProcessorTopologyStarterHelper.SURVEY_PROCESSOR_TOPOLOGY,
+                    EnvConstants.getProfile() ) );
+        
     }
 }

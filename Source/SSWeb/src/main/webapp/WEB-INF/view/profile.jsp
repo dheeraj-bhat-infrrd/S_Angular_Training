@@ -142,6 +142,8 @@
 	href="${initParam.resourcesPath}/resources/css/style-resp.css">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
+<link rel="stylesheet"
+	href="${initParam.resourcesPath}/resources/css/search-engine.css">
 <c:if test="${not empty profile}">
 	<c:if
 		test="${not empty profile.contact_details && not empty profile.contact_details.name }">
@@ -332,10 +334,10 @@
 	<div class="hm-header-main-wrapper">
 		<div class="container">
 			<div class="hm-header-row hm-header-row-main clearfix">
-				<div class="float-left hm-header-row-left padding-10">
+				<div class="float-left hm-header-row-left padding-10 pub-page-hdr-title">
 					<spring:message code="label.readwritesharereviews.key" />
 				</div>
-				<div class="float-right hm-find-pro-right clearfix">
+				<%-- <div class="float-right hm-find-pro-right clearfix">
 					<form id="find-pro-form" method="GET" action="/findapro.do">
 						<div class="float-left prof-input-header">Find a
 							professional</div>
@@ -353,6 +355,17 @@
 						<input id="find-pro-submit" type="button"
 							class="float-left prof-submit-btn" value="Search">
 					</form>
+				</div> --%>
+				<div class="float-right hm-find-pro-right clearfix srch-eng-pub-page-srch col-lg-7 col-md-7 col-sm-6 col-xs-12">
+					<div class="srch-eng-pub-page-cont">
+						<div class="srch-eng-pub-page-inp-cont">
+							<div class="srch-eng-txt-lbl srch-eng-inp-container srch-eng-txt-lbl-bord srch-eng-pub-page-bg" style="color: #2b609b;">Find</div>
+							<input id="srch-eng-pub-page-inp" type="text" placeholder="mortgage brokers, real estate agents,car rentals" class="srch-eng-cat-inp srch-eng-inp-container srch-eng-pub-page-bg">
+						</div>
+						<div id="srch-eng-pub-page-srch-btn" class="srch-eng-srch-img-cont cursor-pointer">
+		    				<img src="/resources/images/search_white.png" alt="search" class="srch-eng-srch-img">
+		    			</div>
+    				</div>
 				</div>
 			</div>
 		</div>
@@ -914,6 +927,7 @@
 	<script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 	<script src="${initParam.resourcesPath}/resources/js/profile.js"></script>
+	<script src="${initParam.resourcesPath}/resources/js/search-engine.js"></script>
 	<script
 		src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 	<script src='//www.google.com/recaptcha/api.js' async="async"

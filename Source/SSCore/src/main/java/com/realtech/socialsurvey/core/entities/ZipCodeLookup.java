@@ -25,6 +25,8 @@ public class ZipCodeLookup implements Serializable {
 	private String countyname;
 	private String cityname;
 	private StateLookup stateLookup;
+	private float latitude;
+	private float longitude;
 
 	public ZipCodeLookup() {
 	}
@@ -39,7 +41,7 @@ public class ZipCodeLookup implements Serializable {
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "state_id")
 	public StateLookup getStateLookup() {
 		return stateLookup;
@@ -72,4 +74,22 @@ public class ZipCodeLookup implements Serializable {
 	public void setCityname(String cityname) {
 		this.cityname = cityname;
 	}
+
+	public float getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(float latitude) {
+		this.latitude = latitude;
+	}
+
+	public float getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(float longitude) {
+		this.longitude = longitude;
+	}
+	
+	
 }

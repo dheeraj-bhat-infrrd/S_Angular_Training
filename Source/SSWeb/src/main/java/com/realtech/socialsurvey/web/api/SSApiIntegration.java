@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.api;
 
 import java.util.List;
 
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.PostToSocialMedia;
@@ -10,7 +11,9 @@ import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
+import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.FtpCreateRequest;
@@ -461,8 +464,33 @@ public interface SSApiIntegration
     @GET( "/v1/mismatched/emailId/{companyId}")
     Response fetchMismatchedSurveyForEmail(@Path ("companyId") long companyId , @Query ("transactionEmail") String transactionEmail,@Query ("startIndex") int startIndex, @Query ("batchSize") int batchSize, @Query ("count") long count, @Header("authorizationHeader") String authorizationHeader);
 
+    @POST ( "/v1/lower/hierarchy/{entityType}/{entityId}")
+    Response updateHierarchyAddress(@Path ("entityType") String entityType , @Path ("entityId") long entityId  , @Body ContactDetailsSettings contactDetails );
+    
+	@POST("/v1/add/address")
+	Response updateAddressForAgentWhileAddingIndividual(@Query("userId") long userId, @Query("regionId") long regionId,
+			@Query("branchId") long branchId);
+    
+    @POST ( "/v1/individual/address")
+    Response updateAddressForAgentId( @Query ( "userId")   long userId);
+    
+    @POST ( "/v1/primary/change/address")
+    Response updateAddressForAgentWhilePrimaryChange(@Query ( "userId")   long userId);
+    
     @POST ( "/v2/surveys/{surveyId}/socialMedia")
     Response postToSocialMedia( @Path ( "surveyId") String surveyId, @Body PostToSocialMedia postsToSocialMedia);
+
+    @GET ( "/v1/applosetting" )
+	Response getApplicationLOSetttings();
+    
+    @POST ( "/v1/searchresults" )
+    Response getSearchResults(@Body AdvancedSearchVO advancedSearchVO);
+    
+    @GET ( "/v1/nearme" )
+    Response getNearMe(@Query ( "searchString" ) String searchString,@Query ( "startIndex") int startIndex, @Query ( "batchSize") int batchSize);
+    
+    @POST ( "/v1/searchresults/count" )
+    Response getSearchResultsCount(@Body AdvancedSearchVO advancedSearchVO);
     
     @GET("/v1/users/{companyId}/owner")
     public Response getOwnerForCompany(@Path("companyId") Long companyId);

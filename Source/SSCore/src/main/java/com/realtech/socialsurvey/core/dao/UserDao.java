@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
@@ -88,6 +90,35 @@ public interface UserDao extends GenericDao<User, Long>
     public Long getOwnerForCompany(Long companyId);
     
     
+
+	/**
+	 * @param searchString
+	 * @param startIndex
+	 * @param batchSize
+	 * @param onlyUsFilter
+	 * @return
+	 */
+	List<ZipCodeLookup> getCityAndCountySuggestion(String searchString, int startIndex, int batchSize, boolean onlyUsFilter);
+
+
+	/**
+	 * @param userId
+	 * @return
+	 */
+	String getCompanyNameForUserId(long userId);
+
+
+	List<StateLookup> getStatesNotInUs();
+
+
+	/**
+	 * @param zipcode
+	 * @param startIndex
+	 * @param batchSize
+	 * @param onlyUsFilter
+	 * @return
+	 */
+	List<ZipCodeLookup> getZipcodeSuggestion(String zipcode, int startIndex, int batchSize, boolean onlyUsFilter);
 
 
 }

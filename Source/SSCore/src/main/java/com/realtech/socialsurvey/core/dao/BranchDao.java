@@ -39,4 +39,15 @@ public interface BranchDao extends GenericDao<Branch, Long> {
 
     public List<Long> getBranchIdsOfRegion( long regionId, int isDefault, int batch, int start ) throws InvalidInputException;
 
+
+	/**
+	 * @param branchId
+	 * @return
+	 */
+	public long checkIfBranchIsDefault(long branchId);
+
+
+	String getCompanyNameForBranchId(long branchId);
+
+
 }

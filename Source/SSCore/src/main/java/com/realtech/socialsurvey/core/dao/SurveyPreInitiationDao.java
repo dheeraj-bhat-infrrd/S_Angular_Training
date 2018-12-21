@@ -179,6 +179,9 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 	void updateAgentIdOfPreInitiatedSurveysByAgentEmailAddressForMismatched(User agent, String agentEmailAddress)
 			throws InvalidInputException;
+
+
+	long getIncompleteSurveyCountForAgent(long agentId);
 	
 	
 	public long surveyPreInitiationCount(List<Integer> status) throws DatabaseException;

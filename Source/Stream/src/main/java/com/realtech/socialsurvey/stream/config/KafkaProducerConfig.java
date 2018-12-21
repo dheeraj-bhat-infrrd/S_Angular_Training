@@ -41,6 +41,9 @@ public class KafkaProducerConfig
     @Value ( "${kafka.topic.transactionIngestionTopic}" )
     private String transactionIngestionTopic;
     
+    @Value ( "${kafka.topic.surveyProcessorTopic}" )
+    private String surveyProcessorTopic;
+    
     @Bean
     public ProducerFactory<String, String> producerFactory()
     {
@@ -137,6 +140,14 @@ public class KafkaProducerConfig
         KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
         kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
         kafkaTemplate.setDefaultTopic(transactionIngestionTopic);
+        return kafkaTemplate;
+    }
+    
+    @Bean(name = "kafkaSurveyProcessorTemplate")
+    public KafkaTemplate<String, String> kafkaSurveyProcessorTemplate(){
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
+        kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
+        kafkaTemplate.setDefaultTopic(surveyProcessorTopic);
         return kafkaTemplate;
     }
 }

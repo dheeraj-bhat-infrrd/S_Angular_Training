@@ -449,4 +449,6 @@ public interface SurveyHandler
 	 */
 	double getNpsScore(List<SurveyResponse> surveyResponse);
 
+	public void streamSurveyProcessRequest(SurveyDetails surveyDetails);
+
 }

@@ -71,7 +71,7 @@
 			
 			$('#rep-icn-sur-popup-cont').data('selected-survey', selectedSurveys);
 			if (selectedSurveys != undefined && selectedSurveys.length > 0 ) {
-				$('#rep-del-mult-sur-icn').addClass('mult-sur-icn-active');
+				<%-- $('#rep-del-mult-sur-icn').addClass('mult-sur-icn-active'); --%>
 				$('#rep-resend-mult-sur-icn').addClass('mult-sur-icn-active');
 			} else {
 				$('#rep-del-mult-sur-icn').removeClass('mult-sur-icn-active');

@@ -47,12 +47,11 @@ import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
-import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.CustomFieldsNameMapping;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.PostToSocialMedia;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.CustomFieldsNameMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -66,6 +65,7 @@ import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -177,6 +177,7 @@ public class SurveyManagementController
 
 	@Autowired
     private SSApiIntergrationBuilder ssApiIntergrationBuilder;
+	
 
 	/*
 	 * Method to store answer to the current question of the survey.
@@ -254,6 +255,8 @@ public class SurveyManagementController
 	@RequestMapping(value = "/data/storeFeedback")
 	public double storeFeedbackAndCloseSurvey(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
+		
+		
 		double surveyScoreRes = -1;
 
 		// To store final feedback provided by customer in mongoDB.
@@ -274,6 +277,8 @@ public class SurveyManagementController
 			String serverBaseUrl = requestUtils.getRequestServerName(request);
 			String onlyPostToSocialSurveyStr = request.getParameter("onlyPostToSocialSurvey");
 			boolean onlyPostToSocialSurvey = Boolean.parseBoolean(onlyPostToSocialSurveyStr);
+			
+	        LOG.info("Inside method storeFeedbackAndCloseSurvey with mood {}, surveyid {}", mood,surveyId);
 			
 			//getting additional parameters to incorporate store in social media
 
@@ -315,6 +320,9 @@ public class SurveyManagementController
 			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
 			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(survey.getSurveyPreIntitiationId());
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);
+			
+			//call stream API to put survey process request
+			surveyHandler.streamSurveyProcessRequest(survey);
 			
 			// update the modified time of hierarchy for seo
 			surveyHandler.updateModifiedOnColumnForAgentHierachy(agentId);
@@ -478,7 +486,7 @@ public class SurveyManagementController
 				
 			}
 			catch (InvalidInputException e) {
-				LOG.error("Exception occurred while trying to send survey completion mail to : " + customerEmail);
+				LOG.error("Exception occurred while trying to send survey completion mail to : {}", customerEmail);
 				throw e;
 			}
 		}

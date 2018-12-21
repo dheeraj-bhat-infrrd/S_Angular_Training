@@ -1,0 +1,115 @@
+db.getCollection('APPLICATION_SETTINGS').insertOne(
+   {
+	"loSearchEngine": {
+		"sortingOrder": [{
+				"displayName": "Best Match",
+				"displayOrder": NumberInt(1),
+				"isDefault": true
+			},
+			{
+				"displayName": "Highest Rated",
+				"displayOrder": NumberInt(2),
+				"isDefault": false
+			},
+			{
+				"displayName": "Most Reviewed",
+				"displayOrder": NumberInt(3),
+				"isDefault": false
+			},
+			{
+				"displayName": "Distance",
+				"displayOrder": NumberInt(4),
+				"isDefault": false
+			}
+		],
+		"distanceCriteria": [{
+				"displayName": "75 miles",
+				"displayOrder": NumberInt(1),
+				"isDefault": false
+			},
+			{
+				"displayName": "50 miles",
+				"displayOrder": NumberInt(2),
+				"isDefault": false
+			},
+			{
+				"displayName": "25 miles",
+				"displayOrder": NumberInt(3),
+				"isDefault": false
+			},
+			{
+				"displayName": "10 miles",
+				"displayOrder": NumberInt(4),
+				"isDefault": false
+			}
+		],
+		"ratingCriteria": [{
+				"displayName": "5 stars",
+				"displayOrder": NumberInt(1),
+				"isDefault": false
+			},
+			{
+				"displayName": "4+ stars",
+				"displayOrder": NumberInt(2),
+				"isDefault": false
+			},
+			{
+				"displayName": "3+ stars",
+				"displayOrder": NumberInt(3),
+				"isDefault": false
+			},
+			{
+				"displayName": "any rating",
+				"displayOrder": NumberInt(4),
+				"isDefault": false
+			}
+		],
+		"reviewCriteria": [{
+				"displayName": "> 100",
+				"displayOrder": NumberInt(1),
+				"isDefault": false
+			},
+			{
+				"displayName": "> 50",
+				"displayOrder": NumberInt(2),
+				"isDefault": true
+			},
+			{
+				"displayName": "> 5",
+				"displayOrder": NumberInt(3),
+				"isDefault": false
+			},
+			{
+				"displayName": "1 or more",
+				"displayOrder": NumberInt(4),
+				"isDefault": false
+			}
+		],
+		"profilesCriteria": [{
+				"displayName": "Professionals",
+				"displayOrder": NumberInt(1),
+				"isDefault": false
+			},
+			{
+				"displayName": "Loan Offices",
+				"displayOrder": NumberInt(2),
+				"isDefault": false
+			},
+			{
+				"displayName": "Companies",
+				"displayOrder": NumberInt(3),
+				"isDefault": false
+			}
+		],
+        "defaultOffset" : -6,
+        "completionRatio" : 0.01,
+        "spsOffset" : 90,
+        "spsRatio" : 0.01,
+	"recentSurveyDays" : NumberInt(365)
+
+	},
+        "createdOn" : NumberLong(new Date()),
+        "modifiedOn" : NumberLong(new Date())
+
+}
+)

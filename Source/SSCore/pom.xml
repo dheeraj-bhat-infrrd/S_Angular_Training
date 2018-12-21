@@ -400,6 +400,12 @@
 			<version>2.5.2</version>
 		</dependency>
 		
+		<!-- dependency for google maps api -->
+		<dependency>
+			<groupId>com.google.maps</groupId>
+			<artifactId>google-maps-services</artifactId>
+			<version>0.2.11</version>
+		</dependency>
 
 	</dependencies>
 
