@@ -238,6 +238,16 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
             throw new DatabaseException( "HibernateException caught in getRegionIdsUnderCompany().", e );
         }
     }
+    
+    //check if REGION is default 
+    @Override
+	public long checkIfRegionIsDefault(long regionId) {
+		LOG.debug( "Method to check if region is default checkIfRegionIsDefault() started." );
+		Query query = getSession().createSQLQuery( "SELECT region_id FROM REGION WHERE region_id = :regionId AND IS_DEFAULT_BY_SYSTEM = 0 " );
+        query.setParameter( "regionId", regionId  );
+        LOG.debug( "Method to check if region is default checkIfRegionIsDefault() finished." );
+        return  (int) query.uniqueResult();
+	}
 
 }
 // JIRA SS-42 By RM-05 EOC

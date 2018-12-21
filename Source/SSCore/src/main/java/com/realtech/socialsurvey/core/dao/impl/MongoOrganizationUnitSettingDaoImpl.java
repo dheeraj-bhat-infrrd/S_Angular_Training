@@ -1,10 +1,12 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +14,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.NestableRuntimeException;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.ejb.criteria.expression.BinaryArithmeticOperation.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,10 +24,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.geo.Circle;
+import org.springframework.data.geo.GeoResult;
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.NearQuery;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
@@ -34,15 +50,21 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.LOSearchEngine;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyStats;
 import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.vo.AddressGeoLocationVO;
+import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
+import com.realtech.socialsurvey.core.vo.LOSearchRankingVO;
 
 
 /**
@@ -59,6 +81,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_CRM_INFO = "crm_info";
     public static final String KEY_CRM_INFO_SOURCE = "crm_info.crm_source";
     public static final String KEY_IDEN = "iden";
+    public static final String KEY_COMPANY_ID = "companyId";
     public static final String KEY_CRM_INFO_CLASS = "crm_info._class";
     public static final String KEY_MAIL_CONTENT = "mail_content";
     public static final String KEY_SURVEY_SETTINGS = "survey_settings";
@@ -178,6 +201,32 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_TRANSACTION_SOURCE_FTP_STATUS = "status";
     public static final String KEY_TRANSACTION_SOURCE_FTP_DOLLAR = "transactionSourceFtpList.$";
     public static final String KEY_TRANSACTION_SOURCE_FTP_EMAIL = "emailId";
+    
+    //address details in contact detail required for update
+    public static final String KEY_CONTACT_DETAILS_ADDRESS = "contact_details.address";
+    public static final String KEY_CONTACT_DETAILS_ADDRESS1 = "contact_details.address1";
+    public static final String KEY_CONTACT_DETAILS_ADDRESS2 = "contact_details.address2";
+    public static final String KEY_CONTACT_DETAILS_COUNTRY = "contact_details.country";
+    public static final String KEY_CONTACT_DETAILS_STATE = "contact_details.state";
+    public static final String KEY_CONTACT_DETAILS_CITY = "contact_details.city";
+    public static final String KEY_CONTACT_DETAILS_COUNTRY_CODE = "contact_details.countryCode";
+    public static final String KEY_CONTACT_DETAILS_ZIP_CODE = "contact_details.zipcode";
+    public static final String KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM = "contact_details.updatedBySystem";
+    public static final String KEY_CONTACT_DETAILS_NAME = "contact_details.name";
+    
+    
+    public static final String KEY_LOCATION = "geoLocation";
+    public static final String KEY_DISTANCE_FIELD = "distanceField";
+    public static final String KEY_SURVEY_STATS = "surveyStats";
+    
+    public static final String APPLICATION_SETTINGS_COLLECTION = "APPLICATION_SETTINGS";
+    
+    //to search by survey stats
+    public static final String KEY_SURVEY_STATS_AVG_SCORE = "surveyStats.avgScore";
+    public static final String KEY_SURVEY_STATS_SURVEY_COUNT = "surveyStats.surveyCount";
+    public static final String KEY_SURVEY_STATS_SEARCH_RANKING_SCORE = "surveyStats.searchRankingScore";
+    
+    
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -517,6 +566,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             LOG.debug( "Creating " + AGENT_SETTINGS_COLLECTION );
             mongoTemplate.createCollection( AGENT_SETTINGS_COLLECTION );
             createIndexOnIden( AGENT_SETTINGS_COLLECTION );
+        }
+        if ( !mongoTemplate.collectionExists( APPLICATION_SETTINGS_COLLECTION ) ) {
+            LOG.debug( "Creating " + APPLICATION_SETTINGS_COLLECTION );
+            mongoTemplate.createCollection( APPLICATION_SETTINGS_COLLECTION );
+            createIndexOnIden( APPLICATION_SETTINGS_COLLECTION );
         }
     }
 
@@ -1625,4 +1679,394 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.info( "query : {} ",query );
         
     }
+    
+    @Override
+    public AddressGeoLocationVO fetchAddressForId(long entityId, String entityType, String collectionName) {
+        LOG.debug( "The method fetchAddressForId() to fetch address for entityType:{}, entityId:{} ", entityType, entityId );
+        ContactDetailsSettings contactDetails = new ContactDetailsSettings();
+        GeoJsonPoint location = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
+        query.addCriteria( Criteria.where(  KEY_CONTACT_DETAILS_ADDRESS ).exists( true ) );
+        query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
+        query.addCriteria( Criteria.where( KEY_ACCOUNT_DISABLED ).is( false ) );
+        query.fields().include( KEY_CONTACT_DETAILS).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
+        if(organizationUnitSettings != null && organizationUnitSettings.getContact_details() != null) {
+            contactDetails =  organizationUnitSettings.getContact_details();
+            if(organizationUnitSettings.getGeoLocation() != null) {
+            	location = organizationUnitSettings.getGeoLocation();
+            }
+        }
+        return createAddressGeoLocationVo(contactDetails,location);
+        
+    }
+    
+    @Override
+    public void updateAddressForLowerHierarchy(String collectionName, AddressGeoLocationVO addGeoVO, List<Long> listOfId) {
+        LOG.debug( "The method to update collection:{} for listOfId:{} with the address ",collectionName,listOfId );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).in( listOfId ) );
+        query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
+        query.addCriteria( Criteria.where( KEY_ACCOUNT_DISABLED ).is( false ) );
+        query.addCriteria( 
+        		//query check if agent has his own address by seeing the flag or if contact details don't exist
+        		new Criteria().orOperator(Criteria.where(  KEY_CONTACT_DETAILS_ADDRESS ).exists( false ),
+        				Criteria.where( KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM ).is( true ),
+        				Criteria.where( KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM ).exists( false )) );
+        
+      
+        mongoTemplate.updateMulti( query, createContactDetailsUpdate(addGeoVO), OrganizationUnitSettings.class, collectionName );
+        
+    }
+    
+    @Override
+    public void updateAgentAddress(String collectionName, AddressGeoLocationVO addGeoVO, long userId) {
+        LOG.debug( "The method to update collection:{} for userId:{} with the address ",collectionName,userId );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( userId ) );
+        query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
+        query.addCriteria( Criteria.where( KEY_ACCOUNT_DISABLED ).is( false ) );
+        query.addCriteria( 
+        		//query check if agent has his own address by seeing the flag or if contact details don't exist
+        		new Criteria().orOperator(Criteria.where(  KEY_CONTACT_DETAILS_ADDRESS ).exists( false ),
+        				Criteria.where( KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM ).is( true ),
+        				Criteria.where( KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM ).exists( false ))
+        		 );
+        
+        
+        mongoTemplate.updateFirst( query, createContactDetailsUpdate(addGeoVO), OrganizationUnitSettings.class, collectionName );
+        LOG.info("update done");
+        
+    }
+    
+    public Update createContactDetailsUpdate(AddressGeoLocationVO addGeoVO) {
+    	Update update = new Update();
+        update.set( KEY_CONTACT_DETAILS_ADDRESS, addGeoVO.getAddress() );
+        update.set( KEY_CONTACT_DETAILS_ADDRESS1, addGeoVO.getAddress1());
+        update.set( KEY_CONTACT_DETAILS_ADDRESS2, addGeoVO.getAddress2());
+        update.set( KEY_CONTACT_DETAILS_COUNTRY, addGeoVO.getCountry());
+        update.set( KEY_CONTACT_DETAILS_STATE, addGeoVO.getState());
+        update.set( KEY_CONTACT_DETAILS_CITY, addGeoVO.getCity());
+        update.set( KEY_CONTACT_DETAILS_COUNTRY_CODE, addGeoVO.getCountryCode());
+        update.set( KEY_CONTACT_DETAILS_ZIP_CODE, addGeoVO.getZipcode());
+        update.set( KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM, true);
+        //update modified on so etl can pick it up
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+        
+        //update location
+        update.set( KEY_LOCATION , createGeoJsonPoint(addGeoVO.getLatitude(),addGeoVO.getLongitude()));
+        return update;
+    }
+    
+    @Override
+    public GeoJsonPoint createGeoJsonPoint(double lat,double lng) {
+    	//https://drissamri.be/blog/2015/08/18/build-a-location-api-with-spring-data-mongodb-and-geojson/
+        return new GeoJsonPoint(
+                Double.valueOf(lng),
+                Double.valueOf(lat));
+        
+    }
+    
+    @Override
+    public void updateLocation(double lat,double lng,long entityId,String collectionName) {
+    	 LOG.debug( "The method to update collection:{} for userId:{} with the address ",collectionName,entityId );
+         Query query = new Query();
+         query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
+         Update update = new Update();
+         //update location
+         update.set( KEY_LOCATION ,  createGeoJsonPoint(lat, lng));
+         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
+    }
+    
+    @Override
+    public AddressGeoLocationVO createAddressGeoLocationVo(ContactDetailsSettings contactDetails, GeoJsonPoint location) {
+    	AddressGeoLocationVO addressVo = new AddressGeoLocationVO();
+    	addressVo.setAddress(contactDetails.getAddress());
+    	addressVo.setAddress1(contactDetails.getAddress1());
+    	addressVo.setAddress2(contactDetails.getAddress2());
+    	addressVo.setCity(contactDetails.getCity());
+    	addressVo.setCountry(contactDetails.getCountry());
+    	addressVo.setCountryCode(contactDetails.getCountryCode());
+    	addressVo.setState(contactDetails.getState());
+    	addressVo.setZipcode(contactDetails.getZipcode());
+    	addressVo.setUpdatedBySystem(true);
+    	
+    	if(location != null) {
+    		//https://community.esri.com/thread/191440-pulling-lat-long-data-from-geopoint
+    		addressVo.setLatitude(location.getY());
+    		addressVo.setLongitude(location.getX());
+    	}
+    	
+    	return addressVo;
+    }
+    
+    //for one time work
+    @Override
+    public List<OrganizationUnitSettings> fetchUsersWithOwnAddress(String collectionName)
+    {
+        Query query = new Query();
+        if(collectionName.equals(AGENT_SETTINGS_COLLECTION)) {
+        	query.addCriteria( Criteria.where( KEY_STATUS )
+                    .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        }
+        
+        //check if contact details has address feild 
+        query.addCriteria(Criteria.where(  KEY_CONTACT_DETAILS_ADDRESS ).exists( true ));
+        
+        //check if flag is false or empty
+        query.addCriteria(new Criteria().orOperator(Criteria.where(KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM).is(false), Criteria.where(KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM).exists(false)));
+        
+        //check if latLng doesn't exist
+        query.addCriteria(Criteria.where(KEY_LOCATION).exists(false));
+        //include only necessary feilds
+        query.fields().include( KEY_IDEN).include( KEY_CONTACT_DETAILS_ADDRESS).include(KEY_CONTACT_DETAILS_ADDRESS1).include(KEY_CONTACT_DETAILS_ADDRESS2).include(KEY_CONTACT_DETAILS_CITY)
+        .include(KEY_CONTACT_DETAILS_COUNTRY).include(KEY_CONTACT_DETAILS_COUNTRY_CODE).include(KEY_CONTACT_DETAILS_STATE).include(KEY_CONTACT_DETAILS_ZIP_CODE).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        
+        return mongoTemplate.find( query, OrganizationUnitSettings.class,
+        		collectionName );
+    }
+    
+    /* db.getCollection('AGENT_SETTINGS').aggregate([{$geoNear: {near: { type: "Point", coordinates: [ 77.6142767 , 13.0039488 ]},
+      	distanceField: "dist.calculated",maxDistance: 1600,spherical: true}}])*/
+    //query for the below function
+    @Override
+    public List<OrganizationUnitSettings> nearestToLoc(double longitude,double latitude,double maxDistanceInMeters, String collectionName) {
+         LOG.debug("the method nearestToLoc has started");
+         Point point = new Point(longitude,latitude);
+         
+         NearQuery nearQuery = NearQuery.near(point).maxDistance(maxDistanceInMeters, Metrics.MILES).spherical(true);
+         TypedAggregation<OrganizationUnitSettings> aggregation = null;
+         aggregation = new TypedAggregation<>( OrganizationUnitSettings.class,
+                 Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD),
+                 Aggregation.sort(Sort.Direction.ASC, KEY_DISTANCE_FIELD)
+                 );
+         AggregationResults<OrganizationUnitSettings> result = mongoTemplate.aggregate( aggregation, collectionName,
+        		 OrganizationUnitSettings.class );
+         return result.getMappedResults();
+    }
+    
+    /**
+     * 
+     * @param iden
+     * @param collectionName
+     * @return
+     */
+    @Override
+    public SurveyStats getSurveyStats(long iden, String collectionName) 
+    {
+    		LOG.debug("Method  getSurveyStats started for collection {} and iden {}", collectionName, iden);
+    		SurveyStats surveyStats;
+    		
+    		//create criteria query and define field to be fetched
+    	 	Query query = new Query( Criteria.where( CommonConstants.IDEN ).is( iden ) );
+    	 	query.fields().include( KEY_SURVEY_STATS );
+    	 	
+    	 	//fetch collection from db
+         OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
+         
+         //check for empty object
+         if(organizationUnitSettings == null)
+        	 	surveyStats = new SurveyStats();
+         else
+        	 	surveyStats = organizationUnitSettings.getSurveyStats();
+         
+         //return survey stats object
+ 		LOG.debug("Method  getSurveyStats finished for collection {} and iden {}", collectionName, iden);
+ 		return surveyStats;
+
+    }
+    
+    @Override
+    public void updateSurveyStats(long iden, String collectionName, SurveyStats surveyStats) 
+    {
+    		LOG.debug("Method  updateSurveyStats started for collection {} and iden {}", collectionName, iden);
+    		
+    		//create criteria query and define field to be fetched
+    	 	Query query = new Query( Criteria.where( CommonConstants.IDEN ).is( iden ) );
+    	 	
+    	 	//update collection in db
+         Update update = new Update();
+         update.set( KEY_SURVEY_STATS , surveyStats);
+         mongoTemplate.updateFirst( query, update, collectionName );
+         
+ 		LOG.debug("Method  updateSurveyStats finished for collection {} and iden {}", collectionName, iden);
+    }
+
+	@Override
+	public List<OrganizationUnitSettings> getSearchResultsForCriteria(AdvancedSearchVO advancedSearchVO,
+			String collectionName, LOSearchEngine loSearchEngine, long companyIdFilter) {
+		LOG.debug("the method to search by given criteria is as follows");
+
+		// adding aggregationOperation for sorting criteria
+		TypedAggregation<OrganizationUnitSettings> aggregation = null;
+		List<AggregationOperation> operations = new ArrayList<>();
+		//check if it's textSearch
+		boolean isTextSearch = false;
+		// check if it's boolean flag
+		boolean isLocationSearch = false;
+		// add near query only if lat and lng is given
+		if (advancedSearchVO.getNearLocation() != null) {
+			// get based on distance
+			// give lat and lng
+			Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
+			NearQuery nearQuery = NearQuery.near(point)
+					.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true);
+			operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
+			isLocationSearch = true;
+		}
+		// check if it's normal search
+		// if normal get default values for reviews and sort criteria
+		//to find pattern irrespective of case sensitivity
+		String regexOption = "i";
+		if(advancedSearchVO.getFindBasedOn() != null && !advancedSearchVO.getFindBasedOn().isEmpty()) {
+			String regexForName = "(^| )" + advancedSearchVO.getFindBasedOn();
+			operations.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption )));
+			isTextSearch = true;
+		}
+		
+		//exclude default entities
+		operations.add(Aggregation.match(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false )));
+		
+		//exclude incomplete or deleted
+		operations.add(Aggregation.match(Criteria.where( KEY_STATUS )
+		         .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) )));
+		  
+		
+		// add operation based on rating
+		if (advancedSearchVO.getRatingCriteria() != 0)
+			operations.add(Aggregation
+					.match(Criteria.where(KEY_SURVEY_STATS_AVG_SCORE).gte(advancedSearchVO.getRatingCriteria())));
+		// add operation based on review
+		if (advancedSearchVO.getReviewCountCriteria() != 0)
+			operations.add(Aggregation.match(
+					Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria())));
+		// add operation if category given
+		if (advancedSearchVO.getCategoryFilterList() != null && !advancedSearchVO.getCategoryFilterList().isEmpty())
+			operations
+					.add(Aggregation.match(Criteria.where(KEY_VERTICAL).in(advancedSearchVO.getCategoryFilterList())));
+		
+		//add company id filter if need to search with in company
+				if (companyIdFilter > 0l)
+					operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
+
+		// sort Criteria where default is best match
+		operations.add(getSortByAggOperation(advancedSearchVO.getSortBy(), isLocationSearch, isTextSearch));
+		// add skip which is start index
+		if (advancedSearchVO.getStartIndex() != 0)
+			operations.add(Aggregation.skip((int) advancedSearchVO.getStartIndex()));
+		// add limit
+		if (advancedSearchVO.getBatchSize() != 0) {
+			operations.add(Aggregation.limit(advancedSearchVO.getBatchSize()));
+		}
+		
+		aggregation = new TypedAggregation<>(OrganizationUnitSettings.class, operations);
+		AggregationResults<OrganizationUnitSettings> result = mongoTemplate.aggregate(aggregation, collectionName,
+				OrganizationUnitSettings.class);
+		List<OrganizationUnitSettings> unitSettings = result.getMappedResults();
+		for (OrganizationUnitSettings organizationUnitSetting : unitSettings) {
+			setCompleteUrlForSettings(organizationUnitSetting, collectionName);
+		}
+		return unitSettings;
+
+	}
+    
+    @Override
+    public AggregationOperation getSortByAggOperation(String sortBy,Boolean isLocationSearch, Boolean isTextSearch) {
+    	switch(sortBy) {
+    	case CommonConstants.SEARCH_ENGINE_SORT_BY_RATING:
+    		return Aggregation.sort(Sort.Direction.DESC,KEY_SURVEY_STATS_AVG_SCORE).and(Sort.Direction.DESC,KEY_SURVEY_STATS_SURVEY_COUNT);
+    	case CommonConstants.SEARCH_ENGINE_SORT_BY_REVIEWS:
+    		return Aggregation.sort(Sort.Direction.DESC,KEY_SURVEY_STATS_SURVEY_COUNT);
+    	case CommonConstants.SEARCH_ENGINE_SORT_BY_DISTANCE:
+    		if(isLocationSearch)
+    			return Aggregation.sort(Sort.Direction.ASC,KEY_DISTANCE_FIELD);
+    		//return default
+    		return Aggregation.sort(Sort.Direction.DESC,KEY_SURVEY_STATS_SEARCH_RANKING_SCORE).and(Sort.Direction.DESC,KEY_SURVEY_STATS_SURVEY_COUNT);
+    	case CommonConstants.SEARCH_ENGINE_SORT_BY_BEST_MATCH:
+    		if(isTextSearch)
+    			return Aggregation.sort(Sort.Direction.ASC,KEY_CONTACT_DETAILS_NAME);
+    		if(isLocationSearch)
+    			return Aggregation.sort(Sort.Direction.ASC,KEY_DISTANCE_FIELD);
+		return Aggregation.sort(Sort.Direction.DESC,KEY_SURVEY_STATS_SEARCH_RANKING_SCORE).and(Sort.Direction.DESC,KEY_SURVEY_STATS_SURVEY_COUNT);
+		default :
+			return Aggregation.sort(Sort.Direction.DESC,KEY_SURVEY_STATS_SEARCH_RANKING_SCORE).and(Sort.Direction.DESC,KEY_SURVEY_STATS_SURVEY_COUNT);
+    	}
+    }
+    
+    @Override
+	public long getSearchResultsForCriteriaCount(AdvancedSearchVO advancedSearchVO,
+			String collectionName, LOSearchEngine loSearchEngine, long companyIdFilter) {
+		LOG.debug("the method to get count for search by given criteria is as follows");
+
+		// adding aggregationOperation for sorting criteria
+		TypedAggregation<OrganizationUnitSettings> aggregation = null;
+		List<AggregationOperation> operations = new ArrayList<>();
+		//check if it's textSearch
+		boolean isTextSearch = false;
+		// check if it's boolean flag
+		boolean isLocationSearch = false;
+		// add near query only if lat and lng is given
+		if (advancedSearchVO.getNearLocation() != null) {
+			// get based on distance
+			// give lat and lng
+			Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
+			NearQuery nearQuery = NearQuery.near(point)
+					.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true);
+			operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
+			isLocationSearch = true;
+		}
+		// check if it's normal search
+		// if normal get default values for reviews and sort criteria
+		//to find pattern irrespective of case sensitivity
+		String regexOption = "i";
+		if(advancedSearchVO.getFindBasedOn() != null && !advancedSearchVO.getFindBasedOn().isEmpty()) {
+			String regexForName = "(^| )" + advancedSearchVO.getFindBasedOn();
+			operations.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption )));
+			isTextSearch = true;
+		}
+		
+		//exclude default entities
+		operations.add(Aggregation.match(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false )));
+		
+		//exclude incomplete or deleted
+		operations.add(Aggregation.match(Criteria.where( KEY_STATUS )
+				.nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) )));
+				  
+				
+		
+		// add operation based on rating
+		if (advancedSearchVO.getRatingCriteria() != 0)
+			operations.add(Aggregation
+					.match(Criteria.where(KEY_SURVEY_STATS_AVG_SCORE).gte(advancedSearchVO.getRatingCriteria())));
+		// add operation based on review
+		if (advancedSearchVO.getReviewCountCriteria() != 0)
+			operations.add(Aggregation.match(
+					Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria())));
+		// add operation if category given
+		if (advancedSearchVO.getCategoryFilterList() != null && !advancedSearchVO.getCategoryFilterList().isEmpty())
+			operations
+					.add(Aggregation.match(Criteria.where(KEY_VERTICAL).in(advancedSearchVO.getCategoryFilterList())));
+		
+		//add company id filter if need to search with in company
+		if (companyIdFilter > 0l)
+					operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
+
+		// sort Criteria where default is best match
+		operations.add(getSortByAggOperation(advancedSearchVO.getSortBy(), isLocationSearch, isTextSearch));
+		operations.add(Aggregation.group().count().as("count"));
+
+		aggregation = new TypedAggregation<>(OrganizationUnitSettings.class, operations);
+		AggregationResults<OrganizationUnitSettings> result = mongoTemplate.aggregate(aggregation, collectionName,
+				OrganizationUnitSettings.class);
+		@SuppressWarnings ( "unchecked") List<BasicDBObject> shares = (List<BasicDBObject>) result.getRawResults()
+	            .get( "result" );
+	        long count = 0;
+	        if ( shares != null && shares.size() != 0 ) {
+	        	count = (int) shares.get( CommonConstants.INITIAL_INDEX ).get( "count" );
+	        }
+		return count;
+
+	}
+    
 }

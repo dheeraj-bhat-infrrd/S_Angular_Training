@@ -1862,7 +1862,7 @@ public class UserManagementController
 
     @ResponseBody
     @RequestMapping ( value = "/deleteuserprofile", method = RequestMethod.POST)
-    public String deleteUserProfile( Model model, HttpServletRequest request )
+    public String deleteUserProfile( Model model, HttpServletRequest request ) throws Exception
     {
         LOG.info( "Method deleteUserProfile() called from UserManagementController" );
         try {
@@ -1899,6 +1899,9 @@ public class UserManagementController
 
 
                 userManagementService.updateUserCountModificationNotification( updatedUser.getCompany() );
+                
+                //update latest hierarchies address
+                sSApiIntergrationBuilder.getIntegrationApi().updateAddressForAgentWhilePrimaryChange(updatedUser.getUserId());
 
                 if ( sessionUser.getUserId() == updatedUser.getUserId() ) {
                     try {
@@ -1912,7 +1915,7 @@ public class UserManagementController
                 throw new NonFatalException( "NumberFormatException while parsing profileId. Reason : " + e.getMessage(), e );
             } catch ( InvalidInputException e ) {
                 throw new NonFatalException( "InvalidInputException while deleting profile. Reason : " + e.getMessage(), e );
-            }
+            } 
         } catch ( NonFatalException e ) {
             LOG.error(
                 "NonFatalException occurred while deleting UserProfile in UserManagementController. Reason : " + e.getMessage(),

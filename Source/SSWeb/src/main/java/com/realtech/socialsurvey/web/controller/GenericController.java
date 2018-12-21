@@ -70,4 +70,13 @@ public class GenericController {
 		LOG.info("Method fetchGoogleMapAPIKey() called from GenericController");
 		return googleMapAPIKey;
 	}
+	
+	/**
+     * Method to redirect to pageNotFound page
+     */
+    @RequestMapping(value = "/sspagenotfound")
+    public String ssPageNotFound() {
+        LOG.warn("Page not found.");
+        return JspResolver.SS_PAGE_NOT_FOUND;
+    }
 }

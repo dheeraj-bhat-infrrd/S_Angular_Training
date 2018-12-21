@@ -12914,3 +12914,22 @@ b{
 	height: 25px;
     width: 85px;
 }
+
+.ss-page-not-found-txt {
+    font-family: OpenSansBold;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.ss-404-img-cont {
+    height: 200px;
+    width: 500px;
+    margin: 0 auto;
+    margin-top: 100px;
+}
+
+body.ss-not-found-page{
+	 background: url(../images/ss-notfound-bg.jpg);
+}

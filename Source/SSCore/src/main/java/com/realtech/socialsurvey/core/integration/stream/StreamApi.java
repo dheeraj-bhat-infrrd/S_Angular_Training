@@ -5,6 +5,7 @@ import java.util.List;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.ReportRequest;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.SurveyProcessData;
 import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.core.entities.ftp.FtpUploadRequest;
 
@@ -48,5 +49,8 @@ public interface StreamApi
 
     @POST ( "/api/v1/stream/transaction/ingestion")
     public Response sendsurveyTransactionRequest( @Body FtpUploadRequest ftpUploadRequest );
+    
+    @POST ( "/api/v1/stream/survey/process")
+    public Response sendsurveyProcessRequest( @Body SurveyProcessData surveyProcessData );
     
 }

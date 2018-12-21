@@ -1006,6 +1006,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Agent settings passed can not be null" );
         }
         LOG.debug( "Updating contact detail information" );
+        //set the isDefaultBySystem status to false
+        contactDetailsSettings.setUpdatedBySystem(false);
         organizationUnitSettingsDao.updateParticularKeyAgentSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contactDetailsSettings, agentSettings );
         // Update the seo content flag to true

@@ -24,6 +24,7 @@ public class ContactDetailsSettings {
 	private ContactNumberSettings contact_numbers;
 	private SocialLinksSettings social_links;
 	private WebAddressSettings web_addresses;
+	private boolean updatedBySystem;
 
 	public String getName() {
 		return name;
@@ -176,12 +177,23 @@ public class ContactDetailsSettings {
 	public void setCity(String city) {
 		this.city = city;
 	}
+	
+	public boolean isUpdatedBySystem() {
+		return updatedBySystem;
+	}
+
+	public void setUpdatedBySystem(boolean updatedBySystem) {
+		this.updatedBySystem = updatedBySystem;
+	}
 
 	@Override
 	public String toString() {
-		return "ContactDetailsSettings [name=" + name + ", address=" + address + ", address1=" + address1 + ", address2=" + address2 + ", country="
-				+ country + ", countryCode=" + countryCode + ", zipcode=" + zipcode + ", about_me=" + about_me + ", title=" + title + ", mail_ids="
-				+ mail_ids + ", contact_numbers=" + contact_numbers + ", social_links=" + social_links + "]";
+		return "ContactDetailsSettings [name=" + name + ", firstName=" + firstName + ", lastName=" + lastName
+				+ ", address=" + address + ", address1=" + address1 + ", address2=" + address2 + ", country=" + country
+				+ ", state=" + state + ", city=" + city + ", countryCode=" + countryCode + ", zipcode=" + zipcode
+				+ ", location=" + location + ", industry=" + industry + ", about_me=" + about_me + ", title=" + title
+				+ ", mail_ids=" + mail_ids + ", contact_numbers=" + contact_numbers + ", social_links=" + social_links
+				+ ", web_addresses=" + web_addresses + ", updatedBySystem=" + updatedBySystem + "]";
 	}
 
 }
