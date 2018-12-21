@@ -1823,4 +1823,6 @@ public interface CommonConstants
     public static final String STATE_LOOKUP = "stateLookup";
     public static final String ID = "id";
     public static final String ZIPCODE_COL = "zipcode";
+    public static final String STATE_NAME = "state";
+    public static final String CITY_STATE_NAME = "citystate";
 }
