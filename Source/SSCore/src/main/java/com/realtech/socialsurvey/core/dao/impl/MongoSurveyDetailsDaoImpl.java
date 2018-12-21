@@ -489,41 +489,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
     }
 
-
-    // This method returns a map of customers count based upon their mood.
-    // Map contains Mood --> Customers count mapping for each mood for a given
-    // agent/branch/region/company.
-
-    @Override
-    public Map<String, Long> getCountOfCustomersByMood( String columnName, long columnValue )
-    {
-        LOG.debug( "Method to get customers according to their mood, getCountOfCustomersByMood() started." );
-        TypedAggregation<SurveyDetails> aggregation;
-        if ( columnName == null ) {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                Aggregation.group( CommonConstants.MOOD_COLUMN ).count().as( "count" ) );
-        } else {
-            aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
-                Aggregation.group( CommonConstants.MOOD_COLUMN ).count().as( "count" ) );
-        }
-
-        AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
-            SurveyDetails.class );
-        Map<String, Long> moodSplit = new HashMap<>();
-        if ( result != null ) {
-            @SuppressWarnings ( "unchecked") List<BasicDBObject> moodCount = (List<BasicDBObject>) result.getRawResults()
-                .get( "result" );
-            for ( BasicDBObject o : moodCount ) {
-                moodSplit.put( o.get( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).toString(),
-                    Long.parseLong( o.get( "count" ).toString() ) );
-            }
-        }
-        LOG.debug( "Method to get customers according to their mood, getCountOfCustomersByMood() finished." );
-        return moodSplit;
-    }
-
-
     // This method returns the customers' count based upon the number of reminder mails sent to
     // them.
 
@@ -3781,6 +3746,89 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         return mongoTemplate.getCollection( SURVEY_DETAILS_COLLECTION ).distinct(field, new Query( Criteria.where( queryKey ).is( value ) ).getQueryObject() );
     }
     
+
+    @Override
+    public Map<String, Long> getSurveyCountForGatewayResponses(String entityType, long entityId)
+	{
+    		LOG.info("Method getSurveyCountForGatewayResponses started for entityType {} and entityId {} " , entityType, entityId);
+		Map<String, Long> surveyCounts = new HashMap<>();
+		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class,
+				Aggregation.match(Criteria.where(entityType).is(entityId)),
+				Aggregation.match(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)),
+				Aggregation.match(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(false)),
+				Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).ne(CommonConstants.DEFAULT_AGENT_ID)),
+				Aggregation.match(Criteria.where(CommonConstants.SOURCE_COLUMN).nin(
+						Arrays.asList(CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY))),
+				Aggregation.group(CommonConstants.MOOD_COLUMN).count().as("count"));
+
+		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION,
+				SurveyDetails.class);
+
+		if (result != null) {
+			@SuppressWarnings("unchecked")
+			List<BasicDBObject> reviewsCount = (List<BasicDBObject>) result.getRawResults().get("result");
+			for (BasicDBObject reviewCount : reviewsCount) {
+				if(reviewCount != null && reviewCount.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN) != null)
+				surveyCounts.put(reviewCount.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString(),
+						Long.parseLong(reviewCount.get("count").toString()));
+			}
+		}
+		
+		LOG.info("Method getSurveyCountForGatewayResponses finished for entityType {} and entityId {} " , entityType, entityId);
+		return surveyCounts;
+	}
+    
+    @Override
+    @SuppressWarnings("unchecked")
+	public double getAvgScoreForEntity(String entityType, long entityId) 
+	{
+		LOG.info("Method getAvgScoreForEntity started for entityType {} and entityId {} ", entityType,
+				entityId);
+		float avg = 0;
+		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class,
+				Aggregation.match(Criteria.where(entityType).is(entityId)),
+				Aggregation
+						.match(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)),
+				Aggregation.match(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(false)),
+				Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).ne(CommonConstants.DEFAULT_AGENT_ID)),
+				Aggregation.match(Criteria.where(CommonConstants.SOURCE_COLUMN).nin(
+						Arrays.asList(CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY))),
+				Aggregation.group().avg(CommonConstants.SCORE_COLUMN).as("avg"));
+
+		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION,
+				SurveyDetails.class);
+
+		if (result != null) {
+			List<BasicDBObject> avgScore = (List<BasicDBObject>) result.getRawResults().get("result");
+			if(avgScore.size() > 0)
+			avg= Float.parseFloat(avgScore.get(CommonConstants.INITIAL_INDEX).get("avg").toString());
+			
+		}
+
+		LOG.info("Method getAvgScoreForEntity finished for entityType {} and entityId {} ", entityType,
+				entityId);
+		return avg;
+	}
+    
+    @Override
+    public SurveyDetails getLatestCompletedSurveyForEntity(String entityType , long entityId)
+    {
+        LOG.debug( "Method getLatestCompletedSurveyForEntity() started" );
+        Query query = new Query();
+        query.addCriteria(Criteria.where(entityType).is(entityId));
+        
+        query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
+        
+        query.addCriteria(Criteria.where(CommonConstants.SOURCE_COLUMN).nin(
+				Arrays.asList(CommonConstants.SURVEY_SOURCE_ZILLOW, CommonConstants.SURVEY_SOURCE_3RD_PARTY)));
+       
+        query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ) );
+
+        
+        LOG.debug( "Method getLatestCompletedSurveyForEntity() finished" );
+        return mongoTemplate.findOne(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+    }
+        
     //One time run job
     @Override
     public int updateSurveyDetailsFields( long surveyPreIntitiationId, int participantType, Date surveySentDate)
@@ -3801,4 +3849,5 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	LOG.debug( "Method updateSurveyDetailsFields() to update participantType and surveySentDate finished." );
     	return 0;
     }
+    
 }

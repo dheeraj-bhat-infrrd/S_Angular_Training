@@ -49,6 +49,7 @@ import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -63,10 +64,6 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 /**
  * @author Ustav
- *
- */
-/**
- * @author sandra
  *
  */
 public interface OrganizationManagementService
@@ -1827,6 +1824,7 @@ public interface OrganizationManagementService
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail,
         boolean sendMail, boolean isAddedByRealtechOrSSAdmin, String firstName, String lastName ) throws InvalidInputException;
 
+
     /**
      * Updates the allowPartner survey field for given unit settings
      * @param unitSettings
@@ -1834,5 +1832,7 @@ public interface OrganizationManagementService
      */
     void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey );
 
+
+	long getCompanyByProfileName(String profileName);
 
 }

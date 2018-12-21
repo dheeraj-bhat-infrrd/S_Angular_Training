@@ -2,10 +2,8 @@ package com.realtech.socialsurvey.api.controllers;
 
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +31,6 @@ import com.realtech.socialsurvey.api.models.request.FailedStormMessage;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentDisableApiEntity;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -441,5 +438,5 @@ public class OrganizationManagementApiController
         SurveyPreInitiationList surveyPreInitiationList = socialManagementService.getUnmatchedPreInitiatedSurveysForEmail( companyId, transactionEmail, startIndex, batchSize, count );
         return new ResponseEntity<>( surveyPreInitiationList, HttpStatus.OK );
     }
- 
+    
 }

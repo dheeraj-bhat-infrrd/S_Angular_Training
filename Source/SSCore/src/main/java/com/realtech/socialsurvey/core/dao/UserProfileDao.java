@@ -97,4 +97,19 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     public List<UserProfile> getUserProfiles( long userId );
+
+
+    /**
+     * @param companyId
+     * @return
+     */
+    public Map<String, Map<Long, List<Long>>> getUserListForhierarchy( long companyId );
+
+
+	/**
+	 * @param entityType
+	 * @param entityId
+	 * @return
+	 */
+	public List<Long> findPrimaryUserProfile(String entityType, long entityId) ;
 }

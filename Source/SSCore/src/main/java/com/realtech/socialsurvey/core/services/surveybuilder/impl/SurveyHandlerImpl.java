@@ -83,6 +83,7 @@ import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveyProcessData;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -94,6 +95,7 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -267,6 +269,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     
     @Autowired
     private EmailUnsubscribeService unsubscribeService;
+    
+    @Autowired
+	private StreamApiIntegrationBuilder streamApiIntergrationBuilder;
     
     @javax.annotation.Resource
     @Qualifier ( "branch")
@@ -5369,6 +5374,31 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			}
 		}
 		return -1;
+	}
+    
+    /**
+     * 
+     */
+    @Override
+	public void streamSurveyProcessRequest(SurveyDetails surveyDetails)
+    {
+    		LOG.info("Method streamSurveyProcessRequest started for survey with id {} " , surveyDetails.get_id());
+		SurveyProcessData surveyProcessData = new SurveyProcessData();
+		surveyProcessData.setAgentId(surveyDetails.getAgentId());
+		surveyProcessData.setBranchId(surveyDetails.getBranchId());
+		surveyProcessData.setRegionId(surveyDetails.getRegionId());
+		surveyProcessData.setCompanyId(surveyDetails.getCompanyId());
+		surveyProcessData.setCustomerEmail(surveyDetails.getCustomerEmail());
+		surveyProcessData.setCustomerFirstName(surveyDetails.getCustomerFirstName());
+		surveyProcessData.setCustomerLastName(surveyDetails.getCustomerLastName());
+		surveyProcessData.setMood(surveyDetails.getMood());
+		surveyProcessData.setNpsScore(surveyDetails.getNpsScore());
+		surveyProcessData.setReview(surveyDetails.getReview());
+		surveyProcessData.setScore(surveyDetails.getScore());
+
+		streamApiIntergrationBuilder.getStreamApi().sendsurveyProcessRequest(surveyProcessData);
+		LOG.info("Method streamSurveyProcessRequest finished for survey with id {} " , surveyDetails.get_id());
+
 	}
 }
 

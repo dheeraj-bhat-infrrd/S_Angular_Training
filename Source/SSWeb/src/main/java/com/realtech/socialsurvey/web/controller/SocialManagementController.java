@@ -2077,7 +2077,7 @@ public class SocialManagementController
                                 }
                             }
                         } catch ( IOException e ) {
-                            LOG.warn( "Exception caught while parsing zillow reviews {}", e.getMessage() );
+                        	LOG.warn( "Exception caught while parsing zillow reviews {}", e.getMessage() );
                             throw new UnavailableException( "Zillow reviews could not be fetched for  nmls: " + nmlsId );
                         }
 	                }

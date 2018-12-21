@@ -25,6 +25,7 @@ kafka:
     batchTopic: batch-topic
     userEventTopic: user-event-topic
     transactionIngestionTopic: transaction-ingestion-topic
+    surveyProcessorTopic : survey-processor-topic
 
 ---
 
@@ -54,6 +55,7 @@ kafka:
     batchTopic: batch-topic-dev
     userEventTopic: user-event-topic-dev
     transactionIngestionTopic: transaction-ingestion-topic-dev
+    surveyProcessorTopic : survey-processor-topic-dev
 
 api:
   security:
@@ -85,6 +87,7 @@ kafka:
     batchTopic: batch-topic-demo
     userEventTopic: user-event-topic-demo
     transactionIngestionTopic: transaction-ingestion-topic-demo
+    surveyProcessorTopic : survey-processor-topic-demo
 
     
 api:
@@ -120,6 +123,7 @@ kafka:
     batchTopic: batch-topic-stage
     userEventTopic: user-event-topic-stage
     transactionIngestionTopic: transaction-ingestion-topic-stage
+    surveyProcessorTopic : survey-processor-topic-stage
     
 api:
   security:

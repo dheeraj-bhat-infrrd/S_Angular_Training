@@ -66,6 +66,8 @@ public class KafkaTopicSpoutBuilder
     private static final String TRANSACTION_INGESTION_TOPIC = "transaction-ingestion-topic";
     private static final String TRANSACTION_INGESTION_GROUP = "tig01";
     
+    private static final String SURVEY_PROCESSOR_TOPIC = "survey-processor-topic";
+    private static final String SURVEY_PROCESSOR_GROUP = "spg01";
     
     public static synchronized KafkaTopicSpoutBuilder getInstance(){
         if (kafkaTopicSpoutBuilder == null){
@@ -192,4 +194,18 @@ public class KafkaTopicSpoutBuilder
         LOG.info( "Survey transaction Ingestion topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
         return new KafkaSpout( transactionIngestionSpoutConfig );
     }
+    
+    public  KafkaSpout surveyProcessorSpout() {
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SURVEY_PROCESSOR_TOPIC
+                : ChararcterUtils.appendWithHypen(SURVEY_PROCESSOR_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SURVEY_PROCESSOR_GROUP
+                : ChararcterUtils.appendWithHypen(SURVEY_PROCESSOR_GROUP, EnvConstants.getProfile() );
+        SpoutConfig surveyProcessorSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        surveyProcessorSpoutConfig.ignoreZkOffsets = false;
+        surveyProcessorSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Survey processor  topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( surveyProcessorSpoutConfig );
+    }
+    
 }

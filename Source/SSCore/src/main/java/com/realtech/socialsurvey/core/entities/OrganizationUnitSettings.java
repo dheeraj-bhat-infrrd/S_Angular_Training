@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfiguration;
@@ -120,6 +121,14 @@ public class OrganizationUnitSettings implements Serializable
     private ZillowShareConfig zillowShareConfig;
     
     private CustomFieldsNameMapping customFieldsNameMapping;
+    
+    private GeoJsonPoint geoLocation;
+    
+    private SurveyStats surveyStats;
+
+    private double distanceField;
+    
+    private long companyId;
     
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
@@ -999,6 +1008,39 @@ public class OrganizationUnitSettings implements Serializable
 
 	public void setCustomFieldsNameMapping(CustomFieldsNameMapping customFieldsNameMapping) {
 		this.customFieldsNameMapping = customFieldsNameMapping;
+	}
+
+	public GeoJsonPoint getGeoLocation() {
+		return geoLocation;
+	}
+
+
+	public void setGeoLocation(GeoJsonPoint geoLocation) {
+		this.geoLocation = geoLocation;
+	}
+
+	public double getDistanceField() {
+		return distanceField;
+	}
+
+
+	public SurveyStats getSurveyStats() {
+		return surveyStats;
+	}
+
+
+	public void setSurveyStats(SurveyStats surveyStats) {
+		this.surveyStats = surveyStats;
+	}
+
+
+	public long getCompanyId() {
+		return companyId;
+	}
+
+
+	public void setCompanyId(long companyId) {
+		this.companyId = companyId;
 	}
 
 

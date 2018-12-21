@@ -2700,6 +2700,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Inserting agent settings. User id: " + user.getUserId() );
         AgentSettings agentSettings = new AgentSettings();
         agentSettings.setIden( user.getUserId() );
+        agentSettings.setCompanyId(user.getCompany().getCompanyId());
         agentSettings.setCreatedBy( user.getCreatedBy() );
         agentSettings.setCreatedOn( System.currentTimeMillis() );
         agentSettings.setModifiedBy( user.getModifiedBy() );

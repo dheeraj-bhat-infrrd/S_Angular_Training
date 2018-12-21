@@ -261,7 +261,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         criteria.add( Restrictions.in( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN, incompleteSurveyIds ) );
         return criteria.list();
     }
-    
+
     @SuppressWarnings ( "unchecked")
     @Override
     public long getIncompleteSurveyCount( long companyId, long agentId, int[] status, Timestamp startDate, Timestamp endDate,
@@ -1047,6 +1047,24 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
     }
     
+
+    @Override
+    public long getIncompleteSurveyCountForAgent(long agentId) 
+    {
+
+        LOG.info( "Method getIncompleteSurveyCountForAgent() started" );
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+        List<Integer> statusList = new ArrayList<Integer>();
+        statusList.add( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+        statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+        criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
+        criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, statusList ) );
+        criteria.setProjection(Projections.rowCount());
+        List results = criteria.list();
+        Integer rowCount = (Integer) results.get(0);
+        return rowCount;
+    }
+
     //one time run job
     @SuppressWarnings("unused")
 	@Override

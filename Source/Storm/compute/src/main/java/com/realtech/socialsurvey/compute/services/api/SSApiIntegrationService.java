@@ -1,17 +1,31 @@
 package com.realtech.socialsurvey.compute.services.api;
 
-import com.realtech.socialsurvey.compute.entities.*;
+import java.util.List;
+import java.util.Map;
+
+import com.realtech.socialsurvey.compute.entities.BulkSurveyPutVO;
+import com.realtech.socialsurvey.compute.entities.FailedFtpRequest;
+import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
+import com.realtech.socialsurvey.compute.entities.Keyword;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.compute.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.compute.entities.response.BulkWriteErrorVO;
+import com.realtech.socialsurvey.compute.entities.response.EntitySurveyStatsVO;
 import com.realtech.socialsurvey.compute.entities.response.FtpSurveyResponse;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
-import retrofit2.Call;
-import retrofit2.http.*;
 
-import java.util.List;
-import java.util.Map;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 
 /**
@@ -159,4 +173,12 @@ public interface SSApiIntegrationService
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/widget/scripts")
     Call<List<String>> getWidgetScripts();
+    
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/{entityType}/{entityId}/surveystats")
+    Call<EntitySurveyStatsVO> getSurveyStatsForEntity(@Path( "entityType") String entityType, @Path("entityId") long entityId);
+    
+    @Headers ( "Content-Type: application/json")
+    @POST ( "v1/{entityType}/{entityId}/surveystats")
+    Call<Boolean> updateSurveyStatsForEntity(@Path( "entityType") String entityType, @Path("entityId") long entityId, @Body EntitySurveyStatsVO entitySurveyStatsVO);
 }

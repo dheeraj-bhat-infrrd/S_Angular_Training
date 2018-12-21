@@ -42,9 +42,6 @@ public interface SurveyDetailsDao
     public void updateSurveyAsClicked( String surveyMongoId );
 
 
-    public Map<String, Long> getCountOfCustomersByMood( String columnName, long columnValue );
-
-
     public Map<String, Long> getCountOfCustomersByReminderMails( String columnName, long columnValue );
 
 
@@ -401,5 +398,14 @@ public interface SurveyDetailsDao
 	public List<SurveyResponse> getSurveyRatingResponse(String surveyId);
 	
 	public int updateSurveyDetailsFields( long surveyPreIntitiationId, int participantType, Date surveySentDate);
+
+
+	public Map<String, Long> getSurveyCountForGatewayResponses(String entityType, long entityId);
+
+
+	double getAvgScoreForEntity(String entityType, long entityId);
+
+
+	SurveyDetails getLatestCompletedSurveyForEntity(String entityType, long entityId);
 
 }

@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -381,5 +382,21 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
         return criteria.list();
     }
     
+    //check if branch is default 
+    @Override
+	public long checkIfBranchIsDefault(long branchId) {
+		LOG.debug( "Method to check if branch is default checkIfBranchIsDefault() started." );
+		Query query = getSession().createSQLQuery( "SELECT branch_id FROM BRANCH WHERE branch_id = :branchId AND IS_DEFAULT_BY_SYSTEM = 0 " );
+        query.setParameter( "branchId", branchId  );
+        LOG.debug( "Method to check if branch is default checkIfBranchIsDefault() finished." );
+        return  (int) query.uniqueResult();
+	}
+    
+    @Override
+    public String getCompanyNameForBranchId(long branchId) {
+    	LOG.debug("method to get companyName for branch with branchId : {}",branchId);
+    	Branch branch = findById(Branch.class, branchId);
+    	return branch.getCompany().getCompany();
+    }
 }
 // JIRA SS-42 By RM-05 EOC

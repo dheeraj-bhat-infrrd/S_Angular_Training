@@ -5,19 +5,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.LOSearchEngine;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SurveyStats;
 import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.vo.AddressGeoLocationVO;
+import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
+import com.realtech.socialsurvey.core.vo.LOSearchRankingVO;
 
 
 /**
@@ -383,5 +394,83 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public List<TransactionSourceFtp> fetchTransactionFtpListActive( long companyId );
+
+
+    /**
+     * @param entityId
+     * @param entityType
+     * @param collectionName
+     * @return
+     */
+    public AddressGeoLocationVO fetchAddressForId( long entityId, String entityType, String collectionName );
+
+
+    /**
+     * @param collectionName
+     * @param contactDetails
+     * @param listOfId
+     */
+    public void updateAddressForLowerHierarchy(String collectionName,
+    		AddressGeoLocationVO addGeoVO, List<Long> listOfId );
+
+
+	/**
+	 * @param collectionName
+	 * @param contactDetails
+	 * @param userId
+	 */
+	public void updateAgentAddress(String collectionName,  AddressGeoLocationVO addGeoVO, long userId);
+
+
+	/**
+	 * @param contactDetails
+	 * @return
+	 */
+	public AddressGeoLocationVO createAddressGeoLocationVo(ContactDetailsSettings contactDetails, GeoJsonPoint location);
+
+
+	GeoJsonPoint createGeoJsonPoint(double lat, double lng);
+
+
+	void updateLocation(double lat,double lng, long entityId, String collectionName);
+
+
+	List<OrganizationUnitSettings> fetchUsersWithOwnAddress(String collectionName);
+
+
+	/**
+	 * @param longitude
+	 * @param latitude
+	 * @param maxDistanceInMeters
+	 * @param collectionName
+	 * @return
+	 */
+	List<OrganizationUnitSettings> nearestToLoc(double longitude, double latitude, double maxDistanceInMeters, String collectionName);
+
+	/**
+	 * 
+	 * @param iden
+	 * @param collectionName
+	 * @return
+	 */
+	public SurveyStats getSurveyStats(long iden, String collectionName);
+
+	/**
+	 * 
+	 * @param iden
+	 * @param collectionName
+	 * @param surveyStats
+	 */
+	void updateSurveyStats(long iden, String collectionName, SurveyStats surveyStats);
+
+	List<OrganizationUnitSettings> getSearchResultsForCriteria(AdvancedSearchVO advancedSearchVO, String collectionName,
+			LOSearchEngine loSearchEngine, long companyIdFilter);
+
+
+	AggregationOperation getSortByAggOperation(String sortBy, Boolean isLocationSearch, Boolean isTextSearch);
+
+
+	long getSearchResultsForCriteriaCount(AdvancedSearchVO advancedSearchVO, String collectionName,
+			LOSearchEngine loSearchEngine, long companyIdFilter);
 
 }
