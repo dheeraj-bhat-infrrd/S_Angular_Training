@@ -34,6 +34,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -160,6 +161,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentExceptio
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.searchengine.SearchEngineManagementServices;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
@@ -405,6 +407,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private SocialFeedService socialFeedService;
+    
+    @Autowired
+    private SearchEngineManagementServices searchEngineManagementServices;
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -666,6 +671,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
         LockSettings lockSettings = new LockSettings();
         companySettings.setIden( company.getCompanyId() );
+        companySettings.setCompanyId( company.getCompanyId() );
         if ( organizationalDetails.get( CommonConstants.LOGO_NAME ) != null ) {
             companySettings.setLogo( organizationalDetails.get( CommonConstants.LOGO_NAME ) );
             companySettings.setLogoThumbnail( organizationalDetails.get( CommonConstants.LOGO_NAME ) );
@@ -697,7 +703,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         contactDetailSettings.setCountryCode( organizationalDetails.get( CommonConstants.COUNTRY_CODE ) );
         contactDetailSettings.setState( organizationalDetails.get( CommonConstants.STATE ) );
         contactDetailSettings.setCity( organizationalDetails.get( CommonConstants.CITY ) );
-
+      
         // Add work phone number in contact details
         ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
         if ( organizationalDetails.get( CommonConstants.COMPANY_CONTACT_NUMBER ) != null ) {
@@ -714,6 +720,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         MailIdSettings mailIdSettings = new MailIdSettings();
         mailIdSettings.setWork( user.getEmailId() );
         contactDetailSettings.setMail_ids( mailIdSettings );
+        
+        //set Geo Location
+        companySettings.setGeoLocation(searchEngineManagementServices.getGeoLocForSettings(contactDetailSettings));
 
         companySettings.setUniqueIdentifier( organizationalDetails.get( CommonConstants.UNIQUE_IDENTIFIER ) );
         companySettings.setVertical( organizationalDetails.get( CommonConstants.VERTICAL ) );
@@ -4597,6 +4606,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Method for inserting region settings called for region : " + region );
         OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
         organizationSettings.setIden( region.getRegionId() );
+        organizationSettings.setCompanyId(region.getCompany().getCompanyId());
         // set is default flag
         boolean isDefaultFlag = false;
         if ( region.getIsDefaultBySystem() == CommonConstants.YES ) {
@@ -4616,6 +4626,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion( region );
         organizationSettings.setContact_details( contactSettings );
+        //updating geoLoc
+        organizationSettings.setGeoLocation(searchEngineManagementServices.getGeoLocForSettings(contactSettings));
         organizationSettings.setLockSettings( new LockSettings() );
 
         if ( organizationSettings.getSurvey_settings() == null ) {
@@ -4651,6 +4663,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Method to insert branch settings called for branch : " + branch );
         OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
         organizationSettings.setIden( branch.getBranchId() );
+        organizationSettings.setCompanyId(branch.getCompany().getCompanyId());
         // set is default flag
         boolean isDefaultFlag = false;
         if ( branch.getIsDefaultBySystem() == CommonConstants.YES ) {
@@ -4678,6 +4691,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch( branch );
         organizationSettings.setContact_details( contactSettings );
+        //setting geoLocation
+        organizationSettings.setGeoLocation(searchEngineManagementServices.getGeoLocForSettings(contactSettings));
         organizationSettings.setLockSettings( new LockSettings() );
 
         // set default profile stages.
@@ -10829,5 +10844,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
             allowPartnerSurvey, unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
     }
-
+    
+    @Override
+    @Transactional
+    public long getCompanyByProfileName( String profileName )
+    {
+        try {
+    	OrganizationUnitSettings companySettings = profileManagementService.getCompanyProfileByProfileName( profileName );
+         if( companySettings != null)
+         	return companySettings.getCompanyId();
+         
+        }catch (ProfileNotFoundException profileNotFoundException) {
+            LOG.error( "Company profile not found", profileNotFoundException );
+        }
+        return 0l;
+    }
 }

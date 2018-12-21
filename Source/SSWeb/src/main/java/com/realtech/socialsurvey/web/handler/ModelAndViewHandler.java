@@ -182,11 +182,13 @@ public class ModelAndViewHandler
 
             LOG.error( "ProfileNotFoundException caught while fetching {} profile : {}", profileAggregate.getProfileLevel(),
                 error.getMessage(), error );
-            Map<String, String> nameMap = profileManagementService
+            
+            returnTemplate = JspResolver.SS_PAGE_NOT_FOUND;
+           /* Map<String, String> nameMap = profileManagementService
                 .findNamesfromProfileName( profileAggregate.getProfileName() );
             redirectAttributes.addFlashAttribute( CommonConstants.PATTERN_FIRST, nameMap.get( CommonConstants.PATTERN_FIRST ) );
             redirectAttributes.addFlashAttribute( CommonConstants.PATTERN_LAST, nameMap.get( CommonConstants.PATTERN_LAST ) );
-            returnTemplate = "redirect:/" + JspResolver.FINDAPRO + ".do";
+            returnTemplate = "redirect:/" + JspResolver.FINDAPRO + ".do";*/
 
         } else if ( error instanceof NonFatalException ) {
 

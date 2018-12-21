@@ -28,4 +28,11 @@ public interface RegionDao extends GenericDao<Region, Long> {
 
     public Map<Long, Long> getCompanyIdsForRegionIds( List<Long> regionIds );
 
+
+	/**
+	 * @param regionId
+	 * @return
+	 */
+	public long checkIfRegionIsDefault(long regionId);
+
 }

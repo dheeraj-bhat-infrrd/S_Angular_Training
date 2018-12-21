@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
@@ -28,6 +29,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.searchengine.SearchEngineManagementServices;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
@@ -36,6 +38,9 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
 {
     private static final Logger LOG = LoggerFactory.getLogger( HierarchyLocationManagementServiceImpl.class );
 
+    @Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+    
     @Autowired
     OrganizationManagementService organizationManagementService;
 
@@ -50,6 +55,9 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
 
     @Autowired
     private SocialManagementService socialManagementService;
+    
+    @Autowired
+    private SearchEngineManagementServices searchEngineManagement;
 
 
     /* method to relocate region to another company 
@@ -280,6 +288,9 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
 
         //updating user in solr
         solrSearchService.addUserToSolr( userToBeRelocated );
+        
+        //update user in mongo
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden("companyId", targetLocation.getTargetCompany().getCompanyId(), userToBeRelocated.getUserId(), CommonConstants.AGENT_ID_COLUMN);
 
 
         //updating  survey details  after relocation
@@ -299,7 +310,9 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
         //updating mongoDB and solr for social posts and social connections 
         socialManagementService
             .processSocialPostsAndSocialConnectionsForUserAfterRelocation( userToBeRelocated, targetLocation );
-
+        
+        //update latest hierarchies address
+        searchEngineManagement.updateAddressForAgentWhilePrimaryChange(userToBeRelocated.getUserId());
 
         LOG.info( "Method HierarchyLocationManagementService.relocateUser() finished" );
 
@@ -603,6 +616,9 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
 
         //start user relocation
         relocateUser( userToBeRelocated, targetLocation );
+        
+        //update latest hierarchies address
+        searchEngineManagement.updateAddressForAgentWhilePrimaryChange(userToBeRelocated.getUserId());
 
         LOG.info( "Method generateEntitiesAndStartRelocationForUser finished" );
     }

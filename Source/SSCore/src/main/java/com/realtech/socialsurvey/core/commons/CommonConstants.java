@@ -1798,5 +1798,29 @@ public interface CommonConstants
 
     public static final String HAS_REGION = "hasRegion";
     public static final String HAS_BRANCH = "hasBranch";
-
+    
+    //Constants for top 10 LO search ranking
+    public static final String SEARCH_ENGINE_SORT_BY_BEST_MATCH = "Best Match";
+    public static final String SEARCH_ENGINE_SORT_BY_RATING = "Highest Rated";
+    public static final String SEARCH_ENGINE_SORT_BY_REVIEWS = "Most Reviewed";
+    public static final String SEARCH_ENGINE_SORT_BY_DISTANCE = "Distance";
+    
+    //Constants for professional
+    public static final String SEARCH_ENGINE_PROFILE_PROFESSIONAL = "Professionals";
+    public static final String SEARCH_ENGINE_PROFILE_LOAN_OFFICERS = "Loan Offices";
+    public static final String SEARCH_ENGINE_PROFILE_COMPANIES = "Companies";
+    
+    public static final long DEFAULT_DISTANCE_CRITERIA = 0l;
+    public static final long DEFAULT_RATING_CRITERIA = 0l;
+    public static final long DEFAULT_REVIEW_COUNT_CRITERIA = 0l;
+    public static final String DEFAULT_SORTING_CRITERIA = "Best Match";
+    public static final long SEARCH_ENGINE_START_INDEX = 0l;
+    public static final long SEARCH_ENGINE_BATCH_SIZE = 10l;
+    
+    public static final Integer[] arrayOfNonUsStateId = new Integer[] {14,50,44,56,3,17,18,5,23,35,21,26,59,28,2,4};
+    public static final String COUNTY_NAME = "countyname";
+    public static final String CITY_NAME = "cityname";
+    public static final String STATE_LOOKUP = "stateLookup";
+    public static final String ID = "id";
+    public static final String ZIPCODE_COL = "zipcode";
 }

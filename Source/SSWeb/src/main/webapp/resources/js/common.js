@@ -1421,3 +1421,7 @@ function paintAvgRatingForPpf(avgRating) {
 		changeRatingPattern(avgRating, $("#rating-avg-comp"), true, undefined, true);
 	}
 }
+
+function redirectPageNotFoundpage(){
+	window.open(getLocationOrigin() + "/sspagenotfound.do",'_self');
+}

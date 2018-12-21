@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -49,7 +51,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     private final String regionUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME ASC";
     private final String branchUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, BRANCH_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.BRANCH_ID = UP.BRANCH_ID and subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID  and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME ASC";
     private final String companyUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ? ) AS subQuery_UP ON subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME ASC";
-
+    private final String userProfileListExcludingDefaults = "select GROUP_CONCAT(UP.USER_ID ORDER BY UP.BRANCH_ID,UP.REGION_ID,UP.USER_ID) as USER_IDS , UP.COMPANY_ID, if(R.IS_DEFAULT_BY_SYSTEM = 0,R.REGION_ID,0) as REGION_ID , if(B.IS_DEFAULT_BY_SYSTEM = 0,B.BRANCH_ID ,0) as BRANCH_ID from USER_PROFILE UP INNER JOIN REGION R ON R.REGION_ID = UP.REGION_ID INNER JOIN BRANCH B ON B.BRANCH_ID = UP.BRANCH_ID where UP.PROFILES_MASTER_ID = 4 and UP.IS_PRIMARY = 1  AND UP.COMPANY_ID =? AND UP.STATUS !=0 GROUP BY BRANCH_ID,REGION_ID ";
 
     private static final String getUserProfileByUserIdsQuery = "select UP.USER_PROFILE_ID , UP.STATUS  , UP.AGENT_ID , UP.BRANCH_ID , UP.REGION_ID ,  "
         + " UP.PROFILES_MASTER_ID , B.BRANCH , R.REGION from " + "USER_PROFILE UP JOIN BRANCH B ON UP.BRANCH_ID = B.BRANCH_ID JOIN REGION R ON UP.REGION_ID = R.REGION_ID where UP.AGENT_ID IN (:userIds)";
@@ -711,5 +713,80 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         List<UserProfile> userProfiles = criteria.list();
         LOG.debug( "Method to find userProfile for userId: " + userId + " finished." );        
         return userProfiles;
+    }
+    
+    //create map of maps, one map is for region and the other for branch
+    @Override
+    public Map<String,Map<Long,List<Long>>> getUserListForhierarchy(long companyId){
+        LOG.debug( "Method to get list of users under for a branch and region" );
+        Query query = getSession().createSQLQuery( userProfileListExcludingDefaults );
+        query.setParameter( 0, companyId );
+        List<Object[]> rows = (List<Object[]>) query.list();
+        return buildUserMap( rows );
+      
+    }
+    
+    private Map<String,Map<Long,List<Long>>> buildUserMap( List<Object[]> rows )
+    {
+        LOG.debug( "Method call buildUserMap started" );
+        Map<String,Map<Long,List<Long>>> mapHierarchy = new HashMap<>();
+        Map<Long,List<Long>> companyMap = new HashMap<>() ;
+        Map<Long,List<Long>> regionMap = new HashMap<>() ;
+        Map<Long,List<Long>> branchMap = new HashMap<>() ;
+        for(Object[] row : rows) {
+            //row[0] consists of a concatenation of agentId 
+            String agentValue = String.valueOf( row[0] );
+            if(Long.parseLong( String.valueOf( row[3] ) ) != 0) {
+                //row[3] gives branchId if not a default branch , if so it will return 0
+                branchMap.put( Long.parseLong( String.valueOf( row[3] ) ), convertToLong( Arrays.asList(agentValue.split(",") ) ) );
+            }else  if(Long.parseLong( String.valueOf( row[2] ) ) != 0) {
+                //row[2] gives regionId if not a default region , if so it will return 0
+                regionMap.put( Long.parseLong( String.valueOf( row[2] ) ), convertToLong( Arrays.asList(agentValue.split(",")) ) );
+            }else  if(Long.parseLong( String.valueOf( row[1] ) ) != 0) {
+                 //row[1] gives companyId if not a default company , if so it will return 0
+                companyMap.put( Long.parseLong( String.valueOf( row[1] ) ), convertToLong( Arrays.asList(agentValue.split(",")) ) );
+            }
+        }
+        mapHierarchy.put( CommonConstants.COMPANY_NAME, companyMap );
+        mapHierarchy.put( CommonConstants.REGION_NAME_COLUMN, regionMap );
+        mapHierarchy.put( CommonConstants.BRANCH_NAME_COLUMN, branchMap );
+        return mapHierarchy;
+    }
+    
+    private List<Long> convertToLong(List<String> stringList){
+        List<Long> longList = new ArrayList<>();
+        for(String string : stringList) {
+            longList.add(Long.parseLong(string)); 
+         }
+        return longList;
+    }
+    
+    @Override
+    public List<Long> findPrimaryUserProfile(  String entityType, long entityId) 
+    {
+        LOG.debug( "Method to find userProfile list for entityType: {} entityId: {} started.",entityType,entityId );
+        Criteria criteria = getSession().createCriteria( UserProfile.class );
+        if(entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+        	criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, entityId ) );
+        }else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+        	criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, entityId ) );
+        }else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+        	criteria.createAlias(CommonConstants.COMPANY , "comp" );
+        	criteria.add( Restrictions.eq( "comp.companyId", entityId ) );
+        }
+        
+        criteria.add( Restrictions.eq( CommonConstants.PROFILE_MASTER_COLUMN + "." + "profileId" , CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+        
+        List<UserProfile> userProfiles = criteria.list();
+        List<Long> userList = new ArrayList<>();
+        if ( userProfiles != null || !userProfiles.isEmpty() ) {
+        	for(UserProfile userProfile : userProfiles) {
+            	userList.add(userProfile.getAgentId());
+            }
+        }
+        
+       
+        LOG.debug( "Method to find userProfile list for entityType: {} entityId: {} finished.",entityType,entityId );
+        return userList;
     }
  }

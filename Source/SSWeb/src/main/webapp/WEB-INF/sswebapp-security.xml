@@ -25,6 +25,13 @@
 		<intercept-url pattern="/findapro.do" access="permitAll" />
 		<intercept-url pattern="/findaproscroll.do" access="permitAll" />
 		
+		<!-- Search Engine Services-->
+		<intercept-url pattern="/showsearchenginepage.do" access="permitAll" />
+		<intercept-url pattern="/searchengine/*.do" access="permitAll" />
+		
+		<!-- Page not found -->
+		<intercept-url pattern="/sspagenotfound.do" access="permitAll" />
+		
 		<!-- Company list page -->
 		<intercept-url pattern="/findcompany.do" access="permitAll" />
 		
@@ -65,10 +72,9 @@
 		<!-- Registration urls -->
 		<intercept-url pattern="registeraccount/*.do" access="permitAll" />
 		<intercept-url pattern="/newlogin.do" access="permitAll" />
-
+		
 		<!-- Restricted Services -->
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />
-
 		<form-login login-page="/"
 			authentication-failure-url="/login.do?s=autherror"
 			authentication-success-handler-ref="userLoginHandler" />

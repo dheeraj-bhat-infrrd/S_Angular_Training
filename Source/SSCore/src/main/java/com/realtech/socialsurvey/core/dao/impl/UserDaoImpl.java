@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +27,10 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -619,7 +623,68 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         }
     }
     
-    /**
+    /*
+     * Method to fetch the list of cities and zipcodes in the state
+     */
+    @Override
+    @Transactional
+    public List<ZipCodeLookup> getCityAndCountySuggestion( String searchString, int startIndex, int batchSize, boolean onlyUsFilter )
+    {
+        LOG.debug( "Method getZipCodesByStateId called to fetch the list of cities and zipcodes in the state" );
+        Criteria criteria = getSession().createCriteria(ZipCodeLookup.class);
+        Criterion criterion = Restrictions.or(Restrictions.like(CommonConstants.COUNTY_NAME, searchString+"%"),Restrictions.like(CommonConstants.CITY_NAME, searchString+"%"));
+        if(onlyUsFilter)
+        	criteria.add(Restrictions.not(Restrictions.in(CommonConstants.STATE_LOOKUP, getStatesNotInUs())));
+        criteria.add( criterion );
+
+        if ( startIndex > -1 )
+            criteria.setFirstResult( startIndex );
+        if ( batchSize > -1 )
+            criteria.setMaxResults( batchSize );
+        
+        return criteria.list();
+    }
+
+    /*
+     * Method to fetch the list of cities and zipcodes in the state
+     */
+    @Override
+    @Transactional
+    public List<ZipCodeLookup> getZipcodeSuggestion( String zipcode, int startIndex, int batchSize, boolean onlyUsFilter )
+    {
+        LOG.debug( "Method getZipCodesByStateId called to fetch the list of zipcodes in the state" );
+        Criteria criteria = getSession().createCriteria(ZipCodeLookup.class);
+        Criterion criterion = Restrictions.like(CommonConstants.ZIPCODE_COL, zipcode+"%");
+        if(onlyUsFilter)
+        	criteria.add(Restrictions.not(Restrictions.in(CommonConstants.STATE_LOOKUP, getStatesNotInUs())));
+        criteria.add( criterion );
+
+        if ( startIndex > -1 )
+            criteria.setFirstResult( startIndex );
+        if ( batchSize > -1 )
+            criteria.setMaxResults( batchSize );
+        
+        return criteria.list();
+    }
+    
+    @Override
+    @Transactional
+	public List<StateLookup> getStatesNotInUs() {
+		Criteria criteria = getSession().createCriteria(StateLookup.class);
+		criteria.add(Restrictions.in(CommonConstants.ID, CommonConstants.arrayOfNonUsStateId));
+		return criteria.list();
+	}
+    
+    @Override
+	public String getCompanyNameForUserId(long userId) {
+		LOG.debug("method to get companyName for user with userId : {}", userId);
+		User user = findById(User.class, userId);
+		if(user != null && user.getCompany() != null)
+			return user.getCompany().getCompany();
+		return "";
+	}
+    	
+    	/**
      * Method to fetch admin of the company based on the companyId
      * @param companyId
      * @throws InvalidInputException

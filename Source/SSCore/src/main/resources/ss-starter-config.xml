@@ -76,12 +76,13 @@
 		<property name="durability" value="true" />
 	</bean>
 	
-	<!-- Updating survey details in mongo (ONE TIME RUN JOB) --> 
-	<bean id="updatesurveyjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.UpdateSurveyDetails" />
+	<!-- Updating location in mongo (ONE TIME JOB) -->
+	<bean id="updatelocationjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.UpdateLocation" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="userManagementService" value-ref="userManagementService" />
+				<entry key="searchEngineManagementServices" value-ref="searchEngineManagementServices" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -604,14 +605,13 @@
 		<property name="cronExpression" value="0 43 * * * ?" />
 	</bean>
 	
-	<!-- setting cron for survey details update in mongo (ONE TIME RUN JOB)-->
-	<bean id="updatesurveydetailcron"
+	<!-- setting cron for updating location (ONE TIME JOB) -->
+	<bean id="updatelocationcron"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="updatesurveyjobdetail" />
+		<property name="jobDetail" ref="updatelocationjobdetail" />
 		<property name="startDelay" value="20000" />
 		<property name="repeatCount" value="0" />
 	</bean>
-	
 
 	<!-- setting cron for update subscription price -->
 	<bean id="updatesubscriptionpricecron"
@@ -874,6 +874,7 @@
 			 	<ref bean="emailreaderjobdetail" /> 
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
+				<ref bean="updatelocationjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<!--<ref bean="socialfeedingesterjobdetail" />-->
 				<!--<ref bean="socialpostsimportjobdetail" />-->
@@ -918,6 +919,7 @@
 			 	<ref bean="emailreadercron" /> 
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
+				<ref bean = "updatelocationcron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<!--<ref bean="socialfeedingestercron" />-->
 				<!--<ref bean="socialpostimportcron" />-->
@@ -983,6 +985,8 @@
 		class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
 	<bean id="userManagementService"
 		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.UserManagementServiceImpl" />
+	<bean id="searchEngineManagementServices"
+		class="com.realtech.socialsurvey.core.services.searchengine.impl.SearchEngineManagementServicesImpl"/>
 	<bean id="zillowIntegrationApiBuilder"
 		class="com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder" />
 	<bean id="organizationManagementService"

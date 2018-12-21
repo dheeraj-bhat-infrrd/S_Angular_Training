@@ -209,4 +209,10 @@ public interface JspResolver
     public static final String SENDGRID_EMAIL_MNGMNT="sendgrid_email_management";
     
     public static final String UNSUBSCRIBE_MESSAGE = "unsubscribe_message";
+    
+    //Top LO search pages
+    public static final String SEARCH_ENGINE = "searchengine";
+    
+    //Page not found page
+    public static final String SS_PAGE_NOT_FOUND = "ssPageNotFound";
 }

@@ -51,7 +51,10 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
 
 
 // JIRA SS-37 BY RM02 BOC
@@ -83,7 +86,13 @@ public class HierarchyManagementController
     @Autowired
     private ReportingDashboardManagement reportingDashboardManagement;
 
+    private SSApiIntergrationBuilder sSApiIntergrationBuilder;
 
+    @Autowired
+    public void setSsApiIntergrationBuilder( SSApiIntergrationBuilder sSApiIntergrationBuilder )
+    {
+        this.sSApiIntergrationBuilder = sSApiIntergrationBuilder;
+    }
     /**
      * Method to call services for showing up the build hierarchy page
      * 
@@ -786,6 +795,7 @@ public class HierarchyManagementController
      * @param request
      * @return
      */
+    @ResponseBody
     @RequestMapping ( value = "/addindividual", method = RequestMethod.POST)
     public String addIndividual( Model model, HttpServletRequest request )
     {
@@ -963,6 +973,18 @@ public class HierarchyManagementController
                         }
                     }
                 }
+                
+                //set immediate hierarchies address for an agent
+                List<User> validUserAssignList = (List<User>) map.get( CommonConstants.VALID_USERS_LIST );
+                if(validUserAssignList != null && !validUserAssignList.isEmpty()) {
+                	 for ( User assigneeUser : validUserAssignList ) {
+                    	sSApiIntergrationBuilder.getIntegrationApi().updateAddressForAgentWhileAddingIndividual(assigneeUser.getUserId(), regionId, branchId);
+                    }
+                }else if ( selectedUserId > 0l ) {
+                	sSApiIntergrationBuilder.getIntegrationApi().updateAddressForAgentId(selectedUserId);
+                }
+               
+               
 
                 model.addAttribute( "message", message );
             } catch ( UserAssignmentException e ) {
