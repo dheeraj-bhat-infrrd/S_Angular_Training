@@ -39,6 +39,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.braintreegateway.exceptions.AuthorizationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -3461,7 +3464,7 @@ public class OrganizationManagementController
 
     @ResponseBody
     @RequestMapping ( value = "/getunmatchedpreinitiatedsurveys", method = RequestMethod.GET)
-    public String getUnmatchedPreinitiatedSurveys( HttpServletRequest request, Model model )
+    public String getUnmatchedPreinitiatedSurveys( HttpServletRequest request, Model model ) throws NonFatalException
     {
         LOG.info( "Method to get getUnmatchedPreinitiatedSurveys started" );
         String startIndexStr = request.getParameter( "startIndex" );
@@ -3503,14 +3506,23 @@ public class OrganizationManagementController
             return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_UNMATCHED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
                 DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Hibernate4Module());
+        String json = null;
+        try {
+			json =  mapper.writeValueAsString(surveyPreInitiationList);
+		} catch (JsonProcessingException e) {
+			LOG.error("Error while parsing object in getaccountstatisticsreportstatus " , e);
+			throw new NonFatalException(e.getMessage());
+		}
         LOG.info( "Method to get posts for the user, getUnmatchedPreinitiatedSurveys() finished" );
-        return new Gson().toJson( surveyPreInitiationList );
+        return json;
     }
 
 
     @ResponseBody
     @RequestMapping ( value = "/getprocessedpreinitiatedsurveys", method = RequestMethod.GET)
-    public String getProcessedPreInitiatedSurveys( HttpServletRequest request, Model model )
+    public String getProcessedPreInitiatedSurveys( HttpServletRequest request, Model model ) throws NonFatalException
     {
         LOG.info( "Method to get getProcessedPreInitiatedSurveys started" );
         String startIndexStr = request.getParameter( "startIndex" );
@@ -3549,14 +3561,23 @@ public class OrganizationManagementController
             return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_PROCESSED_PREINITIATED_SURVEYS_UNSUCCESSFUL,
                 DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Hibernate4Module());
+        String json = null;
+        try {
+			json =  mapper.writeValueAsString(surveyPreInitiationList);
+		} catch (JsonProcessingException e) {
+			LOG.error("Error while parsing object in getaccountstatisticsreportstatus " , e);
+			throw new NonFatalException(e.getMessage());
+		}
         LOG.info( "Method to get posts for the user, getProcessedPreInitiatedSurveys() finished" );
-        return new Gson().toJson( surveyPreInitiationList );
+        return json;
     }
 
 
     @ResponseBody
     @RequestMapping ( value = "/getcorruptpreinitiatedsurveys", method = RequestMethod.GET)
-    public String getCorruptPreInitiatedSurveys( HttpServletRequest request, Model model )
+    public String getCorruptPreInitiatedSurveys( HttpServletRequest request, Model model ) throws NonFatalException
     {
         LOG.info( "Method to getCorruptPreInitiatedSurveys started" );
         String startIndexStr = request.getParameter( "startIndex" );
@@ -3593,8 +3614,17 @@ public class OrganizationManagementController
             return messageUtils.getDisplayMessage( DisplayMessageConstants.FETCH_CORRUPT_PREINITIATED_SURVEYS_UNSUCCESSFUL,
                 DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Hibernate4Module());
+        String json = null;
+        try {
+			json =  mapper.writeValueAsString(surveyPreInitiationList);
+		} catch (JsonProcessingException e) {
+			LOG.error("Error while parsing object in getaccountstatisticsreportstatus " , e);
+			throw new NonFatalException(e.getMessage());
+		}
         LOG.info( "Method to getCorruptPreInitiatedSurveys() finished" );
-        return new Gson().toJson( surveyPreInitiationList );
+        return json;
     }
 
 

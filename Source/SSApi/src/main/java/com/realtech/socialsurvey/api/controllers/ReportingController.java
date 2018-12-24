@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.models.response.FileUploadResponse;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
@@ -159,7 +162,15 @@ public class ReportingController
 
         String json = null;
         Object accountStatisticsStatus = reportingDashboardManagement.getAccountStatisticsRecentActivity( reportId );
-        json = new Gson().toJson( accountStatisticsStatus );
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Hibernate4Module());
+        try {
+            //json = new Gson().toJson( accountStatisticsStatus );
+			json = mapper.writeValueAsString(accountStatisticsStatus);
+		} catch (JsonProcessingException e) {
+			LOGGER.error("Error while parsing object in getaccountstatisticsreportstatus " , e);
+			throw new NonFatalException(e.getMessage());
+		}
         return json;
     }
 
