@@ -3821,10 +3821,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.debug( "Method insertSurveyDetails() to bulk insert details of survey finished." );
     }
 
-
-    
-    
-
     @Override
     public Map<String, Long> getSurveyCountForGatewayResponses(String entityType, long entityId)
 	{

@@ -89,8 +89,8 @@ public class ReviewImporterTopologyStarterHelper extends TopologyStarterHelper
         builder.setBolt( PROCESS_GOOGLE_REVIEW_BOLT, new ProcessGoogleReviewsBolt(),1 )
         .shuffleGrouping( GOOGLE_AUTHORIZATION_SPOUT );
         builder.setBolt( SAVE_OR_UPDATE_REVIEWS_BOLT, new SaveOrUpdateReviews(), 1 )
-        .shuffleGrouping( PROCESS_GOOGLE_REVIEW_BOLT );//.shuffleGrouping( FACEBOOK_REVIEW_EXTRACTOR_BOLT );
-        
+            .shuffleGrouping( PROCESS_GOOGLE_REVIEW_BOLT );//.shuffleGrouping( FACEBOOK_REVIEW_EXTRACTOR_BOLT );
+
         return builder.createTopology();
     }
 

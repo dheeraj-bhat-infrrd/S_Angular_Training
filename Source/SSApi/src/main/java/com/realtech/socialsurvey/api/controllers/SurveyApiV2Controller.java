@@ -20,11 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
@@ -107,6 +103,8 @@ public class SurveyApiV2Controller
 	public void setSurveyBuilder(SurveyBuilder surveyBuilder) {
 		this.surveyBuilder = surveyBuilder;
 	}
+
+    private static final String AUTH_FAILED = "AUTHORIZATION FAILED";
 
 	@RequestMapping ( value = "/surveys", method = RequestMethod.PUT)
     @ApiOperation ( value = "Post Survey Transaction")
@@ -936,15 +934,18 @@ public class SurveyApiV2Controller
     }
 
     @RequestMapping ( value = "/reviews/bulk", method = RequestMethod.POST)
-    @ApiOperation ( value = "Find existing reviees from given survies")
-    public ResponseEntity<?> saveOrUpdateReviews( @Valid @RequestBody List<SurveyDetailsVO> surveyDetails, HttpServletRequest request )
+    @ApiOperation ( value = "Find existing reviees from given surveys")
+    public ResponseEntity<?> saveOrUpdateReviews( @Valid @RequestBody List<SurveyDetailsVO> surveyDetails,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader, HttpServletRequest request )
         throws SSApiException{
         try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
             List<BulkWriteErrorVO> bulkWriteErrors = surveyHandler.saveOrUpdateReviews(surveyDetails);
             return new ResponseEntity<>(bulkWriteErrors, HttpStatus.OK);
         } catch ( InvalidInputException | ParseException e ) {
-            
             throw new SSApiException( e.getMessage(), e );
+        } catch ( AuthorizationException e ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
         }
     }
 }

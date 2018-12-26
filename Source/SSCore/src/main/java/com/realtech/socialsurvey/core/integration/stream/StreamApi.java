@@ -49,6 +49,7 @@ public interface StreamApi
 
     @POST ( "/api/v1/stream/transaction/ingestion")
     public Response sendsurveyTransactionRequest( @Body FtpUploadRequest ftpUploadRequest );
+
     
     @POST ( "/api/v1/stream/survey/process")
     public Response sendsurveyProcessRequest( @Body SurveyProcessData surveyProcessData );

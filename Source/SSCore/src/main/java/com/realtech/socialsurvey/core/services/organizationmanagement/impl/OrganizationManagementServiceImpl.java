@@ -11080,7 +11080,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
             allowPartnerSurvey, unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
     }
-    
+
     @Override
     @Transactional
     public long getCompanyByProfileName( String profileName )

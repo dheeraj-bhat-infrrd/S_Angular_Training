@@ -410,7 +410,7 @@ public interface SurveyDetailsDao
     List<SurveyDetails> fetchSurveyForParticularHierarchyAndSource( long entityId, String entityType, String source );
 	
 	public int updateSurveyDetailsFields( long surveyPreIntitiationId, int participantType, Date surveySentDate);
-	
+
 	public Map<String, Long> getSurveyCountForGatewayResponses(String entityType, long entityId);
 
 

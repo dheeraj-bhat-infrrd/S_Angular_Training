@@ -1844,6 +1844,18 @@ public interface OrganizationManagementService
      */
     BranchVO getBranchDetails( long iden ) throws InvalidInputException, NoRecordsFetchedException;
 
+    /**
+     * Updates the allowPartner survey field for given unit settings
+     * @param unitSettings
+     * @param allowPartnerSurvey
+     */
+    void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey );
+
+
+
+	long getCompanyByProfileName(String profileName);
+
+
     /*
      * This method returns all the idens associated with a placeId.
      * @param placeId
@@ -1877,15 +1889,4 @@ public interface OrganizationManagementService
     //Unsets the key of a particular collection for a given iden
     boolean unsetKey( long iden, String keyToUpdate, String collectionName )
         throws InvalidInputException;
-
-    /**
-     * Updates the allowPartner survey field for given unit settings
-     * @param unitSettings
-     * @param allowPartnerSurvey
-     */
-    void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey );
-
-
-	long getCompanyByProfileName(String profileName);
-
 }

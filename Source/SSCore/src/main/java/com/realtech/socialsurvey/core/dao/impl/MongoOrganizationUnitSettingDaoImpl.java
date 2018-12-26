@@ -48,6 +48,7 @@ import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -59,14 +60,12 @@ import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyStats;
 import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.vo.AddressGeoLocationVO;
 import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
-import com.realtech.socialsurvey.core.vo.LOSearchRankingVO;
 
 
 /**
@@ -1752,6 +1751,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         WriteResult updateResult = mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
         return updateResult.isUpdateOfExisting();
     }
+
     
     @Override
     public AddressGeoLocationVO fetchAddressForId(long entityId, String entityType, String collectionName) {

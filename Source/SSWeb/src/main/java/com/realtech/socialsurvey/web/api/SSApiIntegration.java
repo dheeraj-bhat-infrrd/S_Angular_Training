@@ -491,7 +491,7 @@ public interface SSApiIntegration
     
     @POST ( "/v1/searchresults/count" )
     Response getSearchResultsCount(@Body AdvancedSearchVO advancedSearchVO);
-    
+
     @GET("/v1/users/{companyId}/owner")
     public Response getOwnerForCompany(@Path("companyId") Long companyId);
 }

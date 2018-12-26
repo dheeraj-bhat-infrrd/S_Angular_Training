@@ -1046,7 +1046,6 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             throw new DatabaseException( "Exception caught in getUnmatchedPreInitiatedSurveyForEmailCount() ", e );
         }
     }
-    
 
     @Override
     public long getIncompleteSurveyCountForAgent(long agentId) 

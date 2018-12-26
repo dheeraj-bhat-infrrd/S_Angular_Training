@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.compute.services.api;
 
 import com.realtech.socialsurvey.compute.entities.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
+
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -190,7 +192,8 @@ public interface SSApiIntegrationService
 
     @Headers( "Content-Type: application/json" )
     @POST( "v2/reviews/bulk" )
-    Call<List<BulkWriteErrorVO>> saveOrUpdateReviews( @Body List<SurveyDetailsVO> surveyDetails );
+    Call<List<BulkWriteErrorVO>> saveOrUpdateReviews( @Body List<SurveyDetailsVO> surveyDetails,
+        @Header( "authorizationHeader" ) String authHeader );
 
     @GET ( "v1/organizationsettings/{placeId}/idens")
     Call<List<OrganizationUnitIds>> getDetailsFromPlaceId( @Path("placeId") String placeId );
@@ -207,6 +210,7 @@ public interface SSApiIntegrationService
     @PUT("v1/resetSocialMediaLastFetched/profile/{profile}/iden/{iden}/socialMedia/{socialMedia}")
     Call<Boolean> resetSocialMediaLastFetched(@Path( "profile" ) String profile, @Path( "iden" ) long iden,
         @Path( "socialMedia" ) String socialMedia, @Header( "authorizationHeader" ) String authHeader );
+
     
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/{entityType}/{entityId}/surveystats")

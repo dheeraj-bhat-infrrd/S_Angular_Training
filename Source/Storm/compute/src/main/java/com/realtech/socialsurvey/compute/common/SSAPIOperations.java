@@ -392,7 +392,8 @@ public class SSAPIOperations
     public Optional<List<BulkWriteErrorVO>> saveOrUpdateReviews( List<SurveyDetailsVO> surveyDetails ) throws IOException
     {
         final Call<List<BulkWriteErrorVO>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
-            .saveOrUpdateReviews( surveyDetails );
+            .saveOrUpdateReviews( surveyDetails, AUTH_HEADER );
+
         Response<List<BulkWriteErrorVO>> response = requestCall.execute();
         RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
         if ( LOG.isTraceEnabled() ) {

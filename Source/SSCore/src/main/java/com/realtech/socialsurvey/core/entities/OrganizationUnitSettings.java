@@ -1057,7 +1057,6 @@ public class OrganizationUnitSettings implements Serializable
         this.socialMediaLastFetched = socialMediaLastFetched;
     }
 
-
     @Override
     public String toString()
     {
