@@ -1,25 +1,21 @@
 package com.realtech.socialsurvey.compute.common;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import com.realtech.socialsurvey.compute.entities.*;
 import com.realtech.socialsurvey.compute.entities.response.BulkWriteErrorVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.realtech.socialsurvey.compute.entities.FailedFtpRequest;
-import com.realtech.socialsurvey.compute.entities.Keyword;
-import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
-import com.realtech.socialsurvey.compute.entities.TransactionIngestionMessage;
 import com.realtech.socialsurvey.compute.entities.response.FtpSurveyResponse;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 import retrofit2.Response;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -306,7 +302,8 @@ public class SSAPIOperations
     public Optional<List<BulkWriteErrorVO>> bulkInsertToMongo( List<SocialResponseObject> socialPosts ) throws IOException
     {
         LOG.debug( "Executing bulkInsertToMongo method" );
-        Call<List<BulkWriteErrorVO>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationServiceWithIncreasedTimeOut().saveSocialFeeds( socialPosts, AUTH_HEADER );
+        Call<List<BulkWriteErrorVO>> requestCall = RetrofitApiBuilder.apiBuilderInstance().
+            getSSAPIIntergrationServiceWithIncreasedTimeOut().saveSocialFeeds( socialPosts, AUTH_HEADER );
         Response<List<BulkWriteErrorVO>> response = requestCall.execute();
         RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
         if ( LOG.isTraceEnabled() ) {
@@ -331,5 +328,122 @@ public class SSAPIOperations
         Response<List<String>> response = request.execute();
         RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
         return response.body();
+    }
+
+    /**
+     * Get all the facebook tokens in all hierarchies
+     * @param batchSize
+     * @param skipCount
+     * @return
+     */
+    public Optional<SocialMediaTokensPaginated> getFbTokensPaginated(int skipCount, int batchSize)
+    {
+        LOG.info( "Executing getMediaTokensPaginated method." );
+        Call<SocialMediaTokensPaginated> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationServiceWithIncreasedTimeOut()
+            .getFbTokensPaginated( skipCount, batchSize, AUTH_HEADER);
+        try {
+            Response<SocialMediaTokensPaginated> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "getMediaTokens response {}", response.body() );
+            }
+            return Optional.of( response.body() );
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "getMediaTokens IOException/ APIIntegrationException caught", e );
+            return Optional.empty();
+        }
+    }
+
+
+    /**
+     * Fetches the branch details for given branch id
+     * @param iden
+     * @return
+     * @throws IOException
+     */
+    public Optional<BranchVO> getBranchDetails( long iden ) throws APIIntegrationException, IOException
+    {
+        Call<BranchVO> requestCall =  RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().getBranchDetails(iden, AUTH_HEADER);
+        Response<BranchVO> response = null;
+        response = requestCall.execute();
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "getBranchDetails response {}", response.body() );
+        }
+        return Optional.of( response.body() ) ;
+    }
+
+
+    public Optional<Map<String, Long>> findPrimaryUserProfileByAgentId( long iden ) throws APIIntegrationException, IOException
+    {
+        final Call<Map<String, Long>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+            .getSSAPIIntergrationService().findPrimaryUserProfileByAgentId( iden, AUTH_HEADER );
+        Response<Map<String,Long>> response = null;
+        response = requestCall.execute();
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "getBranchDetails response {}", response.body() );
+        }
+        return Optional.of( response.body() ) ;
+
+    }
+
+
+    public Optional<List<BulkWriteErrorVO>> saveOrUpdateReviews( List<SurveyDetailsVO> surveyDetails ) throws IOException
+    {
+        final Call<List<BulkWriteErrorVO>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .saveOrUpdateReviews( surveyDetails );
+        Response<List<BulkWriteErrorVO>> response = requestCall.execute();
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "saveOrUpdateReviews response {}", response.body() );
+        }
+        return Optional.of( response.body() );
+    }
+
+    public List<OrganizationUnitIds> getDetailsFromPlaceId( String placeId ) throws IOException
+    {
+        Call<List<OrganizationUnitIds>> request = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().getDetailsFromPlaceId(placeId);
+        Response<List<OrganizationUnitIds>> response = request.execute();
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        return response.body();
+        
+    }
+
+
+    public Optional<Boolean> updateSocialMediaLastFetched( long iden, long current, long previous, String collection,
+        String socialMedia )
+    {
+        Call<Boolean> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().
+            updateSocialMediaLastFetched(iden, current, previous, collection, socialMedia, AUTH_HEADER);
+        Response<Boolean> response = null;
+        try {
+            response = requestCall.execute();
+        } catch ( IOException e ) {
+            LOG.error( "Exception while updating socialMediaLastFetched {}", e.getMessage() );
+        }
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "updateSocialMediaLastFetched response {}", response.body() );
+        }
+        return Optional.of( response.body() );
+    }
+
+
+    public Optional<Boolean> resetSocialMediaLastFetched( String profile, long iden, String socialMedia )
+    {
+        Call<Boolean> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().
+            resetSocialMediaLastFetched(profile, iden, socialMedia, AUTH_HEADER);
+        Response<Boolean> response = null;
+        try {
+            response = requestCall.execute();
+        } catch ( IOException e ) {
+            LOG.error( "Exception while resetting socialMedialastFetched {}", e.getMessage() );
+        }
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "resetSocialMediaLastFetched response {}", response.body() );
+        }
+        return Optional.of( response.body() );
     }
 }

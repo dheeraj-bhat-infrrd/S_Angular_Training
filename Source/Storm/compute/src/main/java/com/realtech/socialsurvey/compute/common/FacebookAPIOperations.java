@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.compute.common;
 
 import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
+import com.realtech.socialsurvey.compute.entities.response.FacebookReviewResponse;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMedia;
 import com.realtech.socialsurvey.compute.entities.response.InstagramResponse;
 import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
@@ -32,6 +33,9 @@ public class FacebookAPIOperations
 
     private static final String IG_INITIAL_FIELDS = "connected_instagram_account{media.limit(50){ig_id,caption,media_url,media_type,"
         + "timestamp,username,permalink,like_count,comments_count}}";
+
+    public static final String REVIEWS_FIELDS = "open_graph_story{id},created_time,has_rating,has_review,rating,recommendation_type,"
+        + "review_text,reviewer";
 
     private FacebookAPIOperations()
     {}
@@ -117,6 +121,26 @@ public class FacebookAPIOperations
                 LOG.trace( "headers {}", response.headers() );
             }
             return response ;
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "IOException/ APIIntegrationException caught", e );
+            return null;
+        }
+    }
+
+
+    public Response<FacebookReviewResponse> fetchReviews( String pageId, String pageAccessToken, String after )
+    {
+        Call<FacebookReviewResponse> responseCall = RetrofitApiBuilder.apiBuilderInstance().getFacebookAPIIntergrationService()
+            .fetchReviews(pageId, pageAccessToken, after, LIMIT, REVIEWS_FIELDS);
+        try{
+            Response<FacebookReviewResponse> response = responseCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateFacebookResponse( response );
+
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "response {}", response.body() );
+                LOG.trace( "headers {}", response.headers() );
+            }
+            return response;
         } catch ( IOException | APIIntegrationException e ) {
             LOG.error( "IOException/ APIIntegrationException caught", e );
             return null;

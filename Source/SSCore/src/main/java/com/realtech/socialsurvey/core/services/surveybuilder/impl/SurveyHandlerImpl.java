@@ -11,6 +11,7 @@ import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
+import com.mongodb.BulkWriteError;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.vo.BulkWriteErrorVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -44,6 +48,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.mongodb.BulkOperationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -114,6 +119,7 @@ import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.CsvUtils;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
+import com.realtech.socialsurvey.core.vo.SurveyDetailsVO;
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 
 
@@ -172,6 +178,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private EmailServices emailServices;
+
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -260,6 +267,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
+    
+    @Autowired
+    private GenericDao<DeleteDataTracker, Long> deleteDataTrackerDao;
 
     @Autowired
     private CsvUtils csvUtils;
@@ -1927,7 +1937,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         else
         		return null;
     }
-    
+
     // MEthod to delete survey pre initiation record from MySQL after making an entry into Mongo.
     @Override
     @Transactional
@@ -2608,17 +2618,35 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     @Transactional
-    public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException
+    public void deleteExistingSurveysByEntity( String entityType, long entityId, String source ) throws InvalidInputException
     {
-        LOG.debug( "Method deleteExistingZillowSurveysByEntity() started" );
+        LOG.debug( "Method deleteExistingSurveysByEntity() started" );
         if ( entityType == null || entityType.isEmpty() ) {
             throw new InvalidInputException( "Entity Type is invalid" );
         }
         if ( entityId <= 0 ) {
             throw new InvalidInputException( "Entity ID is invalid" );
         }
-        surveyDetailsDao.removeExistingZillowSurveysByEntity( entityType, entityId );
-        LOG.debug( "Method deleteExistingZillowSurveysByEntity() finished" );
+        List<SurveyDetails> documentsToBeDeleted = surveyDetailsDao.fetchSurveyForParticularHierarchyAndSource( entityId,
+            entityType, source );
+        surveyDetailsDao.removeExistingZillowSurveysByEntity( entityType, entityId, source );
+        writeToDeleteTracker(documentsToBeDeleted);
+        LOG.debug( "Method deleteExistingSurveysByEntity() finished" );
+    }
+    
+    private void writeToDeleteTracker( List<SurveyDetails> documentsToBeDeleted )
+    {
+        List<DeleteDataTracker> trackerList = new ArrayList<>();
+        for(SurveyDetails surveyDetails : documentsToBeDeleted) {
+            DeleteDataTracker tracker = new DeleteDataTracker();
+            tracker.setEntityId( surveyDetails.get_id() );
+            tracker.setEntityType( "SURVEY_DETAILS" );
+            tracker.setIsDeleted( 0 );
+            tracker.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+            tracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            trackerList.add( tracker );
+        }
+        deleteDataTrackerDao.saveAll( trackerList );
     }
 
 
@@ -5336,6 +5364,117 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
     @Override
+    public List<BulkWriteErrorVO> saveOrUpdateReviews( List<SurveyDetailsVO> surveyDetails )
+        throws InvalidInputException, ParseException
+    {
+        List<SurveyDetails> existingReviews = new ArrayList<>(  );
+        List<SurveyDetails> newReviews = new ArrayList<>(  );
+        List<BulkWriteErrorVO> errors = new ArrayList<>( );
+
+        //first  check if the survey is already existing in survey details
+        //yes => update the survey
+        //else => insert it
+        for(SurveyDetailsVO surveyDetail: surveyDetails){
+            //survey exists then update the review
+            SurveyDetails existingReview = checkIfReviewExists(surveyDetail);
+            if( existingReview != null ){
+                existingReview.setReview( surveyDetail.getReview() );
+                existingReview.setSurveyUpdatedDate( new Date(surveyDetail.getSurveyUpdatedDate()) );
+                existingReview.setScore( surveyDetail.getScore() );
+                existingReview.setFbRecommendationType( surveyDetail.getFbRecommendationType() );
+                existingReviews.add( existingReview );
+            }
+            else
+                newReviews.add( convertSurveyVOToEntity( surveyDetail ) );
+        }
+
+        //insert the new reviews
+        if(newReviews != null && !newReviews.isEmpty()){
+            try{
+                surveyDetailsDao.insertSurveyDetails( newReviews );
+            } catch (  BulkOperationException bulkWriteException ) {
+                List<BulkWriteError> bulkWriteErrors = bulkWriteException.getErrors();
+                for(BulkWriteError error: bulkWriteErrors){
+                    errors.add( new BulkWriteErrorVO( error.getIndex(), error.getCode(), error.getMessage() ) );
+                }
+            }
+        }
+
+        //update the reviews
+        if(existingReviews != null && existingReviews.size() > 0) {
+            if(updateReviews(existingReviews) == existingReviews.size()){
+                LOG.info( "Review have been successfully updated" );
+            } else{
+                LOG.warn( "Something went wrong while bulk updating the reviews" );
+            }
+        }
+
+         return errors;
+    }
+    
+    private int updateReviews( List<SurveyDetails> existingReviews )
+    {
+        return surveyDetailsDao.bulkUpdateReviews(existingReviews);
+    }
+
+
+    private SurveyDetails checkIfReviewExists( SurveyDetailsVO surveyDetail ) throws InvalidInputException
+    {
+        LOG.info( "checking if survey already exist in database with review id : {}", surveyDetail.getSourceId() );
+        Map<String, Object> queries = new HashMap<String, Object>();
+        switch ( surveyDetail.getProfileType() ){
+            case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION : {
+                queries.put( CommonConstants.COMPANY_ID_COLUMN, surveyDetail.getCompanyId() );
+                break;
+            }
+            case MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION: {
+                queries.put( CommonConstants.REGION_ID_COLUMN, surveyDetail.getCompanyId() );
+                break;
+            }
+            case MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION: {
+                queries.put( CommonConstants.BRANCH_ID_COLUMN, surveyDetail.getCompanyId() );
+                break;
+            }
+            case MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION: {
+                queries.put( CommonConstants.AGENT_ID_COLUMN, surveyDetail.getCompanyId() );
+                break;
+            }
+            default : throw new InvalidInputException( "Ivalid ProfileType {}", surveyDetail.getProfileType() );
+        }
+        queries.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveyDetail.getSourceId());
+        queries.put(  CommonConstants.SURVEY_SOURCE_COLUMN, surveyDetail.getSource() );
+        SurveyDetails existingSurveyDetails = surveyDetailsDao.getReviewByQueryMap( queries );
+        return existingSurveyDetails;
+    }
+
+    private SurveyDetails convertSurveyVOToEntity(SurveyDetailsVO surveyVO) throws ParseException {
+        SurveyDetails surveyDetails = new SurveyDetails();
+        surveyDetails.setAgentId( surveyVO.getAgentId() );
+        surveyDetails.setCompanyId( surveyVO.getCompanyId() );
+        surveyDetails.setRegionId( surveyVO.getRegionId() );
+        surveyDetails.setBranchId( surveyVO.getBranchId() );
+        surveyDetails.setCompleteProfileUrl( surveyVO.getCompleteProfileUrl() );
+        surveyDetails.setAgentName( surveyVO.getAgentName() );
+        surveyDetails.setCustomerFirstName( surveyVO.getCustomerFirstName() );
+        surveyDetails.setCustomerLastName( surveyVO.getCustomerLastName() );
+        surveyDetails.setSource( surveyVO.getSource() );
+        surveyDetails.setSourceId( surveyVO.getSourceId() );
+        surveyDetails.setReview( surveyVO.getReview() );
+        surveyDetails.setSummary( surveyVO.getSummary() );
+        surveyDetails.setScore( surveyVO.getScore() );
+        surveyDetails.setSurveyTransactionDate( new Date(surveyVO.getSurveyTransactionDate()) );
+        surveyDetails.setStage( surveyVO.getStage() );
+        surveyDetails.setAgreedToShare( surveyVO.getAgreedToShare() );
+        surveyDetails.setSurveySentDate( new Date(surveyVO.getSurveySentDate()) );
+        surveyDetails.setSurveyCompletedDate( new Date(surveyVO.getSurveyCompletedDate()) );
+        surveyDetails.setCreatedOn( new Date(surveyVO.getCreatedOn()) );
+        surveyDetails.setModifiedOn( new Date(surveyVO.getModifiedOn()) );
+        surveyDetails.setSurveyUpdatedDate( new Date(surveyVO.getSurveyUpdatedDate()) );
+        surveyDetails.setShowSurveyOnUI( surveyVO.getShowSurveyOnUI() );
+        surveyDetails.setFbRecommendationType( surveyVO.getFbRecommendationType() );
+        return surveyDetails;
+    }
+
     public double calScore(List<SurveyResponse> surveyResponse) {
     	 double noOfResponse = 0;
          double answer = 0;

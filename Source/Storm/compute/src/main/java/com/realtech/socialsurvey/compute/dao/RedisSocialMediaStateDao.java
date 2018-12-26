@@ -113,4 +113,15 @@ public interface RedisSocialMediaStateDao extends Serializable
      * @return
      */
     public List<Long> getCompanyIdsForSM();
+
+    /** check is wait for next facebook fetch is present in redis
+     * @return
+     */
+    public boolean waitForNextFacebooktFetch();
+    
+    /**
+     * check if wait for next google review fetch is present in redis.
+     * @return
+     */
+    public boolean waitForNextGoogleReviewFetch();
 }

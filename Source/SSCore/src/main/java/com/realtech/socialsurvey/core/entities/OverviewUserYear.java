@@ -75,6 +75,12 @@ public class OverviewUserYear implements Serializable
     @Column ( name = "unsubscribed_count")
     private int unsubscribed;
     
+    @Column ( name = "google")
+    private int google;
+    
+    @Column ( name = "faceebook")
+    private int facebook;
+    
     public String getOverviewUserYearId()
     {
         return overviewUserYearId;
@@ -249,8 +255,6 @@ public class OverviewUserYear implements Serializable
     {
         return serialVersionUID;
     }
-    
-    
 
     public int getThirdParty()
     {
@@ -271,6 +275,26 @@ public class OverviewUserYear implements Serializable
     {
         this.unsubscribed = unsubscribed;
     }
+    
+    public int getGoogle()
+    {
+        return google;
+    }
+
+    public void setGoogle( int google )
+    {
+        this.google = google;
+    }
+
+    public int getFacebook()
+    {
+        return facebook;
+    }
+
+    public void setFacebook( int facebook )
+    {
+        this.facebook = facebook;
+    }
 
     @Override
     public String toString()
@@ -280,7 +304,7 @@ public class OverviewUserYear implements Serializable
             + zillowReviews + ", unprocessed=" + unprocessed + ", unassigned=" + unassigned + ", duplicate=" + duplicate
             + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage=" + completePercentage
             + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview=" + totalReview
-            + ", year=" + year + ", thirdParty=" + thirdParty + ", unsubscribed=" + unsubscribed + "]";
+            + ", year=" + year + ", thirdParty=" + thirdParty + ", unsubscribed=" + unsubscribed + ", google=" + google + ", facebook=" + facebook + "]";
     }
 
 }

@@ -162,15 +162,12 @@
   <hop> <from>Filter Clicked</from><to>Sort rows Clicked</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Completed</from><to>Sort Completed</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Corrupted</from><to>Sort Corrupted</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter Detractors</from><to>Sort rows Detractors</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Ignored</from><to>Sort Ignored</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Mismatched</from><to>Sort Mismatched</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Old Records</from><to>Sort Old Records</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Partially Complete</from><to>Sort rows Partially Completed</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter Passives</from><to>Sort rows Passives</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Pending</from><to>Sort rows Pending</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Duplicate</from><to>Sort rows Duplicate</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter Promoters</from><to>Sort rows Promoters</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Sent</from><to>Sort Sent</to><enabled>Y</enabled> </hop>
   <hop> <from>Group AVg rating</from><to>Report Id Avg rating</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Abusive</from><to>Report Id Abusive</to><enabled>Y</enabled> </hop>
@@ -196,9 +193,6 @@
   <hop> <from>Join User Survey</from><to>Filter Duplicate</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey</from><to>Filter Sent</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Abusive</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Filter Detractors</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Filter Passives</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Filter Promoters</to><enabled>Y</enabled> </hop>
   <hop> <from>Report Id  Detractors</from><to>Sort  Detractors</to><enabled>Y</enabled> </hop>
   <hop> <from>Report Id Abusive</from><to>Sort rows 10 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Report Id Avg rating</from><to>Sort Avg Rating</to><enabled>Y</enabled> </hop>
@@ -275,6 +269,12 @@
   <hop> <from>Modified Java Script Value</from><to>calDelta</to><enabled>Y</enabled> </hop>
   <hop> <from>calDelta</from><to>survey_stats_report_id</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>Sort rows Avg Rating</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter Detractors</from><to>Sort rows Detractors</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter Passives</from><to>Sort rows Passives</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter Promoters</from><to>Sort rows Promoters</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey Details</from><to>Filter Detractors</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey Details</from><to>Filter Passives</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey Details</from><to>Filter Promoters</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Company</name>
@@ -476,61 +476,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>659</xloc>
       <yloc>457</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter Detractors</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows Detractors</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>MOOD</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Unpleasant</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>IS_ABUSIVE</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2297</xloc>
-      <yloc>463</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -767,61 +712,6 @@
     </step>
 
   <step>
-    <name>Filter Passives</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows Passives</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>MOOD</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>OK</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>IS_ABUSIVE</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2478</xloc>
-      <yloc>463</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Filter Pending</name>
     <type>FilterRows</type>
     <description/>
@@ -846,61 +736,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>313</xloc>
       <yloc>457</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter Promoters</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows Promoters</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>MOOD</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Great</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>IS_ABUSIVE</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2649</xloc>
-      <yloc>463</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2313,8 +2148,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2361</xloc>
-      <yloc>364</yloc>
+      <xloc>2365</xloc>
+      <yloc>216</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4143,8 +3978,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1665</xloc>
-      <yloc>364</yloc>
+      <xloc>1792</xloc>
+      <yloc>272</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -5127,8 +4962,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2356</xloc>
-      <yloc>247</yloc>
+      <xloc>2360</xloc>
+      <yloc>99</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -5421,6 +5256,318 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1266</xloc>
       <yloc>1464</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter Detractors</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows Detractors</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>admin</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>agent</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>customer</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>upload</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>CSV_UPLOAD</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>google</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>facebook</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>IS_ABUSIVE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>MOOD</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Unpleasant</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2289</xloc>
+      <yloc>483</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter Passives</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows Passives</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>admin</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>agent</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>customer</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>upload</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>CSV_UPLOAD</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>google</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>facebook</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>IS_ABUSIVE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>MOOD</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Ok</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2470</xloc>
+      <yloc>490</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter Promoters</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows Promoters</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>admin</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>agent</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>customer</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>upload</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>CSV_UPLOAD</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>google</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>SURVEY_SOURCE</leftvalue>
+   <function>&#x3c;&#x3e;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>facebook</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>IS_ABUSIVE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>MOOD</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>Great</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2639</xloc>
+      <yloc>492</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

@@ -49,6 +49,8 @@ public class Utils
     private static final String PROFILE_REGEX_REPLACEMENT = "-";
     private static final Pattern PATTERN = Pattern.compile( PROFILE_REGEX );
     private static final Logger LOG = LoggerFactory.getLogger( Utils.class );
+    private static final String URL_REGEX_FOR_FACEBOOK_PAGE_ID= "(?:https?:\\/\\/)?(?:www\\.)?facebook\\.com\\/(?:(?:\\w)*#!\\/)?(?:pages\\/)?(?:groups\\/)?(?:[\\w\\-]*\\/)*?(\\/)?([^/?]*)";
+
 
     @Value("${EMAIL_MASKING_PREFIX}")
 	private String maskingPrefix;
@@ -441,6 +443,28 @@ public class Utils
                 return StringUtils.EMPTY;
             }
         }
+    }
+
+    /**Common Method to find pageid from social media URL
+     * @param url
+     * @param urlRegex
+     * @return
+     */
+    public static String getPageIdFromURL(String url, String urlRegex){
+        Matcher matcher = Pattern.compile( urlRegex ).matcher( url );
+        if(matcher.find() && matcher.groupCount() >=2){
+            return matcher.group(2);
+        }
+        return null;
+    }
+
+    /**
+     * Get facebook page id from facebook page URL
+     * @param url
+     * @return
+     */
+    public static String getFacebookPageIdFromURL(String url){
+        return getPageIdFromURL(url, URL_REGEX_FOR_FACEBOOK_PAGE_ID);
     }
 
     public static boolean validateCustomerEmail( String emailId )

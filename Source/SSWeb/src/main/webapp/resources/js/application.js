@@ -10210,16 +10210,20 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
         "onblur" : "updateGoogleBusinessLink(this.value);$('#social-token-text').hide();"
     });
     $('#social-token-text').val(link);*/
-	$('body').on('click','#gmb-disconnect-link',function(){
+	$('body').on('click','#gmb-disconnect-link',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
 		
-		var payload = {
+		disconnectSocialMedia(e,"google business", false);
+		/*var payload = {
 				"socialmedia" : "google business"
 			};
 		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
 				$('#overlay-toast').html(data);
 				showToast();
 			}, payload, true);
-		
+		*/
 		$('#overlay-gmb-popup').addClass('hide');
 		removeProfileLinkInEditProfilePage( "googleBusiness" );
 	});
@@ -12043,12 +12047,14 @@ $(document).on('click', '#send-help-mail-button', function() {
 // Disconnect social media
 function disconnectSocialMedia(event, socialMedia, isAutoLogin) {
 	event.stopPropagation();
+	event.stopImmediatePropagation();
+	event.preventDefault();
 	if (isAutoLogin) {
 		$('#overlay-toast').html('Insufficient permission to disconnect from ' + socialMedia);
 		showToast();
 		return;
 	}
-	if ($('div[data-social="' + socialMedia + '"]').text() == undefined || $('div[data-social="' + socialMedia + '"]').text() == '') {
+	if (socialMedia != "google business" && ($('div[data-social="' + socialMedia + '"]').text() == undefined || $('div[data-social="' + socialMedia + '"]').text() == '')) {
 		return;
 	}
 	if (socialMedia == 'linkedin') {
@@ -14826,6 +14832,8 @@ $(document).on('click', '.review-more-button', function() {
 	$(this).parent().find('.review-less-text').hide();
 	$(this).parent().find('.review-complete-txt').show();
 	$(this).parent().find('.view-zillow-link').show();
+	$(this).parent().find('.view-fb-link').show();
+	$(this).parent().find('.view-goo-link').show();
 	$(this).hide();
 });
 $(document).on('click','ul.accordion li',function(){

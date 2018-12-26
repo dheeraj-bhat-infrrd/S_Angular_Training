@@ -6,14 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
-import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.ApiRequestDetails;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveyResponse;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -181,6 +174,8 @@ public interface SurveyDetailsDao
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int start, int rows );
 
 
+    void removeExistingZillowSurveysByEntity( String entityType, long entityId, String source );
+
     public long getSurveysReporetedAsAbusiveCount();
 
 
@@ -246,10 +241,7 @@ public interface SurveyDetailsDao
         throws InvalidInputException;
 
 
-    public void removeExistingZillowSurveysByEntity( String entityType, long entityId );
-
-
-    public SurveyDetails getZillowReviewByQueryMap( Map<String, Object> queries ) throws InvalidInputException;
+    public SurveyDetails getReviewByQueryMap( Map<String, Object> queries ) throws InvalidInputException;
 
 
     public void resetShowSurveyOnUIPropertyForNonLatestReviews( String columnName, long id, List<String> latestSurveyIdList );
@@ -390,16 +382,35 @@ public interface SurveyDetailsDao
 
     public List<String> getDistinctValues( String queryKey, Object value, String field );
 
+    /**
+     * Method to update the existing reviews
+     * @param existingReviews
+     */
+    int bulkUpdateReviews( List<SurveyDetails> existingReviews );
+
+    public SurveyDetails fetchSurveyWithConditions( Map<String, Object> queryMap );
+
+
+    /**
+     * Insert to survey details collection in bulk.
+     * @param surveyDetails
+     */
+    public void insertSurveyDetails( List<SurveyDetails> surveyDetails );
 
 	/**
 	 * @param surveyId
 	 * @return
 	 */
 	public List<SurveyResponse> getSurveyRatingResponse(String surveyId);
+
+
+    List<SurveyDetails> getSurveyBySourceSourceIdAndMongoCollection( long iden, String collectionName );
+
+
+    List<SurveyDetails> fetchSurveyForParticularHierarchyAndSource( long entityId, String entityType, String source );
 	
 	public int updateSurveyDetailsFields( long surveyPreIntitiationId, int participantType, Date surveySentDate);
-
-
+	
 	public Map<String, Long> getSurveyCountForGatewayResponses(String entityType, long entityId);
 
 

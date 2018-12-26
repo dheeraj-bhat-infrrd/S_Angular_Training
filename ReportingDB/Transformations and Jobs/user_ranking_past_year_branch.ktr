@@ -131,7 +131,7 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Generate random value</from><to>Table output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Generate random value</from><to>Table output</to><enabled>N</enabled> </hop>
   <hop> <from>Merge Join</from><to>SortUserId</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeOnUserId</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>SortUserId</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
@@ -153,7 +153,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, STATUS&#xd;&#xa;FROM branch&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0 and STATUS &#x3d; 1 order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, STATUS&#xd;&#xa;FROM branch&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0 and STATUS &#x3d; 1 and branch_id&#x3d;2121 order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -212,7 +212,7 @@
       </valuetypes>
     <fields>
       <field>
-        <name>BRANCH_ID</name>
+        <name>branch_id_final</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
@@ -321,13 +321,13 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var branch_id &#x3d; 0&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	branch_id &#x3d; BRANCH_ID&#xd;&#xa;&#x7d;else if&#x28;BRANCH_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	branch_id &#x3d; BRANCH_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var internal_branch_rank &#x3d; 0&#x3b;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>branch_id</name>
-        <rename>branch_id</rename>
-        <type>String</type>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var branch_id_final &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	branch_id_final &#x3d; BRANCH_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;BRANCH_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	branch_id_final &#x3d; BRANCH_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var internal_branch_rank &#x3d; 0&#x3b;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>branch_id_final</name>
+        <rename>branch_id_final</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
+        <replace>N</replace>
       </field>      <field>        <name>internal_branch_rank</name>
         <rename>internal_branch_rank</rename>
         <type>Number</type>
@@ -458,10 +458,6 @@
           <stream_name>is_eligible</stream_name>
         </field>
         <field>
-          <column_name>branch_id</column_name>
-          <stream_name>BRANCH_ID</stream_name>
-        </field>
-        <field>
           <column_name>year</column_name>
           <stream_name>year</stream_name>
         </field>
@@ -496,6 +492,10 @@
         <field>
           <column_name>answer_sum</column_name>
           <stream_name>answer_sum</stream_name>
+        </field>
+        <field>
+          <column_name>branch_id</column_name>
+          <stream_name>branch_id_final</stream_name>
         </field>
     </fields>
      <cluster_schema/>

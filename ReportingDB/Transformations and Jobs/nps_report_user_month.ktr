@@ -133,12 +133,64 @@
   <order>
   <hop> <from>Generate random value</from><to>nps_report_user_month output</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_stats_report_user</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 3</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>calculate NPS</to><enabled>Y</enabled> </hop>
   <hop> <from>calculate NPS</from><to>Generate random value</to><enabled>Y</enabled> </hop>
-  <hop> <from>group NPS</from><to>Sort rows 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>survey_details_input</from><to>group NPS</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey_details_input 2</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey preinitiation</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join 2</from><to>Calculate Sent</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows</from><to>Merge Join 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Calculate Sent</from><to>Merge Join 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join 3</from><to>calculate NPS</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey_details_input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   </order>
+  <step>
+    <name>Calculate Sent</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xa;&#xa;var sent &#x3d; completed &#x2b; incomplete&#x3b;&#xa;&#xa;var agent_f1 &#x3d; 0&#x3b;&#xa;var month_f1 &#x3d; 0&#x3b;&#xa;var year_f1 &#x3d; 0&#x3b;&#xa;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xa;	agent_f1 &#x3d; AGENT_ID&#x3b;&#xa;&#x7d; else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	agent_f1 &#x3d; AGENT_ID_1&#x3b;&#xa;&#x7d;&#xa;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xa;	month_f1 &#x3d; MONTH_Data&#x3b;&#xa;&#x7d; else if&#x28;MONTH_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	month_f1 &#x3d; MONTH_Data_1&#x3b;&#xa;&#x7d;&#xa;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xa;	year_f1 &#x3d; Year_Data&#x3b;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	year_f1 &#x3d; Year_Data_1&#x3b;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>sent</name>
+        <rename>sent</rename>
+        <type>Integer</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>agent_f1</name>
+        <rename>agent_f1</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>month_f1</name>
+        <rename>month_f1</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>year_f1</name>
+        <rename>year_f1</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>550</xloc>
+      <yloc>76</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>Generate random value</name>
     <type>RandomValue</type>
@@ -158,8 +210,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>361</xloc>
-      <yloc>195</yloc>
+      <xloc>281</xloc>
+      <yloc>197</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -176,7 +228,7 @@
            <schema_name/>
            </partitioning>
 <join_type>INNER</join_type>
-<step1>Sort rows 3</step1>
+<step1>survey_details_input</step1>
 <step2>survey_stats_report_user</step2>
     <keys_1>
       <key>AGENT_ID</key>
@@ -190,14 +242,75 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>655</xloc>
-      <yloc>195</yloc>
+      <xloc>232</xloc>
+      <yloc>76</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort rows 3</name>
+    <name>Merge Join 2</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>INNER</join_type>
+<step1>survey_details_input 2</step1>
+<step2>survey preinitiation</step2>
+    <keys_1>
+      <key>AGENT_ID</key>
+      <key>MONTH_Data</key>
+      <key>Year_Data</key>
+    </keys_1>
+    <keys_2>
+      <key>AGENT_ID</key>
+      <key>MONTH_Data</key>
+      <key>Year_Data</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>674</xloc>
+      <yloc>76</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Join 3</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>INNER</join_type>
+<step1>Sort rows</step1>
+<step2>Calculate Sent</step2>
+    <keys_1>
+      <key>AGENT_ID</key>
+      <key>MONTH_Data</key>
+      <key>Year_Data</key>
+    </keys_1>
+    <keys_2>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>426</xloc>
+      <yloc>76</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -236,8 +349,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>655</xloc>
-      <yloc>55</yloc>
+      <xloc>334</xloc>
+      <yloc>76</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -266,47 +379,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>520</xloc>
-      <yloc>195</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>group NPS</name>
-    <type>MemoryGroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>AGENT_ID</name>
-        </field>
-        <field>
-          <name>MONTH_Data</name>
-        </field>
-        <field>
-          <name>Year_Data</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>nps_sum</aggregate>
-          <subject>NPS_SCORE</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>359</xloc>
-      <yloc>55</yloc>
+      <xloc>426</xloc>
+      <yloc>197</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -383,8 +457,34 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>105</xloc>
-      <yloc>195</yloc>
+      <xloc>281</xloc>
+      <yloc>300</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey preinitiation</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xa;  count&#x28;SURVEY_PRE_INITIATION_ID&#x29; as incomplete&#xa;, AGENT_ID&#xa;, month&#x28;CREATED_ON_EST&#x29; AS MONTH_Data&#xa;, year&#x28;CREATED_ON_EST&#x29; AS Year_Data&#xa;FROM survey_pre_initiation&#xa;where status in &#x28;0,1,2&#x29; and AGENT_ID &#x21;&#x3d; 0 &#xa;AND CREATED_ON_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29;&#xa;and SURVEY_SOURCE NOT IN &#x24;&#x7b;SURVEY_SOURCE_UNVERIFIED&#x7d;&#xa; group by AGENT_ID,MONTH_Data,Year_Data&#xa;order by AGENT_ID,MONTH_Data,Year_Data&#x3b;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>Y</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>814</xloc>
+      <yloc>76</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -401,16 +501,42 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, NPS_SCORE&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;, SURVEY_COMPLETED_DATE_EST&#xd;&#xa;, SURVEY_TRANSACTION_DATE_EST&#xd;&#xa;, SURVEY_UPDATED_DATE_EST&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST_EST&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where stage&#x3d;-1 and AGENT_ID &#x21;&#x3d; 0 &#xa;AND SURVEY_COMPLETED_DATE_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29;&#xa;and NPS_SCORE between 0 and 10&#xa; and IS_ABUSIVE&#x3d;0&#xa;order by AGENT_ID,MONTH_Data,Year_Data&#x3b;</sql>
+    <sql>SELECT&#xd;&#xa;  AGENT_ID&#xd;&#xa;, sum&#x28;NPS_SCORE&#x29; as nps_sum&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where stage&#x3d;-1 and AGENT_ID &#x21;&#x3d; 0 &#xa;AND SURVEY_COMPLETED_DATE_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29;&#xa;and NPS_SCORE between 0 and 10&#xa;and IS_ABUSIVE&#x3d;0 and SOURCE NOT IN &#x24;&#x7b;SURVEY_SOURCE_UNVERIFIED&#x7d;&#xa;group by AGENT_ID,MONTH_Data,Year_Data&#xa;order by AGENT_ID,MONTH_Data,Year_Data&#x3b;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
+    <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>105</xloc>
-      <yloc>55</yloc>
+      <xloc>104</xloc>
+      <yloc>18</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey_details_input 2</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xa;  count&#x28;SURVEY_DETAILS_ID&#x29; as completed&#xa;, AGENT_ID&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xa;FROM survey_details&#xa;where stage&#x3d;-1 and AGENT_ID &#x21;&#x3d; 0 &#xa;AND SURVEY_COMPLETED_DATE_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29;&#xa;and IS_ABUSIVE&#x3d;0 and SOURCE NOT IN &#x24;&#x7b;SURVEY_SOURCE_UNVERIFIED&#x7d;&#xa;group by AGENT_ID,MONTH_Data,Year_Data&#xa;order by AGENT_ID,MONTH_Data,Year_Data&#x3b;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>Y</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>674</xloc>
+      <yloc>197</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -427,7 +553,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  user_id&#xd;&#xa;, year&#xd;&#xa;, month&#xd;&#xa;, sent_count&#xd;&#xa;, nps_detractors&#xd;&#xa;, nps_passives&#xd;&#xa;, nps_promoters&#xd;&#xa;FROM survey_stats_report_user&#xd;&#xa;order by user_id,month,year&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  user_id&#xd;&#xa;, year&#xd;&#xa;, month&#xd;&#xa;, nps_detractors&#xd;&#xa;, nps_passives&#xd;&#xa;, nps_promoters&#xd;&#xa;FROM survey_stats_report_user&#xd;&#xa;order by user_id,month,year&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -435,8 +561,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>847</xloc>
-      <yloc>195</yloc>
+      <xloc>104</xloc>
+      <yloc>117</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

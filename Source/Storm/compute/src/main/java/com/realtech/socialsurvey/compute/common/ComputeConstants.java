@@ -92,6 +92,9 @@ public final class ComputeConstants
     public static final String LINKEDIN_TOKEN_EXPIRY_FIELD = "socialMediaTokens.linkedInToken.tokenExpiryAlertSent";
     public static final String INSTAGRAM_TOKEN_EXPIRY_FIELD = "socialMediaTokens.instagramToken.tokenExpiryAlertSent";
 
+    //social media lastfetched fields
+    public static final String FBREVIEW_LAST_FETCHED_FIELD = "socialMediaLastFetched.fbReviewLastFetched.";
+
     public static final String SOCIAL_MONITOR_REPORT_BATCH_SIZE = "SOCIAL_MONITOR_REPORT_BATCH_SIZE";
 
     //Download from S3 to local temp
@@ -107,6 +110,12 @@ public final class ComputeConstants
     public static final String PROFILE_LEVEL_INDIVIDUAL  = "INDIVIDUAL";
     
     public static String WIDGET_RESOURCES_URL = "WIDGET_RESOURCES_URL";
-
+    
+    public static final String LAST_BATCH_TIME_GOOOGLE = "last_batch_time_google";
+    public static final String GMB_ACCOUNT = "GMB_ACCOUNT";
+    public static final String REGION_SETTINGS_COLLECTION = "REGION_SETTINGS";
+    public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
+    public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
+    public static final String COMPANY_SETTINGS_COLLECTION = "COMPANY_SETTINGS";
 
 }

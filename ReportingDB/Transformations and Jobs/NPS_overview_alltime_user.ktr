@@ -385,11 +385,11 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, NPS_SCORE&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE&#x3d;-1 AND AGENT_ID &#x21;&#x3d; 0 AND NPS_SCORE &#x3e; -1 and IS_ABUSIVE&#x3d;0&#xd;&#xa;order by AGENT_ID, NPS_SCORE&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, NPS_SCORE&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE&#x3d;-1 AND AGENT_ID &#x21;&#x3d; 0 AND NPS_SCORE &#x3e; -1 and IS_ABUSIVE&#x3d;0 and SOURCE NOT IN &#x24;&#x7b;SURVEY_SOURCE_UNVERIFIED&#x7d;&#xd;&#xa;order by AGENT_ID, NPS_SCORE&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
+    <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>

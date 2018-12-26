@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.services.api;
 
+import com.realtech.socialsurvey.compute.entities.*;
 import java.util.List;
 import java.util.Map;
 
@@ -173,6 +174,39 @@ public interface SSApiIntegrationService
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/widget/scripts")
     Call<List<String>> getWidgetScripts();
+
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/fbTokensPaginated")
+    Call<SocialMediaTokensPaginated> getFbTokensPaginated( @Query ( "skipCount") int skipCount,
+        @Query ( "batchSize") int batchSize, @Header ( "authorizationHeader") String authorizationHeader );
+
+    @Headers( "Content-Type: application/json" )
+    @GET ( "v1/branch/{id}" )
+    Call<BranchVO> getBranchDetails( @Path ("id") long id, @Header ( "authorizationHeader") String authHeader );
+
+    @Headers( "Content-Type: application/json" )
+    @GET( "v1/user/{id}" )
+    Call<Map<String,Long>> findPrimaryUserProfileByAgentId(@Path( "id" ) long id, @Header ( "authorizationHeader") String authHeader );
+
+    @Headers( "Content-Type: application/json" )
+    @POST( "v2/reviews/bulk" )
+    Call<List<BulkWriteErrorVO>> saveOrUpdateReviews( @Body List<SurveyDetailsVO> surveyDetails );
+
+    @GET ( "v1/organizationsettings/{placeId}/idens")
+    Call<List<OrganizationUnitIds>> getDetailsFromPlaceId( @Path("placeId") String placeId );
+
+
+    @Headers ( "Content-Type: application/json")
+    @PUT ( "v1/updateSocialMediaLastFetched/profile/{profile}/iden/{iden}/socialMedia/{socialMedia}/current/{current}/previous/{previous}")
+    Call<Boolean> updateSocialMediaLastFetched( @Path ("iden") long iden, @Path ("current") long current,
+        @Path ("previous") long previous, @Path ("profile") String profile, @Path( "socialMedia" ) String socialMedia,
+        @Header ("authorizationHeader") String authHeader
+         );
+
+    @Headers ( "Content-Type: application/json")
+    @PUT("v1/resetSocialMediaLastFetched/profile/{profile}/iden/{iden}/socialMedia/{socialMedia}")
+    Call<Boolean> resetSocialMediaLastFetched(@Path( "profile" ) String profile, @Path( "iden" ) long iden,
+        @Path( "socialMedia" ) String socialMedia, @Header( "authorizationHeader" ) String authHeader );
     
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/{entityType}/{entityId}/surveystats")

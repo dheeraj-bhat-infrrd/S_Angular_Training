@@ -460,7 +460,7 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<bean id="surveysourceidupdater"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"

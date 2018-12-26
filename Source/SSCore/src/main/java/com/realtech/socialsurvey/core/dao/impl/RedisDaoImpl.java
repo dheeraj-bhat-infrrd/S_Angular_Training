@@ -119,13 +119,13 @@ public class RedisDaoImpl implements RedisDao, InitializingBean {
         map.put("modifiedOn", String.valueOf(System.currentTimeMillis()));
         hashOps.putAll(COMPANY_TRUSTED_SOURCE_KEY_PREFIX + companyId, map);
     }
-    
+
     @Override
     public void afterPropertiesSet() throws Exception {
         redisTemplate.getConnectionFactory().getConnection().ping();
     }
 
 
-    
+
 
 }

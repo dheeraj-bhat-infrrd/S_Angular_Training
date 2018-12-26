@@ -255,8 +255,6 @@ public class SurveyManagementController
 	@RequestMapping(value = "/data/storeFeedback")
 	public double storeFeedbackAndCloseSurvey(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
-		
-		
 		double surveyScoreRes = -1;
 
 		// To store final feedback provided by customer in mongoDB.

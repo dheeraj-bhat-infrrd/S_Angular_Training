@@ -2824,6 +2824,8 @@ function drawTransactionStats(overviewYearData){
 		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
 		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
 		$('#third-party-lbl-span').html(overviewYearData.ThirdParty);
+		$('#google-lbl-span').html(overviewYearData.google);
+		$('#facebook-lbl-span').html(overviewYearData.facebook);
 		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);
 		$('#unassigned-lbl-span').html(overviewYearData.Unassigned);
 		$('#duplicate-lbl-span').html(overviewYearData.Duplicate);
@@ -2854,6 +2856,8 @@ function drawTransactionStats(overviewYearData){
 		$('#social-posts-lbl-span').html(0);
 		$('#zillow-lbl-span').html(0);
 		$('#third-party-lbl-span').html(0);
+		$('#google-lbl-span').html(0);
+		$('#facebook-lbl-span').html(0);
 		$('#unprocessed-lbl-span').html(0);
 		$('#unassigned-lbl-span').html(0);
 		$('#duplicate-lbl-span').html(0);

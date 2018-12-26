@@ -154,6 +154,12 @@
 							<c:when test="${singleReviewItem.source =='Zillow'}">
 								<div class='zillow-badge  verify-image-zillow float-right'></div>
 							</c:when>
+							<c:when test="${singleReviewItem.source =='facebook'}">
+								<div class='fb-verified-image verify-image-fb float-right'></div>
+							</c:when>
+							<c:when test="${singleReviewItem.source =='google'}">
+								<div class='google-verified-image verify-image-google float-right'></div>
+							</c:when>
 							<c:otherwise>
 								<div class='unverified-badge  verify-image-ss float-right'></div>
 							</c:otherwise>
@@ -163,6 +169,12 @@
 						${singleReview}
 						<c:if test="${singleReviewItem.source=='Zillow' }">
                               <br><span><a class="view-zillow-link" href="${singleReviewItem.sourceId}"  target="_blank">View on zillow</a></span>
+                        </c:if>
+                        <c:if test="${singleReviewItem.source=='facebook' }">
+                              <br><span><a class="view-fb-link" href="${singleReviewItem.completeProfileUrl}"  target="_blank">View on Facebook</a></span>
+                        </c:if>
+                         <c:if test="${singleReviewItem.source=='facebook' }">
+                              <br><span><a class="view-goo-link" href="${singleReviewItem.completeProfileUrl}"  target="_blank">View on Google</a></span>
                         </c:if>
 					</div>
 					

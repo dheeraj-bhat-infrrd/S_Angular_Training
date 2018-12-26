@@ -1,9 +1,6 @@
 package com.realtech.socialsurvey.compute.dao;
 
-import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
-import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
-import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
-import com.realtech.socialsurvey.compute.entities.UnsavedUserEvent;
+import com.realtech.socialsurvey.compute.entities.*;
 
 
 /**
@@ -66,4 +63,5 @@ public interface FailedMessagesDao
     * @return
     */
    public boolean insertUnsavedUserEvent( UnsavedUserEvent unsavedEvent );
+
 }

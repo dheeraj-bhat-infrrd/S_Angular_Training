@@ -78,6 +78,12 @@
 					<c:when test="${feedback.source =='Zillow'}">
 						<div class='zillow-badge  verify-image-zillow float-right'></div>
 					</c:when>
+					<c:when test="${feedback.source =='facebook'}">
+						<div class='fb-verified-image verify-image-fb float-right'></div>
+					</c:when>
+					<c:when test="${feedback.source =='google'}">
+						<div class='google-verified-image verify-image-google float-right'></div>
+					</c:when>
 					<c:otherwise>
 						<div class='unverified-badge  verify-image-ss float-right'></div>
 					</c:otherwise>
@@ -199,6 +205,12 @@
 						<c:if test="${feedback.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
+						<c:if test="${feedback.source =='facebook'}">
+							<br><span><a class="view-fb-link hide" href="${feedback.facebookProfileUrl}"  target="_blank">View on Facebook</a></span>
+						</c:if>
+						<c:if test="${feedback.source =='google'}">
+							<br><span><a class="view-goo-link hide" href="${feedback.googleBusinessProfileUrl}"  target="_blank">View on Google</a></span>
+						</c:if>
 						<span class="review-less-text">${fn:substring(review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
@@ -206,9 +218,15 @@
 				<c:otherwise>
 					<div class="ppl-content review-height">
 					    <span>${review}</span>
-                    <c:if test="${feedback.source=='Zillow' }">
-                      <br><span><a class="view-zillow-link" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
-                    </c:if>
+	                    <c:if test="${feedback.source=='Zillow' }">
+	                      <br><span><a class="view-zillow-link" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
+	                    </c:if>
+	                    <c:if test="${feedback.source =='facebook'}">
+							<br><span><a class="view-fb-link" href="${feedback.facebookProfileUrl}"  target="_blank">View on Facebook</a></span>
+						</c:if>
+						<c:if test="${feedback.source =='google'}">
+							<br><span><a class="view-goo-link" href="${feedback.googleBusinessProfileUrl}"  target="_blank">View on Google</a></span>
+						</c:if>
                     </div>
 				</c:otherwise>
 			</c:choose>

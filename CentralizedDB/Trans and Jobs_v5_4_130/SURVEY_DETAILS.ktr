@@ -179,7 +179,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var createdOnDate &#x3d; new Date&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnDate &#x3d; new Date&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;var surveyCompletedDateVal &#x3d; new Date&#x28;surveyCompletedDate&#x29;&#x3b;&#xd;&#xa;var surveyTranscationDateVal &#x3d; new Date&#x28;surveyTransactionDate&#x29;&#x3b;&#xd;&#xa;var surveyUpdatedDateVal &#x3d; new Date&#x28;surveyUpdatedDate&#x29;&#x3b;&#xd;&#xa;var lastReminderForSocialPostDate &#x3d; new Date&#x28;lastReminderForSocialPost&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_COMPLETED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_TRANSACTION_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_UPDATED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; null&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;createdOn &#x21;&#x3d; null&#x29;&#x7b; CREATED_ON_EST &#x3d; sdf.format&#x28;createdOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;modifiedOn &#x21;&#x3d; null&#x29;&#x7b; MODIFIED_ON_EST &#x3d; sdf.format&#x28;modifiedOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyCompletedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_COMPLETED_DATE_EST &#x3d; sdf.format&#x28;surveyCompletedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyTransactionDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_TRANSACTION_DATE_EST &#x3d; sdf.format&#x28;surveyTransactionDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyUpdatedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_UPDATED_DATE_EST &#x3d; sdf.format&#x28;surveyUpdatedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;lastReminderForSocialPost &#x21;&#x3d; null&#x29;&#x7b; LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; sdf.format&#x28;lastReminderForSocialPost&#x29;&#x3b;&#x7d;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var createdOnDate &#x3d; new Date&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnDate &#x3d; new Date&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;var surveyCompletedDateVal &#x3d; new Date&#x28;surveyCompletedDate&#x29;&#x3b;&#xd;&#xa;var surveyTranscationDateVal &#x3d; new Date&#x28;surveyTransactionDate&#x29;&#x3b;&#xd;&#xa;var surveyUpdatedDateVal &#x3d; new Date&#x28;surveyUpdatedDate&#x29;&#x3b;&#xd;&#xa;var lastReminderForSocialPostDate &#x3d; new Date&#x28;lastReminderForSocialPost&#x29;&#x3b;&#xa;var surveySentDateD &#x3d; new Date&#x28;surveySentDate&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_COMPLETED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_TRANSACTION_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var SURVEY_UPDATED_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;var LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; null&#x3b;&#xa;var SURVEY_SENT_DATE_EST &#x3d; null&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;createdOn &#x21;&#x3d; null&#x29;&#x7b; CREATED_ON_EST &#x3d; sdf.format&#x28;createdOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;modifiedOn &#x21;&#x3d; null&#x29;&#x7b; MODIFIED_ON_EST &#x3d; sdf.format&#x28;modifiedOn&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyCompletedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_COMPLETED_DATE_EST &#x3d; sdf.format&#x28;surveyCompletedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyTransactionDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_TRANSACTION_DATE_EST &#x3d; sdf.format&#x28;surveyTransactionDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveyUpdatedDate &#x21;&#x3d; null&#x29;&#x7b; SURVEY_UPDATED_DATE_EST &#x3d; sdf.format&#x28;surveyUpdatedDate&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;lastReminderForSocialPost &#x21;&#x3d; null&#x29;&#x7b; LAST_REMINDER_FOR_SOCIAL_POST_EST &#x3d; sdf.format&#x28;lastReminderForSocialPost&#x29;&#x3b;&#x7d;&#xd;&#xa;if&#x28;surveySentDateStr &#x21;&#x3d; null&#x29;&#x7b; SURVEY_SENT_DATE_EST &#x3d; sdf.format&#x28;surveySentDate&#x29;&#x3b;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>CREATED_ON_EST</name>
         <rename>CREATED_ON_EST</rename>
         <type>String</type>
@@ -216,6 +216,12 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
+      </field>      <field>        <name>SURVEY_SENT_DATE_EST</name>
+        <rename>SURVEY_SENT_DATE_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>471</xloc>
@@ -239,7 +245,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;if&#x28;milliValue&#x21;&#x3d;null &#x26;&#x26; milliValue&#x21;&#x3d;&#x22;undefined&#x22;&#x29;&#x7b;&#xd;&#xa;var date &#x3d; milliValue.toString&#x28;&#x29;&#xd;&#xa;var year &#x3d; date.substring&#x28;24,28&#x29;&#xd;&#xa;var mnths &#x3d; &#x7b; &#xd;&#xa;        Jan&#x3a;&#x22;01&#x22;, Feb&#x3a;&#x22;02&#x22;, Mar&#x3a;&#x22;03&#x22;, Apr&#x3a;&#x22;04&#x22;, May&#x3a;&#x22;05&#x22;, Jun&#x3a;&#x22;06&#x22;,&#xd;&#xa;        Jul&#x3a;&#x22;07&#x22;, Aug&#x3a;&#x22;08&#x22;, Sep&#x3a;&#x22;09&#x22;, Oct&#x3a;&#x22;10&#x22;, Nov&#x3a;&#x22;11&#x22;, Dec&#x3a;&#x22;12&#x22;&#xd;&#xa;    &#x7d;&#x3b;&#xd;&#xa;var month &#x3d; mnths&#x5b;date.substring&#x28;4,7&#x29;&#x5d;&#x3b;&#xd;&#xa;var day &#x3d; date.substring&#x28;8,10&#x29;&#x3b;&#xd;&#xa;var time &#x3d; date.substring&#x28;11,19&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;time&#xd;&#xa; &#x7d;&#xd;&#xa;&#xd;&#xa;return null&#x3b;&#xd;&#xa;&#xd;&#xa;&#x7d;&#xd;&#xa;var createdOnStr &#x3d; convertToDate&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnStr &#x3d; convertToDate&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;var surveyCompletedDatestr &#x3d; convertToDate&#x28;surveyCompletedDate&#x29;&#x3b;&#xd;&#xa;var surveyTransactionDatestr &#x3d; convertToDate&#x28;surveyTransactionDate&#x29;&#x3b;&#xd;&#xa;var surveyUpdatedDatestr &#x3d; convertToDate&#x28;surveyUpdatedDate&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;if&#x28;milliValue&#x21;&#x3d;null &#x26;&#x26; milliValue&#x21;&#x3d;&#x22;undefined&#x22;&#x29;&#x7b;&#xd;&#xa;var date &#x3d; milliValue.toString&#x28;&#x29;&#xd;&#xa;var year &#x3d; date.substring&#x28;24,28&#x29;&#xd;&#xa;var mnths &#x3d; &#x7b; &#xd;&#xa;        Jan&#x3a;&#x22;01&#x22;, Feb&#x3a;&#x22;02&#x22;, Mar&#x3a;&#x22;03&#x22;, Apr&#x3a;&#x22;04&#x22;, May&#x3a;&#x22;05&#x22;, Jun&#x3a;&#x22;06&#x22;,&#xd;&#xa;        Jul&#x3a;&#x22;07&#x22;, Aug&#x3a;&#x22;08&#x22;, Sep&#x3a;&#x22;09&#x22;, Oct&#x3a;&#x22;10&#x22;, Nov&#x3a;&#x22;11&#x22;, Dec&#x3a;&#x22;12&#x22;&#xd;&#xa;    &#x7d;&#x3b;&#xd;&#xa;var month &#x3d; mnths&#x5b;date.substring&#x28;4,7&#x29;&#x5d;&#x3b;&#xd;&#xa;var day &#x3d; date.substring&#x28;8,10&#x29;&#x3b;&#xd;&#xa;var time &#x3d; date.substring&#x28;11,19&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;time&#xd;&#xa; &#x7d;&#xd;&#xa;&#xd;&#xa;return null&#x3b;&#xd;&#xa;&#xd;&#xa;&#x7d;&#xd;&#xa;var createdOnStr &#x3d; convertToDate&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnStr &#x3d; convertToDate&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;var surveyCompletedDatestr &#x3d; convertToDate&#x28;surveyCompletedDate&#x29;&#x3b;&#xd;&#xa;var surveyTransactionDatestr &#x3d; convertToDate&#x28;surveyTransactionDate&#x29;&#x3b;&#xd;&#xa;var surveyUpdatedDatestr &#x3d; convertToDate&#x28;surveyUpdatedDate&#x29;&#x3b;&#xa;var surveySentDateStr &#x3d; convertToDate&#x28;surveySentDate&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>createdOnStr</name>
         <rename>createdOnStr</rename>
         <type>String</type>
@@ -266,6 +272,12 @@
         <replace>N</replace>
       </field>      <field>        <name>surveyUpdatedDatestr</name>
         <rename>surveyUpdatedDatestr</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>surveySentDateStr</name>
+        <rename>surveySentDateStr</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -343,222 +355,237 @@
       <value>
         <name>BRANCH_ID</name>
         <rename>BRANCH_ID</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>COMPANY_ID</name>
         <rename>COMPANY_ID</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>REGION_ID</name>
         <rename>REGION_ID</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SOURCE_ID</name>
         <rename>SOURCE_ID</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SURVEY_PRE_INTITIATION_ID</name>
         <rename>SURVEY_PRE_INTITIATION_ID</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>AGENT_ID</name>
         <rename>AGENT_ID</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>AGENT_NAME</name>
         <rename>AGENT_NAME</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>AGREED_TO_SHARE</name>
         <rename>AGREED_TO_SHARE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>CITY</name>
         <rename>CITY</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>COMPLETE_PROFILE_URL</name>
         <rename>COMPLETE_PROFILE_URL</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>CUSTOMER_EMAIL</name>
         <rename>CUSTOMER_EMAIL</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>CUSTOMER_FIRST_NAME</name>
         <rename>CUSTOMER_FIRST_NAME</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>CUSTOMER_LAST_NAME</name>
         <rename>CUSTOMER_LAST_NAME</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>EDITABLE</name>
         <rename>EDITABLE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>IS_ABUSE_REP_BY_USER</name>
         <rename>IS_ABUSE_REP_BY_USER</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>IS_ABUSIVE</name>
         <rename>IS_ABUSIVE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>LAST_REMINDER_FOR_SOCIAL_POST</name>
         <rename>LAST_REMINDER_FOR_SOCIAL_POST</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>MOOD</name>
         <rename>MOOD</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>REMINDER_COUNT</name>
         <rename>REMINDER_COUNT</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>REMINDERS_FOR_SOCIAL_POSTS</name>
         <rename>REMINDERS_FOR_SOCIAL_POSTS</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>RETAKE_SURVEY</name>
         <rename>RETAKE_SURVEY</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>REVIEW</name>
         <rename>REVIEW</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SCORE</name>
         <rename>SCORE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SHOW_SURVEY_ON_UI</name>
         <rename>SHOW_SURVEY_ON_UI</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SOCIAL_POSTS_REMINDER</name>
         <rename>SOCIAL_POSTS_REMINDER</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SOURCE</name>
         <rename>SOURCE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>STAGE</name>
         <rename>STAGE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>STATE</name>
         <rename>STATE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SUMMARY</name>
         <rename>SUMMARY</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SURVEY_CLICKED</name>
         <rename>SURVEY_CLICKED</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>UNDER_RESOLUTION</name>
         <rename>UNDER_RESOLUTION</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>URL</name>
         <rename>URL</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>CREATED_ON</name>
         <rename>CREATED_ON</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>MODIFIED_ON</name>
         <rename>MODIFIED_ON</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SURVEY_COMPLETED_DATE</name>
         <rename>SURVEY_COMPLETED_DATE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SURVEY_TRANSACTION_DATE</name>
         <rename>SURVEY_TRANSACTION_DATE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SURVEY_UPDATED_DATE</name>
         <rename>SURVEY_UPDATED_DATE</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>CREATED_ON_EST</name>
         <rename>CREATED_ON_EST</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>MODIFIED_ON_EST</name>
         <rename>MODIFIED_ON_EST</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SURVEY_COMPLETED_DATE_EST</name>
         <rename>SURVEY_COMPLETED_DATE_EST</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SURVEY_TRANSACTION_DATE_EST</name>
         <rename>SURVEY_TRANSACTION_DATE_EST</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>SURVEY_UPDATED_DATE_EST</name>
         <rename>SURVEY_UPDATED_DATE_EST</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>LAST_REMINDER_FOR_SOCIAL_POST_EST</name>
         <rename>LAST_REMINDER_FOR_SOCIAL_POST_EST</rename>
-        <update>Y</update>
+        <update>N</update>
       </value>
       <value>
         <name>NPS_SCORE</name>
         <rename>NPS_SCORE</rename>
-        <update>Y</update>
+        <update>N</update>
+      </value>
+      <value>
+        <name>PARTICIPANT_TYPE</name>
+        <rename>participantType</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>SURVEY_SENT_DATE</name>
+        <rename>SURVEY_SENT_DATE</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>SURVEY_SENT_DATE_EST</name>
+        <rename>SURVEY_SENT_DATE_EST</rename>
+        <update>N</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -1269,6 +1296,22 @@
         <field_path>&#x24;.npsScore</field_path>
 
         <field_type>String</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>participantType</field_name>
+
+        <field_path>&#x24;.participantType</field_path>
+
+        <field_type>Integer</field_type>
+
+      </mongo_field>
+      <mongo_field>
+        <field_name>surveySentDate</field_name>
+
+        <field_path>&#x24;.surveySentDate</field_path>
+
+        <field_type>Date</field_type>
 
       </mongo_field>
     </mongo_fields>     <cluster_schema/>
@@ -2902,6 +2945,18 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>NPS_SCORE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>participantType</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>surveySentDate</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>      <field>        <name>createdOnStr</name>
         <rename/>
         <length>-2</length>
@@ -2919,6 +2974,10 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>surveyUpdatedDatestr</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>surveySentDateStr</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -2946,7 +3005,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>NPS_SCORE</name>
+      </field>      <field>        <name>SURVEY_SENT_DATE_EST</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -3676,6 +3735,51 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
+      </meta>      <meta>        <name>SURVEY_SENT_DATE_EST</name>
+        <rename>SURVEY_SENT_DATE_EST</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>participantType</name>
+        <rename>participantType</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>surveySentDateStr</name>
+        <rename>SURVEY_SENT_DATE</rename>
+        <type>Timestamp</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
       </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>780</xloc>
@@ -3685,6 +3789,18 @@
     </step>
 
   <step_error_handling>
+      <error>
+        <source_step>Convert to EST</source_step>
+        <target_step/>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>

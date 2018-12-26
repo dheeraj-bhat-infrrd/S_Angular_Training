@@ -28,4 +28,7 @@ public class RedisKeyConstants
 
     public static final String WAIT_FOR_NEXT_FETCH_TIME = "waitForNextFetchTime";
 
+    public static final String WAIT_FOR_NEXT_FB_FETCH = "waitForNextFbFetch";
+    public static final String WAIT_FOR_NEXT_GOOGLE_FETCH = "waitForNextGoogleFetch";
+
 }
