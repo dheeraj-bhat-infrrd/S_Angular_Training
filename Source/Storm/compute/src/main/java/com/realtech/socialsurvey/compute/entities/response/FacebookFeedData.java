@@ -33,6 +33,8 @@ public class FacebookFeedData implements Serializable
     private FBObjectLikes likes;
 
     private FBObjectComments comments;
+    
+    private String type;
 
     public String getFullPicture()
     {
@@ -187,14 +189,29 @@ public class FacebookFeedData implements Serializable
     {
         this.comments = comments;
     }
+    
+    
 
 
-    @Override public String toString()
+    public String getType()
     {
-        return "FacebookFeedData{" + "id='" + id + '\'' + ", message='" + message + '\'' + ", story='" + story + '\''
-            + ", application=" + application + ", createdTime=" + createdTime + ", updatedTime=" + updatedTime
-            + ", fullPicture='" + fullPicture + '\'' + ", postLink='" + postLink + '\'' + ", picture='" + picture + '\''
-            + ", from=" + from + ", likes=" + likes + ", comments=" + comments + ", link='" + link + '\'' + '}';
+        return type;
+    }
+
+
+    public void setType( String type )
+    {
+        this.type = type;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "FacebookFeedData [id=" + id + ", message=" + message + ", story=" + story + ", application=" + application
+            + ", createdTime=" + createdTime + ", updatedTime=" + updatedTime + ", fullPicture=" + fullPicture + ", postLink="
+            + postLink + ", picture=" + picture + ", from=" + from + ", likes=" + likes + ", comments=" + comments + ", type="
+            + type + ", link=" + link + "]";
     }
 
 }

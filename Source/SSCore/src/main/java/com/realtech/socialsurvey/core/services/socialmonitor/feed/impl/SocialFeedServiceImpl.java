@@ -133,7 +133,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 socialMonitorFeedData.setType( socialResponseObject.getType() );
                 socialMonitorFeedData.setStatus( socialResponseObject.getStatus() );
                 socialMonitorFeedData.setText( socialResponseObject.getText() );
-                socialMonitorFeedData.setPictures( socialResponseObject.getPictures() );
+                socialMonitorFeedData.setMediaEntities( socialResponseObject.getMediaEntities() );
                 socialMonitorFeedData.setOwnerName( socialResponseObject.getOwnerName() );
                 if ( organizationUnitSettings != null ) {
                     socialMonitorFeedData.setOwnerProfileImage( organizationUnitSettings.getProfileImageUrl() );
@@ -159,7 +159,6 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 } else {
                     socialMonitorFeedData.setTextHighlighted( socialResponseObject.getText() );
                 }
-                
                 socialMonitorStreamDataList.add( socialMonitorFeedData );
             }
             socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( socialFeedFilter.getStatus(),
@@ -889,7 +888,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 socialMonitorFeedData.setType( socialResponseObject.getType() );
                 socialMonitorFeedData.setStatus( socialResponseObject.getStatus() );
                 socialMonitorFeedData.setText( socialResponseObject.getText() );
-                socialMonitorFeedData.setPictures( socialResponseObject.getPictures() );
+                socialMonitorFeedData.setMediaEntities( socialResponseObject.getMediaEntities() );
                 socialMonitorFeedData.setOwnerName( socialResponseObject.getOwnerName() );
                 if ( organizationUnitSettings != null ) {
                     socialMonitorFeedData.setOwnerProfileImage( organizationUnitSettings.getProfileImageUrl() );

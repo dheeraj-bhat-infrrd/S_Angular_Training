@@ -25,14 +25,14 @@ public class FacebookAPIOperations
     private static FacebookAPIOperations apiOperations;
     
     private static final String FIELDS ="story,message,created_time,updated_time,full_picture,picture,message_tags,from,permalink_url,"
-        + "application,likes.summary(true),comments.summary(true)";
+        + "application,likes.summary(true),comments.summary(true),type";
     private static final String LIMIT = "100";
 
-    private static final String IG_FIELDS = "ig_id,caption,media_url,media_type,timestamp,username,permalink,like_count,comments_count";
+    private static final String IG_FIELDS = "ig_id,caption,media_url,media_type,timestamp,username,permalink,like_count,comments_count,thumbnail_url";
     public static final String IG_LIMIT = "50";
 
     private static final String IG_INITIAL_FIELDS = "connected_instagram_account{media.limit(50){ig_id,caption,media_url,media_type,"
-        + "timestamp,username,permalink,like_count,comments_count}}";
+        + "timestamp,username,permalink,like_count,comments_count,thumbnail_url}}";
 
     public static final String REVIEWS_FIELDS = "open_graph_story{id},created_time,has_rating,has_review,rating,recommendation_type,"
         + "review_text,reviewer";

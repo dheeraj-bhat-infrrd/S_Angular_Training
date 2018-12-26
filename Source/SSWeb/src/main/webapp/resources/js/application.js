@@ -18278,15 +18278,20 @@ function drawStreamPage(streamPostList){
 		}
 		
 		$('#stream-post-details-cont-'+postId).find('.email-reply-text').html(streamPostList[i].textHighlighted);
-
-		if(streamPostList[i].pictures != null && streamPostList[i].pictures != undefined){
-			for(var picI=0; picI<streamPostList[i].pictures.length; picI++){
-				
-				if(streamPostList[i].pictures[picI] != null && streamPostList[i].pictures[picI] != undefined && streamPostList[i].pictures[picI] != ''){
-					var picContainer = '<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 float-right stream-post-pic-div" >'
-			   			+'<img src="'+streamPostList[i].pictures[picI]+'" class="stream-post-details-pic float-left stream-post-pic"></div>';
 		
-					$('#stream-post-details-cont-'+postId).append(picContainer);
+		if(streamPostList[i].mediaEntities != null && streamPostList[i].mediaEntities != undefined){
+			for(var picI=0; picI<streamPostList[i].mediaEntities.length; picI++){
+				if(streamPostList[i].mediaEntities[picI] != null && streamPostList[i].mediaEntities[picI] != undefined && streamPostList[i].mediaEntities[picI] != ''){
+					if(streamPostList[i].mediaEntities[picI].type === 'VIDEO') {
+						var videoIcon = '<div class="video-icon"><a href="'+streamPostList[i].postLink+'" target="_blank"><svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><title/><desc/><g><title>background</title><rect fill="none" id="canvas_background" height="62" width="62" y="-1" x="-1"/></g><g><title>Play</title><g stroke="null" id="Page-1" fill-rule="evenodd" fill="none"><g stroke="null" id="Icons-AV" fill="#009FE0"><g stroke="null" id="play-circle-outline"><path stroke="null" id="Shape" d="m24.200001,42.825l17.4,-12.825l-17.4,-12.825l0,25.65l0,0zm5.8,-41.325c-15.95,0 -29,12.825 -29,28.5c0,15.675 13.05,28.5 29,28.5c15.95,0 29,-12.825 29,-28.5c0,-15.675 -13.05,-28.5 -29,-28.5l0,0zm0,51.3c-12.76,0 -23.2,-10.26 -23.2,-22.8c0,-12.54 10.44,-22.8 23.2,-22.8c12.76,0 23.2,10.26 23.2,22.8c0,12.54 -10.44,22.8 -23.2,22.8l0,0z"/></g></g></g></g></svg></a></div>';
+						var picContainer = '<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 float-right stream-post-pic-div" >'
+				   			+'<img src="'+streamPostList[i].mediaEntities[picI].thumbnailUrl+'" class="stream-post-details-pic float-left stream-post-pic">'+videoIcon+'</div>';
+						$('#stream-post-details-cont-'+postId).append(picContainer);
+					} else {
+						var picContainer = '<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 float-right stream-post-pic-div" >'
+				   			+'<img src="'+streamPostList[i].mediaEntities[picI].url+'" class="stream-post-details-pic float-left stream-post-pic"></div>';
+						$('#stream-post-details-cont-'+postId).append(picContainer);
+					}
 				}
 			}	
 		}

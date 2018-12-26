@@ -6,8 +6,10 @@ import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.FacebookTokenForSM;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
+import com.realtech.socialsurvey.compute.entities.response.SocialFeedMediaEntity;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedMediaType;
 import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
@@ -164,7 +166,6 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
         responseWrapper.setPostId( facebookFeedData.getId() );
         //Id is postId_companyId
         responseWrapper.setId( facebookFeedData.getId() + "_" + responseWrapper.getCompanyId() );
-        responseWrapper.setPictures(Arrays.asList(facebookFeedData.getFullPicture()));
         
         // Setting contact details.
         if(mediaToken.getContactDetails() != null) {
@@ -189,6 +190,29 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
 
         responseWrapper.setTotalLikesCount( facebookFeedData.getLikes().getSummary().getTotalCount() );
         responseWrapper.setTotalCommentsCount( facebookFeedData.getComments().getSummary().getTotalCount() );
+        
+        
+        if(facebookFeedData.getFullPicture()!= null && StringUtils.isNotEmpty( facebookFeedData.getFullPicture() )) {
+
+            SocialFeedMediaEntity mediaEntity = new SocialFeedMediaEntity();
+            
+            if(facebookFeedData.getType()!= null) {
+                if( facebookFeedData.getType().equals( "video" )) { 
+                	responseWrapper.setVideoFeed(true);
+                    mediaEntity.setThumbnailUrl( facebookFeedData.getFullPicture());
+                    mediaEntity.setType( SocialFeedMediaType.VIDEO.toString() );
+                } else  if(facebookFeedData.getType().equals( "photo" )){
+                    mediaEntity.setType( SocialFeedMediaType.IMAGE.toString() );
+                } else  if(facebookFeedData.getType().equals( "link" )){
+                    mediaEntity.setType( SocialFeedMediaType.LINK.toString() );
+                } else  if(facebookFeedData.getType().equals( "status" )){
+                    mediaEntity.setType( SocialFeedMediaType.STATUS.toString() );
+                } 
+            }
+            mediaEntity.setUrl( facebookFeedData.getFullPicture());
+            
+            responseWrapper.setMediaEntities(Arrays.asList(mediaEntity));
+        } 
 
         return responseWrapper;
     }

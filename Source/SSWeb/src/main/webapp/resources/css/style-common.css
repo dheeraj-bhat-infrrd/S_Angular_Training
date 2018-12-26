@@ -12915,6 +12915,13 @@ b{
     border-color: #C8C8C8;
 }
 
+.video-icon{
+	left: 50%;
+    margin: -36px 0 0 -36px;
+    position: absolute;
+    top: 50%;
+}
+
 .verified-partner-badge{
     background: url(../images/VerifiedPartner_stamp.png) no-repeat;
     cursor: pointer;
