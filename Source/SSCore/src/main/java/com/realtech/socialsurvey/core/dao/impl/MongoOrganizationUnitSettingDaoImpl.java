@@ -1894,8 +1894,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     }
 
 	@Override
-	public List<OrganizationUnitSettings> getSearchResultsForCriteria(AdvancedSearchVO advancedSearchVO,
-			String collectionName, LOSearchEngine loSearchEngine, long companyIdFilter) {
+	public List<OrganizationUnitSettings> getSearchResultsForCriteria(AdvancedSearchVO advancedSearchVO, String collectionName,
+			LOSearchEngine loSearchEngine, long companyIdFilter, String pattern) {
 		LOG.debug("the method to search by given criteria is as follows");
 
 		// adding aggregationOperation for sorting criteria
@@ -1920,7 +1920,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		//to find pattern irrespective of case sensitivity
 		String regexOption = "i";
 		if(advancedSearchVO.getFindBasedOn() != null && !advancedSearchVO.getFindBasedOn().isEmpty()) {
-			String regexForName = "(^| )" + advancedSearchVO.getFindBasedOn();
+			String regexForName = pattern + advancedSearchVO.getFindBasedOn();
 			operations.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption )));
 			isTextSearch = true;
 		}
@@ -1999,7 +1999,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     
     @Override
 	public long getSearchResultsForCriteriaCount(AdvancedSearchVO advancedSearchVO,
-			String collectionName, LOSearchEngine loSearchEngine, long companyIdFilter) {
+			String collectionName, LOSearchEngine loSearchEngine, long companyIdFilter, String pattern) {
 		LOG.debug("the method to get count for search by given criteria is as follows");
 
 		// adding aggregationOperation for sorting criteria
@@ -2024,7 +2024,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		//to find pattern irrespective of case sensitivity
 		String regexOption = "i";
 		if(advancedSearchVO.getFindBasedOn() != null && !advancedSearchVO.getFindBasedOn().isEmpty()) {
-			String regexForName = "(^| )" + advancedSearchVO.getFindBasedOn();
+			String regexForName = pattern + advancedSearchVO.getFindBasedOn();
 			operations.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption )));
 			isTextSearch = true;
 		}

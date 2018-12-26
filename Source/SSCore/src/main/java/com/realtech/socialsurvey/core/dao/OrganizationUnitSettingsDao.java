@@ -464,13 +464,14 @@ public interface OrganizationUnitSettingsDao
 	void updateSurveyStats(long iden, String collectionName, SurveyStats surveyStats);
 
 	List<OrganizationUnitSettings> getSearchResultsForCriteria(AdvancedSearchVO advancedSearchVO, String collectionName,
-			LOSearchEngine loSearchEngine, long companyIdFilter);
+			LOSearchEngine loSearchEngine, long companyIdFilter, String pattern);
 
 
 	AggregationOperation getSortByAggOperation(String sortBy, Boolean isLocationSearch, Boolean isTextSearch);
 
 
 	long getSearchResultsForCriteriaCount(AdvancedSearchVO advancedSearchVO, String collectionName,
-			LOSearchEngine loSearchEngine, long companyIdFilter);
+			LOSearchEngine loSearchEngine, long companyIdFilter, String pattern);
+
 
 }
