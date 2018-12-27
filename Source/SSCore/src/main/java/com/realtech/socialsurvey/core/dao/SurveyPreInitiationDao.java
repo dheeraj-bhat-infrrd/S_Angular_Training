@@ -181,8 +181,9 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 			throws InvalidInputException;
 
 
+
 	long getIncompleteSurveyCountForAgent(long agentId);
-	
+
 	
 	public long surveyPreInitiationCount(List<Integer> status) throws DatabaseException;
 	

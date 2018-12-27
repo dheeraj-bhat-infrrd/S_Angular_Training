@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.data.geo.GeoResults;
-import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
@@ -28,7 +25,6 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.vo.AddressGeoLocationVO;
 import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
-import com.realtech.socialsurvey.core.vo.LOSearchRankingVO;
 
 
 /**
@@ -395,6 +391,28 @@ public interface OrganizationUnitSettingsDao
      */
     public List<TransactionSourceFtp> fetchTransactionFtpListActive( long companyId );
 
+    /**
+     * Get all facebook tokens by collection name
+     * @param collectionName
+     * @param skipCount
+     * @param numOfRecords
+     * @return
+     */
+    public List<SocialMediaTokenResponse> getFbTokensByCollection( String collectionName, int skipCount, int numOfRecords );
+
+    public List<OrganizationUnitSettings> getOrganizationSettingsByKey( String key, Object value, String branchSettingsCollection );
+
+    /**
+     * Gets the facebook tokens count
+     * @param companySettingsCollection
+     * @return
+     */
+    long getFacebookTokensCount( String companySettingsCollection );
+
+    /*Returns the socialMediaLastFetched for given id */
+    OrganizationUnitSettings fetchSocialMediaLastFetched( long iden, String profile );
+
+    boolean removeKeyInOrganizationSettings( long iden, String keyToUpdate, String collectionName );
 
     /**
      * @param entityId

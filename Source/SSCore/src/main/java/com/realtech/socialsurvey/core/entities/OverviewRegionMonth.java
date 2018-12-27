@@ -80,6 +80,12 @@ public class OverviewRegionMonth implements Serializable
 
     @Column ( name = "unsubscribed_count")
     private int unsubscribed;
+    
+    @Column ( name = "google")
+    private int google;
+    
+    @Column ( name = "faceebook")
+    private int facebook;
 
     public String getOverviewRegionMonthId()
     {
@@ -339,6 +345,26 @@ public class OverviewRegionMonth implements Serializable
         this.unsubscribed = unsubscribed;
     }
 
+    public int getGoogle()
+    {
+        return google;
+    }
+
+    public void setGoogle( int google )
+    {
+        this.google = google;
+    }
+
+    public int getFacebook()
+    {
+        return facebook;
+    }
+
+    public void setFacebook( int facebook )
+    {
+        this.facebook = facebook;
+    }
+
 
     @Override
     public String toString()
@@ -349,7 +375,7 @@ public class OverviewRegionMonth implements Serializable
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
             + totalReview + ", month=" + month + ", year=" + year + ", thirdParty=" + thirdParty + ", cumulativeUserCount="
-            + cumulativeUserCount + ", unsubscribed=" + unsubscribed + "]";
+            + cumulativeUserCount + ", unsubscribed=" + unsubscribed + ", google=" + google + ", facebook=" + facebook + "]";
     }
 
 }

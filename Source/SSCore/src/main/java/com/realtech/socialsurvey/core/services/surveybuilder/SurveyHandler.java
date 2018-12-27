@@ -1,10 +1,13 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.vo.BulkWriteErrorVO;
+import com.realtech.socialsurvey.core.vo.SurveyDetailsVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
@@ -291,7 +294,7 @@ public interface SurveyHandler
         NoRecordsFetchedException, SolrException;
 
 
-    public void deleteExistingZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
+    public void deleteExistingSurveysByEntity( String entityType, long entityId, String source ) throws InvalidInputException;
 
 
     /**
@@ -437,6 +440,11 @@ public interface SurveyHandler
 
 	SurveyPreInitiation getPreInitiatedSurveyByCustomer(String customerEmailId);
 
+    /**
+     * Saves or updates the survey details in bulk
+     * @param surveyDetails
+     */
+    List<BulkWriteErrorVO> saveOrUpdateReviews( List<SurveyDetailsVO> surveyDetails ) throws InvalidInputException,ParseException;
 	/**
 	 * @param surveyResponse
 	 * @return
@@ -448,6 +456,7 @@ public interface SurveyHandler
 	 * @return
 	 */
 	double getNpsScore(List<SurveyResponse> surveyResponse);
+
 
 	public void streamSurveyProcessRequest(SurveyDetails surveyDetails);
 

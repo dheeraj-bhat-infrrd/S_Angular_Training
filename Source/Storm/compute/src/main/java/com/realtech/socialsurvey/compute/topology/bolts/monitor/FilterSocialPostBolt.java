@@ -41,7 +41,8 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     private static final String WORD_SEPARATOR = "[^\\w(%)]|_";
     private static final String SPACE_SEPARATOR = " ";
     private static final String OWNERNAME_SYSTEM = "System";
-
+    
+    private static final String VIDEO_MESSAGE="This post should be manually checked as it contains a Video";
 
     private Map<Long, TrieNode> companyTrie = new HashMap<>();
 
@@ -65,6 +66,12 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
                 // check if post from trusted source
                 if ( isPostFromTrustedSource( post, companyId ) ) {
                     post.setFromTrustedSource( true );
+                }
+                
+                if(post.isVideoFeed()) {
+                    post.setStatus( SocialFeedStatus.ALERT );
+                	actionHistory = getVideoFeedActionHistory(post);
+                	post.getActionHistory().add(actionHistory );
                 }
 
                 if ( post.getText() != null ) {
@@ -294,4 +301,14 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source <b class='soc-mon-bold-text'>" + source + "</b>");
         return actionHistory;
     }
+    
+   private ActionHistory getVideoFeedActionHistory( SocialResponseObject<?> post )
+    {
+	    ActionHistory actionHistory = new ActionHistory();
+        actionHistory.setCreatedDate( new Date().getTime() );
+        actionHistory.setOwnerName( OWNERNAME_SYSTEM );
+        actionHistory.setText( VIDEO_MESSAGE );
+        return actionHistory;
+    }
+
 }

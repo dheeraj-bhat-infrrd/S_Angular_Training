@@ -1,12 +1,14 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 
+import com.amazonaws.services.s3.model.GetObjectMetadataRequest;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterTokenForSM;
+import com.realtech.socialsurvey.compute.entities.response.SocialFeedMediaEntity;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -148,7 +151,20 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         responseWrapper.setPostId( String.valueOf( twitterFeedData.getId() ) );
         //Id is postId_companyId
         responseWrapper.setId( String.valueOf( twitterFeedData.getId() ) + "_" + responseWrapper.getCompanyId() );
-        responseWrapper.setPictures(twitterFeedData.getPictures());
+        
+        responseWrapper.setMediaEntities( twitterFeedData.getMediaEntities() );
+        
+        List<SocialFeedMediaEntity> entityList=twitterFeedData.getMediaEntities();
+        
+        for(SocialFeedMediaEntity mediaEntity:entityList)
+        {
+        	if(mediaEntity.getType().equals("VIDEO")){
+        		responseWrapper.setVideoFeed(true);
+        		break;
+        		}
+        }
+        
+        
         
         //Setting contact details.
         if(mediaToken.getContactDetails() != null) {

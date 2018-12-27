@@ -18,7 +18,7 @@ public class SocialMonitorFeedData implements Serializable {
 	private long branchId = 0;
 	private long agentId = 0;
 	private String text = "";
-	private List<String> pictures;
+    private List<SocialFeedMediaEntity> mediaEntities;
 	private long updatedOn;
 	private String ownerName = "";
 	private String ownerProfileImage="";
@@ -106,16 +106,20 @@ public class SocialMonitorFeedData implements Serializable {
 	public void setText(String text) {
 		this.text = text;
 	}
+	
+	
 
-	public List<String> getPictures() {
-		return pictures;
-	}
+	public List<SocialFeedMediaEntity> getMediaEntities()
+    {
+        return mediaEntities;
+    }
 
-	public void setPictures(List<String> pictures) {
-		this.pictures = pictures;
-	}
+    public void setMediaEntities( List<SocialFeedMediaEntity> mediaEntities )
+    {
+        this.mediaEntities = mediaEntities;
+    }
 
-	public long getUpdatedOn() {
+    public long getUpdatedOn() {
 		return updatedOn;
 	}
 
@@ -200,14 +204,14 @@ public class SocialMonitorFeedData implements Serializable {
 		this.postSource = postSource;
 	}
 
-	@Override
+    @Override
     public String toString()
     {
         return "SocialMonitorFeedData [postId=" + postId + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId="
-            + branchId + ", agentId=" + agentId + ", text=" + text + ", pictures=" + pictures + ", updatedOn=" + updatedOn
-            + ", ownerName=" + ownerName + ", ownerProfileImage=" + ownerProfileImage + ", type=" + type + ", status=" + status
-            + ", actionHistory=" + actionHistory + ", foundKeywords=" + foundKeywords + ", duplicateCount=" + duplicateCount
-            + ", pageLink=" + pageLink + ", postLink=" + postLink + ", textHighlighted=" + textHighlighted
-            + ", fromTrustedSource=" + fromTrustedSource + ", postSource=" + postSource + "]";
+            + branchId + ", agentId=" + agentId + ", text=" + text + ", mediaEntities=" + mediaEntities + ", updatedOn="
+            + updatedOn + ", ownerName=" + ownerName + ", ownerProfileImage=" + ownerProfileImage + ", type=" + type
+            + ", status=" + status + ", actionHistory=" + actionHistory + ", foundKeywords=" + foundKeywords
+            + ", duplicateCount=" + duplicateCount + ", pageLink=" + pageLink + ", postLink=" + postLink + ", textHighlighted="
+            + textHighlighted + ", fromTrustedSource=" + fromTrustedSource + ", postSource=" + postSource + "]";
     }
 }

@@ -118,6 +118,7 @@ public class SurveyDetails
 	//update survey details
     private int participantType;
 
+    private String fbRecommendationType;
     
 	public int getParticipantType() {
 		return participantType;
@@ -126,6 +127,8 @@ public class SurveyDetails
 	public void setParticipantType(int participantType) {
 		this.participantType = participantType;
 	}
+
+    private String facebookProfileUrl;
 
     public String getAgentEmailId()
     {
@@ -963,6 +966,17 @@ public class SurveyDetails
 	}
 
 
+    public String getFacebookProfileUrl()
+    {
+        return facebookProfileUrl;
+    }
+
+
+    public void setFacebookProfileUrl( String facebookProfileUrl )
+    {
+        this.facebookProfileUrl = facebookProfileUrl;
+    }
+
 	public String getCustomFieldOne() {
 		return customFieldOne;
 	}
@@ -1013,4 +1027,14 @@ public class SurveyDetails
 	}
 
 
+    public String getFbRecommendationType()
+    {
+        return fbRecommendationType;
+    }
+
+
+    public void setFbRecommendationType( String fbRecommendationType )
+    {
+        this.fbRecommendationType = fbRecommendationType;
+    }
 }

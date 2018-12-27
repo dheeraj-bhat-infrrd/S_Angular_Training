@@ -1,9 +1,7 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -15,11 +13,14 @@ import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterTokenForSM;
+import com.realtech.socialsurvey.compute.entities.response.SocialFeedMediaEntity;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
+import com.realtech.socialsurvey.compute.enums.SocialFeedMediaType;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
 
 import redis.clients.jedis.exceptions.JedisConnectionException;
+import twitter4j.MediaEntity;
 import twitter4j.Paging;
 import twitter4j.RateLimitStatus;
 import twitter4j.ResponseList;
@@ -156,8 +157,25 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         }
         
         feed.setRetweetCount( status.getRetweetCount() );
-        feed.setPictures(
-            Arrays.stream( status.getMediaEntities() ).map( x -> x.getMediaURL() ).collect( Collectors.toList() ) );
+        
+        List<SocialFeedMediaEntity> mediaEntities = new ArrayList<>();
+        
+        for ( MediaEntity media : status.getMediaEntities()  ) {
+            SocialFeedMediaEntity mediaEntity = new SocialFeedMediaEntity();
+            
+            if(media.getType().equals( "video" )) {
+                mediaEntity.setType( SocialFeedMediaType.VIDEO.toString() );
+                mediaEntity.setThumbnailUrl( media.getMediaURL() );
+            } else {
+                mediaEntity.setType( SocialFeedMediaType.IMAGE.toString() );
+            }
+            
+            mediaEntity.setUrl( media.getMediaURL() );
+            mediaEntities.add( mediaEntity );
+        }
+        
+        feed.setMediaEntities(mediaEntities);
+        
         feed.setUserName( status.getUser().getScreenName() );
         feed.setRetweetCount( status.getRetweetCount() );
 

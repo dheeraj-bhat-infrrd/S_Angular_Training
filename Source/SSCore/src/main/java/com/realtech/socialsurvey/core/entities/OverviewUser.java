@@ -120,6 +120,12 @@ public class OverviewUser implements Serializable {
     
     @Column ( name = "unsubscribed_count")
     private int unsubscribed;
+    
+    @Column ( name = "google")
+    private int google;
+    
+    @Column ( name = "faceebook")
+    private int facebook;
 
     public String getOverviewUserId()
     {
@@ -457,6 +463,26 @@ public class OverviewUser implements Serializable {
         this.unsubscribed = unsubscribed;
     }
 
+    public int getGoogle()
+    {
+        return google;
+    }
+
+    public void setGoogle( int google )
+    {
+        this.google = google;
+    }
+
+    public int getFacebook()
+    {
+        return facebook;
+    }
+
+    public void setFacebook( int facebook )
+    {
+        this.facebook = facebook;
+    }
+
     @Override
     public String toString()
     {
@@ -471,7 +497,7 @@ public class OverviewUser implements Serializable {
             + ", processed=" + processed + ", unprocessed=" + unprocessed + ", npsScore=" + npsScore + ", npsDetractors="
             + npsDetractors + ", npsDetractorPercentage=" + npsDetractorPercentage + ", npsPassives=" + npsPassives
             + ", npsPassivesPercentage=" + npsPassivesPercentage + ", npsPromoters=" + npsPromoters + ", npsPromoterPercentage="
-            + npsPromoterPercentage + ", unsubscribed=" + unsubscribed + "]";
+            + npsPromoterPercentage + ", unsubscribed=" + unsubscribed + ", google=" + google + ", facebook=" + facebook + "]";
     }
 
 }

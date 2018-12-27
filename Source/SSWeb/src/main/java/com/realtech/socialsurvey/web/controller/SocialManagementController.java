@@ -7,13 +7,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
+import com.realtech.socialsurvey.core.dao.RedisDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.ProfileType;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -2161,7 +2164,7 @@ public class SocialManagementController
             if ( checkZillowAccountChanged( profileSettings, zillowScreenName ) ) {
                 if(LOG.isDebugEnabled())
                     LOG.debug( "Deleting zillow feed for agent ID : {}", profileSettings.getIden() );
-                surveyHandler.deleteExistingZillowSurveysByEntity( entityType, profileSettings.getIden() );
+                surveyHandler.deleteExistingSurveysByEntity( entityType, profileSettings.getIden(), CommonConstants.SURVEY_SOURCE_ZILLOW );
             }
 
             String errorCode = request.getParameter( "error" );
@@ -2462,7 +2465,7 @@ public class SocialManagementController
                 // if user has changed his Zillow account, then delete existing Zillow reviews
                 if ( checkZillowAccountChanged( profileSettings, zillowScreenName ) ) {
                     LOG.debug( "Deleting zillow feed for agent ID : {}", profileSettings.getIden() );
-                    surveyHandler.deleteExistingZillowSurveysByEntity( entityType, profileSettings.getIden() );
+                    surveyHandler.deleteExistingSurveysByEntity( entityType, profileSettings.getIden(), CommonConstants.SURVEY_SOURCE_ZILLOW );
                 }
 
                 String errorCode = request.getParameter( "error" );
@@ -2879,7 +2882,7 @@ public class SocialManagementController
             // Remove zillow reviews on disconnect.
             if ( socialMedia.equals( CommonConstants.ZILLOW_SOCIAL_SITE ) && keepOrDeleteReview != null && keepOrDeleteReview.equals( "delete-review" )) {//and is to delete reviews
                 LOG.debug( "Deleting zillow feed for agent ID : " + entityId );
-                surveyHandler.deleteExistingZillowSurveysByEntity( entityType, entityId );
+                surveyHandler.deleteExistingSurveysByEntity( entityType, entityId, CommonConstants.SURVEY_SOURCE_ZILLOW );
             }
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured in disconnectSocialNetwork() while disconnecting with the social Media. Reason : ",
@@ -2933,6 +2936,7 @@ public class SocialManagementController
             boolean isZillow = false;
             boolean unset = CommonConstants.UNSET_SETTINGS;
             SettingsForApplication settings;
+            String collection = null;
 
             switch ( socialMedia ) {
                 case CommonConstants.FACEBOOK_SOCIAL_SITE:
@@ -2959,6 +2963,10 @@ public class SocialManagementController
                 case CommonConstants.INSTAGRAM_SOCIAL_SITE:
                     settings = SettingsForApplication.INSTAGRAM;
                     break;
+                    
+                case CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE:
+                    settings = SettingsForApplication.GOOGLE_BUSINESS;
+                    break;
 
                 default:
                     throw new InvalidInputException( "Invalid social media token entered" );
@@ -2969,8 +2977,9 @@ public class SocialManagementController
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getCompanySettings( entityId );
                 mediaTokens = unitSettings.getSocialMediaTokens();
+                collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                    collection );
                 userSettings.setCompanySettings( unitSettings );
                 //update SETTINGS_SET_STATUS to unset in COMPANY table
                 Company company = userManagementService.getCompanyById( entityId );
@@ -2982,8 +2991,9 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
                 mediaTokens = unitSettings.getSocialMediaTokens();
+                collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                    collection);
                 userSettings.getRegionSettings().put( entityId, unitSettings );
                 //update SETTINGS_SET_STATUS to unset in REGION table
                 Region region = userManagementService.getRegionById( entityId );
@@ -3000,8 +3010,9 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 mediaTokens = unitSettings.getSocialMediaTokens();
+                collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                    collection);
                 userSettings.getBranchSettings().put( entityId, unitSettings );
                 //update SETTINGS_SET_STATUS to unset in BRANCH table
                 Branch branch = userManagementService.getBranchById( entityId );
@@ -3019,24 +3030,57 @@ public class SocialManagementController
             if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 unitSettings = userManagementService.getUserSettings( entityId );
                 mediaTokens = unitSettings.getSocialMediaTokens();
+                collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 unitSettings = socialManagementService.disconnectSocialNetwork( socialMedia, removeFeed, unitSettings,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                    collection);
                 userSettings.setAgentSettings( (AgentSettings) unitSettings );
             }
-            profileSettings.setSocialMediaTokens( unitSettings.getSocialMediaTokens() );
 
-            // Remove zillow reviews on disconnect.
+            //delete the zillow reviews irrespective if the user selects to keep reviews
             if ( socialMedia.equals( CommonConstants.ZILLOW_SOCIAL_SITE ) ) {
+                profileSettings.setSocialMediaTokens( unitSettings.getSocialMediaTokens() );
                 LOG.debug( "Deleting zillow feed for agent ID : " + entityId );
-                surveyHandler.deleteExistingZillowSurveysByEntity( entityType, entityId );
-            }
+                surveyHandler.deleteExistingSurveysByEntity( entityType, entityId, socialMedia );
 
-            // Set IS_ZILLOW_CONNECTED to false
-            if ( isZillow ) {
-               
                 long reviewCount = profileManagementService.getReviewsCount( entityId, -1, -1,
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
                 solrSearchService.editUserInSolr( entityId, CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
+            }
+            // Remove reviews if removeFeed is true =>
+            // 1.unset the lastfetchedkeys
+            // 2.delete the reviews
+            // 3.update reviewCount in solr
+            else if ( removeFeed )  {
+                boolean deleteReviews = false;
+                
+                //unset fbReviewLastFetched from hiararchy settings
+                switch ( socialMedia ) {
+                    case CommonConstants.FACEBOOK_SOCIAL_SITE:
+                        deleteReviews = true;
+                        organizationManagementService.unsetKey( entityId,
+                            MongoOrganizationUnitSettingDaoImpl.KEY_FBREVIEW_LASTFETCHED , collection );
+                        break;
+                    case CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE:
+                        deleteReviews = true;
+                        organizationManagementService.unsetKey( entityId,
+                            MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_REVIEW_LASTFETCHED , collection );
+                        break;
+
+                    default: LOG.info( "Currently feeds are not being fetched for {} . So not deleting reviews", socialMedia );
+                }
+                //deleting reviews
+                if(deleteReviews) {
+                    LOG.debug( "Deleting {} feed for agent ID : {}", socialMedia, entityId );
+                    if(socialMedia.equals( CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE)) {
+                        socialMedia = CommonConstants.SURVEY_SOURCE_GOOGLE;
+                    }
+                    surveyHandler.deleteExistingSurveysByEntity( entityType, entityId, socialMedia );
+
+                    //update the review count in solr
+                    long reviewCount = profileManagementService
+                        .getReviewsCount( entityId, -1, -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
+                    solrSearchService.editUserInSolr( entityId, CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
+                }
             }
 
             //Add action to social connection history
@@ -3048,7 +3092,9 @@ public class SocialManagementController
             return "failue";
         }
 
-        session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
+        if ( socialMedia.equals( CommonConstants.ZILLOW_SOCIAL_SITE ) ) {
+            session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, profileSettings );
+        }
         return "success";
     }
 

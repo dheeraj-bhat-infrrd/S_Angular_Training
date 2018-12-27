@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.mongodb.WriteResult;
+import com.realtech.socialsurvey.core.entities.*;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.NestableRuntimeException;
@@ -46,6 +48,7 @@ import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -57,14 +60,12 @@ import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyStats;
 import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.vo.AddressGeoLocationVO;
 import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
-import com.realtech.socialsurvey.core.vo.LOSearchRankingVO;
 
 
 /**
@@ -227,6 +228,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SURVEY_STATS_SEARCH_RANKING_SCORE = "surveyStats.searchRankingScore";
     
     
+
+    public static final String KEY_SOCIAL_MEDIA_LASTFETCHED = "socialMediaLastFetched";
+    public static final String KEY_FBREVIEW_LASTFETCHED = "socialMediaLastFetched.fbReviewLastFetched";
+    public static final String KEY_FBREVIEW_LASTFETCHED_CURRENT = "socialMediaLastFetched.fbReviewLastFetched.current";
+    public static final String KEY_GOOGLE_REVIEW_LASTFETCHED = "socialMediaLastFetched.googleReviewLastFetched";
+    public static final String KEY_GOOGLE_REVIEW_LAST_FETCHED_CURRENT = "socialMediaLastFetched.googleReviewLastFetched.current";
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -1679,6 +1686,72 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.info( "query : {} ",query );
         
     }
+
+    @Override
+    public List<SocialMediaTokenResponse> getFbTokensByCollection( String collectionName, int skipCount, int batchSize )
+    {
+        LOG.debug( "Fetching social media tokens from {}", collectionName );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        query.fields().include( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).include( KEY_IDENTIFIER ).include( KEY_CONTACT_DETAILS )
+            .include( KEY_FBREVIEW_LASTFETCHED ).exclude( "_id" );
+
+        if ( skipCount > 0 ) {
+            query.skip( skipCount );
+        }
+        if ( batchSize > 0 ) {
+            query.limit( batchSize );
+        }
+        return mongoTemplate.find( query, SocialMediaTokenResponse.class, collectionName );
+    }
+
+    @Override
+    public List<OrganizationUnitSettings> getOrganizationSettingsByKey( String key, Object value, String collectionName )
+    {
+        Query query = new Query();
+        query.addCriteria( Criteria.where( key ).is( value ) );
+        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
+        return settings;
+    }
+
+
+    @Override public long getFacebookTokensCount( String collectionName )
+    {
+        LOG.debug( "Fetching facebook tokens record count from {}", collectionName );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        query.fields().include( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).include( KEY_IDENTIFIER ).exclude( "_id" );
+        return mongoTemplate.count( query, collectionName );
+    }
+
+
+    @Override public OrganizationUnitSettings fetchSocialMediaLastFetched( long iden, String collection )
+    {
+        LOG.debug( "Fetching socialMediaLastFetched from {} with id {}", collection, iden );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN  ).is( iden ));
+        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_LASTFETCHED ).exists( true )  );
+        query.fields().include( KEY_SOCIAL_MEDIA_LASTFETCHED ).exclude( "_id" );
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class,collection );
+
+    }
+
+    @Override
+    public boolean removeKeyInOrganizationSettings( long iden, String keyToUpdate, String collectionName )
+    {
+        LOG.debug( "Method removeKeyInOrganizationSettings() started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
+        Update update = new Update().unset( keyToUpdate );
+        LOG.debug( "Updating the unit settings" );
+        WriteResult updateResult = mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
+        return updateResult.isUpdateOfExisting();
+    }
+
     
     @Override
     public AddressGeoLocationVO fetchAddressForId(long entityId, String entityType, String collectionName) {

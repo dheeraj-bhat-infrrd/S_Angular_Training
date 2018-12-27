@@ -89,8 +89,6 @@ public interface UserDao extends GenericDao<User, Long>
      */    
     public Long getOwnerForCompany(Long companyId);
     
-    
-
 	/**
 	 * @param searchString
 	 * @param startIndex
@@ -119,6 +117,5 @@ public interface UserDao extends GenericDao<User, Long>
 	 * @return
 	 */
 	List<ZipCodeLookup> getZipcodeSuggestion(String zipcode, int startIndex, int batchSize, boolean onlyUsFilter);
-
 
 }

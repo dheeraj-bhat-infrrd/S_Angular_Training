@@ -1624,7 +1624,7 @@ span.footer-ul a:hover {
 }
 .verify-image{
 	height: 25px;
-    width: 79px;
+	width: 79px;
 }
 .verify-image-zillow{
 	height: 20px;
@@ -2054,5 +2054,17 @@ span.footer-ul a:hover {
 
 .verify-image-fb{
 	height: 25px;
-    width: 80px;
+   	width: 65px;
+    margin-left: 5px;
+}
+
+.google-verified-image{
+	background: url(../images/google_logo_review.png) no-repeat;
+	cursor: pointer;
+	background-size: contain;
+}
+
+.verify-image-google{
+	height: 20px;
+    width: 60px;
 }

@@ -20,17 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.models.BulkSurveyPutVO;
 import com.realtech.socialsurvey.api.models.SurveyPutVO;
-import com.realtech.socialsurvey.api.models.TransactionInfoPutVO;
 import com.realtech.socialsurvey.api.models.v2.BulkSurveyProcessResponseVO;
 import com.realtech.socialsurvey.api.models.v2.IncompeteSurveyGetVO;
 import com.realtech.socialsurvey.api.models.v2.SurveyCountVO;
@@ -55,9 +50,10 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.vo.BulkWriteErrorVO;
+import com.realtech.socialsurvey.core.vo.SurveyDetailsVO;
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 import io.swagger.annotations.ApiOperation;
-
 
 
 @RestController
@@ -68,15 +64,15 @@ public class SurveyApiV2Controller
     Logger AUDIT_LOG = LoggerFactory.getLogger("Audit");
     private static final Logger AUDIT_app = LoggerFactory.getLogger("auditlog");
 
-    
+
     @Autowired
     private SurveysAndReviewsV2VOTransformer surveysAndReviewsV2VOTransformer;
-    
+
     @Autowired
-    private IncompleteSurveyVOTransformer incompleteSurveyVOTransformer;  
+    private IncompleteSurveyVOTransformer incompleteSurveyVOTransformer;
 
     private SurveyHandler surveyHandler;
-    
+
     @Autowired
     public void setSurveyHandler(SurveyHandler surveyHandler) {
         this.surveyHandler = surveyHandler;
@@ -102,11 +98,13 @@ public class SurveyApiV2Controller
     private SocialManagementService socialManagementService;
     
     private SurveyBuilder surveyBuilder;
-
+    
     @Autowired
 	public void setSurveyBuilder(SurveyBuilder surveyBuilder) {
 		this.surveyBuilder = surveyBuilder;
 	}
+
+    private static final String AUTH_FAILED = "AUTHORIZATION FAILED";
 
 	@RequestMapping ( value = "/surveys", method = RequestMethod.PUT)
     @ApiOperation ( value = "Post Survey Transaction")
@@ -146,7 +144,7 @@ public class SurveyApiV2Controller
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request, companyId );
         }
 
-        
+
         //save the object to database
         Map<String, Long> surveyIds = new LinkedHashMap<String, Long>();
         try {
@@ -313,8 +311,8 @@ public class SurveyApiV2Controller
             }
         }
 
-        
-        
+
+
         if ( state != null ) {
             if ( CommonConstants.SURVEY_MOOD_GREAT.equalsIgnoreCase( state ) ) {
                 state = CommonConstants.SURVEY_MOOD_GREAT;
@@ -412,7 +410,7 @@ public class SurveyApiV2Controller
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "surveys", surveyVOs, request,
             companyId );
     }
-    
+
     @RequestMapping ( value = "/addquestiontosurvey", method = RequestMethod.POST)
     @ApiOperation ( value = "Add question to existing survey.")
 	public String addQuestionToExistingSurvey(@RequestBody SurveyQuestionDetails questionDetails) throws SSApiException {
@@ -425,11 +423,11 @@ public class SurveyApiV2Controller
 			throw new SSApiException("Invalid input exception caught while adding question to existing survey.",ie);
 		}catch(NoRecordsFetchedException e){
 			LOGGER.error("NoRecordsFetchedException caught while adding new question to existing survey.",e);
-			throw new SSApiException("NoRecordsFetchedException caught while adding new question to existing survey.",e);			
+			throw new SSApiException("NoRecordsFetchedException caught while adding new question to existing survey.",e);
 		}
 		return Long.toString(questionId);
 	}
-    
+
     @RequestMapping ( value = "/updatesurveyquestion", method = RequestMethod.PUT)
     @ApiOperation ( value = "update existing survey question.")
 	public String updateQuestionInExistingSurvey(@RequestBody SurveyQuestionDetails questionDetails) throws SSApiException {
@@ -441,11 +439,11 @@ public class SurveyApiV2Controller
 			throw new SSApiException("Invalid input exception caught while adding question to existing survey.",ie);
 		}catch(NoRecordsFetchedException e){
 			LOGGER.error("NoRecordsFetchedException caught while updating question in existing survey.",e);
-			throw new SSApiException("NoRecordsFetchedException caught while updating question in existing survey.",e);			
+			throw new SSApiException("NoRecordsFetchedException caught while updating question in existing survey.",e);
 		}
     	return "SUCCESS";
     }
-    
+
     @RequestMapping ( value = "/removesurveyquestion", method = RequestMethod.DELETE)
     @ApiOperation ( value = "remove question from survey question.")
 	public String removeQuestionFromExistingSurvey(long userId, long surveyQuestionId) throws SSApiException {
@@ -457,11 +455,11 @@ public class SurveyApiV2Controller
 			throw new SSApiException("Invalid input exception caught while removing question from existing survey.",ie);
 		}catch(NoRecordsFetchedException e){
 			LOGGER.error("NoRecordsFetchedException caught while removing question from existing survey.",e);
-			throw new SSApiException("NoRecordsFetchedException caught while removing question from existing survey.",e);			
+			throw new SSApiException("NoRecordsFetchedException caught while removing question from existing survey.",e);
 		}
     	return "SUCCESS";
-    } 
-    
+    }
+
     @RequestMapping ( value = "/surveys/{surveyId}/response", method = RequestMethod.POST)
     @ApiOperation ( value = "Update Survey Response And Get Swear words")
     public String updateSurveyResponse( @PathVariable ( "surveyId") String surveyId, String question, String questionType, String answer, int stage,
@@ -471,7 +469,7 @@ public class SurveyApiV2Controller
         LOGGER.info("Method updateSurveyResponse() to store response of customer finished successfully");
         return "Survey response updated successfully";
     }
-    
+
     @RequestMapping ( value = "/surveys/{surveyId}/score", method = RequestMethod.POST)
     @ApiOperation ( value = "Get Survey Transaction")
     public double updateScore(@PathVariable ( "surveyId") String surveyId,String mood,String feedback,boolean isAbusive,String agreedToShare){
@@ -480,7 +478,7 @@ public class SurveyApiV2Controller
         LOGGER.info("Method storeScore() to store score of survey finished successfully");
         return score;
     }
-    
+
     @RequestMapping ( value = "/swearwords",method = RequestMethod.GET)
     @ApiOperation ( value = "Get Swear Words" )
     public String getSwearWordsList(long companyId) throws InvalidInputException{
@@ -488,7 +486,7 @@ public class SurveyApiV2Controller
         return new Gson().toJson(surveyHandler.fetchSwearWords( "companyId", companyId ));
     }
 
-   
+
     @RequestMapping ( value = "/surveycount", method = RequestMethod.GET)
     @ApiOperation ( value = "Get Survey Transactions Count")
     public ResponseEntity<?> getSurveyTransactionsCouunt( HttpServletRequest request ) throws SSApiException
@@ -547,8 +545,8 @@ public class SurveyApiV2Controller
             }
         }
 
-        
-        
+
+
         if ( state != null ) {
             if ( CommonConstants.SURVEY_MOOD_GREAT.equalsIgnoreCase( state ) ) {
                 state = CommonConstants.SURVEY_MOOD_GREAT;
@@ -637,7 +635,7 @@ public class SurveyApiV2Controller
         //get data from database
        Integer surveyCount = surveyHandler.getSurveysCountByFilterCriteria( state, startSurveyID,
             startReviewDate, startTransactionDate, userIds, isAltered, companyId );
-      
+
        Float surveyAvgScore = surveyHandler.getSurveysAvgScoreByFilterCriteria( state, startSurveyID,
                startReviewDate, startTransactionDate, userIds, isAltered, companyId );
 
@@ -650,8 +648,8 @@ public class SurveyApiV2Controller
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "surveyStats", surveyCountVO, request,
             companyId );
     }
-    
-    
+
+
     @RequestMapping ( value = "/incompletesurveys", method = RequestMethod.GET)
     @ApiOperation ( value = "Get Survey Transactions")
     public ResponseEntity<?> getIncompleteSurveyTransactions( HttpServletRequest request ) throws SSApiException
@@ -755,13 +753,13 @@ public class SurveyApiV2Controller
         if ( !StringUtils.isEmpty( userEmailAddress ) ) {
             try {
                 User user = userManagementService.getUserByEmail(userEmailAddress);
-                
+
                 //check if user is in same comapny
                 if(user.getCompany().getCompanyId() != companyId) {
                 	return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "You do not have access to the user's data.",
                             null, null, request , companyId  );
                 }
-                
+
                 userIds = new ArrayList<Long>();
                 userIds.add( user.getUserId() );
 
@@ -790,7 +788,7 @@ public class SurveyApiV2Controller
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "surveys", incompleteSurveyVOs, request,
             companyId );
     }
-    
+
 
     @RequestMapping ( value = "/swearwords/{companyId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get Swear Words")
@@ -814,7 +812,7 @@ public class SurveyApiV2Controller
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "swearWords", swear_words, request,
             companyId );
     }
-    
+
     @RequestMapping ( value = "/swearwords/{companyId}", method = RequestMethod.POST)
     @ApiOperation ( value = "post swear words Transaction")
     public ResponseEntity<?> postSwearWords( @PathVariable ( "companyId") long companyId, HttpServletRequest request , @RequestBody String[] swearWords)
@@ -839,9 +837,9 @@ public class SurveyApiV2Controller
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", null, null, request,
             companyId );
     }
-    
+
     /**
-     * 
+     *
      * @param bulkSurveyPutVO
      * @param request
      * @return
@@ -856,7 +854,7 @@ public class SurveyApiV2Controller
         request.setAttribute( "input", bulkSurveyPutVO );
         List<BulkSurveyProcessResponseVO> bulkSurveyProcessResponseVOs = new ArrayList<BulkSurveyProcessResponseVO>();
         String message = "Surveys successfully processed.";
-        
+
         String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         //authorize request
         try {
@@ -869,17 +867,17 @@ public class SurveyApiV2Controller
 
         if(bulkSurveyPutVO == null)
                 return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, "Passed Body is null or empty", null, null, request, 0l );
-        
+
         long companyId = bulkSurveyPutVO.getCompanyId();
         if(companyId <= 0l)
             return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, "Passed companyId is  invalid", null, null, request, 0l );
-            
+
         //check if survey list is present
         List<SurveyPutVO> surveyPutVOs = bulkSurveyPutVO.getSurveys();
         if(surveyPutVOs == null || surveyPutVOs.size() == 0)
                 return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, "Survey list can not be null or empty", null, null, request, companyId );
-    
-                        
+
+
         //parse input object
         List<SurveyPreInitiation> transactionSurveyPreInitiations;
         for (SurveyPutVO surveyPutVO : surveyPutVOs) {
@@ -899,7 +897,7 @@ public class SurveyApiV2Controller
                     surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject(surveyPreInitiation);
                     if(surveyPreInitiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED)
                         surveyIds.put(surveyPreInitiation.getParticipantType(), surveyPreInitiation.getSurveyPreIntitiationId());
-                }           
+                }
                 //fill response vo
                 bulkSurveyProcessResponseVO.setProcessed(true);
                 bulkSurveyProcessResponseVO.setSurveyIds(surveyIds);
@@ -914,7 +912,7 @@ public class SurveyApiV2Controller
             }
         }
         LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
-        
+
         return restUtils.getRestResponseEntity( HttpStatus.CREATED, message, "response", bulkSurveyProcessResponseVOs,
                 request, companyId );
     }
@@ -934,6 +932,21 @@ public class SurveyApiV2Controller
         LOGGER.info("Method postToSocialMedia() to post review finished successfully");
        return restUtils.getRestResponseEntity( HttpStatus.OK, "Posted successfully", null, null, request, 0 );
     }
-    
-}
 
+    @RequestMapping ( value = "/reviews/bulk", method = RequestMethod.POST)
+    @ApiOperation ( value = "Find existing reviees from given surveys")
+    public ResponseEntity<?> saveOrUpdateReviews( @Valid @RequestBody List<SurveyDetailsVO> surveyDetails,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader, HttpServletRequest request )
+        throws SSApiException{
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            List<BulkWriteErrorVO> bulkWriteErrors = surveyHandler.saveOrUpdateReviews(surveyDetails);
+            return new ResponseEntity<>(bulkWriteErrors, HttpStatus.OK);
+        } catch ( InvalidInputException | ParseException e ) {
+            throw new SSApiException( e.getMessage(), e );
+        } catch ( AuthorizationException e ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+    }
+}
+    

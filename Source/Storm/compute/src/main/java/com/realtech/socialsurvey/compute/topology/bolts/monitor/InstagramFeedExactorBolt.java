@@ -1,19 +1,9 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
-import com.google.gson.Gson;
-import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
-import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
-import com.realtech.socialsurvey.compute.entities.InstagramTokenForSM;
-import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
-import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
-import com.realtech.socialsurvey.compute.enums.ProfileType;
-import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
-import com.realtech.socialsurvey.compute.enums.SocialFeedType;
-import com.realtech.socialsurvey.compute.feeds.InstagramFeedProcessor;
-import com.realtech.socialsurvey.compute.feeds.impl.InstagramFeedProcessorImpl;
-import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
-import com.realtech.socialsurvey.compute.utils.UrlHelper;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -22,12 +12,25 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import com.google.gson.Gson;
+import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
+import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
+import com.realtech.socialsurvey.compute.entities.InstagramTokenForSM;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
+import com.realtech.socialsurvey.compute.entities.response.SocialFeedMediaEntity;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.enums.ProfileType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedMediaType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
+import com.realtech.socialsurvey.compute.enums.SocialFeedType;
+import com.realtech.socialsurvey.compute.feeds.InstagramFeedProcessor;
+import com.realtech.socialsurvey.compute.feeds.impl.InstagramFeedProcessorImpl;
+import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
+import com.realtech.socialsurvey.compute.utils.UrlHelper;
+
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class InstagramFeedExactorBolt extends BaseComputeBolt {
 
@@ -103,7 +106,6 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
         responseWrapper.setPostId( instagramMediaData.getIgId() );
         //Id is postId_companyId
         responseWrapper.setId( instagramMediaData.getIgId() + "_" + responseWrapper.getCompanyId() );
-        responseWrapper.setPictures(Arrays.asList(instagramMediaData.getMediaUrl()));
         
         // Setting contact details.
         if(mediaToken.getContactDetails() != null) {
@@ -116,6 +118,20 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
         responseWrapper.setPostLink( instagramMediaData.getPostLink() );
         responseWrapper.setTotalLikesCount( instagramMediaData.getLikeCount() );
         responseWrapper.setTotalCommentsCount( instagramMediaData.getCommentsCount() );
+        
+        SocialFeedMediaEntity mediaEntity = new SocialFeedMediaEntity();
+        
+        if ( instagramMediaData.getMediaType().equals( "VIDEO" ) ) {
+        	responseWrapper.setVideoFeed(true);
+            mediaEntity.setType( SocialFeedMediaType.VIDEO.toString() );
+            mediaEntity.setThumbnailUrl( instagramMediaData.getThumbnailUrl());
+            mediaEntity.setUrl( instagramMediaData.getMediaUrl());
+        } else {
+            mediaEntity.setType( SocialFeedMediaType.IMAGE.toString() );
+            mediaEntity.setUrl( instagramMediaData.getMediaUrl() );
+        }
+        
+        responseWrapper.setMediaEntities(Arrays.asList(mediaEntity));
 
         if ( instagramMediaData.getTimestamp() > 0 ) {
             responseWrapper.setCreatedTime( instagramMediaData.getTimestamp() * 1000 );

@@ -7420,7 +7420,7 @@ tr.u-tbl-header td {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
 .verified-badge {
-	background: url(../images/ss-verified-customer.png) no-repeat;
+	background: url(../images/VerifiedPartner_stamp.png) no-repeat;
 	cursor: pointer;
 	background-size: contain;
 }
@@ -9978,6 +9978,17 @@ ul.accordion li>a:before {
 #third-party-lbl{
 	margin-left: 15px;
     margin-right: 32px;
+}
+
+
+#google-lbl{
+    margin-left: 15px;
+    margin-right: 58px;
+}
+
+#facebook-lbl{
+    margin-left: 15px;
+    margin-right: 42px;
 }
 
 #unassigned-lbl{
@@ -12902,6 +12913,13 @@ b{
 .hr-survey {
     width: 50%;
     border-color: #C8C8C8;
+}
+
+.video-icon{
+	left: 50%;
+    margin: -36px 0 0 -36px;
+    position: absolute;
+    top: 50%;
 }
 
 .verified-partner-badge{

@@ -16,7 +16,7 @@
 			<value>${DATABASE_PASSWORD}</value>
 		</property>
 	</bean>
-	
+
 	<bean id="dataSourceForReporting" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="url">
 			<value>${REPORTING_DATABASE_URL}</value>
@@ -75,7 +75,7 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- Updating location in mongo (ONE TIME JOB) -->
 	<bean id="updatelocationjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.UpdateLocation" />
@@ -189,9 +189,9 @@
 
 	<!-- Image loader job detail -->
 	<bean id="imageloaderjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.ImageLoader" />
+				  value="com.realtech.socialsurvey.core.starter.ImageLoader" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="fileUploadService" value-ref="fileUploadService" />
@@ -203,9 +203,9 @@
 
 	<!-- Setting hierarchy upload job detail -->
 	<bean id="hierarchyuploadjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.HierarchyUploader" />
+				  value="com.realtech.socialsurvey.core.starter.HierarchyUploader" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="hierarchyUploadHandler" value-ref="hierarchyUploadHandler" />
@@ -216,9 +216,9 @@
 
 	<!-- Setting billing report job detail -->
 	<bean id="billingreportjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.BillingReportGenerator" />
+				  value="com.realtech.socialsurvey.core.starter.BillingReportGenerator" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="billingReportHandler" value-ref="billingReportHandler" />
@@ -229,9 +229,9 @@
 
 	<!-- Setting billing report job detail -->
 	<bean id="companiesbillingreportjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.CompaniesBillingReportGenerator" />
+				  value="com.realtech.socialsurvey.core.starter.CompaniesBillingReportGenerator" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="billingReportsService" value-ref="billingReportsService" />
@@ -242,9 +242,9 @@
 
 	<!-- Setting survey file upload job detail -->
 	<bean id="surveyfileuploadjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.CSVBulkSurveyUploader" />
+				  value="com.realtech.socialsurvey.core.starter.CSVBulkSurveyUploader" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="surveyuploadHandler" value-ref="surveyuploadHandler" />
@@ -254,9 +254,9 @@
 	</bean>
 
 	<bean id="hierarchysettingsjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.HierarchySettingsCorrector" />
+				  value="com.realtech.socialsurvey.core.starter.HierarchySettingsCorrector" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
@@ -268,9 +268,9 @@
 
 
 	<bean id="remaxEntitiesTransfer"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.ReMaxPartitonBatch" />
+				  value="com.realtech.socialsurvey.core.starter.ReMaxPartitonBatch" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
@@ -278,23 +278,23 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<bean id="hideUsersFromSearch"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" 
-			value="com.realtech.socialsurvey.core.starter.SolrAgentSearchCriteriaUpdator"/>
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+				  value="com.realtech.socialsurvey.core.starter.SolrAgentSearchCriteriaUpdator"/>
 		<property name="jobDataAsMap">
 			<map>
 				<entry value-ref="solrUserSearchCriteriaProcessor" key="solrUserSearchCriteriaProcessor"/>
-		    </map>
+			</map>
 		</property>
-        <property name="durability" value="true"/>
+		<property name="durability" value="true"/>
 	</bean>
 
 	<bean id="updateExistingCompanyPrice"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.ExistingCompanyPriceUpdator" />
+				  value="com.realtech.socialsurvey.core.starter.ExistingCompanyPriceUpdator" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="reviseSubscription" value-ref="reviseSubscription" />
@@ -302,11 +302,11 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<bean id="monthlydigeststarter"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.MonthlyDigestStarter" />
+				  value="com.realtech.socialsurvey.core.starter.MonthlyDigestStarter" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="reportingDashboardManagement" value-ref="reportingDashboardManagement" />
@@ -317,9 +317,9 @@
 
 	<!-- vendasta ticket job detail -->
 	<bean id="deleteUsedVendastaTickets"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.UsedVendastaTicketRemover" />
+				  value="com.realtech.socialsurvey.core.starter.UsedVendastaTicketRemover" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="vendastaManagementService" value-ref="vendastaManagementService" />
@@ -330,9 +330,9 @@
 
 	<!-- Setting dotloop job detail -->
 	<bean id="dotloopjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.DotloopReviewProcessor" />
+				  value="com.realtech.socialsurvey.core.starter.DotloopReviewProcessor" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="dotloopIntegrationApiBuilder" value-ref="dotloopIntegrationApiBuilder" />
@@ -354,9 +354,9 @@
 
 	<!-- Setting lonewolf job detail -->
 	<bean id="lonewolfjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.LoneWolfReviewProcessor" />
+				  value="com.realtech.socialsurvey.core.starter.LoneWolfReviewProcessor" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
@@ -382,9 +382,9 @@
 
 	<!-- Setting lonewolf job detail -->
 	<bean id="socialMediaTokenExpiryJobDetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.SocialMediaTokenExpiryScheduler" />
+				  value="com.realtech.socialsurvey.core.starter.SocialMediaTokenExpiryScheduler" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="batchTrackerService" value-ref="batchTrackerService" />
@@ -398,9 +398,9 @@
 	</bean>
 
 	<bean id="imageprocessingjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.ImageProcessingStarter" />
+				  value="com.realtech.socialsurvey.core.starter.ImageProcessingStarter" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
@@ -411,9 +411,9 @@
 
 	<!-- Setting zillow review process and auto post detail -->
 	<bean id="zillowreviewprocessandautopostjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.ZillowReviewProcessorAndAutoPostStarter" />
+				  value="com.realtech.socialsurvey.core.starter.ZillowReviewProcessorAndAutoPostStarter" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="socialManagementService" value-ref="socialManagementService" />
@@ -423,9 +423,9 @@
 	</bean>
 
 	<bean id="userencryptedidupdaterjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.AgentSettingUserEncryptedIdUpdater" />
+				  value="com.realtech.socialsurvey.core.starter.AgentSettingUserEncryptedIdUpdater" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="organizationManagementService" value-ref="organizationManagementService" />
@@ -437,9 +437,9 @@
 
 	<!-- Setting bulk survey import job detail -->
 	<bean id="surveyimporterjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.BulkSurveyImporter" />
+				  value="com.realtech.socialsurvey.core.starter.BulkSurveyImporter" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="surveyImportHandler" value-ref="surveyImportHandler" />
@@ -447,12 +447,12 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- Setting social-monitor feed retry job detail -->
 	<bean id="socialfeedretryjobdetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.RetryFailedSocialFeeds" />
+				  value="com.realtech.socialsurvey.core.starter.RetryFailedSocialFeeds" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="socialFeedService" value-ref="socialFeedService" />
@@ -460,11 +460,11 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<bean id="surveysourceidupdater"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.SurveyTransactionDateUpdater" />
+				  value="com.realtech.socialsurvey.core.starter.SurveyTransactionDateUpdater" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="surveyHandler" value-ref="surveyHandler" />
@@ -472,12 +472,12 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
-	
+
+
 	<bean id="surveyquestionupdater"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.SurveyQuestionUpdater" />
+				  value="com.realtech.socialsurvey.core.starter.SurveyQuestionUpdater" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="surveyBuilder" value-ref="surveyBuilder" />
@@ -489,9 +489,9 @@
 	</bean>
 
 	<bean id="transactionActivityMonitorJobDetail"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.TransactionActivityMonitor" />
+				  value="com.realtech.socialsurvey.core.starter.TransactionActivityMonitor" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="reportingDashboardManagement" value-ref="reportingDashboardManagement" />
@@ -500,7 +500,7 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 
 	<!-- Survey Csv Upload job detail -->
 	<bean id="surveycsvuploadjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -511,30 +511,30 @@
 			</map>
 		</property>
 		<property name="durability" value="true" />
-	</bean> 
-	
+	</bean>
+
 	<!-- Survey invitation mail count past month job -->
 	<bean id="surveyInvitationEmailCountJobPastMonth" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SurveyInvitationEmailCountJob" />
 		<property name="jobDataAsMap">
 			<map>
-			<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
-			<entry key="timeFrame" value="PastMonth" />
+				<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
+				<entry key="timeFrame" value="PastMonth" />
 			</map>
-			</property>
-			<property name="durability" value="true" />
+		</property>
+		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- Survey invitation mail count this month job -->
 	<bean id="surveyInvitationEmailCountJobThisMonth" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SurveyInvitationEmailCountJob" />
 		<property name="jobDataAsMap">
 			<map>
-			<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
-			<entry key="timeFrame" value="ThisMonth" />
+				<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
+				<entry key="timeFrame" value="ThisMonth" />
 			</map>
-			</property>
-			<property name="durability" value="true" />
+		</property>
+		<property name="durability" value="true" />
 	</bean>
 
 	<bean id="failedstreammsgprocessorjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -542,11 +542,11 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="streamMessagesService" value-ref="streamMessagesService" />
-				</map>
+			</map>
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- Archive social feed data job -->
 	<bean name="archiveSocialFeedCollectionJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.ArchiveSocialFeedCollectionJob" />
@@ -557,18 +557,18 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- Run the job every day 6:30 GMT -->
 	<bean id="archiveSocialFeedCollectionCronTrigger"  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="archiveSocialFeedCollectionJob" />
 		<property name="cronExpression" value="0 30 6 * * ?" />
-	</bean> 
-	
-	
+	</bean>
+
+
 	<bean id="ftpfileuploader"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
-			value="com.realtech.socialsurvey.core.starter.FTPFileUploader" />
+				  value="com.realtech.socialsurvey.core.starter.FTPFileUploader" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="ftpManagement" value-ref="ftpManagement" />
@@ -576,38 +576,38 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-	
+
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="solrreviewcounterupdaterjobdetail" />
 		<property name="cronExpression" value="0 0 0/3 * * ?" />
 	</bean>
 
 	<!-- setting cron for Account deactivator -->
 	<bean id="sitemapgeneratorcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="sitemapjobdetail" />
 		<property name="cronExpression" value="0 0 * * * ?" />
 	</bean>
 
 	<!-- setting cron for incomplete social post reminder -->
 	<bean id="incompletesocialpostcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesocialpostjobdetail" />
 		<property name="cronExpression" value="0 0 6 * * ?" />
 	</bean>
 
 	<!-- setting cron for incomplete survey reminder -->
 	<bean id="incompletesurveycron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="incompletesurveyjobdetail" />
 		<property name="cronExpression" value="0 43 * * * ?" />
 	</bean>
-	
+
 	<!-- setting cron for updating location (ONE TIME JOB) -->
 	<bean id="updatelocationcron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="updatelocationjobdetail" />
 		<property name="startDelay" value="20000" />
 		<property name="repeatCount" value="0" />
@@ -615,35 +615,35 @@
 
 	<!-- setting cron for update subscription price -->
 	<bean id="updatesubscriptionpricecron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="updatesubscriptionpricejobdetail" />
 		<property name="cronExpression" value="0 30 6 * * ?" />
 	</bean>
 
 	<!-- setting cron for social feed ingester -->
 	<bean id="socialfeedingestercron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialfeedingesterjobdetail" />
 		<property name="cronExpression" value="0 0 19,20,21,22,23,0,1,2,3 * * ?" />
 	</bean>
 
 	<!-- setting cron for social post import -->
 	<bean id="socialpostimportcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialpostsimportjobdetail" />
 		<property name="cronExpression" value="0 1 * * * ?" />
 	</bean>
 
 	<!-- setting cron for isprofileimgset batch -->
 	<bean id="isprofileimagesetcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="isprofileimgsetjobdetail" />
 		<property name="cronExpression" value="0 0/1 * * * ?" />
 	</bean>
 
 	<!-- setting cron for Set Company Ids In Social Posts -->
 	<bean id="setcompanyidsinsocialpostscron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="setcompanyidsinsocialpostsjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="1000" />
@@ -651,7 +651,7 @@
 
 	<!-- setting cron for email reader -->
 	<bean id="emailreadercron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="emailreaderjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="1000" />
@@ -659,7 +659,7 @@
 	</bean>
 
 	<bean id="hierarchysettingscron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="hierarchysettingsjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="1000" />
@@ -668,21 +668,21 @@
 
 
 	<bean id="remaxEntitiesTransfercron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="remaxEntitiesTransfer" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="1000" />
 	</bean>
-	
+
 	<bean id="hideUsersFromSearchcron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="hideUsersFromSearch" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="10000" />
 	</bean>
 
 	<bean id="updateExistingCompanyPricecron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="updateExistingCompanyPrice" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="10000" />
@@ -690,35 +690,35 @@
 
 	<!-- setting cron for account deactivator -->
 	<bean id="accountdeactivatorcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="accountdeactivatorjobdetail" />
 		<property name="cronExpression" value="0 0 7 * * ?" />
 	</bean>
 
 	<!-- setting cron for deactivated account purger -->
 	<bean id="deactivatedaccountpurgercron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="deactivatedaccountpurgerjobdetail" />
 		<property name="cronExpression" value="0 15 7 * * ?" />
 	</bean>
 
 	<!-- setting cron for mapping crm data agent id -->
 	<bean id="crmdataagentidmappercron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
 		<property name="cronExpression" value="0 35 * * * ?" />
 	</bean>
 
 	<!-- setting cron for loading image from linkedin to amazon server -->
 	<bean id="imageloadercron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="imageloaderjobdetail" />
 		<property name="cronExpression" value="0 45 7 * * ?" />
 	</bean>
 
 	<!-- setting cron for hierarchy upload -->
 	<bean id="hierarchyuploadcron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="hierarchyuploadjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
@@ -726,58 +726,58 @@
 
 	<!-- setting cron for billing report -->
 	<bean id="billingreportcron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="billingreportjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2300" />
 	</bean>
 
 	<bean id="companiesbillingreportcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="companiesbillingreportjobdetail" />
 		<property name="cronExpression" value="0 0 9 * * ?" />
 	</bean>
 
 	<!-- setting cron for survey file upload -->
 	<bean id="surveyfileuploadcron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="surveyfileuploadjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
 
 	<bean id="dotloopcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="dotloopjobdetail" />
 		<property name="cronExpression" value="0 01 7 * * ?" />
 	</bean>
 
 	<bean id="lonewolfcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="lonewolfjobdetail" />
 		<property name="cronExpression" value="0 01 8 * * ?" />
 	</bean>
 
 	<bean id="socialmediatokenexpirycron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialMediaTokenExpiryJobDetail" />
 		<property name="cronExpression" value="0 25 13 * * ?" />
 	</bean>
 
 	<bean id="imageprocessingcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="imageprocessingjobdetail" />
 		<property name="cronExpression" value="0 0 8 * * ?" />
 	</bean>
 
 	<bean id="zillowreviewprocessandautopostcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="zillowreviewprocessandautopostjobdetail" />
 		<property name="cronExpression" value="0 0 21 * * ?" />
 	</bean>
 
 	<bean id="userencryptedidupdatercron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="userencryptedidupdaterjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="1000" />
@@ -785,93 +785,93 @@
 
 	<!-- setting cron for bulk survey import -->
 	<bean id="surveyimportercron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="surveyimporterjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
-	
+
 	<!-- setting cron for social-monitor feed retry -->
 	<bean id="socialfeedretrycron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="socialfeedretryjobdetail" />
 		<property name="cronExpression" value="0 0 0/1 1/1 * ?" />
 	</bean>
-	
+
 	<bean id="surveysourceidupdatercron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="surveysourceidupdater" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
-	
+
 	<bean id="surveyquestionupdatercron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="surveyquestionupdater" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
-	
+
 	<bean id="deleteUsedVendastaTicketscron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="deleteUsedVendastaTickets" />
 		<property name="cronExpression" value="0 0 0/1 1/1 * ?" />
 	</bean>
-	
+
 	<bean id="monthlydigeststartercron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="monthlydigeststarter" />
-        <property name="cronExpression" value="0 25 13 5 * ?" />
+		<property name="cronExpression" value="0 25 13 5 * ?" />
 	</bean>
 
 	<bean id="transactionActivityMonitorCron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="transactionActivityMonitorJobDetail" />
 		<property name="cronExpression" value="0 30 1 * * ?" />
 	</bean>
-	
+
 
 	<!-- survey csv upload cron -->
 	<bean id="surveycsvuploadcron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="surveycsvuploadjobdetail" />
 		<property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
 	</bean>
-	
+
 	<!-- survey invitaion mail count cron -->
 	<bean id="surveyInvitationEmailCountCronPastMonth"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="surveyInvitationEmailCountJobPastMonth" />
 		<property name="cronExpression" value="0 30 12 1 * ?" />
 	</bean>
-	
+
 	<!-- survey invitaion mail count this month cron -->
 	<bean id="surveyInvitationEmailCountCronThisMonth"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="surveyInvitationEmailCountJobThisMonth" />
 		<property name="cronExpression" value="0 0 1 1/1 * ? *" />
 	</bean>
-	
+
 	<bean id="failedstreammsgprocessorceron"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="failedstreammsgprocessorjobdetail" />
 		<property name="repeatCount" value="0" />
 		<property name="startDelay" value="2000" />
 	</bean>
-	
+
 	<bean id="ftpfileuploadercron"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="ftpfileuploader" />
-        <property name="cronExpression" value="0 0/5 * * * ?" />
+		<property name="cronExpression" value="0 0/5 * * * ?" />
 	</bean>
-	
+
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
 			<list>
 				<ref bean="sitemapjobdetail" />
-			 	<ref bean="emailreaderjobdetail" /> 
+				<ref bean="emailreaderjobdetail" />
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatelocationjobdetail" />
@@ -900,13 +900,13 @@
 				<!-- <ref bean="updateExistingCompanyPrice" /> -->
 				<!-- <ref bean="hideUsersFromSearch" />	-->
 				<!-- <ref bean="surveysourceidupdater" /> -->
-				<!-- <ref bean="surveyquestionupdater" /> -->	
+				<!-- <ref bean="surveyquestionupdater" /> -->
 				<ref bean="monthlydigeststarter" />
-				<ref bean="transactionActivityMonitorJobDetail" />	
+				<ref bean="transactionActivityMonitorJobDetail" />
 				<ref bean="surveycsvuploadjobdetail" />
 				<ref bean="surveyInvitationEmailCountJobPastMonth" />
 				<ref bean="surveyInvitationEmailCountJobThisMonth" />
-				<ref bean="failedstreammsgprocessorjobdetail" /> 
+				<ref bean="failedstreammsgprocessorjobdetail" />
 				<ref bean="archiveSocialFeedCollectionJob" />
 				<ref bean="ftpfileuploader" />
 				<!-- <ref bean="updatesurveyjobdetail"/> -->
@@ -916,7 +916,7 @@
 		<property name="triggers">
 			<list>
 				<ref bean="sitemapgeneratorcron" />
-			 	<ref bean="emailreadercron" /> 
+				<ref bean="emailreadercron" />
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
 				<ref bean = "updatelocationcron" />
@@ -944,7 +944,7 @@
 				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
 				<!-- <ref bean="updateExistingCompanyPricecron" /> -->
 				<!-- <ref bean="hideUsersFromSearchcron" /> -->
-				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->	
+				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->
 				<!-- <ref bean="surveysourceidupdatercron" /> -->
 				<!-- <ref bean="surveyquestionupdatercron" /> -->
 				<ref bean="monthlydigeststartercron" />
@@ -967,97 +967,97 @@
 
 	<!-- Bean definitions -->
 	<!-- Site map generetor dependencies -->
-	<!-- <bean id="sitemapgenerator" class=" com.realtech.socialsurvey.core.utils.sitemap.SiteMapGenerator" 
+	<!-- <bean id="sitemapgenerator" class=" com.realtech.socialsurvey.core.utils.sitemap.SiteMapGenerator"
 		scope="prototype" /> -->
 	<bean id="siteMapService"
-		class="com.realtech.socialsurvey.core.services.generator.impl.SiteMapServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.generator.impl.SiteMapServiceImpl" />
 	<bean id="uploadService"
-		class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
 
 	<!-- Incomplete survey reminder and social post reminder dependencies -->
 	<bean id="urlGenerator"
-		class="com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl" />
+		  class="com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl" />
 	<bean id="surveyHandler"
-		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyHandlerImpl" />
+		  class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyHandlerImpl" />
 	<bean id="surveyImportHandler"
-		class="com.realtech.socialsurvey.core.handler.SurveyImportHandler" />
+		  class="com.realtech.socialsurvey.core.handler.SurveyImportHandler" />
 	<bean id="emailServices"
-		class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
+		  class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
 	<bean id="userManagementService"
-		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.UserManagementServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.UserManagementServiceImpl" />
 	<bean id="searchEngineManagementServices"
-		class="com.realtech.socialsurvey.core.services.searchengine.impl.SearchEngineManagementServicesImpl"/>
+		  class="com.realtech.socialsurvey.core.services.searchengine.impl.SearchEngineManagementServicesImpl"/>
 	<bean id="zillowIntegrationApiBuilder"
-		class="com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder" />
+		  class="com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder" />
 	<bean id="organizationManagementService"
-		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl" />
 	<bean id="solrSearchService"
-		class="com.realtech.socialsurvey.core.services.search.impl.SolrSearchServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.search.impl.SolrSearchServiceImpl" />
 	<bean id="batchTrackerService"
-		class="com.realtech.socialsurvey.core.services.batchtracker.impl.BatchTrackerServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.batchtracker.impl.BatchTrackerServiceImpl" />
 	<bean id="crmBatchTrackerService"
-		class="com.realtech.socialsurvey.core.services.crmbatchtracker.impl.CRMBatchTrackerServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.crmbatchtracker.impl.CRMBatchTrackerServiceImpl" />
 	<bean id="crmBatchTrackerHistoryService"
-		class="com.realtech.socialsurvey.core.services.crmbatchtrackerhistory.impl.CRMBatchTrackerHistoryServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.crmbatchtrackerhistory.impl.CRMBatchTrackerHistoryServiceImpl" />
 	<bean id="urlService"
-		class="com.realtech.socialsurvey.core.services.generator.impl.UrlServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.generator.impl.UrlServiceImpl" />
 	<bean id="socialMediaExceptionHandler"
-		class="com.realtech.socialsurvey.core.services.social.impl.SocialMediaExceptionHandlerImpl" />	
+		  class="com.realtech.socialsurvey.core.services.social.impl.SocialMediaExceptionHandlerImpl" />
 	<bean id="loneWolfRestUtils" class="com.realtech.socialsurvey.core.utils.LoneWolfRestUtils" />
 	<bean id="socialFeedService"
-		class="com.realtech.socialsurvey.core.services.socialmonitor.feed.impl.SocialFeedServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.socialmonitor.feed.impl.SocialFeedServiceImpl" />
 
 	<bean id="loneWolfIntegrationService"
-		class="com.realtech.socialsurvey.core.services.lonewolf.impl.LoneWolfIntegrationServiceImpl">
+		  class="com.realtech.socialsurvey.core.services.lonewolf.impl.LoneWolfIntegrationServiceImpl">
 		<property name="loneWolfRestUtils" ref="loneWolfRestUtils" />
 		<property name="loneWolfIntegrationApiBuilder" ref="loneWolfIntegrationApiBuilder" />
 	</bean>
 
 	<!-- Update subscription dependencies -->
 	<bean id="reviseSubscription"
-		class="com.realtech.socialsurvey.core.starter.ReviseSubscriptionPrice" />
+		  class="com.realtech.socialsurvey.core.starter.ReviseSubscriptionPrice" />
 
 	<!-- Social feed ingestor dependencies -->
 	<bean id="ingestor"
-		class="com.realtech.socialsurvey.core.feed.impl.SocialFeedIngestionKickStarter" />
+		  class="com.realtech.socialsurvey.core.feed.impl.SocialFeedIngestionKickStarter" />
 
 	<!-- Social post import dependencies -->
 	<bean id="socialPostsDeltaImport"
-		class="com.realtech.socialsurvey.core.utils.solr.SocialPostsDeltaImport" />
+		  class="com.realtech.socialsurvey.core.utils.solr.SocialPostsDeltaImport" />
 
 	<!-- IsProfileImageSet for users dependencies -->
 	<bean id="setIsProfileImageSetFieldForUsers"
-		class="com.realtech.socialsurvey.core.utils.solr.SetIsProfileImageSetFieldForUsers" />
+		  class="com.realtech.socialsurvey.core.utils.solr.SetIsProfileImageSetFieldForUsers" />
 
 	<!-- setCompanyIdsInSocialPosts dependencies -->
 	<bean id="setCompanyIdInSocialPosts"
-		class="com.realtech.socialsurvey.core.utils.mongo.SetCompanyIdInSocialPosts" />
+		  class="com.realtech.socialsurvey.core.utils.mongo.SetCompanyIdInSocialPosts" />
 
 	<!-- Email reader -->
 	<bean id="emailHandler" class="com.realtech.socialsurvey.core.handler.EmailHandler" />
 
 	<bean id="surveyGenerationService"
-		class="com.realtech.socialsurvey.core.dummy.generator.SurveyGenerationServiceImpl" />
+		  class="com.realtech.socialsurvey.core.dummy.generator.SurveyGenerationServiceImpl" />
 	<bean id="surveyBuilder"
-		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyBuilderImpl" />
+		  class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyBuilderImpl" />
 	<bean id="socialManagementService"
-		class="com.realtech.socialsurvey.core.services.social.impl.SocialManagementServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.social.impl.SocialManagementServiceImpl" />
 	<bean id="fileUploadService"
-		class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl" />
 	<bean id="profileManagementService"
-		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.ProfileManagementServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.ProfileManagementServiceImpl" />
 	<bean id="dotloopIntegrationApiBuilder"
-		class="com.realtech.socialsurvey.core.integration.dotloop.DotloopIntergrationApiBuilder" />
+		  class="com.realtech.socialsurvey.core.integration.dotloop.DotloopIntergrationApiBuilder" />
 	<bean id="loneWolfIntegrationApiBuilder"
-		class="com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder">
+		  class="com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder">
 		<property name="loneWolfEndpoint" value="${LONEWOLF_ENDPOINT}" />
 	</bean>
 	<bean id="regionsFullImport"
-		class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
+		  class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
 	<bean id="branchesFullImport"
-		class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
+		  class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
 	<bean id="usersFullImport"
-		class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
+		  class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
 	<bean id="fileOperations" class="com.realtech.socialsurvey.core.utils.FileOperations" />
 
 	<!-- Posts to wall -->
@@ -1065,46 +1065,46 @@
 
 	<!-- Hierarchy Upload handler -->
 	<bean id="hierarchyUploadHandler"
-		class="com.realtech.socialsurvey.core.handler.HierarchyUploadHandler" />
+		  class="com.realtech.socialsurvey.core.handler.HierarchyUploadHandler" />
 
 	<!-- Billing report generator -->
 	<bean id="billingReportHandler"
-		class="com.realtech.socialsurvey.core.handler.BillingReportHandler" />
+		  class="com.realtech.socialsurvey.core.handler.BillingReportHandler" />
 
 	<bean id="billingReportsService"
-		class="com.realtech.socialsurvey.core.services.reports.impl.BillingReportsServiceImpl" />
+		  class="com.realtech.socialsurvey.core.services.reports.impl.BillingReportsServiceImpl" />
 
 	<!-- CSV Upload reader -->
 	<bean id="surveyuploadHandler"
-		class="com.realtech.socialsurvey.core.handler.CSVBulkSurveyInitiatorHandler" />
+		  class="com.realtech.socialsurvey.core.handler.CSVBulkSurveyInitiatorHandler" />
 
 	<!-- Utils dependency -->
 	<bean id="utils" class="com.realtech.socialsurvey.core.commons.Utils" />
 
 	<!-- Image processing bean -->
 	<bean id="imageProcessor"
-		class="com.realtech.socialsurvey.core.utils.images.impl.ImageProcessorImpl" />
-	
-	<!-- dependency for deleteUsedVendastaTickets -->	
-	<bean id="vendastaManagementService" 
-		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.VendastaManagementServiceImpl" />
-		
-		
-	<!-- dependency for monthlyDigestStarter -->	
-	<bean id="reportingDashboardManagement" 
-		class="com.realtech.socialsurvey.core.services.reportingmanagement.impl.ReportingDashboardManagementImpl" />
+		  class="com.realtech.socialsurvey.core.utils.images.impl.ImageProcessorImpl" />
+
+	<!-- dependency for deleteUsedVendastaTickets -->
+	<bean id="vendastaManagementService"
+		  class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.VendastaManagementServiceImpl" />
+
+
+	<!-- dependency for monthlyDigestStarter -->
+	<bean id="reportingDashboardManagement"
+		  class="com.realtech.socialsurvey.core.services.reportingmanagement.impl.ReportingDashboardManagementImpl" />
 
 	<!-- Activity Management service bean -->
 	<bean id="activityManagementService"
-		class="com.realtech.socialsurvey.core.services.activitymanager.impl.ActivityManagementServiceImpl" />	
-	
-	<bean id="streamMessagesService"
-		class="com.realtech.socialsurvey.core.services.stream.impl.StreamMessagesServiceImpl" />	
-		
-	<bean id="streamApiIntegrationBuilder"
-		class="com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder" />
+		  class="com.realtech.socialsurvey.core.services.activitymanager.impl.ActivityManagementServiceImpl" />
 
-	<!-- dependency for monthlyDigestStarter -->	
-	<bean id="ftpManagement" 
-		class="com.realtech.socialsurvey.core.services.ftpmanagement.impl.FTPManagementImpl" />
+	<bean id="streamMessagesService"
+		  class="com.realtech.socialsurvey.core.services.stream.impl.StreamMessagesServiceImpl" />
+
+	<bean id="streamApiIntegrationBuilder"
+		  class="com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder" />
+
+	<!-- dependency for monthlyDigestStarter -->
+	<bean id="ftpManagement"
+		  class="com.realtech.socialsurvey.core.services.ftpmanagement.impl.FTPManagementImpl" />
 </beans>

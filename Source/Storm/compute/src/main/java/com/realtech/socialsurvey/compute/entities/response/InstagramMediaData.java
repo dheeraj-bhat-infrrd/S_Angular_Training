@@ -24,6 +24,9 @@ public class InstagramMediaData implements Serializable{
     private String id;
 
     private String username;
+
+    @SerializedName ( "thumbnail_url")
+    private String thumbnailUrl;
     
     @SerializedName ( "permalink")
     private String postLink;
@@ -109,12 +112,21 @@ public class InstagramMediaData implements Serializable{
         this.commentsCount = commentsCount;
     }
 
-
-    @Override public String toString()
+    public String getThumbnailUrl()
     {
-        return "InstagramMediaData{" + "igId='" + igId + '\'' + ", timestamp=" + timestamp + ", mediaUrl='" + mediaUrl + '\''
-            + ", mediaType='" + mediaType + '\'' + ", caption='" + caption + '\'' + ", id='" + id + '\'' + ", username='"
-            + username + '\'' + ", postLink='" + postLink + '\'' + ", likeCount='" + likeCount + '\'' + ", commentsCount='"
-            + commentsCount + '\'' + '}';
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl( String thumbnailUrl )
+    {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "InstagramMediaData [igId=" + igId + ", timestamp=" + timestamp + ", mediaUrl=" + mediaUrl + ", mediaType="
+            + mediaType + ", caption=" + caption + ", id=" + id + ", username=" + username + ", thumbnailUrl=" + thumbnailUrl
+            + ", postLink=" + postLink + ", likeCount=" + likeCount + ", commentsCount=" + commentsCount + "]";
     }
 }

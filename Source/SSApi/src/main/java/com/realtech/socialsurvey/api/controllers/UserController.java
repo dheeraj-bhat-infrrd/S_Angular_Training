@@ -4,6 +4,9 @@ import java.io.IOException;
 
 import javax.validation.Valid;
 
+import com.realtech.socialsurvey.core.exception.AuthorizationException;
+import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestOperations;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
@@ -54,6 +52,7 @@ public class UserController
     private UserService userService;
     private UserManagementService userManagementService;
     private UrlValidationHelper urlValidationHelper;
+    private AdminAuthenticationService adminAuthenticationService;
 
     @Value ( "http://localhost:8082")
     private String authUrl;
@@ -68,7 +67,8 @@ public class UserController
     @Autowired
     public UserController( RestOperations restTemplate, LoginValidator loginValidator,
         PersonalProfileValidator personalProfileValidator, PersonalProfileTransformer personalProfileTransformer,
-        UserService userService, UserManagementService userManagementService, UrlValidationHelper urlValidationHelper )
+        UserService userService, UserManagementService userManagementService, UrlValidationHelper urlValidationHelper,
+        AdminAuthenticationService adminAuthenticationService)
     {
         this.restTemplate = restTemplate;
         this.loginValidator = loginValidator;
@@ -77,6 +77,7 @@ public class UserController
         this.userService = userService;
         this.userManagementService = userManagementService;
         this.urlValidationHelper = urlValidationHelper;
+        this.adminAuthenticationService = adminAuthenticationService;
     }
 
 
@@ -240,6 +241,22 @@ public class UserController
             return new ResponseEntity<Void>( HttpStatus.OK );
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
+    }
+
+    @RequestMapping( value = "/user/{id}", method = RequestMethod.GET)
+    @ApiOperation( value = "Gets the user details")
+    public ResponseEntity<?> getPrimaryUserProfileByAgentId(@PathVariable long id, @RequestHeader ( "authorizationHeader") String authorizationHeader)
+        throws SSApiException
+    {
+        LOGGER.info( " Method to fetch primary user profile with agent id {} started ", id );
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            return new ResponseEntity<>( userManagementService.getPrimaryUserProfileByAgentId(id), HttpStatus.OK);
+        } catch ( AuthorizationException e ) {
+            return new ResponseEntity<>( "AUTHORIZATION FAILED", HttpStatus.UNAUTHORIZED );
+        } catch ( ProfileNotFoundException | InvalidInputException e ) {
+            throw new SSApiException( e.getMessage() );
         }
     }
     

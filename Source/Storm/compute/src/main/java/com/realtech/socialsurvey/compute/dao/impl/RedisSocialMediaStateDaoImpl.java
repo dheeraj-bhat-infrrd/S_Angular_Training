@@ -216,4 +216,41 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
             return ConversionUtils.deserialize( companyIds, new TypeToken<List<Long>>() {}.getType() );
         }
     }
+
+
+    @Override public boolean waitForNextFacebooktFetch()
+    {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+
+            if ( jedis.exists( RedisKeyConstants.WAIT_FOR_NEXT_FB_FETCH ) ) {
+                return true;
+            } else {
+                int redisWaitForNextFetchTime = NumberUtils.toInt(jedis.get( RedisKeyConstants.WAIT_FOR_NEXT_FETCH_TIME ));
+
+                // Check fi redis has ttl for wait for next time.
+                int ttlForNextFetch = (redisWaitForNextFetchTime == 0) ? waitForNextFetchTime: redisWaitForNextFetchTime;
+                jedis.setex( RedisKeyConstants.WAIT_FOR_NEXT_FB_FETCH, ttlForNextFetch, "true" );
+                return false;
+            }
+        }
+    }
+
+
+    @Override
+    public boolean waitForNextGoogleReviewFetch()
+    {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+
+            if ( jedis.exists( RedisKeyConstants.WAIT_FOR_NEXT_GOOGLE_FETCH ) ) {
+                return true;
+            } else {
+                int redisWaitForNextFetchTime = NumberUtils.toInt(jedis.get( RedisKeyConstants.WAIT_FOR_NEXT_FETCH_TIME ));
+
+                // Check if redis has ttl for wait for next time.
+                int ttlForNextFetch = (redisWaitForNextFetchTime == 0) ? waitForNextFetchTime: redisWaitForNextFetchTime;
+                jedis.setex( RedisKeyConstants.WAIT_FOR_NEXT_GOOGLE_FETCH, ttlForNextFetch, "true" );
+                return false;
+            }
+        }
+    }
 }

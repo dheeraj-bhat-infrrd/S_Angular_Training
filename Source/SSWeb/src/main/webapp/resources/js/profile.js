@@ -776,8 +776,12 @@ function paintReviews(result){
 		}else if(reviewItem.source=="encompass"||reviewItem.source=="DOTLOOP"||reviewItem.source=="API" || reviewItem.source == "FTP" || reviewItem.source=="LONEWOLF"){
 			reviewsHtml +=' <div class="verified-badge  verify-image float-right" title="Click here to know more"></div>';
 			}
-		else if(reviewItem.source=="Zillow"){
-			reviewsHtml +=' <div class="zillow-badge  verify-image-zillow float-right" ></div>';
+			else if(reviewItem.source=="Zillow"){
+				reviewsHtml +=' <div class="zillow-badge  verify-image-zillow float-right" ></div>';
+			}else if(reviewItem.source =='facebook'){
+				reviewsHtml +=' <div class="fb-verified-image verify-image-fb float-right" ></div>';
+			}else if(reviewItem.source =='google'){
+				reviewsHtml +=' <div class="google-verified-image verify-image-google float-right"></div>';
 			}else{
 				reviewsHtml +='<div class="unverified-badge  verify-image-ss float-right"></div>'
 			}
@@ -870,6 +874,10 @@ function paintReviews(result){
 			reviewsHtml += '<div class="ppl-content review-height"><span class="review-complete-txt">'+reviewItem.review+'';
 			if(reviewItem.source == "Zillow") {
 				reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a></span>';
+			}else if(reviewItem.source == "facebook") {
+				reviewsHtml += '<br><a class="view-fb-link" href="'+reviewItem.facebookProfileUrl+'"  target="_blank">View on Facebook</a></span>';
+			}else if(reviewItem.source =='google'){
+				reviewsHtml += '<br><a class="view-goo-link" href="'+reviewItem.googleBusinessProfileUrl+'"  target="_blank">View on google</a></span>';
 			}else{
 				reviewsHtml += '</span>';
 			}
@@ -878,7 +886,11 @@ function paintReviews(result){
 			reviewsHtml += '<div class="ppl-content review-height"><span>'+review+'</span>';
             if(reviewItem.source == "Zillow") {
                 reviewsHtml += '<br><a class="view-zillow-link" href="'+reviewItem.sourceId+'"  target="_blank">View on zillow</a></span>';
-            }
+            }else if(reviewItem.source == "facebook") {
+				reviewsHtml += '<br><a class="view-fb-link" href="'+reviewItem.facebookProfileUrl+'"  target="_blank">View on Facebook</a></span>';
+			}else if(reviewItem.source =='google'){
+				reviewsHtml += '<br><a class="view-goo-link" href="'+reviewItem.googleBusinessProfileUrl+'"  target="_blank">View on google</a></span>';
+			}
 		}
 		
 		if(reviewItem.agentName == undefined || reviewItem.agentName == null)
@@ -2233,6 +2245,10 @@ function setUpReviewPopupListener(){
 		
 		// exceptions
 		if( $('.view-zillow-link').is( event.target ) ){
+			return;
+		}
+		
+		if( $('.view-fb-link').is( event.target ) ){
 			return;
 		}
 		

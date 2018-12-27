@@ -40,7 +40,7 @@ public class SocialResponseObject<T> implements Serializable
     private String textHighlighted;
     private String pageLink;
     private String postLink;
-    private List<String> pictures;
+    private List<SocialFeedMediaEntity> mediaEntities;
     private long updatedTime;
     private long createdTime;
     private String ownerName;
@@ -66,6 +66,9 @@ public class SocialResponseObject<T> implements Serializable
 	private int totalLikesCount;
 	private int totalCommentsCount;
     private long retweetCount;
+    
+    private boolean videoFeed;
+
 
     public T getResponse()
     {
@@ -112,15 +115,6 @@ public class SocialResponseObject<T> implements Serializable
     public void setText( String text )
     {
         this.text = text;
-    }
-
-
-    public List<String> getPictures() {
-        return pictures;
-    }
-
-    public void setPictures(List<String> pictures) {
-        this.pictures = pictures;
     }
 
     public String getOwnerName()
@@ -407,19 +401,40 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.retweetCount = retweetCount;
     }
-
-
-    @Override public String toString()
+    
+    public List<SocialFeedMediaEntity> getMediaEntities()
     {
-        return "SocialResponseObject{" + "id='" + id + '\'' + ", postId='" + postId + '\'' + ", text='" + text + '\''
-            + ", textHighlighted='" + textHighlighted + '\'' + ", pageLink='" + pageLink + '\'' + ", postLink='" + postLink
-            + '\'' + ", pictures=" + pictures + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime
-            + ", ownerName='" + ownerName + '\'' + ", ownerEmail='" + ownerEmail + '\'' + ", response=" + response + ", type="
-            + type + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId
-            + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash + ", duplicateCount=" + duplicateCount
-            + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried
-            + ", fromTrustedSource=" + fromTrustedSource + ", postSource='" + postSource + '\'' + ", isDuplicate=" + isDuplicate
-            + ", totalLikesCount=" + totalLikesCount + ", totalCommentsCount=" + totalCommentsCount + ", retweetCount="
-            + retweetCount + '}';
+        return mediaEntities;
+    }
+
+
+    public void setMediaEntities( List<SocialFeedMediaEntity> mediaEntities )
+    {
+        this.mediaEntities = mediaEntities;
+    }
+
+
+	public boolean isVideoFeed() {
+		return videoFeed;
+	}
+
+
+	public void setVideoFeed(boolean videoFeed) {
+		this.videoFeed = videoFeed;
+	}
+
+
+	@Override
+    public String toString()
+    {
+        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", textHighlighted="
+            + textHighlighted + ", pageLink=" + pageLink + ", postLink=" + postLink + ", mediaEntities=" + mediaEntities
+            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail="
+            + ownerEmail + ", response=" + response + ", type=" + type + ", status=" + status + ", companyId=" + companyId
+            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType
+            + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory="
+            + actionHistory + ", isRetried=" + isRetried + ", fromTrustedSource=" + fromTrustedSource + ", postSource="
+            + postSource + ", isDuplicate=" + isDuplicate + ", totalLikesCount=" + totalLikesCount + ", totalCommentsCount="
+            + totalCommentsCount + ", retweetCount=" + retweetCount + ", videoFeed=" + videoFeed +" ]";
     }
 }

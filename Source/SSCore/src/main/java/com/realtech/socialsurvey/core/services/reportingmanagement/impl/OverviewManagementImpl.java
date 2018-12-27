@@ -78,6 +78,8 @@ public class OverviewManagementImpl implements OverviewManagement
     private static final String NPS_PASSIVESPERCENTAGE = "NpsPassivesPercentage";
     private static final String NPS_PROMOTERPERCENTAGE = "NpsPromoterPercentage";
     private static final String UNSUBSCRIBE = "Unsubscribed";
+    private static final String GOOGLE = "google";
+    private static final String FACEBOOK = "facebook";
 
     @Autowired
     private OverviewUserDao overviewUserDao;
@@ -226,6 +228,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewUser.getTotalReviews() );
                 overviewMap.put( THIRDPARTY, overviewUser.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewUser.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewUser.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewUser.getFacebook() );
             }
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
@@ -246,6 +250,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewBranch.getTotalReviews() );
                 overviewMap.put( THIRDPARTY, overviewBranch.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewBranch.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewBranch.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewBranch.getFacebook() );
             }
 
 
@@ -267,6 +273,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewRegion.getTotalReviews() );
                 overviewMap.put( THIRDPARTY, overviewRegion.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewRegion.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewRegion.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewRegion.getFacebook() );
             }
 
         } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -287,6 +295,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewCompany.getTotalReviews() );
                 overviewMap.put( THIRDPARTY, overviewCompany.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewCompany.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewCompany.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewCompany.getFacebook() );
 
             }
         }
@@ -399,6 +409,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewUserMonth.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewUserMonth.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewUserMonth.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewUserMonth.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewUserMonth.getFacebook() );
 
             }
 
@@ -421,6 +433,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewBranchMonth.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewBranchMonth.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewBranchMonth.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewBranchMonth.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewBranchMonth.getFacebook() );
 
             }
 
@@ -443,6 +457,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewRegionMonth.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewRegionMonth.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewRegionMonth.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewRegionMonth.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewRegionMonth.getFacebook() );
 
             }
 
@@ -465,6 +481,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewCompanyMonth.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewCompanyMonth.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewCompanyMonth.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewCompanyMonth.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewCompanyMonth.getFacebook() );
             }
 
         }
@@ -503,6 +521,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewUserYear.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewUserYear.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewUserYear.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewUserYear.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewUserYear.getFacebook() );
 
             }
 
@@ -524,6 +544,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewBranchYear.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewBranchYear.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewBranchYear.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewBranchYear.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewBranchYear.getFacebook() );
 
             }
 
@@ -545,6 +567,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewRegionYear.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewRegionYear.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewRegionYear.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewRegionYear.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewRegionYear.getFacebook() );
 
             }
 
@@ -567,6 +591,8 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( TOTALREVIEW, overviewCompanyYear.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewCompanyYear.getThirdParty() );
                 overviewMap.put( UNSUBSCRIBE, overviewCompanyYear.getUnsubscribed() );
+                overviewMap.put( GOOGLE, overviewCompanyYear.getGoogle() );
+                overviewMap.put( FACEBOOK, overviewCompanyYear.getFacebook() );
 
             }
 
