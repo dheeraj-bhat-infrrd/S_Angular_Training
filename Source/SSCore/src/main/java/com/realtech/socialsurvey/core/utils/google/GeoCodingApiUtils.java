@@ -38,7 +38,7 @@ public class GeoCodingApiUtils {
 	private GeocodingResult getGoogleApiResults(GeoApiContext context, String address)
 			throws ApiException, InterruptedException, IOException {
 		GeocodingResult[] results = GeocodingApi.geocode(context, address).await();
-		if(results == null && results.length >0)
+		if(results != null && results.length >0)
 			return results[0];
 		else 
 			return null;
