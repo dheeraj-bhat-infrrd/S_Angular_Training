@@ -132,7 +132,7 @@ function drawWidgetDataEntities($, widgetDetails) {
 				$('#ss-widget-options-arrow').hide();
 				$('#ss-widget-rev-options').removeClass('hide');
 			} else {
-				$('#ss-widget-options-dropdown').addClass('hide');
+				$('#ss-widget-options-dropdown').hide();
 				$('#ss-widget-options-arrow').show();
 			}
 		}else{
