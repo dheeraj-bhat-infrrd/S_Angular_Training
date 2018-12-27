@@ -108,7 +108,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>46</xloc>
-      <yloc>102</yloc>
+      <yloc>95</yloc>
       </entry>
     <entry>
       <name>Overview_main</name>
@@ -139,8 +139,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>379</xloc>
-      <yloc>102</yloc>
+      <xloc>560</xloc>
+      <yloc>95</yloc>
       </entry>
     <entry>
       <name>SurveyStatsJobMain</name>
@@ -171,8 +171,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>528</xloc>
-      <yloc>102</yloc>
+      <xloc>715</xloc>
+      <yloc>95</yloc>
       </entry>
     <entry>
       <name>NPS_Report</name>
@@ -203,8 +203,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>679</xloc>
-      <yloc>102</yloc>
+      <xloc>870</xloc>
+      <yloc>95</yloc>
       </entry>
     <entry>
       <name>userranking_this_month_job</name>
@@ -235,8 +235,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>852</xloc>
-      <yloc>102</yloc>
+      <xloc>872</xloc>
+      <yloc>218</yloc>
       </entry>
     <entry>
       <name>user_ranking_this_year_job</name>
@@ -267,8 +267,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>852</xloc>
-      <yloc>214</yloc>
+      <xloc>671</xloc>
+      <yloc>218</yloc>
       </entry>
     <entry>
       <name>ScoreStats</name>
@@ -299,8 +299,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>535</xloc>
-      <yloc>214</yloc>
+      <xloc>348</xloc>
+      <yloc>218</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report</name>
@@ -331,8 +331,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>388</xloc>
-      <yloc>214</yloc>
+      <xloc>195</xloc>
+      <yloc>218</yloc>
       </entry>
     <entry>
       <name>company_user_report</name>
@@ -367,8 +367,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>216</xloc>
-      <yloc>214</yloc>
+      <xloc>59</xloc>
+      <yloc>218</yloc>
       </entry>
     <entry>
       <name>User_Adoption</name>
@@ -400,8 +400,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>42</xloc>
-      <yloc>334</yloc>
+      <xloc>182</xloc>
+      <yloc>360</yloc>
       </entry>
     <entry>
       <name>account_statistics</name>
@@ -435,8 +435,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>227</xloc>
-      <yloc>334</yloc>
+      <xloc>354</xloc>
+      <yloc>360</yloc>
       </entry>
     <entry>
       <name>CreateReportJobLog</name>
@@ -472,7 +472,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>149</xloc>
-      <yloc>102</yloc>
+      <yloc>95</yloc>
       </entry>
     <entry>
       <name>FinalReportJobLog</name>
@@ -507,8 +507,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>549</xloc>
-      <yloc>334</yloc>
+      <xloc>677</xloc>
+      <yloc>360</yloc>
       </entry>
     <entry>
       <name>GetJobLogID</name>
@@ -541,7 +541,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>270</xloc>
-      <yloc>102</yloc>
+      <yloc>95</yloc>
       </entry>
     <entry>
       <name>UpdateJobLog</name>
@@ -576,8 +576,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>419</xloc>
-      <yloc>421</yloc>
+      <xloc>427</xloc>
+      <yloc>488</yloc>
       </entry>
     <entry>
       <name>Abort job</name>
@@ -587,8 +587,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>703</xloc>
-      <yloc>421</yloc>
+      <xloc>711</xloc>
+      <yloc>488</yloc>
       </entry>
     <entry>
       <name>Truncate tables</name>
@@ -605,8 +605,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>43</xloc>
-      <yloc>214</yloc>
+      <xloc>57</xloc>
+      <yloc>360</yloc>
       </entry>
     <entry>
       <name>user_ranking_branch_r</name>
@@ -637,8 +637,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>669</xloc>
-      <yloc>214</yloc>
+      <xloc>487</xloc>
+      <yloc>218</yloc>
       </entry>
     <entry>
       <name>SurveyResultsReport</name>
@@ -670,8 +670,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>414</xloc>
-      <yloc>334</yloc>
+      <xloc>511</xloc>
+      <yloc>360</yloc>
       </entry>
     <entry>
       <name>MailSenderJob</name>
@@ -702,8 +702,40 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>576</xloc>
-      <yloc>421</yloc>
+      <xloc>584</xloc>
+      <yloc>488</yloc>
+      </entry>
+    <entry>
+      <name>DeleteDataTrackerJob</name>
+      <description/>
+      <type>JOB</type>
+      <specification_method>filename</specification_method>
+      <job_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;DeleteDataTrackerJob.kjb</filename>
+      <jobname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Nothing</loglevel>
+      <slave_server_name/>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <expand_remote_job>N</expand_remote_job>
+      <create_parent_folder>N</create_parent_folder>
+      <pass_export>N</pass_export>
+      <force_separate_logging>N</force_separate_logging>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <set_append_logfile>N</set_append_logfile>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>414</xloc>
+      <yloc>95</yloc>
       </entry>
   </entries>
   <hops>
@@ -782,15 +814,6 @@
     <hop>
       <from>CreateReportJobLog</from>
       <to>GetJobLogID</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
-    </hop>
-    <hop>
-      <from>GetJobLogID</from>
-      <to>Overview_main</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -912,6 +935,24 @@
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>GetJobLogID</from>
+      <to>DeleteDataTrackerJob</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>DeleteDataTrackerJob</from>
+      <to>Overview_main</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
       <unconditional>Y</unconditional>
     </hop>
   </hops>

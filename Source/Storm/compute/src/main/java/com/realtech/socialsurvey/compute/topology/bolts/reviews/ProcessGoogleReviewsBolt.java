@@ -240,12 +240,15 @@ public class ProcessGoogleReviewsBolt extends BaseComputeBoltWithAck
     private String getCustomerName( String displayName, boolean flag )
     {
         int lastSpacePos = displayName.lastIndexOf( ' ' );
-        if ( flag ) {
+        if(flag && lastSpacePos > 0) {
             return displayName.substring( 0, lastSpacePos );
-        } else {
+        } else if(flag && lastSpacePos < 0 ) {
+          return displayName;  
+        } else if(!flag && lastSpacePos > 0) {
             return displayName.substring( lastSpacePos );
+        } else {
+            return "";
         }
-
     }
 
 
