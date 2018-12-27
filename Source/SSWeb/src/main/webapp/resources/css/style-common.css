@@ -7420,7 +7420,7 @@ tr.u-tbl-header td {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
 }
 .verified-badge {
-	background: url(../images/VerifiedPartner_stamp.png) no-repeat;
+	background: url(../images/ss-verified-customer.png) no-repeat;
 	cursor: pointer;
 	background-size: contain;
 }
