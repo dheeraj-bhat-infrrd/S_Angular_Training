@@ -24,6 +24,8 @@ public class ZipCodeLookup implements Serializable {
 	private String zipcode;
 	private String countyname;
 	private String cityname;
+	private String state;
+	private String citystate;
 	private StateLookup stateLookup;
 	private float latitude;
 	private float longitude;
@@ -90,6 +92,21 @@ public class ZipCodeLookup implements Serializable {
 	public void setLongitude(float longitude) {
 		this.longitude = longitude;
 	}
-	
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getCitystate() {
+		return citystate;
+	}
+
+	public void setCitystate(String citystate) {
+		this.citystate = citystate;
+	}
 	
 }
