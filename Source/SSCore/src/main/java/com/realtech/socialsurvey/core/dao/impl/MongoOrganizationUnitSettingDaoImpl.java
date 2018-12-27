@@ -1890,8 +1890,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         //check if flag is false or empty
         query.addCriteria(new Criteria().orOperator(Criteria.where(KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM).is(false), Criteria.where(KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM).exists(false)));
         
-        //check if latLng doesn't exist
-        query.addCriteria(Criteria.where(KEY_LOCATION).exists(false));
+        //dont xcheck if latLng doesn't exist
+       // query.addCriteria(Criteria.where(KEY_LOCATION).exists(false));
+        
         //include only necessary feilds
         query.fields().include( KEY_IDEN).include( KEY_CONTACT_DETAILS_ADDRESS).include(KEY_CONTACT_DETAILS_ADDRESS1).include(KEY_CONTACT_DETAILS_ADDRESS2).include(KEY_CONTACT_DETAILS_CITY)
         .include(KEY_CONTACT_DETAILS_COUNTRY).include(KEY_CONTACT_DETAILS_COUNTRY_CODE).include(KEY_CONTACT_DETAILS_STATE).include(KEY_CONTACT_DETAILS_ZIP_CODE).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
