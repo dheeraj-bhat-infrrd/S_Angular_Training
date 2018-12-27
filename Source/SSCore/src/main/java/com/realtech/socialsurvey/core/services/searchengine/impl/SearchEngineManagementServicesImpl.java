@@ -262,8 +262,13 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 		LatLng location = new LatLng();
 		try {
 			location = geoUtils.getGoogleApiResultsLocation(googleGeoApi, createGoogleAddressFormat(addGeoLoc));
-			addGeoLoc.setLatitude(location.lat);
-			addGeoLoc.setLongitude(location.lng);
+			if(location != null) {
+				addGeoLoc.setLatitude(location.lat);
+				addGeoLoc.setLongitude(location.lng);
+			}else {
+				addGeoLoc.setLatitude(0);
+				addGeoLoc.setLongitude(0);
+			}
 		} catch (ApiException | InterruptedException | IOException exception) {
 			LOG.error("Exception caught while hitting google geocoding api" + exception.getMessage());
 		}
