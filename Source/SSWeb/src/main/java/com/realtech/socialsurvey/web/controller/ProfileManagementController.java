@@ -1439,7 +1439,7 @@ public class ProfileManagementController
                 companySettings.setContact_details( contactDetailsSettings );
                 //need to fetch the location of lat and long and save 
                 //update address for agent directly connected to company
-                //ssApiIntergrationBuilder.getIntegrationApi().updateHierarchyAddress(CommonConstants.COMPANY_ID_COLUMN, companySettings.getIden(), contactDetailsSettings);
+                ssApiIntergrationBuilder.getIntegrationApi().updateHierarchyAddress(CommonConstants.COMPANY_ID_COLUMN, companySettings.getIden(), contactDetailsSettings);
                 userSettings.setCompanySettings( companySettings );
                 Company company = userManagementService.getCompanyById( companySettings.getIden() );
                 if ( company != null ) {
@@ -1459,7 +1459,7 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings );
                 regionSettings.setContact_details( contactDetailsSettings );
                 //update address for agents directly linked under region
-                //ssApiIntergrationBuilder.getIntegrationApi().updateHierarchyAddress(CommonConstants.REGION_ID_COLUMN, regionSettings.getIden(), contactDetailsSettings );
+                ssApiIntergrationBuilder.getIntegrationApi().updateHierarchyAddress(CommonConstants.REGION_ID_COLUMN, regionSettings.getIden(), contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
                 if ( region != null ) {
@@ -1480,7 +1480,7 @@ public class ProfileManagementController
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings );
                 branchSettings.setContact_details( contactDetailsSettings );
                 //update address for agents directly linked under branch
-                //ssApiIntergrationBuilder.getIntegrationApi().updateHierarchyAddress(CommonConstants.BRANCH_ID_COLUMN, branchSettings.getIden(), contactDetailsSettings );
+                ssApiIntergrationBuilder.getIntegrationApi().updateHierarchyAddress(CommonConstants.BRANCH_ID_COLUMN, branchSettings.getIden(), contactDetailsSettings );
                 userSettings.getRegionSettings().put( entityId, branchSettings );
                 Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                 if ( branch != null ) {
@@ -1498,9 +1498,11 @@ public class ProfileManagementController
                     state, city, zipcode );
                 contactDetailsSettings = profileManagementService.updateAgentContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
+                //set that it is self updated by making updated by system false
+                contactDetailsSettings.setUpdatedBySystem(false);
                 agentSettings.setContact_details( contactDetailsSettings );
                 //update location for agent
-                //ssApiIntergrationBuilder.getIntegrationApi().updateHierarchyAddress(CommonConstants.AGENT_ID_COLUMN, agentSettings.getIden(), contactDetailsSettings );
+                ssApiIntergrationBuilder.getIntegrationApi().updateHierarchyAddress(CommonConstants.AGENT_ID_COLUMN, agentSettings.getIden(), contactDetailsSettings );
                 userSettings.setAgentSettings( agentSettings );
             } else {
                 LOG.warn( "Invalid input exception occurred in editing Address details." );

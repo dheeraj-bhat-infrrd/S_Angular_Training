@@ -246,9 +246,10 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 		AddressGeoLocationVO addGeoLoc = organizationUnitSettingsDao.createAddressGeoLocationVo(contactDetails, null);
 		// update location for higher hierarchy
 		fetchLatLng(addGeoLoc);
+		String collectionName = getCollectionForEntity(entityType);
 		organizationUnitSettingsDao.updateLocation(addGeoLoc.getLatitude(), addGeoLoc.getLongitude(), entityId,
-				getCollectionForEntity(entityType));
-		if (!entityType.equals(CommonConstants.AGENT_SETTINGS_COLLECTION)) {
+				collectionName);
+		if (!collectionName.equals(CommonConstants.AGENT_SETTINGS_COLLECTION)) {
 			List<Long> userList = userProfileDao.findPrimaryUserProfile(entityType, entityId);
 			if (userList != null && !userList.isEmpty()) {
 				organizationUnitSettingsDao.updateAddressForLowerHierarchy(CommonConstants.AGENT_SETTINGS_COLLECTION,
