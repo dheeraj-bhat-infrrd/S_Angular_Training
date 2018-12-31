@@ -1,4 +1,4 @@
-db.getCollection('APPLICATION_SETTINGS').insertOne(
+db.getCollection('APPLICATION_SETTINGS').insert(
    {
 	"loSearchEngine": {
 		"sortingOrder": [{
@@ -108,8 +108,8 @@ db.getCollection('APPLICATION_SETTINGS').insertOne(
 	"recentSurveyDays" : NumberInt(365)
 
 	},
-        "createdOn" : NumberLong(new Date()),
-        "modifiedOn" : NumberLong(new Date())
+        "createdOn" : NumberLong(1542709177798),
+    	"modifiedOn" : NumberLong(1542709177798)
 
 }
 )
