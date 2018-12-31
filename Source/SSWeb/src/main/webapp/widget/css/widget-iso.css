@@ -217,7 +217,7 @@
   padding-left: 0 !important;
 }
 #ss-widget-container .ss-widget-rev-cust-addr {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: bold !important;
   color: #999;
 }
@@ -432,7 +432,43 @@
 }
 
 #ss-widget-container #ss-widget-rev-options{
-	font-weight:bold !important;	
+	font-weight:bold !important;
+}
+
+#ss-widget-container .ss-widget-fb-recommendation-cont-pos {
+    background-color: #39a77a !important;
+    border-radius: 3px !important;
+    width: 110px !important;
+    height: 25px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-bottom: 2px !important;
+}
+
+#ss-widget-container .ss-widget-fb-recommendation-cont-neg {
+    background-color: #e64141 !important;
+    border-radius: 3px !important;
+    width: 110px !important;
+    height: 25px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-bottom: 2px !important;
+}
+
+#ss-widget-container .ss-widget-fb-recom {
+    margin: 0 auto !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+#ss-widget-container .ss-widget-fb-recom-div {
+    padding: 10px 15px 10px !important;
+    padding-left: 0 !important;
+    display: flex !important;
+}
+
+#ss-widget-container .ss-widget-rev-cust-name-div{
+	padding-left:0 !important;	
 }
 
 @media (max-width: 767px) {
