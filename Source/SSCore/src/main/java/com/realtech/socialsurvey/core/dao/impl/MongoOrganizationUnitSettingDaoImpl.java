@@ -1848,7 +1848,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
          query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
          Update update = new Update();
          //update location
-         update.set( KEY_LOCATION ,  createGeoJsonPoint(lat, lng));
+         if(lat == 0 && lng == 0) {
+        	 update.unset( KEY_LOCATION);
+         }else {
+        	 update.set( KEY_LOCATION ,  createGeoJsonPoint(lat, lng));
+         }
          mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
     }
     

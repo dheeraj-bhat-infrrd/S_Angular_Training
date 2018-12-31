@@ -26,7 +26,7 @@
 		<intercept-url pattern="/findaproscroll.do" access="permitAll" />
 		
 		<!-- Search Engine Services-->
-		<!-- <intercept-url pattern="/showsearchenginepage.do" access="permitAll" /> -->
+		<intercept-url pattern="/showsearchenginepage.do" access="permitAll" />
 		<intercept-url pattern="/searchengine/*.do" access="permitAll" />
 		
 		<!-- Page not found -->

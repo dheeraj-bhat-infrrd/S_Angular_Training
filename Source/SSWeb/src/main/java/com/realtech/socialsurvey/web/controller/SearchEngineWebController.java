@@ -39,7 +39,7 @@ public class SearchEngineWebController
     private String applicationBaseUrl;
 
 
-   /* @RequestMapping ( value = "/showsearchenginepage", method = RequestMethod.GET)
+    @RequestMapping ( value = "/showsearchenginepage", method = RequestMethod.GET)
     public String showSearchEnginePage( Model model, HttpServletRequest request, @QueryParam ( value = "basedOn") String basedOn, @QueryParam ( value = "companyProfileName") String companyProfileName )
     {
 
@@ -56,7 +56,7 @@ public class SearchEngineWebController
         }
         
         return JspResolver.SEARCH_ENGINE;
-    }*/
+    }
 
     @ResponseBody
     @RequestMapping ( value = "/searchengine/applosetting", method = RequestMethod.GET)
