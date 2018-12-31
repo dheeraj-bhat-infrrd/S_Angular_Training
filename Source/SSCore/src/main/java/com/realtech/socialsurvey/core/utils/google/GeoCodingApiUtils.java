@@ -47,14 +47,20 @@ public class GeoCodingApiUtils {
 	private LatLng getGoogleApiResultsLocation(GeoApiContext context, String address)
 			throws ApiException, InterruptedException, IOException {
 		GeocodingResult result = getGoogleApiResults(context, address);
+		if(result == null) {
+		    return null;
+		}
 		return result.geometry.location;
 	}
 	
-	private String getGoogleApiResultsPlaceId(GeoApiContext context, String address)
-			throws ApiException, InterruptedException, IOException {
-		GeocodingResult result = getGoogleApiResults(context, address);
-		return result.placeId;
-	}
-	
-	
+
+    private String getGoogleApiResultsPlaceId( GeoApiContext context, String address )
+        throws ApiException, InterruptedException, IOException
+    {
+        GeocodingResult result = getGoogleApiResults( context, address );
+        if ( result == null ) {
+            return null;
+        }
+        return result.placeId;
+    }
 }
