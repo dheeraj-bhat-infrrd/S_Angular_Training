@@ -39,6 +39,7 @@ $('#srch-eng-loc-inp').on('keyup', function(e) {
 			lastNearMeAjaxRequestToDelete.abort();
 		}
 
+		$('#srchEngLocFromBrowser').val(false);
 		$('#srch-eng-loc-inp').attr('data-lat', 0);
 		$('#srch-eng-loc-inp').attr('data-lng', 0);
 	} else {
@@ -195,6 +196,16 @@ function getSearchFilters() {
 	var batchSize = parseInt($('#srch-eng-pag-data').attr('data-batchSize'));
 	var companyProfileName = $('#srchEngCompanyProfileName').val();
 
+	if(!(lat == 0 && lng == 0)){
+		if(distanceCriteria == 0){
+			if($('#srchEngLocFromBrowser').val() == 'false'){
+				distanceCriteria = 25;
+			}else{
+				distanceCriteria = 75;
+			}
+		}
+	}	
+	
 	var filters = {
 		"startIndex" : startIndex,
 		"batchSize" : batchSize,
@@ -387,6 +398,7 @@ function showNearMeSuggestions(nearMe) {
 		$('#srch-eng-loc-inp').attr('data-lat', lat);
 		$('#srch-eng-loc-inp').attr('data-lng', lng);
 		$('#srch-eng-loc-inp').val(location);
+		$('#srchEngLocFromBrowser').val(false);
 
 		$('#srch-eng-loc-dropdown').slideToggle();
 		
@@ -816,7 +828,8 @@ function initializeLatLong(position) {
 
 	$('#srch-eng-loc-inp').attr('data-lat', lat);
 	$('#srch-eng-loc-inp').attr('data-lng', lng);
-
+	$('#srchEngLocFromBrowser').val(true);
+	
 	getLOSearchList();
 	$('.srch-eng-result-hdr-vert').html('Top');
 	$('.srch-eng-result-hdr-loc').html(' near you');
@@ -825,6 +838,8 @@ function initializeLatLong(position) {
 function resetLatLongForNoLocation(error) {
 	$('#srch-eng-loc-inp').attr('data-lat', 0);
 	$('#srch-eng-loc-inp').attr('data-lng', 0);
+	$('#srchEngLocFromBrowser').val(false);
+	
 	getLOSearchList();
 	
 	$('.srch-eng-result-hdr-vert').html('Top');

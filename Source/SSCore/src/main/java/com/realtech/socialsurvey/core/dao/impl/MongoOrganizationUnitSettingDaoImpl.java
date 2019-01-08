@@ -1983,54 +1983,93 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		boolean isTextSearch = false;
 		// check if it's boolean flag
 		boolean isLocationSearch = false;
-		// add near query only if lat and lng is given
-		if (advancedSearchVO.getNearLocation() != null) {
-			// get based on distance
-			// give lat and lng
-			Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
-			NearQuery nearQuery = NearQuery.near(point)
-					.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true);
-			operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
-			isLocationSearch = true;
-		}
+		Query query = new Query();
+		
 		// check if it's normal search
 		// if normal get default values for reviews and sort criteria
 		//to find pattern irrespective of case sensitivity
 		String regexOption = "i";
+		boolean checkLoc = false;
+		if(advancedSearchVO.getNearLocation() != null) {
+			checkLoc = true;
+		}
 		if(advancedSearchVO.getFindBasedOn() != null && !advancedSearchVO.getFindBasedOn().isEmpty()) {
 			String regexForName = pattern + advancedSearchVO.getFindBasedOn();
-			operations.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption )));
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption ));
+			else
+				operations.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption )));
+			
 			isTextSearch = true;
 		}
 		
 		//exclude default entities
-		operations.add(Aggregation.match(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false )));
+		if(checkLoc)
+			query.addCriteria(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ));
+		else
+		 operations.add(Aggregation.match(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false )));
 		
 		//exclude incomplete or deleted
-		operations.add(Aggregation.match(Criteria.where( KEY_STATUS )
-		         .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) )));
-		  
+		if(checkLoc)
+		  query.addCriteria(Criteria.where( KEY_STATUS )
+		         .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ));
+		else
+			operations.add(Aggregation.match(Criteria.where( KEY_STATUS )
+			         .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) )));
 		
 		// add operation based on rating
-		if (advancedSearchVO.getRatingCriteria() != 0)
-			operations.add(Aggregation
+		if (advancedSearchVO.getRatingCriteria() != 0) {
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_SURVEY_STATS_AVG_SCORE).gte(advancedSearchVO.getRatingCriteria()));
+			else
+				operations.add(Aggregation
 					.match(Criteria.where(KEY_SURVEY_STATS_AVG_SCORE).gte(advancedSearchVO.getRatingCriteria())));
+		}
+		
+			
 		// add operation based on review
 		if (advancedSearchVO.getReviewCountCriteria() != 0) {
-			operations.add(Aggregation.match(
-					Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria())));
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria()));
+			else
+				operations.add(Aggregation.match(
+						Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria())));
 		} else {
-			operations.add(Aggregation.match(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1)));
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1));
+			else
+				operations.add(Aggregation.match(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1)));
+
 		}
 		// add operation if category given
 		if (advancedSearchVO.getCategoryFilterList() != null && !advancedSearchVO.getCategoryFilterList().isEmpty())
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_VERTICAL).in(advancedSearchVO.getCategoryFilterList()));
+			else
 			operations
 					.add(Aggregation.match(Criteria.where(KEY_VERTICAL).in(advancedSearchVO.getCategoryFilterList())));
+			
 		
 		//add company id filter if need to search with in company
 				if (companyIdFilter > 0l)
-					operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
+					if(checkLoc)
+						query.addCriteria(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter));
+					else
+					    operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
+					
+				// add near query only if lat and lng is given
+				if (checkLoc) {
+					// get based on distance
+					// give lat and lng
+					Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
+					NearQuery nearQuery = NearQuery.near(point)
+							.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true).num(2000000000);
+					nearQuery.query(query);
+					operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
+					isLocationSearch = true;
+				}
 
+				
 		// sort Criteria where default is best match
 		operations.add(getSortByAggOperation(advancedSearchVO.getSortBy(), isLocationSearch, isTextSearch));
 		// add skip which is start index
@@ -2067,9 +2106,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     	case CommonConstants.SEARCH_ENGINE_SORT_BY_BEST_MATCH:
     		if(isTextSearch)
     			return Aggregation.sort(Sort.Direction.ASC,KEY_CONTACT_DETAILS_NAME);
-    		if(isLocationSearch)
-    			return Aggregation.sort(Sort.Direction.ASC,KEY_DISTANCE_FIELD);
-		return Aggregation.sort(Sort.Direction.DESC,KEY_SURVEY_STATS_SEARCH_RANKING_SCORE).and(Sort.Direction.DESC,KEY_SURVEY_STATS_SURVEY_COUNT);
+//    		if(isLocationSearch)
+//    			return Aggregation.sort(Sort.Direction.ASC,KEY_DISTANCE_FIELD);
+    		return Aggregation.sort(Sort.Direction.DESC,KEY_SURVEY_STATS_SEARCH_RANKING_SCORE).and(Sort.Direction.DESC,KEY_SURVEY_STATS_SURVEY_COUNT);
 		default :
 			return Aggregation.sort(Sort.Direction.DESC,KEY_SURVEY_STATS_SEARCH_RANKING_SCORE).and(Sort.Direction.DESC,KEY_SURVEY_STATS_SURVEY_COUNT);
     	}
@@ -2087,54 +2126,91 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		boolean isTextSearch = false;
 		// check if it's boolean flag
 		boolean isLocationSearch = false;
-		// add near query only if lat and lng is given
-		if (advancedSearchVO.getNearLocation() != null) {
-			// get based on distance
-			// give lat and lng
-			Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
-			NearQuery nearQuery = NearQuery.near(point)
-					.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true);
-			operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
-			isLocationSearch = true;
-		}
+		Query query = new Query();
+		
 		// check if it's normal search
 		// if normal get default values for reviews and sort criteria
 		//to find pattern irrespective of case sensitivity
 		String regexOption = "i";
+		boolean checkLoc = false;
+		if(advancedSearchVO.getNearLocation() != null) {
+			checkLoc = true;
+		}
 		if(advancedSearchVO.getFindBasedOn() != null && !advancedSearchVO.getFindBasedOn().isEmpty()) {
 			String regexForName = pattern + advancedSearchVO.getFindBasedOn();
-			operations.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption )));
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption ));
+			else
+				operations.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_NAME).regex(regexForName,regexOption )));
+			
 			isTextSearch = true;
 		}
 		
 		//exclude default entities
-		operations.add(Aggregation.match(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false )));
+		if(checkLoc)
+			query.addCriteria(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ));
+		else
+		 operations.add(Aggregation.match(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false )));
 		
 		//exclude incomplete or deleted
-		operations.add(Aggregation.match(Criteria.where( KEY_STATUS )
-				.nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) )));
-				  
-				
+		if(checkLoc)
+		  query.addCriteria(Criteria.where( KEY_STATUS )
+		         .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ));
+		else
+			operations.add(Aggregation.match(Criteria.where( KEY_STATUS )
+			         .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) )));
 		
 		// add operation based on rating
-		if (advancedSearchVO.getRatingCriteria() != 0)
-			operations.add(Aggregation
+		if (advancedSearchVO.getRatingCriteria() != 0) {
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_SURVEY_STATS_AVG_SCORE).gte(advancedSearchVO.getRatingCriteria()));
+			else
+				operations.add(Aggregation
 					.match(Criteria.where(KEY_SURVEY_STATS_AVG_SCORE).gte(advancedSearchVO.getRatingCriteria())));
+		}
+		
+			
 		// add operation based on review
 		if (advancedSearchVO.getReviewCountCriteria() != 0) {
-			operations.add(Aggregation.match(
-					Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria())));
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria()));
+			else
+				operations.add(Aggregation.match(
+						Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(advancedSearchVO.getReviewCountCriteria())));
 		} else {
-			operations.add(Aggregation.match(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1)));
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1));
+			else
+				operations.add(Aggregation.match(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1)));
+
 		}
 		// add operation if category given
 		if (advancedSearchVO.getCategoryFilterList() != null && !advancedSearchVO.getCategoryFilterList().isEmpty())
+			if(checkLoc)
+				query.addCriteria(Criteria.where(KEY_VERTICAL).in(advancedSearchVO.getCategoryFilterList()));
+			else
 			operations
 					.add(Aggregation.match(Criteria.where(KEY_VERTICAL).in(advancedSearchVO.getCategoryFilterList())));
+			
 		
 		//add company id filter if need to search with in company
-		if (companyIdFilter > 0l)
-					operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
+				if (companyIdFilter > 0l)
+					if(checkLoc)
+						query.addCriteria(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter));
+					else
+					    operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
+					
+				// add near query only if lat and lng is given
+				if (checkLoc) {
+					// get based on distance
+					// give lat and lng
+					Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
+					NearQuery nearQuery = NearQuery.near(point)
+							.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true).num(2000000000);
+					nearQuery.query(query);
+					operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
+					isLocationSearch = true;
+				}
 
 		// sort Criteria where default is best match
 		operations.add(getSortByAggOperation(advancedSearchVO.getSortBy(), isLocationSearch, isTextSearch));
