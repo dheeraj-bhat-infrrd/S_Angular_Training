@@ -2977,7 +2977,7 @@ public class OrganizationManagementController
         LOG.info( "Updating Complaint Resolution Settings" );
         String ratingText = request.getParameter( "rating" );
         String moodText = request.getParameter( "mood" );
-        String mailId = request.getParameter( "mailId" );
+        String mailIdsInput = request.getParameter( "mailId" );
         String enabled = request.getParameter( "enabled" );
         boolean isComplaintHandlingEnabled = false;
 
@@ -2997,33 +2997,44 @@ public class OrganizationManagementController
             } else if ( enabled.equalsIgnoreCase( "enable" ) )
                 isComplaintHandlingEnabled = true;
 
-            if ( mailId == null || mailId.isEmpty() ) {
+            if ( mailIdsInput == null || mailIdsInput.isEmpty() ) {
                 throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
 
-            if ( !mailId.contains( "," ) ) {
-                if ( !organizationManagementService.validateEmail( mailId.trim() ) )
-                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
+            if ( !mailIdsInput.contains( "," ) ) {
+                if ( !organizationManagementService.validateEmail( mailIdsInput.trim() ) )
+                    throw new InvalidInputException( "Mail id - " + mailIdsInput + " entered as send alert to input is invalid",
                         DisplayMessageConstants.GENERAL_ERROR );
                 else
-                	mailId = mailId.trim();
+                	mailIdsInput = mailIdsInput.trim();
             } else {
-                String mailIds[] = mailId.split( "," );
+                String mailIds[] = mailIdsInput.split( "," );
 
                 if ( mailIds.length == 0 )
-                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is empty",
+                    throw new InvalidInputException( "Mail id - " + mailIdsInput + " entered as send alert to input is empty",
                         DisplayMessageConstants.GENERAL_ERROR );
 
+                List<String> mailIdList = new ArrayList<String>();
+                
                 for ( String mailID : mailIds ) {
-                    if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                        throw new InvalidInputException(
-                            "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
-                            DisplayMessageConstants.GENERAL_ERROR );
-                    else
-                        mailIDStr += mailID.trim() + " , ";
+
+                    if ( !mailIdList.contains( mailID.trim().toLowerCase() ) ) {
+
+
+                        if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                            throw new InvalidInputException(
+                                "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                                DisplayMessageConstants.GENERAL_ERROR );
+                        else {
+                            
+                            mailIdList.add( mailID.trim().toLowerCase() );
+                            mailIDStr += mailID.trim() + " , ";
+                        }
+                    }
+
                 }
-                mailId = mailIDStr.substring( 0, mailIDStr.length() - 2 );
+                mailIdsInput = mailIDStr.substring( 0, mailIDStr.length() - 2 );
             }
 
             long entityId = user.getCompany().getCompanyId();
@@ -3074,7 +3085,7 @@ public class OrganizationManagementController
 
             }
 
-            originalComplaintRegSettings.setMailId( mailId );
+            originalComplaintRegSettings.setMailId( mailIdsInput );
             originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
             unitSettings.getSurvey_settings().setComplaint_res_settings( originalComplaintRegSettings );
 
