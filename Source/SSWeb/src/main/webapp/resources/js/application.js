@@ -410,9 +410,9 @@ $(document).on('click', function(e) {
 		$('#macro-alerts-chevron-up').toggle();
 	}
 
-	/*if ($('#summit-popup-body').is(':visible')) {
+	if ($('#summit-popup-body').is(':visible')) {
 		closeSummitPopup();
-	} */
+	}
 	
 
 	if ($('#add-macro-action-options').is(':visible')) {
@@ -20604,24 +20604,21 @@ $(document).on('click','#action-edit-txt-box',function(e){
 });
 
 function showSummitPopup(){
-	$('#summit-popup').show();
-	disableBodyScroll();
+	$('#summit-popup-outer').show();
 }
 
 function closeSummitPopup(){
-	$('#summit-popup').hide();
-	enableBodyScroll();
+	$('#summit-popup-outer').hide();
 }
 
 
 function showSummitRibbon(){
-	$('#summit-ribbon').show();
+	$('#summit-ribbon-outer').show();
 }
 
 function closeSummitRibbon(){
 	
-	$('#summit-ribbon').hide();
-	sendClickedEventInfo( "home.dashboard.summit.ribbon.close" );
+	$('#summit-ribbon-outer').hide();
 }
 
 
@@ -20634,20 +20631,19 @@ $(document).on('click','#register-summit-btn',function(e){
 	
 });
 
-$(document).on('click','#close-summit-popup',function(e){
+$(document).on('click','#summit-popup-close-btn',function(e){
 	e.stopPropagation();
 	closeSummitPopup();
 });
 
-$(document).on('click','#summit-ribbon',function(e){
+$(document).on('click','#summit-ribbon-outer',function(e){
 	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
-	sendClickedEventInfo( "home.dashboard.summit.ribbon.register" );
-	window.open('http://www.createwowsummit.com', '_blank');
+	window.open('http://www.socialsurvey.com/top-performers-2018', '_blank');
 });
 
-$(document).on('click','#close-summit-ribbon',function(e){
+$(document).on('click','#summit-ribbon-close-btn',function(e){
 	e.stopPropagation();
 		
 	closeSummitRibbon();
@@ -20657,6 +20653,8 @@ $(document).on('click','#summit-popup-body',function(e){
 	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
+	
+	window.open('http://www.socialsurvey.com/top-performers-2018', '_blank');
 });
 
 function sendClickedEventInfo( event ){

@@ -2122,90 +2122,15 @@
 	}
 	
 	
-	/*summit popup resp styles*/
-	
-	.summit-popup{
-	    width: 100%;
-    	height: 230px;
-    	top: 50px;
-    	background-image: url(../images/WOWworthy_EmmaM_Mobile_Banner.png);
-	}
-	
-	.close-summit-popup {
-    width: 20px;
-    height: 20px;
-    top: 18px;
-    right: 0px;
-	}
-	
-	.register-summit-btn {
-    left: 81px;
-    bottom: 51px;
-    width: 93px;
-    height: 22px;
-	}
-	
-	.summit-ribbon-con{
-		padding:0;
-	}
-	
-	.summit-ribbon{
-		margin: 0;
-		background-image: url(../images/CreateWowSummit_Ribbon_Daysof_mobile.png);
-	}
-	
-	.close-summit-ribbon{
-		width: 18px;
- 	    height: 18px;
-    	right: 0;
-    	top: 11px;
-	}
-	
 	.mismatch-popup-body-right{
 		margin-top: 15px;
-	}
-	
-	.summit-timer-back {
-	    width: 285px;
-	    height: 38px;
-	    background: #216dab;
-	    position: absolute;
-	    top: 36px;
-	    left: 10px;
-	}
-	
-	.summit-timer-img {
-	    margin-left: 6px;
-	    margin-top: 0px;
-	    width: 285px;
-	    height: 38px;
-	}
-	
-	.summit-timer-text {
-	    position: absolute;
-	    color: #ffcd32;
-	    font-size: 16px;
-	    font-weight: bold !important;
-	    top: 8px;
-	}
-	
-	.summit-timer-days {
-    	right: 140px;
-	}
-	
-	.summit-timer-hrs {
-    	right: 85px;
-	}
-	
-	.summit-timer-min {
-    	right: 32px;
 	}
 	
 	.summit-checkbox-cont {
 	    display: flex;
 	    position: absolute;
-	    bottom: 23px;
-	    margin-left: 32px;
+	    top: 282px;
+	    margin-left: 5px;
 	    width: 100%;
 	}
 	
@@ -2230,6 +2155,36 @@
 	    font-weight: bold !important;
 	    margin-left: 7px !important;
 	    font-size: 8px;
+	}
+	
+	/*Banner and ribbon styles*/
+
+	.summit-popup-body {
+	    background-image: url(../images/TP_Banner_mobile_v2.png);
+	    margin-top: -200px;
+	    background-size: contain;
+	}
+	
+	.summit-ribbon-body{
+		background-image:url(../images/TP_Ribbon_mobile_v2.png);
+	}
+	
+	.summit-popup-close-btn {
+	    width: 20px;
+	    height: 20px;
+	    position: fixed;
+	    top: 98px;
+	    right: 0px;
+	}
+	
+	.summit-ribbon-outer {
+   	 	height: 30px;
+	}
+	
+	.summit-ribbon-close-btn {
+	    width: 25px;
+	    height: 28px;
+	    margin-right: 0;
 	}
 }
 
@@ -2262,6 +2217,20 @@
     .sq-1to10-range{
     	width: 100%;
     }
+    
+    .summit-checkbox-cont {
+    	top: 276px;
+    }
+    
+    .summit-popup-close-btn{
+    	top: 103px;
+    }
+    
+    .summit-ribbon-close-btn {
+	    width: 25px;
+	    height: 28px;
+	    margin-right: 0;
+	}
 }
 
 @media (min-width: 360px) and (max-width: 640px) and (orientation: portrait) {
@@ -2284,6 +2253,20 @@
     .sq-1to10-range{
     	width: 100%;
     }
+    
+     .summit-checkbox-cont {
+    	top: 282px;
+    }
+    
+    .summit-popup-close-btn{
+    	top: 98px;
+    }
+    
+    .summit-ribbon-close-btn {
+	    width: 25px;
+	    height: 28px;
+	    margin-right: 0;
+	}
 }
 
 @media (min-width: 375px) and (max-width: 670px) and (orientation: portrait) {
@@ -2310,6 +2293,20 @@
     .sq-1to10-range{
     	width: 100%;
     }
+    
+    .summit-checkbox-cont {
+    	top: 285px;
+    }
+    
+    .summit-popup-close-btn{
+    	top: 92px;
+    }
+    
+    .summit-ribbon-close-btn {
+	    width: 25px;
+	    height: 28px;
+	    margin-right: 5px;
+	}
 }
 
 @media (min-width: 410px) and (max-width: 767px) and (orientation: portrait){
@@ -2332,6 +2329,20 @@
     .sq-1to10-range{
     	width: 100%;
     }
+    
+    .summit-checkbox-cont {
+    	top: 295px;
+    }
+    
+    .summit-popup-close-btn{
+    	top: 82px;
+    }
+    
+    .summit-ribbon-close-btn {
+	    width: 25px;
+	    height: 28px;
+	    margin-right: 25px;
+	}
 }
 
 @media (min-width: 992px){
@@ -2912,6 +2923,17 @@
 		padding-left: 0;
 	} 
 	
+	.summit-checkbox-cont {
+	    bottom: 244px;
+	    margin-left: 35px;
+	}
+	
+	.summit-popup-close-btn {
+	    top: 81px;
+	    right: 8px;
+	}
+	
+	
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -3282,7 +3304,7 @@
     
 }
 
-/* ============== ANTHING ABOVE SMARTPHONES ==============*/
+/* ============== ANTHINGf ABOVE SMARTPHONES ==============*/
 @media (min-width: 768px) {
     .login-wrapper-resp{
         width: 457px;
@@ -3360,5 +3382,39 @@
 	.st-subject-input-cont{
 	 width:66%;
 	}
+}
+
+@media (min-width: 768px) and (max-width: 1100px){
+	.summit-popup-body{
+	    background-size: contain;
+	}
 	
+	.summit-popup-close-btn {
+	    top: 35px;
+	    right: 30px;
+	}
+	
+	.summit-checkbox-cont {
+	    bottom: 195px;
+	    margin-left: 35px;
+	}
+	
+	.summit-ribbon-close-btn {
+	    margin-right: 0px;
+	}
+}
+
+@media (min-width:1353px){
+	.summit-checkbox-cont {
+	    margin-left: 260px;
+	}
+}
+
+@media (min-width:2600px){
+	.summit-ribbon-close-btn {
+	    width: 37px;
+	    height: 50px;
+	    float: right;
+	    margin-right: 876px;
+	}
 }
