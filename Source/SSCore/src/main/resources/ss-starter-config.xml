@@ -919,7 +919,7 @@
 				<ref bean="emailreadercron" />
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
-				<ref bean = "updatelocationcron" />
+				<!-- <ref bean = "updatelocationcron" /> -->
 				<ref bean="updatesubscriptionpricecron" />
 				<!--<ref bean="socialfeedingestercron" />-->
 				<!--<ref bean="socialpostimportcron" />-->
