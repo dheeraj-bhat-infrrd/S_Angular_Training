@@ -407,6 +407,7 @@ public class ReportingWebController
         model.addAttribute( CommonConstants.HAS_BRANCH, hasBranch );
         model.addAttribute( CommonConstants.HAS_REGION, hasRegion );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        model.addAttribute( "vertical", profileSettings.getVertical().toLowerCase() );
         return JspResolver.REPORTING_DASHBOARD;
     }
 

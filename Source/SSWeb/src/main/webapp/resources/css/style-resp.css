@@ -1,3 +1,100 @@
+@media (min-width:375px and max-width: 400px){
+	.summit-checkbox-cont{
+		margin-bottom: -3px;
+	}
+}
+	
+@media (max-width: 1119px){
+	.summit-popup-body{
+		width: 100%;
+    	background-size: contain;	
+    	height: calc(100vw/1.6);
+	}
+	
+	.summit-checkbox-cont {
+	    margin-bottom: 35px;
+	}
+	
+	.summit-popup-close-cont{
+		margin-top: 13px;
+	}
+	
+	@media (max-width: 1099){
+		.summit-ribbon-body{
+			width:100%
+		}
+	}
+	
+	@media (max-width: 1000px){
+		.summit-ribbon-body{
+			background-image: url(../images/TP_Ribbon_mobile_v2.png);
+			height: 50px;
+			background-size: cover;
+		}
+	}
+	
+	@media (max-width: 930px){
+		.summit-checkbox-cont{
+			margin-bottom:18px;
+		}
+	}
+	
+	@media (max-width: 870px){
+		.summit-checkbox-cont{
+			margin-bottom:2px;
+		}
+	}
+	
+	@media (max-width: 767px){
+		.summit-popup-close-btn {
+		    width: 15px;
+		    height: 30px;
+		    margin: 0 auto;
+		    margin-right: 0px;
+		}
+		
+		.summit-checkbox-cont{
+			margin-left: 5px;
+    		margin-bottom: 4px;
+		}
+		
+		.summit-check{
+			width: 13px;
+		    height: 13px;
+		    margin-top: 10px !important;
+		}
+		
+		.summit-check-text{
+			font-size: 11px;
+		}
+	}
+	
+	@media (max-width: 580px){
+		.summit-popup-body{
+			background-image: url(../images/TP_Banner_mobile_v2.png);
+		}
+		
+		.summit-ribbon-outer{
+			height: 30px;
+		}
+		
+		.summit-ribbon-body{
+			height: 30px;
+		}
+	}
+	
+	@media (max-width: 321px){
+		.summit-ribbon-body{
+			background-size: contain;
+		}
+		
+		.summit-checkbox-cont {
+		    margin-left: 5px;
+		    margin-bottom: -4px;
+		}
+	}
+}
+
 @media (max-width: 769px){
 	.rep-prof-details{
     border-bottom: 1px solid #d2cdcd;
@@ -2126,66 +2223,6 @@
 		margin-top: 15px;
 	}
 	
-	.summit-checkbox-cont {
-	    display: flex;
-	    position: absolute;
-	    top: 282px;
-	    margin-left: 5px;
-	    width: 100%;
-	}
-	
-	.summit-check-contain {
-	    padding-right: 0;
-	    margin-right: 25px;
-	}
-	
-	.summit-check {
-	    width: 10px;
-	    height: 10px;
-	    background-image: url(../images/checkbox-blank.png);
-	    background-position: center;
-	    background-size: contain;
-	    background-repeat: no-repeat;
-	    cursor: pointer;
-	    margin: 7px 0 0 !important;
-	}
-	
-	.summit-check-text {
-	    color: white;
-	    font-weight: bold !important;
-	    margin-left: 7px !important;
-	    font-size: 8px;
-	}
-	
-	/*Banner and ribbon styles*/
-
-	.summit-popup-body {
-	    background-image: url(../images/TP_Banner_mobile_v2.png);
-	    margin-top: -200px;
-	    background-size: contain;
-	}
-	
-	.summit-ribbon-body{
-		background-image:url(../images/TP_Ribbon_mobile_v2.png);
-	}
-	
-	.summit-popup-close-btn {
-	    width: 20px;
-	    height: 20px;
-	    position: fixed;
-	    top: 98px;
-	    right: 0px;
-	}
-	
-	.summit-ribbon-outer {
-   	 	height: 30px;
-	}
-	
-	.summit-ribbon-close-btn {
-	    width: 25px;
-	    height: 28px;
-	    margin-right: 0;
-	}
 }
 
 @media (min-width: 320px) and (max-width: 580px) and (orientation: portrait) {
@@ -2217,20 +2254,6 @@
     .sq-1to10-range{
     	width: 100%;
     }
-    
-    .summit-checkbox-cont {
-    	top: 276px;
-    }
-    
-    .summit-popup-close-btn{
-    	top: 103px;
-    }
-    
-    .summit-ribbon-close-btn {
-	    width: 25px;
-	    height: 28px;
-	    margin-right: 0;
-	}
 }
 
 @media (min-width: 360px) and (max-width: 640px) and (orientation: portrait) {
@@ -2253,20 +2276,6 @@
     .sq-1to10-range{
     	width: 100%;
     }
-    
-     .summit-checkbox-cont {
-    	top: 282px;
-    }
-    
-    .summit-popup-close-btn{
-    	top: 98px;
-    }
-    
-    .summit-ribbon-close-btn {
-	    width: 25px;
-	    height: 28px;
-	    margin-right: 0;
-	}
 }
 
 @media (min-width: 375px) and (max-width: 670px) and (orientation: portrait) {
@@ -2293,20 +2302,6 @@
     .sq-1to10-range{
     	width: 100%;
     }
-    
-    .summit-checkbox-cont {
-    	top: 285px;
-    }
-    
-    .summit-popup-close-btn{
-    	top: 92px;
-    }
-    
-    .summit-ribbon-close-btn {
-	    width: 25px;
-	    height: 28px;
-	    margin-right: 5px;
-	}
 }
 
 @media (min-width: 410px) and (max-width: 767px) and (orientation: portrait){
@@ -2329,20 +2324,6 @@
     .sq-1to10-range{
     	width: 100%;
     }
-    
-    .summit-checkbox-cont {
-    	top: 295px;
-    }
-    
-    .summit-popup-close-btn{
-    	top: 82px;
-    }
-    
-    .summit-ribbon-close-btn {
-	    width: 25px;
-	    height: 28px;
-	    margin-right: 25px;
-	}
 }
 
 @media (min-width: 992px){
@@ -2921,18 +2902,7 @@
 	
 	.lp-disclaimer-row {
 		padding-left: 0;
-	} 
-	
-	.summit-checkbox-cont {
-	    bottom: 244px;
-	    margin-left: 35px;
 	}
-	
-	.summit-popup-close-btn {
-	    top: 81px;
-	    right: 8px;
-	}
-	
 	
 }
 
@@ -3381,40 +3351,5 @@
 	}
 	.st-subject-input-cont{
 	 width:66%;
-	}
-}
-
-@media (min-width: 768px) and (max-width: 1100px){
-	.summit-popup-body{
-	    background-size: contain;
-	}
-	
-	.summit-popup-close-btn {
-	    top: 35px;
-	    right: 30px;
-	}
-	
-	.summit-checkbox-cont {
-	    bottom: 195px;
-	    margin-left: 35px;
-	}
-	
-	.summit-ribbon-close-btn {
-	    margin-right: 0px;
-	}
-}
-
-@media (min-width:1353px){
-	.summit-checkbox-cont {
-	    margin-left: 260px;
-	}
-}
-
-@media (min-width:2600px){
-	.summit-ribbon-close-btn {
-	    width: 37px;
-	    height: 50px;
-	    float: right;
-	    margin-right: 876px;
 	}
 }

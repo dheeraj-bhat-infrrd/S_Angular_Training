@@ -135,16 +135,18 @@
 	</div>
 </div> --%>
 
+<c:if test='${vertical == "mortgage"}'>
 <div id="summit-ribbon-outer" class="summit-ribbon-outer">
 	<div id="summit-ribbon-body" class="summit-ribbon-body  cursor-pointer">
 		<div id="summit-ribbon-close-btn" class="summit-ribbon-close-btn cursor-pointer"></div>
 	</div>
 </div>
 
-<!-- <div id="summit-popup-outer" class="summit-popup-outer hide">
+<div id="summit-popup-outer" class="summit-popup-outer hide">
 	<div id="summit-popup-body" class="summit-popup-body cursor-pointer">
-		<div id="summit-popup-close-btn" class="summit-popup-close-btn cursor-pointer"></div>
-		<div id="summit-reg-btn" class="summit-reg-btn cursor-pointer"></div>
+		<div class="summit-popup-close-cont">
+			<div id="summit-popup-close-btn" class="summit-popup-close-btn cursor-pointer"></div>
+		</div>
 		<div class="summit-checkbox-cont clearfix">
 			<div class="float-left wc-width summit-check-contain" id="">
 				<div id="summit-do-not-show" class="float-left summit-check" data-checked=false></div>
@@ -152,7 +154,8 @@
 			</div>
 		</div>
 	</div>
-</div> -->
+</div>
+</c:if>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
@@ -272,7 +275,7 @@
 		$(document).attr("title", "Dashboard");
 
 		updateViewAsScroll();
-
+		
 	$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
 			e.stopPropagation();
 			if (colName == 'agentId') {
@@ -386,7 +389,7 @@
 		
 		showSummitRibbon();
 		
-		/* var isShowSummitPopup ="${isShowSummitPopup}";
+		var isShowSummitPopup ="${isShowSummitPopup}";
 		var newSession = sessionStorage.getItem("newSession");
 		
 		if(newSession == false || newSession == 'false'){
@@ -398,7 +401,7 @@
 			}else{
 				showSummitRibbon();
 			}
-		} */
+		}
 		
 		sessionStorage.setItem("newSession",false);
 	});
