@@ -874,7 +874,7 @@
 				<ref bean="emailreaderjobdetail" />
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
-				<ref bean="updatelocationjobdetail" /> 
+				<!--<ref bean="updatelocationjobdetail" /> -->
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<!--<ref bean="socialfeedingesterjobdetail" />-->
 				<!--<ref bean="socialpostsimportjobdetail" />-->
