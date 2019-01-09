@@ -97,7 +97,7 @@ public interface FileUploadService
     public void uploadReport( File file, String fileName ) throws NonFatalException;
 
 
-    public void updateFileUploadRecord( FileUpload fileUpload ) throws InvalidInputException;
+    public void updateFileUploadRecord( FileUpload fileUpload ) throws InvalidInputException, Exception;
 
     
     public String uploadFileAtSurveyCsvBucket( File tempFile, String fileName ) throws NonFatalException;

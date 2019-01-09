@@ -158,9 +158,9 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xa;&#xa;var sent &#x3d; completed &#x2b; incomplete&#x3b;&#xa;&#xa;var agent_f1 &#x3d; 0&#x3b;&#xa;var month_f1 &#x3d; 0&#x3b;&#xa;var year_f1 &#x3d; 0&#x3b;&#xa;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xa;	agent_f1 &#x3d; AGENT_ID&#x3b;&#xa;&#x7d; else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	agent_f1 &#x3d; AGENT_ID_1&#x3b;&#xa;&#x7d;&#xa;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xa;	month_f1 &#x3d; MONTH_Data&#x3b;&#xa;&#x7d; else if&#x28;MONTH_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	month_f1 &#x3d; MONTH_Data_1&#x3b;&#xa;&#x7d;&#xa;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xa;	year_f1 &#x3d; Year_Data&#x3b;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	year_f1 &#x3d; Year_Data_1&#x3b;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>sent</name>
-        <rename>sent</rename>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xa;&#xa;var sent_count &#x3d; completed &#x2b; incomplete&#x3b;&#xa;&#xa;var agent_f1 &#x3d; 0&#x3b;&#xa;var month_f1 &#x3d; 0&#x3b;&#xa;var year_f1 &#x3d; 0&#x3b;&#xa;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xa;	agent_f1 &#x3d; AGENT_ID&#x3b;&#xa;&#x7d; else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	agent_f1 &#x3d; AGENT_ID_1&#x3b;&#xa;&#x7d;&#xa;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xa;	month_f1 &#x3d; MONTH_Data&#x3b;&#xa;&#x7d; else if&#x28;MONTH_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	month_f1 &#x3d; MONTH_Data_1&#x3b;&#xa;&#x7d;&#xa;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xa;	year_f1 &#x3d; Year_Data&#x3b;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	year_f1 &#x3d; Year_Data_1&#x3b;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>sent_count</name>
+        <rename>sent_count</rename>
         <type>Integer</type>
         <length>16</length>
         <precision>2</precision>

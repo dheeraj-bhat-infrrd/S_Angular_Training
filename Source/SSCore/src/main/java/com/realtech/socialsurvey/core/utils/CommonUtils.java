@@ -54,5 +54,17 @@ public class CommonUtils
         Long result = Long.valueOf(days * 24 * 60 * 60 * 1000);
         return result;
     }
+    
+    /**
+     * This method keeps only alpha numeric characters, _ and - in the fileName 
+     * and replaces all spaces with _ .
+     * @param fileName
+     * @return
+     */
+    public static String generateCleanFileName(String fileName) {
+        fileName = fileName.replaceAll("[^a-zA-Z0-9 _-]", "");
+        fileName = fileName.replaceAll( " ", "_" );
+        return fileName;
+    }
    
 }

@@ -77,7 +77,10 @@ public class WriteWidgetReportToExcelBolt extends BaseComputeBoltWithAck
             WidgetScriptData widgetScriptData = (WidgetScriptData) input.getValueByField( "widgetScriptMap" );
             workbook = writeReportToWorkbook( widgetScriptData );
             if ( workbook != null && status.equals( ReportStatus.PROCESSED.getValue() ) ) {
-                fileName = reportRequest.getReportType() + "_" + ( Calendar.getInstance().getTimeInMillis() ) + FILE_EXTENSION;
+                fileName = reportRequest.getReportType() + "_" + ( Calendar.getInstance().getTimeInMillis() );
+                fileName = fileName.replaceAll("[^a-zA-Z0-9 _-]", "");
+                fileName = fileName.replaceAll( " ", "_" );
+                fileName = fileName + FILE_EXTENSION;
                 try {
                     file = FileUtils.createFileInLocal( fileName, workbook );
                     fileBytes = FileUtils.convertFileToBytes( file );

@@ -382,7 +382,7 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 		for (JsonElement jsonElement : jsonObject.getAsJsonArray(pivotName)) {
 			JsonObject obj = jsonElement.getAsJsonObject();
 			
-			long countVal = obj.get("pivot").getAsJsonArray().size();
+			long countVal = obj.get("count").getAsLong();
 			long agentId = obj.get("value").getAsLong();
 			
 			countMap.put(agentId, countVal);

@@ -131,8 +131,8 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Memory Group by abusive</from><to>Update</to><enabled>Y</enabled> </hop>
   <hop> <from>Survey Details Input</from><to>Memory Group by abusive</to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by abusive</from><to>Insert &#x2f; Update Abusive</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Memory Group by abusive</name>
@@ -168,7 +168,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>276</xloc>
-      <yloc>59</yloc>
+      <yloc>64</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -194,14 +194,14 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>99</xloc>
-      <yloc>59</yloc>
+      <yloc>64</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update</name>
-    <type>Update</type>
+    <name>Insert &#x2f; Update Abusive</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -211,11 +211,8 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
     <commit>10000</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
+    <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
       <table>survey_transaction_report</table>
@@ -224,28 +221,44 @@
         <field>month</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
       <key>
         <name>year</name>
         <field>year</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
       <key>
         <name>AGENT_ID</name>
         <field>user_id</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
       <value>
         <name>total_abusive_reviews</name>
         <rename>abusive</rename>
-        </value>
-      </lookup>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>user_id</name>
+        <rename>AGENT_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>month</name>
+        <rename>month</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>year</name>
+        <rename>year</rename>
+        <update>N</update>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>480</xloc>
-      <yloc>59</yloc>
+      <xloc>491</xloc>
+      <yloc>64</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

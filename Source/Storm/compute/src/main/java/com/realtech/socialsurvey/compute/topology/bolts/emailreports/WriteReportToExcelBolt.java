@@ -70,7 +70,10 @@ public class WriteReportToExcelBolt extends BaseComputeBoltWithAck {
 					monthStr = new DateFormatSymbols().getMonths()[month - 1];
 				}
 				fileName = "Email_Message_Report_Month_" + monthStr + "_" + emailReportWrapper.get(0).getYear()
-					+ (Calendar.getInstance().getTimeInMillis()) + EXCEL_FILE_EXTENSION;
+					+ (Calendar.getInstance().getTimeInMillis());
+				fileName = fileName.replaceAll("[^a-zA-Z0-9 _-]", "");
+				fileName = fileName.replaceAll( " ", "_" );
+				fileName = fileName + EXCEL_FILE_EXTENSION;
 				try {
 					file = FileUtils.createFileInLocal(fileName, workbook);
 					fileBytes = FileUtils.convertFileToBytes(file);
