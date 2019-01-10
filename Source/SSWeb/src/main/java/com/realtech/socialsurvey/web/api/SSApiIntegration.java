@@ -405,7 +405,7 @@ public interface SSApiIntegration
 
 
     @POST ( "/v1/setshowsummitpopup")
-    Response setShowSummitPopup( @Query ( "companyId") Long companyId,
+    Response setShowSummitPopup( @Query ( "entityId") Long entityId, @Query ("entityType") String entityType,
         @Query ( "isShowSummitPopup") boolean isShowSummitPopup );
 
 

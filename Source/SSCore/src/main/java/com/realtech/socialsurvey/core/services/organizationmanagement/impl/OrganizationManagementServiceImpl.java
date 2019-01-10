@@ -746,7 +746,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         MailContentSettings mailContentSettings = new MailContentSettings();
         companySettings.setMail_content( mailContentSettings );
-
+        companySettings.setShowSummitPopup( false );
 
         LOG.debug( "Inserting company settings." );
         OrganizationUnitSettings oldCompanySettings = null;
@@ -4581,6 +4581,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( !isDefaultFlag ) {
             organizationSettings.setSendMonthlyDigestMail( true );
         }
+        
+        organizationSettings.setShowSummitPopup( false );
 
         organizationUnitSettingsDao.insertOrganizationUnitSettings( organizationSettings,
             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
@@ -4638,6 +4640,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( !isDefaultFlag ) {
             organizationSettings.setSendMonthlyDigestMail( true );
         }
+        
+        organizationSettings.setShowSummitPopup( false );
 
         organizationUnitSettingsDao.insertOrganizationUnitSettings( organizationSettings,
             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
@@ -10490,52 +10494,52 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-	@Override
-	public boolean hasRegisteredForSummit(Long companyId) throws InvalidInputException {
-		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
-	     if ( companyId < 0l ) {
-	    	LOG.error( "Invalid company id passed as argument " );
-	       	throw new InvalidInputException( "Invalid company id passed as argument " );
-	     }
-	
-	     return organizationUnitSettingsDao.hasRegisteredForSummit(companyId).hasRegisteredForSummit();
-	}
+    @Override
+    public boolean hasRegisteredForSummit(Long companyId) throws InvalidInputException {
+         LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+         if ( companyId < 0l ) {
+            LOG.error( "Invalid company id passed as argument " );
+            throw new InvalidInputException( "Invalid company id passed as argument " );
+         }
+    
+         return organizationUnitSettingsDao.hasRegisteredForSummit(companyId).hasRegisteredForSummit();
+    }
 
 
-	@Override
-	public void setHasRegisteredForSummit(Long companyId, boolean hasRegisteredForSummit) throws InvalidInputException {
-		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
-	     if ( companyId < 0l ) {
-	    	LOG.error( "Invalid company id passed as argument " );
-	       	throw new InvalidInputException( "Invalid company id passed as argument " );
-	     }
-	     
-	     organizationUnitSettingsDao.updateHasRegisteredForSummit(companyId, hasRegisteredForSummit);
-	}
-	
-	@Override
-	public boolean isShowSummitPopup(Long companyId) throws InvalidInputException {
-		 LOG.debug( "Method isShowSummitPopup called for companyId:" + companyId );
-	     if ( companyId < 0l ) {
-	    	LOG.error( "Invalid company id passed as argument " );
-	       	throw new InvalidInputException( "Invalid company id passed as argument " );
-	     }
-	
-	     return organizationUnitSettingsDao.isShowSummitPopup(companyId).isShowSummitPopup();
-	}
+    @Override
+    public void setHasRegisteredForSummit(Long companyId, boolean hasRegisteredForSummit) throws InvalidInputException {
+         LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+         if ( companyId < 0l ) {
+            LOG.error( "Invalid company id passed as argument " );
+            throw new InvalidInputException( "Invalid company id passed as argument " );
+         }
+         
+         organizationUnitSettingsDao.updateHasRegisteredForSummit(companyId, hasRegisteredForSummit);
+    }
+    
+    @Override
+    public boolean isShowSummitPopup(Long entityId, String entityType) throws InvalidInputException {
+         LOG.debug( "Method isShowSummitPopup called for entityId:" + entityId );
+         if ( entityId < 0l ) {
+            LOG.error( "Invalid entityId passed as argument " );
+            throw new InvalidInputException( "Invalid entityId passed as argument " );
+         }
+    
+         return organizationUnitSettingsDao.isShowSummitPopup(entityId,entityType).isShowSummitPopup();
+    }
 
 
 
-	@Override
-	public void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException {
-		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
-	     if ( companyId < 0l ) {
-	    	LOG.error( "Invalid company id passed as argument " );
-	       	throw new InvalidInputException( "Invalid company id passed as argument " );
-	     }
-	     
-	     organizationUnitSettingsDao.updateShowSummitPopup(companyId, isShowSummitPopup);
-	}
+    @Override
+    public void setShowSummitPopup(Long entityId, String entityType, boolean isShowSummitPopup) throws InvalidInputException {
+         LOG.debug( "Method hasRegisteredForSummit called for entityId:" + entityId );
+         if ( entityId < 0l ) {
+            LOG.error( "Invalid entityId passed as argument " );
+            throw new InvalidInputException( "Invalid entityId passed as argument " );
+         }
+         
+         organizationUnitSettingsDao.updateShowSummitPopup(entityId, entityType, isShowSummitPopup);
+    }
 
     
      @Override 

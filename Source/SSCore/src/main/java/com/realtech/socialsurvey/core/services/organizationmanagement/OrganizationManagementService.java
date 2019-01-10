@@ -1735,9 +1735,9 @@ public interface OrganizationManagementService
     
     public void setHasRegisteredForSummit(Long companyId, boolean isShowSummitPopup) throws InvalidInputException;
 
-	boolean isShowSummitPopup(Long companyId) throws InvalidInputException;
+	boolean isShowSummitPopup(Long entityId, String entityType) throws InvalidInputException;
 
-	void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException;
+	void setShowSummitPopup(Long entityId, String entityType, boolean isShowSummitPopup) throws InvalidInputException;
 
     /**
      * @param companyId

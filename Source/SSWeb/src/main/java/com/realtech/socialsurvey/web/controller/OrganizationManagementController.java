@@ -878,7 +878,7 @@ public class OrganizationManagementController
 
             if ( surveySettings != null ) {
                 model.addAttribute( "autoPostEnabled", surveySettings.isAutoPostEnabled() );
-                model.addAttribute( "minpostscore", surveySettings.getShow_survey_above_score() );
+                model.addAttribute( "minpostscore", surveySettings.getAuto_post_score() );
                 model.addAttribute( "autoPostLinkToUserSite", surveySettings.isAutoPostLinkToUserSiteEnabled() );
             }
 

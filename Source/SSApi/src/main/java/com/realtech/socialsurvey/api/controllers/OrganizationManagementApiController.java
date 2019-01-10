@@ -152,10 +152,10 @@ public class OrganizationManagementApiController
     
     @RequestMapping ( value = "/setshowsummitpopup", method = RequestMethod.POST)
     @ApiOperation ( value = "Set IsShowSummitPopup")
-    public ResponseEntity<?> setShowSummitPopup(long companyId, boolean isShowSummitPopup) throws SSApiException
+    public ResponseEntity<?> setShowSummitPopup(long entityId, String entityType, boolean isShowSummitPopup) throws SSApiException
     {
         try {
-            organizationManagementService.setShowSummitPopup(companyId, isShowSummitPopup);
+            organizationManagementService.setShowSummitPopup(entityId, entityType, isShowSummitPopup);
             LOGGER.info( "setShowSummitPopup completed successfully" );
             return new ResponseEntity<>( "Successfully updated", HttpStatus.OK );
                 

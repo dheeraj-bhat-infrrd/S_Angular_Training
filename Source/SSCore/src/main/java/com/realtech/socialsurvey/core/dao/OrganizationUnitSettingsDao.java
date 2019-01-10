@@ -362,10 +362,10 @@ public interface OrganizationUnitSettingsDao
 	void updateHasRegisteredForSummit(long companyId, boolean isShowSummitPopup) throws InvalidInputException;
 
 
-	OrganizationUnitSettings isShowSummitPopup(long companyId) throws InvalidInputException;
+	OrganizationUnitSettings isShowSummitPopup(long entityId, String entityType) throws InvalidInputException;
 
 
-	void updateShowSummitPopup(long companyId, boolean isShowSummitPopup) throws InvalidInputException;
+	void updateShowSummitPopup(long entityId, String entityType, boolean isShowSummitPopup) throws InvalidInputException;
 
 	
     public List<TransactionSourceFtp> getFtpConnectionsForCompany( String status, int startIndex, int batchSize );

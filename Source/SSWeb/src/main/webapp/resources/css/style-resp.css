@@ -1,6 +1,7 @@
-@media (min-width:375px and max-width: 400px){
-	.summit-checkbox-cont{
-		margin-bottom: -3px;
+@media (max-height: 425px){
+	.summit-popup-body{
+		height: 100vh;
+    	margin-top: 0;
 	}
 }
 	
@@ -16,12 +17,20 @@
 	}
 	
 	.summit-popup-close-cont{
-		margin-top: 13px;
+		margin-top: 50px;
 	}
 	
 	@media (max-width: 1099){
 		.summit-ribbon-body{
 			width:100%
+		}
+		
+		.summit-popup-close-cont{
+			margin-top: 60px;
+		}
+		
+		.summit-popup-close-btn{
+			margin-right: 25px;
 		}
 	}
 	
@@ -30,6 +39,10 @@
 			background-image: url(../images/TP_Ribbon_mobile_v2.png);
 			height: 50px;
 			background-size: cover;
+		}
+		
+		.summit-popup-close-cont{
+			margin-top: 45px;
 		}
 	}
 	
@@ -43,16 +56,17 @@
 		.summit-checkbox-cont{
 			margin-bottom:2px;
 		}
+		
+		.summit-popup-close-cont{
+			margin-top: 30px;
+		}
+		
+		.summit-popup-close-btn{
+			margin-right: 35px;
+		}
 	}
 	
 	@media (max-width: 767px){
-		.summit-popup-close-btn {
-		    width: 15px;
-		    height: 30px;
-		    margin: 0 auto;
-		    margin-right: 0px;
-		}
-		
 		.summit-checkbox-cont{
 			margin-left: 5px;
     		margin-bottom: 4px;
@@ -81,6 +95,29 @@
 		.summit-ribbon-body{
 			height: 30px;
 		}
+		
+		.summit-popup-close-cont{
+			margin-top: 15px;
+		}
+		
+		.summit-popup-close-btn{
+		    margin-right: 5px;
+		    width: 15px;
+		    height: 15px;
+		    border-width: 3px;
+		    line-height: 7px;
+		    font-size: 9px;
+		}
+		
+		.summit-ribbon-close-btn{
+			width: 15px;
+		    height: 15px;
+		    border-width: 3px;
+		    line-height: 7px;
+		    font-size: 9px;
+		    margin-right: 5px;
+		    margin-top: -5px;
+		}
 	}
 	
 	@media (max-width: 321px){
@@ -91,6 +128,14 @@
 		.summit-checkbox-cont {
 		    margin-left: 5px;
 		    margin-bottom: -4px;
+		}
+		
+		.summit-popup-close-cont{
+			margin-top: 9px;
+		}
+		
+		.summit-popup-close-btn{
+		    margin-right: 2px;
 		}
 	}
 }

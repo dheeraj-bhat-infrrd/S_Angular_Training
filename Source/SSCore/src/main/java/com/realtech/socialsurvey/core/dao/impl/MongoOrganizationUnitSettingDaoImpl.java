@@ -1566,29 +1566,51 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     }
     
     @Override
-    public OrganizationUnitSettings isShowSummitPopup( long companyId ) throws InvalidInputException
+    public OrganizationUnitSettings isShowSummitPopup( long entityId, String entityType ) throws InvalidInputException
     {
         LOG.debug( "Method getShowSummitPopupFlag() to fetch show summit popup flag running." );
 
         Query query = new Query();
-        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
         
+        String collection = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        
+        if(entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID )) {
+            collection = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        }else if(entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID )) {
+            collection = CommonConstants.BRANCH_SETTINGS_COLLECTION;
+        }else if(entityType.equalsIgnoreCase( CommonConstants.REGION_ID )) {
+            collection = CommonConstants.REGION_SETTINGS_COLLECTION;
+        }else if(entityType.equalsIgnoreCase( CommonConstants.AGENT_ID )) {
+            collection = CommonConstants.AGENT_SETTINGS_COLLECTION;
+        }  
         query.fields().include( IS_SHOW_SUMMIT_POPUP ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
-        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collection);
     }
 
     @Override
-    public void updateShowSummitPopup( long companyId, boolean isShowSummitPopup ) throws InvalidInputException
+    public void updateShowSummitPopup( long entityId, String entityType, boolean isShowSummitPopup ) throws InvalidInputException
     {
         LOG.debug( "Method updateShowSummitPopupFlag() to update showSummitPopup started." );
         
         Query query = new Query();
-        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
         Update update = new Update();
         
+        String collection = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        
+        if(entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID )) {
+            collection = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        }else if(entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID )) {
+            collection = CommonConstants.BRANCH_SETTINGS_COLLECTION;
+        }else if(entityType.equalsIgnoreCase( CommonConstants.REGION_ID )) {
+            collection = CommonConstants.REGION_SETTINGS_COLLECTION;
+        }else if(entityType.equalsIgnoreCase( CommonConstants.AGENT_ID )) {
+            collection = CommonConstants.AGENT_SETTINGS_COLLECTION;
+        }  
         update.set( IS_SHOW_SUMMIT_POPUP, isShowSummitPopup );
         
-        mongoTemplate.updateFirst( query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        mongoTemplate.updateFirst( query, update, collection );
         LOG.debug( "Method updateHasRegisteredForSummit() finished." );
     }
 
