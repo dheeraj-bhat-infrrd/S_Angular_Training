@@ -159,4 +159,12 @@ public interface SearchEngineManagementServices {
 	List<ZipCodeLookup> getSuggestionForZipcode(String zipcode, int startIndex, int batchSize, boolean onlyUsFilter);
 
 	public boolean updateCompanyIdForAllEntities() throws InvalidInputException;
+
+
+
+	boolean updateHiddenSectionForAllAgents() throws InvalidInputException;
+
+
+	boolean updateHiddenSectionForAgentsOfCompany(long companyId, String collection, String flagToBeUpdated,
+			Boolean flag) throws InvalidInputException;
 }

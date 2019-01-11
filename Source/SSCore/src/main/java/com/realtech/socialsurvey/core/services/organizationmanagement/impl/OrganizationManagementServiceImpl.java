@@ -10360,6 +10360,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, status,
                     unitSettings.getIden(), collection );
             }
+            if(flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDDEN_SECTION) && collection.equals(CommonConstants.COMPANY_SETTINGS_COLLECTION)) {
+            	boolean flag = Boolean.parseBoolean( status );
+            	searchEngineManagementServices.updateHiddenSectionForAgentsOfCompany(unitSettings.getIden(), collection, flagToBeUpdated, flag);
+            }
             return true;
         } catch ( InvalidInputException e ) {
             LOG.error( "Invalid Input Exception occurred while updating settings", e );
