@@ -83,8 +83,6 @@ public class LoginController
     @Autowired
     private ResponseUtils responseUtils;
 
-
-
     // Redirects user to Landing Page if session is active
     @ResponseBody
     @RequestMapping ( value = "/redirectifexistsactivesession")
@@ -335,6 +333,7 @@ public class LoginController
         AccountType accountType = null;
         String redirectTo = null;
         String isDirectRegistration = null;
+        OrganizationUnitSettings companySettings = null;
 
         try {
             
@@ -357,7 +356,7 @@ public class LoginController
 
             
             try {
-                OrganizationUnitSettings companySettings = organizationManagementService
+                companySettings = organizationManagementService
                     .getCompanySettings( user.getCompany().getCompanyId() );
                 if ( companySettings != null )
                     redirectAttributes.addFlashAttribute( "hiddenSection", companySettings.isHiddenSection() );
@@ -439,7 +438,10 @@ public class LoginController
             		session.invalidate();
             	model.addAttribute( "userId", user.getUserId() );
                 SecurityContextHolder.clearContext();
-                model.addAttribute( CommonConstants.DISABLED_ACCOUNT_FLAG, CommonConstants.YES );
+                model.addAttribute( CommonConstants.DISABLED_ACCOUNT_FLAG, CommonConstants.YES );                
+                model.addAttribute( "optOutText", companySettings.getOptoutText() );
+                model.addAttribute( "isLoginEnableAllowed", companySettings.getIsLoginEnableAllowed() );
+                
                 return JspResolver.LOGIN_DISABLED_PAGE;
             }
             

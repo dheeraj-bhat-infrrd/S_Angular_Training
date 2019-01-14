@@ -6483,6 +6483,58 @@ function updateCopyToClipBoardSettings(updateCopyToClipBoardSetting, disableEle)
 	
 }
 
+function resetOptOutTextFlow(resetId) {
+	
+	callAjaxGET("./resetoptouttext.do", function(data) {
+		hideOverlay();
+		if (data != null) {
+			$('#' + resetId).val(data);
+			$('#overlay-toast').html("Content reverted successfully!");
+		} else {
+			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+		}
+		showToast();
+	}, true);
+}
+
+function storeOptOutText(content, mood) {
+	//encode text before sending to server
+	var content = window.btoa( unescape( encodeURIComponent( content ) ) );
+	var payload = {
+		"text" : content
+	};
+	callAjaxGetWithPayloadData("./storeoptouttext.do", function(data) {
+		if (data == "success") {
+			$('#overlay-toast').html("Content updated successfully!");
+		} else {
+			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+		}
+		showToast();
+	}, payload, true);
+}
+
+function showEnableLoginButton(isLoginEnabled, disableEle) {
+	var payload = {
+		"isLoginEnabled" : isLoginEnabled
+	};
+	
+	callAjaxPostWithPayloadData("./showenableloginbutton.do",function(data) {
+		
+		if (data == "true") {
+			$('#enable-login-chk-box').removeClass('bd-check-img-checked');
+			$('#overlay-toast').html("EnableLogin button is visible!");
+		}
+		else if (data == "false") {
+			$('#enable-login-chk-box').addClass('bd-check-img-checked');
+			$('#overlay-toast').html("EnableLogin button is hidden!");
+		}
+		else {
+			$('#overlay-toast').html("Unable update show/hide EnableLogin button!!");
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
 
 function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
@@ -12667,6 +12719,9 @@ $('body').on('blur', '#neutral-text-complete', function() {
 $('body').on('blur', '#sad-text-complete', function() {
 	saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
 });
+$('body').on('blur', '#opt-out-text', function() {
+	storeOptOutText($("#opt-out-text").val(), "optOutText");
+});
 
 $('body').on('click', '.reset-icon', function() {
 	var resetId = $(this).prev().attr('id');
@@ -12688,6 +12743,12 @@ $('body').on('click', '.reset-icon', function() {
 
 	showOverlay();
 	resetTextForMoodFlow(resetTag, resetId);
+});
+
+$('body').on('click', '.reset-opt-out-icon', function() {
+	var resetId = $(this).prev().attr('id');
+	showOverlay();
+	resetOptOutTextFlow(resetId);
 });
 
 $('body').on('click', '#atpst-chk-box', function() {
@@ -12791,6 +12852,16 @@ $('body').on('click', '#survey-mail-thrhld-chk-box', function() {
 	} else {
 		$('#survey-mail-thrhld-chk-box').addClass('bd-check-img-checked');
 		updateSendDigestMailSiteSetting(false, '#survey-mail-thrhld-chk-box');
+	}
+});
+
+$('body').on('click', '#enable-login-chk-box', function() {
+	if ($('#enable-login-chk-box').hasClass('bd-check-img-checked')) {
+		$('#enable-login-chk-box').removeClass('bd-check-img-checked');
+		showEnableLoginButton(true, '#enable-login-chk-box');
+	} else {
+		$('#enable-login-chk-box').addClass('bd-check-img-checked');
+		showEnableLoginButton(false, '#enable-login-chk-box');
 	}
 });
 

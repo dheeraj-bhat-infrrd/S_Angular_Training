@@ -69,8 +69,8 @@
 	<div class="container reg_panel_container">
 		<div class="reg_header text-center"><spring:message code="label.account.disabled.notification.key" /></div>
 		<div class="reg_lkin_wrapper">
-			<div class="reg_lin_lin2"><pre class="email-reply-text"><spring:message code="label.account.login.disabled.text.key" /></pre></div>
-			<div class="reg_btn" id="enable-login">Enable Login</div>
+			<div class="reg_lin_lin2"><pre class="email-reply-text"><font size="3">${optOutText}</font></pre></div>
+			<div class="reg_btn hide" id="enable-login"><spring:message code="label.opt.in.social.survey" /></div>
 			<div style="display: none"><form id='enableLoginForm' action="./rest/user/enableuserlogin/${userId}" method="get"></form></div>
 		</div>
 	</div>
@@ -90,6 +90,10 @@ $(document).ready(function() {
 		}
 	});
 
+	var isLoginEnableAllowed = "${isLoginEnableAllowed}";
+	if(isLoginEnableAllowed==true||isLoginEnableAllowed=="true"){
+		$('#enable-login').show();
+	}
 });
 </script>
 </body>

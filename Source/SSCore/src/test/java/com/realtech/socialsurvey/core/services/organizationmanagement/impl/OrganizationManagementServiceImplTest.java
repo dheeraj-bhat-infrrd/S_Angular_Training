@@ -2363,4 +2363,10 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.getAgentIdsUnderCompany( 0, 0, 50 );
     }
+    
+    @Test
+    public void testUpdateCompanySettings() {
+        
+        organizationManagementServiceImpl.updateCompanySettings( new OrganizationUnitSettings(), "optoutText", "Your Login is currently disabled by your company admin" );
+    }
 }

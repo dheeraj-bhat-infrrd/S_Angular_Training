@@ -121,7 +121,6 @@ public class UserManagementController
 
     private final static int SOLR_BATCH_SIZE = 20;
 
-
     // JIRA SS-42 BY RM05 BOC
     /*
      * Method to show the User Management Page to a user on clicking UserManagement link.
@@ -1113,6 +1112,7 @@ public class UserManagementController
     {
         LOG.info( "Method completeRegistration() to complete registration of user started." );
         User user = null;
+        OrganizationUnitSettings companySettings = null;
 
         try {
             String firstName = request.getParameter( CommonConstants.FIRST_NAME );
@@ -1158,7 +1158,7 @@ public class UserManagementController
             }
 
             try {
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+                companySettings = organizationManagementService.getCompanySettings( companyId );
                 redirectAttributes.addFlashAttribute( "hiddenSection", companySettings.isHiddenSection() );
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( "Invalid Input exception occured in method getCompanySettings()",
@@ -1178,6 +1178,7 @@ public class UserManagementController
 
             //get agent settings
             AgentSettings agentSettings = null;
+            HttpSession session = request.getSession( true );
             try {
                 agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
             } catch ( NoRecordsFetchedException e ) {
@@ -1187,6 +1188,11 @@ public class UserManagementController
             //check if login is prevented for user
             if ( agentSettings.isLoginPrevented() ) {
                 SecurityContextHolder.clearContext();
+                
+                session.setAttribute( "userId", user.getUserId() );
+                session.setAttribute( "optOutText", companySettings.getOptoutText() );
+                session.setAttribute( "isLoginEnableAllowed", companySettings.getIsLoginEnableAllowed() );
+                
                 return JspResolver.LOGIN_DISABLED_PAGE;
             }
 
@@ -1195,7 +1201,7 @@ public class UserManagementController
             LOG.debug( "Successfully added registered user to principal session" );
 
             AccountType accountType = null;
-            HttpSession session = request.getSession( true );
+            
             List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
             if ( licenseDetails != null && !licenseDetails.isEmpty() ) {
                 LicenseDetail licenseDetail = licenseDetails.get( 0 );

@@ -11099,4 +11099,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return 0l;
     }
+    
+    @Override
+    public void updateCompanySettings(OrganizationUnitSettings companySettings, String columnName, String columnValue) {
+        
+        LOG.info( "Method to update company settings, OrganizationManagementServiceImpl.updateCompanySettings() started." );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( columnName, columnValue, companySettings, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "Method to update company settings, OrganizationManagementServiceImpl.updateCompanySettings() finished." );
+    }
 }

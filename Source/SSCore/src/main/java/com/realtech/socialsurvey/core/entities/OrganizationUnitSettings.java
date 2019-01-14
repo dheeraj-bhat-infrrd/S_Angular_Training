@@ -132,6 +132,9 @@ public class OrganizationUnitSettings implements Serializable
     
     private long companyId;
     
+    private String optoutText;
+    private Boolean isLoginEnableAllowed;
+    
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
 	}
@@ -1056,6 +1059,30 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.socialMediaLastFetched = socialMediaLastFetched;
     }
+
+    public String getOptoutText()
+    {
+        return optoutText;
+    }
+
+
+    public void setOptoutText( String optoutText )
+    {
+        this.optoutText = optoutText;
+    }
+
+
+    public Boolean getIsLoginEnableAllowed()
+    {
+        return isLoginEnableAllowed;
+    }
+
+
+    public void setIsLoginEnableAllowed( Boolean isLoginEnableAllowed )
+    {
+        this.isLoginEnableAllowed = isLoginEnableAllowed;
+    }
+
 
     @Override
     public String toString()

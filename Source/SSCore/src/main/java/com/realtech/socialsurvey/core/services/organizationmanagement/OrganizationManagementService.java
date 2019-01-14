@@ -1889,4 +1889,13 @@ public interface OrganizationManagementService
     //Unsets the key of a particular collection for a given iden
     boolean unsetKey( long iden, String keyToUpdate, String collectionName )
         throws InvalidInputException;
+    
+    /**
+     * Update CompanySettings based on given criteria
+     * 
+     * @param companySettings
+     * @param columnName
+     * @param columnValue
+     */
+    public void updateCompanySettings(OrganizationUnitSettings companySettings, String columnName, String columnValue);
 }
