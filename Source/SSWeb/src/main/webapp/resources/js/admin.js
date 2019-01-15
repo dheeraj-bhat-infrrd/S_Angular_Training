@@ -350,10 +350,18 @@ function createUserHierarchyRow(users){
 		for (var i = 0; i < users.length; i++) {
 			var user = users[i];
 			var roleString = '';
-			if((user.regionAdmin || user.branchAdmin) && user.agent) {
-				roleString = globalStrings['label.admin.key'] + "&#44;&nbsp;"  + globalStrings['label.user.key'];
-			} else if(user.regionAdmin || user.branchAdmin){
-				roleString = globalStrings['label.admin.key'];
+			if(user.owner && user.agent) {
+				roleString = globalStrings['label.companyadmin.key'] + "&#44;&nbsp;"  + globalStrings['label.user.key'];
+			}else if(user.regionAdmin && user.agent) {
+				roleString = globalStrings['label.regionadmin.key'] + "&#44;&nbsp;"  + globalStrings['label.user.key'];
+			}else if(user.branchAdmin && user.agent) {
+				roleString = globalStrings['label.branchadmin.key'] + "&#44;&nbsp;"  + globalStrings['label.user.key'];
+			}else if(user.owner){
+				roleString = globalStrings['label.companyadmin.key'];
+			}else if(user.regionAdmin){
+				roleString = globalStrings['label.regionadmin.key'];
+			}else if(user.branchAdmin){
+				roleString = globalStrings['label.branchadmin.key'];
 			} else if(user.agent) {
 				roleString = globalStrings['label.user.key'];
 			}

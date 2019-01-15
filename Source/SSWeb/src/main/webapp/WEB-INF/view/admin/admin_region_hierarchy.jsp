@@ -84,13 +84,20 @@
 					test="${not empty regionUser.emailId}">${regionUser.emailId}</c:if></td>
 			<td class="v-tbl-role"><c:choose>
 					<c:when
-						test="${(regionUser.isRegionAdmin || regionUser.isBranchAdmin) && regionUser.isAgent}">
-						<spring:message code="label.admin.key" />&#44;&nbsp;<spring:message
+						test="${regionUser.isRegionAdmin && regionUser.isAgent}">
+						<spring:message code="label.regionadmin.key" />&#44;&nbsp;<spring:message
 							code="label.user.key" />
 					</c:when>
 					<c:when
-						test="${regionUser.isRegionAdmin || regionUser.isBranchAdmin}">
-						<spring:message code="label.admin.key" />
+						test="${regionUser.isBranchAdmin && regionUser.isAgent}">
+						<spring:message code="label.branchadmin.key" />&#44;&nbsp;<spring:message
+							code="label.user.key" />
+					</c:when>
+					<c:when test="${regionUser.isRegionAdmin}">
+					<spring:message code="label.regionadmin.key" />
+					</c:when>
+					<c:when test="${regionUser.isBranchAdmin}">
+					<spring:message code="label.branchadmin.key" />
 					</c:when>
 					<c:when test="${regionUser.isAgent}">
 						<spring:message code="label.user.key" />

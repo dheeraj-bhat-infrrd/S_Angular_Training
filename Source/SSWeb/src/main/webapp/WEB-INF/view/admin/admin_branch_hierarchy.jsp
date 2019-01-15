@@ -30,13 +30,20 @@
 					test="${not empty branchUser.emailId}">${branchUser.emailId}</c:if></td>
 			<td class="v-tbl-role"><c:choose>
 					<c:when
-						test="${(branchUser.isRegionAdmin || branchUser.isBranchAdmin) && branchUser.isAgent}">
-						<spring:message code="label.admin.key" />&#44;&nbsp;<spring:message
+						test="${branchUser.isBranchAdmin && branchUser.isAgent}">
+						<spring:message code="label.branchadmin.key" />&#44;&nbsp;<spring:message
 							code="label.user.key" />
 					</c:when>
 					<c:when
-						test="${branchUser.isRegionAdmin || branchUser.isBranchAdmin}">
-						<spring:message code="label.admin.key" />
+						test="${branchUser.isRegionAdmin && branchUser.isAgent}">
+						<spring:message code="label.regionadmin.key" />&#44;&nbsp;<spring:message
+							code="label.user.key" />
+					</c:when>
+					<c:when test="${branchUser.isBranchAdmin}">
+					<spring:message code="label.branchadmin.key" />
+					</c:when>
+					<c:when test="${branchUser.isRegionAdmin}">
+					<spring:message code="label.regionadmin.key" />
 					</c:when>
 					<c:when test="${branchUser.isAgent}">
 						<spring:message code="label.user.key" />
