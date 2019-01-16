@@ -17,6 +17,8 @@ import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.common.RetrofitApiBuilder;
 import com.realtech.socialsurvey.compute.entities.SurveyData;
 import com.realtech.socialsurvey.compute.entities.response.EntitySurveyStatsVO;
+import com.realtech.socialsurvey.compute.services.FailedMessagesService;
+import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 
@@ -37,7 +39,7 @@ public class FetchPrerequisiteSurveyStatsDataBolt  extends BaseComputeBoltWithAc
 	@Override
 	public void declareOutputFields( OutputFieldsDeclarer outputFieldsDeclarer ) 
 	{
-		outputFieldsDeclarer.declare( new Fields( "surveyData", "agentSurveyStatsVO", "branchSurveyStatsVO", "companySurveyStatsVO" ) );
+		outputFieldsDeclarer.declare( new Fields( "isSucess", "surveyData", "agentSurveyStatsVO", "branchSurveyStatsVO", "companySurveyStatsVO" ) );
 		
 	}
 
@@ -48,12 +50,22 @@ public class FetchPrerequisiteSurveyStatsDataBolt  extends BaseComputeBoltWithAc
 	public void executeTuple(Tuple input) 
 	{
 		LOG.info("Starting execution of FetchPrerequisiteSurveyStatsDataBolt ");
-		SurveyData surveyData = ConversionUtils.deserialize( input.getString( 0 ), SurveyData.class );
-		LOG.info("Fetching prerequisite data related to survey with id {}", surveyData.getId());
-		EntitySurveyStatsVO agentSurveyStatsVO = getSurveyStats("agentId",surveyData.getAgentId());
-		EntitySurveyStatsVO branchSurveyStatsVO = getSurveyStats("branchId",surveyData.getBranchId());
-		EntitySurveyStatsVO companySurveyStatsVO = getSurveyStats("companyId",surveyData.getCompanyId());
-		_collector.emit( input, Arrays.asList( surveyData, agentSurveyStatsVO, branchSurveyStatsVO, companySurveyStatsVO ) );
+		FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
+		SurveyData surveyData = ConversionUtils.deserialize(input.getString(0), SurveyData.class);
+		EntitySurveyStatsVO agentSurveyStatsVO = new EntitySurveyStatsVO();
+		EntitySurveyStatsVO branchSurveyStatsVO = new EntitySurveyStatsVO();
+		EntitySurveyStatsVO companySurveyStatsVO = new EntitySurveyStatsVO();
+		boolean isSucess = false;
+		try {
+			LOG.info("Fetching prerequisite data related to survey with id {}", surveyData.getId());
+			agentSurveyStatsVO = getSurveyStats("agentId", surveyData.getAgentId());
+			branchSurveyStatsVO = getSurveyStats("branchId", surveyData.getBranchId());
+			companySurveyStatsVO = getSurveyStats("companyId", surveyData.getCompanyId());
+			isSucess = true;
+		} catch (Exception exception) {
+			failedMessagesService.insertTemporaryFailedSurveyProcessor(surveyData);
+		}
+		_collector.emit( input, Arrays.asList( isSucess, surveyData, agentSurveyStatsVO, branchSurveyStatsVO, companySurveyStatsVO ) );
 	}
 	
 	/**

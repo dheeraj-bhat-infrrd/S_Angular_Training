@@ -93,6 +93,21 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         LOG.debug( "Persisting temporarily failed email messages" );
         failedEmailMessagesDao.insertFailedEmailMessages( failedEmailMessage );
     }
+    
+    @Override
+    public void insertTemporaryFailedSurveyProcessor( SurveyData surveyData )
+    {
+        LOG.debug( "Adding a temporary failed messages. This message will be retried" );
+        FailedSurveyProcessor failedSurveyProcessor = new FailedSurveyProcessor();
+        failedSurveyProcessor.setMessageType( FailedMessageConstants.SURVEY_PROCESSOR_MESSAGE );
+        failedSurveyProcessor.setRetryCounts( 0 );
+        failedSurveyProcessor.setRetrySuccessful( false );
+        failedSurveyProcessor.setWillRetry( true );
+        failedSurveyProcessor.setPermanentFailure( false );
+        failedSurveyProcessor.setData( surveyData );
+        LOG.debug( "Persisting temporarily failed surveyProcessor messages" );
+        failedEmailMessagesDao.insertFailedSurveyProcessor(failedSurveyProcessor);
+    }
 
     @Override
     public void insertPermanentlyFailedReportRequest(ReportRequest reportRequest, Throwable thrw)
@@ -185,4 +200,11 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         LOG.debug("Updating failed social post retryCount having postId {}", postId);
         return failedEmailMessagesDao.updateFailedSocialPostRetryCount(postId);
     }
+    
+    @Override
+    public int deleteFailedSurveyProcessor(long surveyId) {
+        LOG.debug("Deleting temporary failed survey processor with surveyId {}", surveyId);
+        return failedEmailMessagesDao.deleteFailedSurveyProcessor(surveyId);
+    }
+    
 }

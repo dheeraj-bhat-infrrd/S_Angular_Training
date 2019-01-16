@@ -64,4 +64,11 @@ public interface FailedMessagesDao
     */
    public boolean insertUnsavedUserEvent( UnsavedUserEvent unsavedEvent );
 
+	/**
+	 * @param failedSurveyProcessor
+	 * @return
+	 */
+	public boolean insertFailedSurveyProcessor(FailedSurveyProcessor failedSurveyProcessor);
+
+	int deleteFailedSurveyProcessor(long surveyId);
 }

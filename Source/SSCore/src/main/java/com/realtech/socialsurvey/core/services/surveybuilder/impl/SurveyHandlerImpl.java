@@ -5524,6 +5524,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
     		LOG.info("Method streamSurveyProcessRequest started for survey with id {} " , surveyDetails.get_id());
 		SurveyProcessData surveyProcessData = new SurveyProcessData();
+		surveyProcessData.setSurveyId(surveyDetails.getSurveyPreIntitiationId());
 		surveyProcessData.setAgentId(surveyDetails.getAgentId());
 		surveyProcessData.setBranchId(surveyDetails.getBranchId());
 		surveyProcessData.setRegionId(surveyDetails.getRegionId());

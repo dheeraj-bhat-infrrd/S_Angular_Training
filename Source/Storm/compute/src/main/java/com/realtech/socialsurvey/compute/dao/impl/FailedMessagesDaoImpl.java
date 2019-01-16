@@ -11,6 +11,11 @@ import org.slf4j.LoggerFactory;
 import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.compute.common.MongoDB;
 import com.realtech.socialsurvey.compute.dao.FailedMessagesDao;
+import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
+import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
+import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
+import com.realtech.socialsurvey.compute.entities.FailedSurveyProcessor;
+import com.realtech.socialsurvey.compute.entities.UnsavedUserEvent;
 
 
 /**
@@ -54,6 +59,19 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
         mongoDB.datastore().save( failedReportRequest );
         return true;
 
+    }
+    
+    @Override
+    public boolean insertFailedSurveyProcessor(FailedSurveyProcessor failedSurveyProcessor) {
+    	LOG.debug( "Inserting failed survey processor request: {}", failedSurveyProcessor );
+    	Datastore datastore = mongoDB.datastore();
+    	final Query<FailedSurveyProcessor> query = datastore.createQuery(FailedSurveyProcessor.class)
+                .field("data.surveyId").equal(failedSurveyProcessor.getData().getSurveyId());
+    	long numberOfRecords = datastore.getCount(query);
+    	if(numberOfRecords  == 0) {
+    		mongoDB.datastore().save( failedSurveyProcessor );
+    	}
+        return true;
     }
 
     @Override
@@ -113,5 +131,14 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
         mongoDB.datastore().save( unsavedEvent );
         return true;
     }
-
+    
+    @Override
+    public int deleteFailedSurveyProcessor(long surveyId) {
+        LOG.debug("Deleting failed survey processor with internal dataId", surveyId);
+        Query<FailedSurveyProcessor> query = mongoDB.datastore().createQuery(FailedSurveyProcessor.class)
+                .field("data.surveyId").equal(surveyId)
+                .field("permanentFailure").equal(false);
+        final WriteResult result = mongoDB.datastore().delete(query);
+        return result.getN();
+    }
 }

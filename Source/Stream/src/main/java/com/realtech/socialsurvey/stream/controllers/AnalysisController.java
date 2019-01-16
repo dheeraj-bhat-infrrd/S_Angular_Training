@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.realtech.socialsurvey.stream.entities.FailedEmailMessage;
 import com.realtech.socialsurvey.stream.services.FailedMessagesService;
 import com.realtech.socialsurvey.stream.services.FailedSocialPostService;
+import com.realtech.socialsurvey.stream.services.FailedSurveyProcessorService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,6 +40,7 @@ public class AnalysisController
     private static final int NUMBER_OF_RECORDS = 10;
     private FailedMessagesService failedMessagesService;
     private FailedSocialPostService failedSocialPostService;
+    private FailedSurveyProcessorService failedSurveyProcessorService;
 
 
     @Autowired public void setFailedMessagesService( FailedMessagesService failedMessagesService )
@@ -51,9 +53,11 @@ public class AnalysisController
         this.failedSocialPostService = failedSocialPostService;
     }
     
+    @Autowired public void setFailedSurveyProcessorService(FailedSurveyProcessorService failedSurveyProcessorService) {
+		this.failedSurveyProcessorService = failedSurveyProcessorService;
+	}
 
-    
-    /**
+	/**
      * Returns failed messages list of 10 records
      * @return
      */
@@ -165,5 +169,20 @@ public class AnalysisController
 	        failedSocialPostService.queueFailedSocialPosts();
 	        return new ResponseEntity<>( HttpStatus.CREATED );
 	    }
-
+	 
+	 @ApiOperation ( value = "Queues failed survey data for survey processor.", response = Void.class)
+	    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Successfully queued failed survey data."),
+	        @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
+	        @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+	        @ApiResponse ( code = 503, message = "Service not available") })
+	    @RequestMapping ( value = "/failed/surveyprocessor", method = RequestMethod.GET)
+	    public ResponseEntity<?> queueFailedSurveyProcessor(  )
+	        throws InterruptedException, ExecutionException, TimeoutException
+	    {
+	        LOG.info( "Received request to generate failed survey processor in stream" );
+	        failedSurveyProcessorService.queueFailedSurveyProcessor();
+	        return new ResponseEntity<>( HttpStatus.CREATED );
+	    }
+		    
+ 
 }

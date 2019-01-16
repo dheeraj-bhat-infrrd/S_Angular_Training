@@ -15,8 +15,9 @@ import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.common.RetrofitApiBuilder;
 import com.realtech.socialsurvey.compute.entities.SurveyData;
 import com.realtech.socialsurvey.compute.entities.response.EntitySurveyStatsVO;
+import com.realtech.socialsurvey.compute.services.FailedMessagesService;
+import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
-import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -43,13 +44,24 @@ public class UpdateSurveyStatsBolt  extends BaseComputeBoltWithAck
 	public void executeTuple(Tuple input) 
 	{
 		LOG.info("Starting execution of CalculateSurveyStatsData ");
-		SurveyData surveyData = (SurveyData) input.getValueByField("surveyData");
-		EntitySurveyStatsVO agentSurveyStatsVO = (EntitySurveyStatsVO) input.getValueByField("agentSurveyStatsVO");
-		updateSurveyStats("agentId", surveyData.getAgentId(), agentSurveyStatsVO);
-		EntitySurveyStatsVO branchSurveyStatsVO = (EntitySurveyStatsVO) input.getValueByField("branchSurveyStatsVO");
-		updateSurveyStats("branchId", surveyData.getBranchId(), branchSurveyStatsVO);
-		EntitySurveyStatsVO companySurveyStatsVO = (EntitySurveyStatsVO) input.getValueByField("companySurveyStatsVO");
-		updateSurveyStats("companyId", surveyData.getCompanyId(), companySurveyStatsVO);
+		Boolean isSucess = (Boolean) input.getValueByField("isSucess");
+		if(isSucess) {
+			FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
+			SurveyData surveyData = (SurveyData) input.getValueByField("surveyData");
+			EntitySurveyStatsVO agentSurveyStatsVO = (EntitySurveyStatsVO) input.getValueByField("agentSurveyStatsVO");
+			EntitySurveyStatsVO branchSurveyStatsVO = (EntitySurveyStatsVO) input.getValueByField("branchSurveyStatsVO");
+			EntitySurveyStatsVO companySurveyStatsVO = (EntitySurveyStatsVO) input.getValueByField("companySurveyStatsVO");
+			try {
+				updateSurveyStats("agentId", surveyData.getAgentId(), agentSurveyStatsVO);
+				updateSurveyStats("branchId", surveyData.getBranchId(), branchSurveyStatsVO);
+				updateSurveyStats("companyId", surveyData.getCompanyId(), companySurveyStatsVO);
+				//delete from failed mesage if exists
+				failedMessagesService.deleteFailedSurveyProcessor(surveyData.getSurveyId());
+			}catch (Exception exception) {
+				failedMessagesService.insertTemporaryFailedSurveyProcessor(surveyData);
+			}
+		}
+		
 	}
 	
 	private boolean updateSurveyStats(String entityType, long entityId, EntitySurveyStatsVO entitySurveyStatsVO) 
