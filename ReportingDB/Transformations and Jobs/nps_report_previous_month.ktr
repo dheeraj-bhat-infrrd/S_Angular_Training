@@ -69,7 +69,7 @@
   <created_date>2017&#x2f;12&#x2f;13 12&#x3a;30&#x3a;18.015</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;12&#x2f;13 12&#x3a;30&#x3a;18.015</modified_date>
-    <key_for_session_key/>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -134,32 +134,6 @@
   <hop> <from>nps_report_month input</from><to>Update nps_report_month </to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>nps_report_month input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  nps_report_month_id&#xd;&#xa;, month&#xd;&#xa;, year&#xd;&#xa;, month&#x28;date_add&#x28;date_format&#x28;now&#x28;&#x29;,concat&#x28;year,&#x27;-&#x27;,month,&#x27;-&#x25;d&#x27;&#x29;&#x29;,interval 1 month&#x29;&#x29; as next_month&#xd;&#xa;, year&#x28;date_add&#x28;date_format&#x28;now&#x28;&#x29;,concat&#x28;year,&#x27;-&#x27;,month,&#x27;-&#x25;d&#x27;&#x29;&#x29;,interval 1 month&#x29;&#x29; as next_year&#xd;&#xa;, company_id&#xd;&#xa;, company_name&#xd;&#xa;, region_id&#xd;&#xa;, region_name&#xd;&#xa;, branch_id&#xd;&#xa;, branch_name&#xd;&#xa;, nps&#xd;&#xa;, previous_month_nps&#xd;&#xa;, nps_delta&#xd;&#xa;, responders&#xd;&#xa;, response_percent&#xd;&#xa;, avg_nps_rating&#xd;&#xa;, promotors_percent&#xd;&#xa;, detractors_percent&#xd;&#xa;FROM nps_report_month&#xd;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>251</xloc>
-      <yloc>94</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Update nps_report_month </name>
     <type>Update</type>
     <description/>
@@ -172,7 +146,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
-    <commit>1000</commit>
+    <commit>5000</commit>
     <use_batch>N</use_batch>
     <error_ignored>Y</error_ignored>
     <ignore_flag_field/>
@@ -217,6 +191,32 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>505</xloc>
+      <yloc>94</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>nps_report_month input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  nps_report_month_id&#xd;&#xa;, month&#xd;&#xa;, year&#xd;&#xa;, month&#x28;date_add&#x28;date_format&#x28;now&#x28;&#x29;,concat&#x28;year,&#x27;-&#x27;,month,&#x27;-&#x25;d&#x27;&#x29;&#x29;,interval 1 month&#x29;&#x29; as next_month&#xd;&#xa;, year&#x28;date_add&#x28;date_format&#x28;now&#x28;&#x29;,concat&#x28;year,&#x27;-&#x27;,month,&#x27;-&#x25;d&#x27;&#x29;&#x29;,interval 1 month&#x29;&#x29; as next_year&#xd;&#xa;, company_id&#xd;&#xa;, company_name&#xd;&#xa;, region_id&#xd;&#xa;, region_name&#xd;&#xa;, branch_id&#xd;&#xa;, branch_name&#xd;&#xa;, nps&#xd;&#xa;, previous_month_nps&#xd;&#xa;, nps_delta&#xd;&#xa;, responders&#xd;&#xa;, response_percent&#xd;&#xa;, avg_nps_rating&#xd;&#xa;, promotors_percent&#xd;&#xa;, detractors_percent&#xd;&#xa;FROM nps_report_month&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>251</xloc>
       <yloc>94</yloc>
       <draw>Y</draw>
       </GUI>

@@ -131,7 +131,7 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Generate random value</from><to>Table output</to><enabled>N</enabled> </hop>
+  <hop> <from>Generate random value</from><to>Table output</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>SortUserId</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeOnUserId</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>SortUserId</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
@@ -153,7 +153,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, STATUS&#xd;&#xa;FROM branch&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0 and STATUS &#x3d; 1 and branch_id&#x3d;2121 order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, STATUS&#xd;&#xa;FROM branch&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0 and STATUS &#x3d; 1 order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
