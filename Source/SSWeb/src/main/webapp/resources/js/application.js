@@ -7090,13 +7090,22 @@ $(document).on('keyup', '#search-users-key', function(e) {
 	// detect enter
 	if (e.keyCode == 13) {
 		userStartIndex = 0;
-		searchUsersByNameEmailLoginId($(this).val());
+		if($(this).val() != '' && $(this).val() != null && $(this).val() != undefined ){
+			searchUsersByNameEmailLoginId($(this).val());
+		}else{
+			initUserManagementPage();
+		}
 	}
 });
 
 $(document).on('click', '#um-search-icn', function(e) {
 	userStartIndex = 0;
-	searchUsersByNameEmailLoginId($('#search-users-key').val());
+	if($('#search-users-key').val() != '' && $('#search-users-key').val() != null && $('#search-users-key').val() != undefined ){
+		searchUsersByNameEmailLoginId($('#search-users-key').val());
+	}else{
+		initUserManagementPage();
+	}
+	
 });
 
 function searchUsersByNameEmailLoginId(searchKey) {
@@ -19590,8 +19599,10 @@ function drawSegmentList(segments){
 	$('#seg').find('.seg-name').html(company.name);
 	$('#seg').attr('id','company-'+company.iden);
 	
-	$('#stream-seg-dropdown-options').append('<div class="stream-dropdown-option-container stream-dropdown-segement-hdr">Regions</div>');
-	
+	if(regions != null && regions != undefined && regions.length != 0){
+		$('#stream-seg-dropdown-options').append('<div class="stream-dropdown-option-container stream-dropdown-segement-hdr">Regions</div>');
+	}
+		
 	$('#UsrOptions').html('');
 	
 	$('#UsrOptions').append(usrOuterContainer);
@@ -19641,7 +19652,9 @@ function drawSegmentList(segments){
 		}		
 	}
 	
-	$('#stream-seg-dropdown-options').append('<div class="stream-dropdown-option-container stream-dropdown-segement-hdr">Offices</div>');
+	if(branchs != null && branchs != undefined && branchs.length != 0){
+		$('#stream-seg-dropdown-options').append('<div class="stream-dropdown-option-container stream-dropdown-segement-hdr">Offices</div>');
+	}
 	
 	if(branchs != null && branchs != undefined){
 		for(var i=0; i<branchs.length; i++){
