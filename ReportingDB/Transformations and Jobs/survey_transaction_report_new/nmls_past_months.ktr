@@ -134,7 +134,8 @@
   <hop> <from>Database join Company</from><to>Database join FOR NMLS</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join FOR NMLS</from><to>Database join for license</to><enabled>Y</enabled> </hop>
   <hop> <from>survey transaction report input</from><to>Database join Company</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join for license</from><to>Update survey transaction report nmls</to><enabled>Y</enabled> </hop>
+  <hop> <from>Database join for license</from><to>Filter rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows</from><to>Update survey transaction report nmls</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Database join Company</name>
@@ -150,7 +151,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>select company,company_id as company_id_final from company where company_id in &#x28;&#xd;&#xa;select company_id from users where user_id &#x3d; &#x3f;&#x29;&#x3b;</sql>
-    <outer_join>Y</outer_join>
+    <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
       <field>
@@ -179,8 +180,8 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>SELECT NMLS_ID FROM lender_ref WHERE ZILLOW_TOKEN_ID &#x3d; &#x28;SELECT ZILLOW_TOKEN_ID FROM zillow_token WHERE type &#x3d; 4 AND id &#x3d; &#x3f;&#x29;&#x3b;</sql>
-    <outer_join>Y</outer_join>
+    <sql>SELECT NMLS_ID FROM lender_ref WHERE ZILLOW_TOKEN_ID &#x3d; &#xa;&#x28;SELECT ZILLOW_TOKEN_ID FROM zillow_token WHERE type &#x3d; 4 AND id &#x3d; &#x3f;&#x29;&#x3b;</sql>
+    <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
       <field>
@@ -210,7 +211,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT LICENSES FROM agent_settings WHERE USER_ID &#x3d; &#x3f;</sql>
-    <outer_join>Y</outer_join>
+    <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
       <field>
@@ -220,8 +221,56 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>825</xloc>
+      <xloc>828</xloc>
       <yloc>48</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Update survey transaction report nmls</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>month</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>year</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>user_id</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>828</xloc>
+      <yloc>159</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -283,8 +332,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>829</xloc>
-      <yloc>160</yloc>
+      <xloc>586</xloc>
+      <yloc>159</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

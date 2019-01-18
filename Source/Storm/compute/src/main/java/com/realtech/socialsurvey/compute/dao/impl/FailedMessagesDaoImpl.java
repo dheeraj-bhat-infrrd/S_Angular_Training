@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.dao.impl;
 
+import com.realtech.socialsurvey.compute.entities.*;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
@@ -10,10 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.compute.common.MongoDB;
 import com.realtech.socialsurvey.compute.dao.FailedMessagesDao;
-import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
-import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
-import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
-import com.realtech.socialsurvey.compute.entities.UnsavedUserEvent;
 
 
 /**
@@ -116,4 +113,5 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
         mongoDB.datastore().save( unsavedEvent );
         return true;
     }
+
 }

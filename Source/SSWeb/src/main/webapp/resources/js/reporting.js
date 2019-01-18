@@ -1879,7 +1879,7 @@ function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 	
 	var curDate = new Date();
 	var curYear = curDate.getFullYear();
-	
+	var curMonth = curDate.getMonth() + 1;
 	for(var i=0;i<recentActivityList.length;i++){
 		
 		var statusString = getStatusString(recentActivityList[i][6]);
@@ -1893,7 +1893,27 @@ function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>";
 			
-			if(reportType == 107){
+			if(reportType == 112){
+				var monthOfReport = getMonthNumberFromName((startDate.split(",")[0]).split(" ")[0])+1;
+				
+				
+				if((monthOfReport == curMonth) ){
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">This Month</td>";
+				}else if((monthOfReport == 12 && curMonth == 1) ){
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">Last Month</td>";
+				}else if(monthOfReport < curMonth){
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">Last Month</td>";
+				}else{
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">"+monthStartDate+"</td>";
+				}
+			}else if(reportType == 113){
+				var yearOfReport = parseInt(startDate.split(",")[1]);
+				if(yearOfReport < curYear){
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">Last Year</td>";
+				}else{
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">This Year</td>";
+				}
+			}else if(reportType == 107){
 				var yearOfReport = parseInt(startDate.split(",")[1]);
 				if(yearOfReport < curYear){
 					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">Last Year</td>";
@@ -2824,6 +2844,8 @@ function drawTransactionStats(overviewYearData){
 		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
 		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
 		$('#third-party-lbl-span').html(overviewYearData.ThirdParty);
+		$('#google-lbl-span').html(overviewYearData.google);
+		$('#facebook-lbl-span').html(overviewYearData.facebook);
 		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);
 		$('#unassigned-lbl-span').html(overviewYearData.Unassigned);
 		$('#duplicate-lbl-span').html(overviewYearData.Duplicate);
@@ -2854,6 +2876,8 @@ function drawTransactionStats(overviewYearData){
 		$('#social-posts-lbl-span').html(0);
 		$('#zillow-lbl-span').html(0);
 		$('#third-party-lbl-span').html(0);
+		$('#google-lbl-span').html(0);
+		$('#facebook-lbl-span').html(0);
 		$('#unprocessed-lbl-span').html(0);
 		$('#unassigned-lbl-span').html(0);
 		$('#duplicate-lbl-span').html(0);

@@ -470,5 +470,22 @@ public class SocialMonitorController
 
     }
 
+    @RequestMapping ( value = "/fbTokensPaginated", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch facebook tokens paginated")
+    public ResponseEntity<?> fetchFacebookTokensPaginated( HttpServletRequest request,
+        @RequestParam ( value = "skipCount", required = false) int skipCount,
+        @RequestParam ( value = "batchSize", required = false) int batchSize,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException, InvalidInputException
+    {
+        // get company setting for login user
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            SocialMediaTokensPaginated mediaTokens = organizationManagementService.fetchFbTokensPaginated( skipCount,
+                batchSize );
+            return new ResponseEntity<>( mediaTokens, HttpStatus.OK );
+        } catch ( AuthorizationException authoriztionFailure ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
 
+    }
 }

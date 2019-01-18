@@ -472,15 +472,15 @@
 }
 
 @media (max-width: 767px) {
-	
+
 	#ss-widget-container .ss-widget-stars {
     	font-size: 12px !important;
-	}	
-	
+	}
+
 	#ss-widget-container .ss-widget-rating-perc {
     	font-size: 9px !important;
 	}
-	
+
 	#ss-widget-container .ss-widget-rating-cont {
     	padding-left: 5px !important;
 	}

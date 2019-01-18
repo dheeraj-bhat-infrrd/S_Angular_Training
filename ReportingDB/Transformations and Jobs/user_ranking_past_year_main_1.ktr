@@ -2396,11 +2396,11 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,stage&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where stage &#x3d; -1 and SOURCE not in &#x28;&#x22;Zillow&#x22;, &#x22;admin&#x22;, &#x22;agent&#x22;, &#x22;customer&#x22;, &#x22;3rd Party Review&#x22;, &#x22;upload&#x22;, &#x22;CSV_UPLOAD&#x22;&#x29;&#xd;&#xa;and is_abusive&#x3d;0&#xa;order by SURVEY_PRE_INTITIATION_ID&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,stage&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where stage &#x3d; -1 and SOURCE not in &#x24;&#x7b;SURVEY_SOURCE_UNVERIFIED&#x7d;&#xd;&#xa;and is_abusive&#x3d;0&#xa;AND PARTICIPANT_TYPE NOT IN &#x24;&#x7b;REALTOR_SURVEY_TYPE&#x7d;&#xa;order by SURVEY_PRE_INTITIATION_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
+    <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -2422,11 +2422,11 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, STATUS as SURVEY_STATUS&#xd;&#xa;, year&#x28;CREATED_ON_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;where  SURVEY_SOURCE NOT IN &#x28;&#x22;Zillow&#x22; , &#x22;3rd Party Review&#x22;, &#x22;admin&#x22;, &#x22;agent&#x22;, &#x22;customer&#x22;, &#x22;upload&#x22;, &#x22;CSV_UPLOAD&#x22; &#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, STATUS as SURVEY_STATUS&#xd;&#xa;, year&#x28;CREATED_ON_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;where  SURVEY_SOURCE NOT IN &#x24;&#x7b;SURVEY_SOURCE_UNVERIFIED&#x7d;&#xa;AND PARTICIPANT_TYPE NOT IN &#x24;&#x7b;REALTOR_SURVEY_TYPE&#x7d;&#x3b;&#xd;&#xa;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
+    <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>

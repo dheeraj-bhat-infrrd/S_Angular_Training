@@ -38,20 +38,29 @@ public class GeoCodingApiUtils {
 	private GeocodingResult getGoogleApiResults(GeoApiContext context, String address)
 			throws ApiException, InterruptedException, IOException {
 		GeocodingResult[] results = GeocodingApi.geocode(context, address).await();
-		return results[0];
+		if(results != null && results.length >0)
+			return results[0];
+		else 
+			return null;
 	}
 	
 	private LatLng getGoogleApiResultsLocation(GeoApiContext context, String address)
 			throws ApiException, InterruptedException, IOException {
 		GeocodingResult result = getGoogleApiResults(context, address);
+		if(result == null) {
+		    return null;
+		}
 		return result.geometry.location;
 	}
 	
-	private String getGoogleApiResultsPlaceId(GeoApiContext context, String address)
-			throws ApiException, InterruptedException, IOException {
-		GeocodingResult result = getGoogleApiResults(context, address);
-		return result.placeId;
-	}
-	
-	
+
+    private String getGoogleApiResultsPlaceId( GeoApiContext context, String address )
+        throws ApiException, InterruptedException, IOException
+    {
+        GeocodingResult result = getGoogleApiResults( context, address );
+        if ( result == null ) {
+            return null;
+        }
+        return result.placeId;
+    }
 }

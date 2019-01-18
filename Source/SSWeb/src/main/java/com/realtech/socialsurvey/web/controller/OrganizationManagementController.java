@@ -46,7 +46,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.WidgetTemplateConstants;
-import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
@@ -878,7 +877,7 @@ public class OrganizationManagementController
 
             if ( surveySettings != null ) {
                 model.addAttribute( "autoPostEnabled", surveySettings.isAutoPostEnabled() );
-                model.addAttribute( "minpostscore", surveySettings.getShow_survey_above_score() );
+                model.addAttribute( "minpostscore", surveySettings.getAuto_post_score() );
                 model.addAttribute( "autoPostLinkToUserSite", surveySettings.isAutoPostLinkToUserSiteEnabled() );
             }
 
@@ -914,9 +913,11 @@ public class OrganizationManagementController
             model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
             
             
-            // add isSocialMonitorEnabled flag
-            model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
+            // add isEnableLoginButton flag
+            model.addAttribute( "isEnableLogin", companySettings.getIsLoginEnableAllowed() );
             
+            //Add OptOutText
+            model.addAttribute( "optOutText", companySettings.getOptoutText() );            
             
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason : ", e );
@@ -2625,6 +2626,141 @@ public class OrganizationManagementController
         LOG.info( "Method to reset text to be displayed to a customer after choosing the flow, resetTextForFlow() finished." );
         return message;
     }
+    
+    /**
+     * This controller is called to store text to be displayed to a customer after choosing the
+     * flow(happy/neutral/sad).
+     * 
+     * @param request
+     * @param model
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/storeoptouttext", method = RequestMethod.GET)
+    public String storeOptOutTextFlow( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to store text to be displayed on Disabled Login page, storeOptOutTextFlow() started." );
+        User user = sessionHelper.getCurrentUser();
+        String status = "";
+
+        try {
+            String text = request.getParameter( "text" );
+            
+            if ( text == null || text.isEmpty() ) {
+                LOG.error( "Null or empty value found in storeOptOutTextFlow() for text." );
+                return status;
+            }
+            text = text.trim();
+            
+            //decode text
+            text = new String( DatatypeConverter.parseBase64Binary( text ) );
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+
+            companySettings.setOptoutText( text );
+            
+            organizationManagementService.updateCompanySettings( companySettings, "optoutText", text );
+
+            status = CommonConstants.SUCCESS_ATTRIBUTE;
+
+            // Updating settings in session
+            HttpSession session = request.getSession();
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            if ( userSettings != null )
+                userSettings.setCompanySettings( companySettings );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in storeOptOutTextFlow(). Nested exception is ", e );
+        }
+
+        LOG.info( "Method to store text to be displayed on Disabled Login page, storeOptOutTextFlow() finished." );
+        return status;
+    }
+    
+    /**
+     * This controller is called to revert text to be displayed on Disabled Login page
+     * 
+     * @param request
+     * @param model
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/resetoptouttext", method = RequestMethod.GET)
+    public String resetOptOutText( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to reset text to be displayed on Disabled Login page, resetOptOutText() started." );
+        User user = sessionHelper.getCurrentUser();
+        String message = "";
+
+        try {
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+            
+            message = companySettings.getOptoutText();
+
+            // Updating settings in session
+            HttpSession session = request.getSession();
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            if ( userSettings != null )
+                userSettings.setCompanySettings( companySettings );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in storeOptOutTextFlow(). Nested exception is ", e );
+        }
+
+        LOG.info( "Method to reset text to be displayed on Disabled Login page, resetOptOutText() finished." );
+        return message;
+    }
+    
+    /**
+     * This controller is called to show/hide EnableLogin button on DisabledLogin page
+     * 
+     * @param request
+     * @param model
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/showenableloginbutton", method = RequestMethod.POST)
+    public String setEnableLoginButtonVisibility( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method to show EnableLogin button on Disabled Login page, setEnableLoginButtonVisibility() started." );
+        User user = sessionHelper.getCurrentUser();
+        String status = "";
+
+        try {
+            String showEnableLoginButton = request.getParameter( "isLoginEnabled" );
+            
+            if ( showEnableLoginButton == null || showEnableLoginButton.isEmpty() ) {
+                LOG.error( "Null or empty value found in storeOptOutTextFlow() for text." );
+                return status;
+            }
+            showEnableLoginButton = showEnableLoginButton.trim();
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+
+            companySettings.setIsLoginEnableAllowed( Boolean.parseBoolean( showEnableLoginButton ) );
+            
+            organizationManagementService.updateCompanySettings( companySettings, "isLoginEnableAllowed", showEnableLoginButton );
+
+            if(companySettings.getIsLoginEnableAllowed()) {
+               status = Boolean.TRUE.toString();
+            }
+            else {
+                status = Boolean.FALSE.toString();
+            }
+
+            // Updating settings in session
+            HttpSession session = request.getSession();
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            if ( userSettings != null )
+                userSettings.setCompanySettings( companySettings );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in setEnableLoginButtonVisibility(). Nested exception is ", e );
+        }
+        LOG.info( "Method to show EnableLogin button on Disabled Login page, setEnableLoginButtonVisibility() finished." );
+        return status;
+    }
 
 
     @ResponseBody
@@ -2977,7 +3113,7 @@ public class OrganizationManagementController
         LOG.info( "Updating Complaint Resolution Settings" );
         String ratingText = request.getParameter( "rating" );
         String moodText = request.getParameter( "mood" );
-        String mailId = request.getParameter( "mailId" );
+        String mailIdsInput = request.getParameter( "mailId" );
         String enabled = request.getParameter( "enabled" );
         boolean isComplaintHandlingEnabled = false;
 
@@ -2997,33 +3133,44 @@ public class OrganizationManagementController
             } else if ( enabled.equalsIgnoreCase( "enable" ) )
                 isComplaintHandlingEnabled = true;
 
-            if ( mailId == null || mailId.isEmpty() ) {
+            if ( mailIdsInput == null || mailIdsInput.isEmpty() ) {
                 throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
 
-            if ( !mailId.contains( "," ) ) {
-                if ( !organizationManagementService.validateEmail( mailId.trim() ) )
-                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
+            if ( !mailIdsInput.contains( "," ) ) {
+                if ( !organizationManagementService.validateEmail( mailIdsInput.trim() ) )
+                    throw new InvalidInputException( "Mail id - " + mailIdsInput + " entered as send alert to input is invalid",
                         DisplayMessageConstants.GENERAL_ERROR );
                 else
-                	mailId = mailId.trim();
+                	mailIdsInput = mailIdsInput.trim();
             } else {
-                String mailIds[] = mailId.split( "," );
+                String mailIds[] = mailIdsInput.split( "," );
 
                 if ( mailIds.length == 0 )
-                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is empty",
+                    throw new InvalidInputException( "Mail id - " + mailIdsInput + " entered as send alert to input is empty",
                         DisplayMessageConstants.GENERAL_ERROR );
 
+                List<String> mailIdList = new ArrayList<String>();
+                
                 for ( String mailID : mailIds ) {
-                    if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                        throw new InvalidInputException(
-                            "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
-                            DisplayMessageConstants.GENERAL_ERROR );
-                    else
-                        mailIDStr += mailID.trim() + " , ";
+
+                    if ( !mailIdList.contains( mailID.trim().toLowerCase() ) ) {
+
+
+                        if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                            throw new InvalidInputException(
+                                "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
+                                DisplayMessageConstants.GENERAL_ERROR );
+                        else {
+                            
+                            mailIdList.add( mailID.trim().toLowerCase() );
+                            mailIDStr += mailID.trim() + " , ";
+                        }
+                    }
+
                 }
-                mailId = mailIDStr.substring( 0, mailIDStr.length() - 2 );
+                mailIdsInput = mailIDStr.substring( 0, mailIDStr.length() - 2 );
             }
 
             long entityId = user.getCompany().getCompanyId();
@@ -3074,7 +3221,7 @@ public class OrganizationManagementController
 
             }
 
-            originalComplaintRegSettings.setMailId( mailId );
+            originalComplaintRegSettings.setMailId( mailIdsInput );
             originalComplaintRegSettings.setEnabled( isComplaintHandlingEnabled );
             unitSettings.getSurvey_settings().setComplaint_res_settings( originalComplaintRegSettings );
 

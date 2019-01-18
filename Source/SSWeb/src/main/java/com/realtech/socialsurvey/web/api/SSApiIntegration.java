@@ -405,7 +405,7 @@ public interface SSApiIntegration
 
 
     @POST ( "/v1/setshowsummitpopup")
-    Response setShowSummitPopup( @Query ( "companyId") Long companyId,
+    Response setShowSummitPopup( @Query ( "entityId") Long entityId, @Query ("entityType") String entityType,
         @Query ( "isShowSummitPopup") boolean isShowSummitPopup );
 
 
@@ -491,7 +491,7 @@ public interface SSApiIntegration
     
     @POST ( "/v1/searchresults/count" )
     Response getSearchResultsCount(@Body AdvancedSearchVO advancedSearchVO);
-    
+
     @GET("/v1/users/{companyId}/owner")
     public Response getOwnerForCompany(@Path("companyId") Long companyId);
 }

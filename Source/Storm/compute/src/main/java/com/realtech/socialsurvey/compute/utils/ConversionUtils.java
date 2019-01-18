@@ -5,11 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 
 /**
@@ -107,6 +110,24 @@ public class ConversionUtils
             ZoneId.of("-05:00"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" MM/dd/yyyy H:m:s a");
         return zonedDateTime.format(formatter);
+    }
+
+
+    /**
+     * Converts seconds to date object
+     * @param seconds
+     * @return
+     */
+    public static Date secondsToDateTime(long seconds){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        String dateTimeString =  Instant.ofEpochSecond(seconds).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" ));
+        try {
+            return format.parse( dateTimeString );
+        } catch ( ParseException e ) {
+            LOG.error( "Error while converting seconds {} to date", seconds );
+
+        }
+        return null;
     }
 
 }

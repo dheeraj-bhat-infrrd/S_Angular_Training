@@ -308,22 +308,11 @@ public class ReportingWebController
 
         String profileName = "";
         
-        if("companyId".equals( entityType)) {
-        	 String activeSession = (String) session.getAttribute("activeSession");
-        	 if(activeSession != null) {
-        		 session.setAttribute("activeSession","true");
-        	 }else{
-        		 session.setAttribute("activeSession","false");
-        	 }
-        	 
-        	 boolean hasRegisteredForSummit = organizationManagementService.hasRegisteredForSummit(entityId);
-             session.setAttribute("hasRegisteredForSummit", hasRegisteredForSummit);
-             boolean isShowSummitPopup = organizationManagementService.isShowSummitPopup(entityId);
-             session.setAttribute("isShowSummitPopup", isShowSummitPopup);
-        }else {
-        	session.setAttribute("hasRegisteredForSummit", true);
-        }
-       
+       /* boolean hasRegisteredForSummit = organizationManagementService.hasRegisteredForSummit(entityId);
+        session.setAttribute("hasRegisteredForSummit", hasRegisteredForSummit);*/
+        boolean isShowSummitPopup = organizationManagementService.isShowSummitPopup(entityId, entityType);
+        session.setAttribute("isShowSummitPopup", isShowSummitPopup);
+        
         //get unitSetting's and set session attribute column's 
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
@@ -407,6 +396,7 @@ public class ReportingWebController
         model.addAttribute( CommonConstants.HAS_BRANCH, hasBranch );
         model.addAttribute( CommonConstants.HAS_REGION, hasRegion );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
+        model.addAttribute( "vertical", profileSettings.getVertical().toLowerCase() );
         return JspResolver.REPORTING_DASHBOARD;
     }
 
@@ -1335,7 +1325,8 @@ public class ReportingWebController
         LOG.info( "Method setShowSummitPopup() started" );
         HttpSession session = request.getSession();
 
-        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         
         String isShowSummitPopupStr = request.getParameter( "isShowSummitPopup" );
         boolean isShowSummitPopup = false;
@@ -1346,7 +1337,7 @@ public class ReportingWebController
         Response response = null;
         
         try {
-        	 response = ssApiIntergrationBuilder.getIntegrationApi().setShowSummitPopup(companyId, isShowSummitPopup);
+        	 response = ssApiIntergrationBuilder.getIntegrationApi().setShowSummitPopup(entityId,entityType, isShowSummitPopup);
 
         	 LOG.info( "Method to setShowSummitPopup() finished." );
         	        String responseString = null;

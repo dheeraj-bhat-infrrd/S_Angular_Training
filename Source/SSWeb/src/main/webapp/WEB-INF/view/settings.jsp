@@ -67,7 +67,7 @@
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
 							</div>							
 							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
-								<div class="review-sort-sel-col">
+									<div class="review-sort-sel-col">
 									<div class="clearfix setting-sel-wrapper">
 										<div class="st-score-rt-top margin-top-twenty email-sel-item-resp sort-resp">
 											<spring:message code="label.review.sort.criteria.key" />
@@ -258,6 +258,25 @@
 			</div>
 		</c:if>
 		
+		<!-- Starting code for configuring opt-out text -->
+		<!-- <c:if test="${profilemasterid == 1 || accountMasterId == 1}">
+			<div class="um-top-container">
+				<div class="um-header  margin-top-25"><spring:message code="label.optout.text.setting" /></div>
+				<div class="clearfix um-panel-content">
+					<div id="enable-login-chk-box" class="float-left bd-check-img clear-both"></div>
+					<input type="hidden" id="enable-login-cb" name="enablelogin" value="${isEnableLogin}">
+					<div class="float-left listing-access-txt cust-resp-txt"><spring:message code="label.show.enable.login.button" /></div>
+				</div>
+				<div class="clearfix um-panel-content">
+					<div class="bd-mcq-row clearfix txtareaRow">
+						<div class="float-left cs-gq-lbl"><spring:message code="label.optout.configure.text" /></div>
+						<textarea id="opt-out-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+						<div class="float-left reset-opt-out-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
+					</div>
+				</div>
+			</div>
+		</c:if> -->
+		
 		<!-- Starting code for Other settings -->
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container border-0">
@@ -321,6 +340,17 @@
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Edit Settings");
+
+	/*if( "${columnName}" == "companyId" || "${columnName}" == "companyId" ){
+		$('#opt-out-text').val("${optOutText}");
+		if("${isEnableLogin}" == "false"){
+			$('#enable-login-chk-box').addClass('bd-check-img-checked');
+		}
+		else {
+			$('#enable-login-chk-box').removeClass('bd-check-img-checked');
+		}
+	}*/
+	
 	if( "${columnName}" != "agentId" && "${columnName}" != "companyId" ){
 		$('#customized-setting-div').addClass('margin-top-hundred');
 	}

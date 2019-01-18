@@ -31,8 +31,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
-import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -3007,6 +3005,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         && mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
                         review.setGoogleBusinessProfileUrl( mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() );
                     }
+
+                    //adding facebookUrl
+                    if(mediaTokens.getFacebookToken() !=null && mediaTokens.getFacebookToken().getFacebookPageLink() != null){
+                        review.setFacebookProfileUrl( mediaTokens.getFacebookToken().getFacebookPageLink() );
+                    }
                 }
             }
         }
@@ -5388,13 +5391,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             SurveyDetails surveyDetails = surveyDetailsList.get( i );
 
             queries.put( CommonConstants.REVIEW_COLUMN, surveyDetails.getReview() );
+            queries.put(  CommonConstants.SURVEY_SOURCE_COLUMN, CommonConstants.SURVEY_SOURCE_ZILLOW );
 
             if ( fromBatch ) {
                 utils.checkReviewForSwearWords( surveyDetails.getReview(), surveyHandler.getSwearList() );
             }
 
             LOG.info( "checking if survey already exist in database with review : {}", surveyDetails.getReview() );
-            SurveyDetails existingSurveyDetails = surveyDetailsDao.getZillowReviewByQueryMap( queries );
+            SurveyDetails existingSurveyDetails = surveyDetailsDao.getReviewByQueryMap( queries );
             if ( existingSurveyDetails == null ) {
                 LOG.info( "no survey found in database for current review" );
                 if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {

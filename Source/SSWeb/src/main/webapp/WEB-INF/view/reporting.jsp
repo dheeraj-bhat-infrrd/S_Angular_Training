@@ -133,44 +133,29 @@
 			</div>
 		</div>
 	</div>
+</div> --%>
+
+<c:if test='${vertical == "mortgage"}'>
+<div id="summit-ribbon-outer" class="summit-ribbon-outer">
+	<div id="summit-ribbon-body" class="summit-ribbon-body  cursor-pointer">
+		<div id="summit-ribbon-close-btn" class="summit-ribbon-close-btn cursor-pointer">x</div>
+	</div>
 </div>
 
-<div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
-	<div class="container summit-ribbon-con">
-		<div class="summit-ribbon">
-			<div class="summit-rib-timer-back">
-				<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown.png" class="summit-rib-timer-img">
-    			<div class="summit-rib-text summit-rib-days">23</div>
-			    <div class="summit-rib-text summit-rib-hrs">23</div> 
-			    <div class="summit-rib-text summit-rib-min">23</div> 
-			</div>
-			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
+<div id="summit-popup-outer" class="summit-popup-outer hide">
+	<div id="summit-popup-body" class="summit-popup-body cursor-pointer">
+		<div class="summit-popup-close-cont">
+			<div id="summit-popup-close-btn" class="summit-popup-close-btn cursor-pointer">x</div>
 		</div>
-	</div> --%>
-<%-- <c:if test="${profilemasterid == 1}">
-<div id="summit-popup" class="overlay-login summit-popup-outer">
-	<div id="summit-popup-body" class="summit-popup">
-		<div class="summit-timer-back">
-			<img src="${initParam.resourcesPath}/resources/images/TimeToWOW_Countdown_trans.png" class="summit-timer-img">
-			<div class="summit-timer-text summit-timer-days"></div>
-			<div class="summit-timer-text summit-timer-hrs"></div>
-			<div class="summit-timer-text summit-timer-min"></div>
-		</div>		
-		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
-		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
-		<!-- <div class="summit-checkbox-cont clearfix">
+		<div class="summit-checkbox-cont clearfix">
 			<div class="float-left wc-width summit-check-contain" id="">
 				<div id="summit-do-not-show" class="float-left summit-check" data-checked=false></div>
 	     		<div class="float-left wc-dashboard-text summit-check-text">Do not show this again</div>
 			</div>
-			<div class="float-left wc-width summit-popup-check-right summit-check-contain" id="">
-				<div id="summit-already-reg" class="float-left summit-check" data-checked=false></div>
-	     		<div class="float-left wc-dashboard-text summit-check-text">I already registered</div>
-			</div>
-		</div> -->
+		</div>
 	</div>
 </div>
-</c:if> --%>
+</c:if>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
@@ -179,10 +164,10 @@
 			<div id="reporting-prof-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper rep-prof-details" style="border-bottom:1px solid #d2cdcd">
 				<%@ include file="reporting_prof_details.jsp" %>
 			</div>
-			
+
 			<div id="reportingDashTabs" class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:15px; display:inline-block; padding: 0;">
 				<ul class="nav nav-tabs" role="tablist">
-					<li id="transaction-stats-btn"  class="active float-left"><a href="#trans-stats-tab" data-toggle="tab">Transaction Stats</a></li>							
+					<li id="transaction-stats-btn"  class="active float-left"><a href="#trans-stats-tab" data-toggle="tab">Transaction Stats</a></li>
 					<li id="overview-btn" onclick="showOverviewTab()" class="float-left"><a href="#overview-tab" data-toggle="tab">Promoter Stats</a></li>
 					<li id="leaderboard-btn"  class="float-left"><a href="#leaderboard-tab" data-toggle="tab">LeaderBoard</a></li>
 					<li id="score-stats-btn" class="float-left"><a href="#score-stats-tab" data-toggle="tab">Score Stats</a></li>
@@ -196,7 +181,7 @@
 							<%-- <%@ include file="reporting_transaction_details.jsp" %> --%>
 						</div>
 					</div>
-					
+
 					<div class="tab-pane fade" id="overview-tab"  style="margin-top: 40px;">
 						<div id="overviewSuccess" class="hide col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0">
 							<%@ include file="reporting_overview.jsp" %>
@@ -205,16 +190,16 @@
 							<div style="text-align:center; margin:5% auto">
 								<span class="incomplete-trans-span" style="font-size:large">Sorry!!!</span>
 								<div style="clear: both">
-									<span class="incomplete-trans-span" style="font-size:large">Incomplete Data Found in Overview</span> 
+									<span class="incomplete-trans-span" style="font-size:large">Incomplete Data Found in Overview</span>
 								</div>
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12" id="leaderboard-tab" style="padding: 0;">
 						<%@ include file="reporting_leaderboard.jsp" %>
 					</div>
-					
+
 					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12" id="score-stats-tab">
 						<div id="score-stats-dash" class="hide" ></div>
 						<div id="overall-ratings-div" class="col-md-12 col-lg-12 col-sm-12 col-xs-12 score-stats-overall-con">
@@ -223,9 +208,9 @@
 								<div id="overall-rating-chart" style="width: 100%; min-height: 300px"></div>
 							</div>
 						</div>
-						
+
 						<div id="question-ratings-div" class="col-md-12 col-lg-12 col-sm-12 col-xs-12 score-stats-ques-con">
-							
+
 						</div>
 						<div id="empty-questions-div" class="hide" style="position: relative;">
 							<div style="text-align: center; margin: 5% auto">
@@ -236,7 +221,7 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="tab-pane fade" id="reviews-tab" style="margin-top: 30px;">
 						<div id="rep-reviews-container" class="people-say-wrapper rt-content-main rt-content-main-adj" style="margin-left:0">
 							<div class="main-con-header clearfix pad-bot-10-resp" style="display: block; border-bottom: 1px solid #dcdcdc; padding: 15px 0;">
@@ -246,7 +231,7 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="tab-pane fade" id="incomplete-surveys-tab" style="max-height:600px; margin-top: 30px;">
 						<div id="rep-dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12" style="width: 100%; padding-top:0; margin-top: -10px; margin-bottom: 20px;">
 							<div class="dash-lp-header clearfix" id="incomplete-survey-header">
@@ -256,7 +241,7 @@
 								<div id="rep-icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="icn-sur-popup-cont"></div>
 								<div class="mult-sur-icn-wrapper">
 									<div id="rep-resend-mult-sur-icn" class="mult-sur-icn resend-mult-sur-icn float-left" title="Resend"></div>
-								    <%--<div id="rep-del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right" title="Delete"></div>--%> 
+								    <div id="rep-del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right" title="Delete"></div> 
 								</div>
 							</div>
 							<div id="paginate-buttons-survey" class="paginate-buttons-survey clearfix">
@@ -273,13 +258,13 @@
 								<div style="text-align:center; margin:5% auto">
 									<span class="incomplete-trans-span" style="font-size:large">Cheers!!!</span>
 									<div style="clear: both">
-										<span class="incomplete-trans-span" style="font-size:large">No Incomplete surveys found</span> 
+										<span class="incomplete-trans-span" style="font-size:large">No Incomplete surveys found</span>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					
+
 				</div>
 			</div>
 		</div>
@@ -288,7 +273,7 @@
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Dashboard");
-	
+
 		updateViewAsScroll();
 		
 	$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
@@ -301,54 +286,54 @@
 				sendSurveyInvitationAdmin(colName, colValue, '#dsh-btn1');
 			}
 		});
-	
+
 	var profileMasterId = $('#rep-prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#rep-prof-container').attr('data-column-name');
 	var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
 	var accountType = $('#rep-prof-container').attr('data-account-type');
-	
-	
+
+
 	if( "${isSocialMediaExpired}" == "true" ){
 		var columnName = "${columnName}";
 		var columnValue = "${columnValue}";
 		$("#rep-fix-social-media").removeClass("hide");
-		
+
 	} else {
 		drawReportingDashButtons(currentProfileName, currentProfileValue);
 	}
-	
+
 	drawTransactionDetailsTab();
-	
+
 	drawOverviewPage();
-	
+
 	//Score stats
 		var companyId = "${companyId}";
 		var userId = "${userId}";
 		var profileMasterIdLead = "${profilemasterid}";
 		var columnName = "${columnName}";
 		var columnId = "${columnValue}";
-		
+
 		drawLeaderboardPage(columnName, columnId, profileMasterIdLead, userId, companyId);
-		
+
 		var entityType = $('#reporting-data-div').attr('data-column-name');
 		var entityId = parseInt($('#reporting-data-div').attr('data-column-value'));
-		
+
 		getOverallScoreStats(entityId, entityType);
-		
+
 		getQuestionScoreStats(entityId,entityType);
-		
+
 		paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
-		
+
 		$(window).resize();
-		
+
 		var currentProfileName = $('#rep-prof-container').attr('data-column-name');
 		var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
-		
+
 		getIncompleteSurveyCountForNewDashboard(currentProfileName, currentProfileValue);
-		
+
 		$('#rep-icn-sur-popup-cont').attr("data-start", 0);
 		paintIncompleteSurveyListForNewDashboard(0,currentProfileName,currentProfileValue);
-		
+
 		$('#rep-pro-cmplt-stars').on('click', '#dsh-btn2', function(e) {
 			e.stopPropagation();
 			var buttonId = 'dsh-btn2';
@@ -359,9 +344,9 @@
 					var currentProfileName = $('#rep-prof-container').attr('data-column-name');
 					var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
 					changeSocialMedia(currentProfileName, currentProfileValue);
-			}	
+			}
 		});
-		
+
 		$('#rep-pro-fix-cmplt-stars').on('click', '#dsh-btn0', function(e) {
 			e.stopPropagation();
 			var buttonId = 'dsh-btn0';
@@ -370,9 +355,9 @@
 					"columnName" : $('#rep-prof-container').attr('data-column-name'),
 					"columnValue" : $('#rep-prof-container').attr('data-column-value')
 				};
-			callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);	
+			callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);
 		});
-		
+
 		$('#rep-social-media').on('click','#rep-dismiss-social-media',function(e){
 			$('#rep-social-media').fadeOut(500);
 			delay(function(){
@@ -382,77 +367,41 @@
 				changeSocialMedia(currentProfileName, currentProfileValue);
 			},500);
 		});
-		
-		
+
+
 		$('#rep-fix-social-media').on('click','#rep-dismiss-fix-social-media',function(e){
 			$('#rep-fix-social-media').fadeOut(500);
 			delay(function(){
 				drawReportingDashButtons(currentProfileName, currentProfileValue);
 			},500);
 		});
-		
+
 		$(window).off('scroll');
 		$(window).scroll(function() {
 			if(window.location.hash.substr(1) == "showreportingpage" && $('#reviews-tab').hasClass('active')) {
-				dashbaordReviewScroll();		
+				dashbaordReviewScroll();
 			}
 		});
-		
+
 		cssForSafari();
-		
+
 		hideOverlay();
 		
-		/* var newSession = sessionStorage.getItem("newSession");
-		if(parseInt(profileMasterIdLead)==1){
-			if(newSession == false || newSession == 'false'){
-				closeSummitPopup();
-			}else{
-				showSummitPopup();
-			}
-		} */
+		showSummitRibbon();
 		
-		/* var hasRegisteredForSummit = "${hasRegisteredForSummit}";
-		var activeSession = "${activeSession}";
 		var isShowSummitPopup ="${isShowSummitPopup}";
-		
 		var newSession = sessionStorage.getItem("newSession");
-		var fbPopup = sessionStorage.getItem("fbPopup");
 		
 		if(newSession == false || newSession == 'false'){
 			$('#summit-popup').hide();
 			showSummitRibbon();
-			enableBodyScroll();
 		}else{
 			if(isShowSummitPopup == 'false' || isShowSummitPopup == false){
 				showSummitPopup();
 			}else{
 				showSummitRibbon();
 			}
-		} */
-		
-		/* if(fbPopup == true || fbPopup == 'true'){
-			$('#fb-policy-banner').show();
-		}else if(fbPopup == false || fbPopup == 'false'){
-			$('#fb-policy-banner').hide();
-		} */
-		
-		/* var diffDays = summitTimer();
-		$('.summit-timer-days').html(diffDays.d);
-		$('.summit-timer-hrs').html(diffDays.h);
-		$('.summit-timer-min').html(diffDays.m);
-		$('.summit-rib-days').html(diffDays.d);
-		$('.summit-rib-hrs').html(diffDays.h);
-		$('.summit-rib-min').html(diffDays.m);
-		
-		window.setInterval(function(){
-			var diffDays = summitTimer();
-			$('.summit-timer-days').html(diffDays.d);
-			$('.summit-timer-hrs').html(diffDays.h);
-			$('.summit-timer-min').html(diffDays.m);
-			$('.summit-rib-days').html(diffDays.d);
-			$('.summit-rib-hrs').html(diffDays.h);
-			$('.summit-rib-min').html(diffDays.m);
-		}, 60000); */
+		}
 		
 		sessionStorage.setItem("newSession",false);
 	});

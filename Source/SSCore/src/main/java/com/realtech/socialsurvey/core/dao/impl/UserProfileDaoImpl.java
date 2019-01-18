@@ -773,6 +773,9 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         }else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
         	criteria.createAlias(CommonConstants.COMPANY , "comp" );
         	criteria.add( Restrictions.eq( "comp.companyId", entityId ) );
+        }else {
+        	//since no hierarchy is updating agent list is null
+        	return null;
         }
         
         criteria.add( Restrictions.eq( CommonConstants.PROFILE_MASTER_COLUMN + "." + "profileId" , CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );

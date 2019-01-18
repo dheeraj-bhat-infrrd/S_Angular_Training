@@ -10,6 +10,25 @@ public class BranchVO
     private String branch;
     private String address1;
     private String address2;
+    private long regionId;
+    private String regionName;
+    
+    public long getRegionId()
+    {
+        return regionId;
+    }
+    public void setRegionId( long regionId )
+    {
+        this.regionId = regionId;
+    }
+    public String getRegionName()
+    {
+        return regionName;
+    }
+    public void setRegionName( String regionName )
+    {
+        this.regionName = regionName;
+    }
     public long getBranchId()
     {
         return branchId;

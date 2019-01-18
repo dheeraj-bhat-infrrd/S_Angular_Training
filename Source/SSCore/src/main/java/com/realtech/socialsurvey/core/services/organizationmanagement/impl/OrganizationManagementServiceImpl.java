@@ -29,12 +29,13 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.vo.BranchVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -71,69 +72,6 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
 import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
-import com.realtech.socialsurvey.core.entities.CRMInfo;
-import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
-import com.realtech.socialsurvey.core.entities.CompanyView;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
-import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
-import com.realtech.socialsurvey.core.entities.DisabledAccount;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
-import com.realtech.socialsurvey.core.entities.Event;
-import com.realtech.socialsurvey.core.entities.FacebookToken;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.FileUpload;
-import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
-import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
-import com.realtech.socialsurvey.core.entities.Keyword;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.LinkedInToken;
-import com.realtech.socialsurvey.core.entities.LockSettings;
-import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
-import com.realtech.socialsurvey.core.entities.MailContent;
-import com.realtech.socialsurvey.core.entities.MailContentSettings;
-import com.realtech.socialsurvey.core.entities.MailIdSettings;
-import com.realtech.socialsurvey.core.entities.MonitorType;
-import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
-import com.realtech.socialsurvey.core.entities.RankingRequirements;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
-import com.realtech.socialsurvey.core.entities.RegistrationStage;
-import com.realtech.socialsurvey.core.entities.RemovedUser;
-import com.realtech.socialsurvey.core.entities.RetriedTransaction;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
-import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
-import com.realtech.socialsurvey.core.entities.StateLookup;
-import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
-import com.realtech.socialsurvey.core.entities.UploadStatus;
-import com.realtech.socialsurvey.core.entities.UploadValidation;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserApiKey;
-import com.realtech.socialsurvey.core.entities.UserEmailMapping;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
-import com.realtech.socialsurvey.core.entities.VerticalsMaster;
-import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -175,6 +113,7 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
 import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
+import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -402,9 +341,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private SocialMediaExceptionHandler socialMediaExceptionHandler;
     
-    @Autowired
-    private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
-
     @Autowired
     private SocialFeedService socialFeedService;
     
@@ -810,7 +746,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         MailContentSettings mailContentSettings = new MailContentSettings();
         companySettings.setMail_content( mailContentSettings );
-
+        companySettings.setShowSummitPopup( false );
 
         LOG.debug( "Inserting company settings." );
         OrganizationUnitSettings oldCompanySettings = null;
@@ -4645,6 +4581,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( !isDefaultFlag ) {
             organizationSettings.setSendMonthlyDigestMail( true );
         }
+        
+        organizationSettings.setShowSummitPopup( false );
 
         organizationUnitSettingsDao.insertOrganizationUnitSettings( organizationSettings,
             MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
@@ -4702,6 +4640,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( !isDefaultFlag ) {
             organizationSettings.setSendMonthlyDigestMail( true );
         }
+        
+        organizationSettings.setShowSummitPopup( false );
 
         organizationUnitSettingsDao.insertOrganizationUnitSettings( organizationSettings,
             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
@@ -10554,52 +10494,52 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-	@Override
-	public boolean hasRegisteredForSummit(Long companyId) throws InvalidInputException {
-		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
-	     if ( companyId < 0l ) {
-	    	LOG.error( "Invalid company id passed as argument " );
-	       	throw new InvalidInputException( "Invalid company id passed as argument " );
-	     }
-	
-	     return organizationUnitSettingsDao.hasRegisteredForSummit(companyId).hasRegisteredForSummit();
-	}
+    @Override
+    public boolean hasRegisteredForSummit(Long companyId) throws InvalidInputException {
+         LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+         if ( companyId < 0l ) {
+            LOG.error( "Invalid company id passed as argument " );
+            throw new InvalidInputException( "Invalid company id passed as argument " );
+         }
+    
+         return organizationUnitSettingsDao.hasRegisteredForSummit(companyId).hasRegisteredForSummit();
+    }
 
 
-	@Override
-	public void setHasRegisteredForSummit(Long companyId, boolean hasRegisteredForSummit) throws InvalidInputException {
-		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
-	     if ( companyId < 0l ) {
-	    	LOG.error( "Invalid company id passed as argument " );
-	       	throw new InvalidInputException( "Invalid company id passed as argument " );
-	     }
-	     
-	     organizationUnitSettingsDao.updateHasRegisteredForSummit(companyId, hasRegisteredForSummit);
-	}
-	
-	@Override
-	public boolean isShowSummitPopup(Long companyId) throws InvalidInputException {
-		 LOG.debug( "Method isShowSummitPopup called for companyId:" + companyId );
-	     if ( companyId < 0l ) {
-	    	LOG.error( "Invalid company id passed as argument " );
-	       	throw new InvalidInputException( "Invalid company id passed as argument " );
-	     }
-	
-	     return organizationUnitSettingsDao.isShowSummitPopup(companyId).isShowSummitPopup();
-	}
+    @Override
+    public void setHasRegisteredForSummit(Long companyId, boolean hasRegisteredForSummit) throws InvalidInputException {
+         LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+         if ( companyId < 0l ) {
+            LOG.error( "Invalid company id passed as argument " );
+            throw new InvalidInputException( "Invalid company id passed as argument " );
+         }
+         
+         organizationUnitSettingsDao.updateHasRegisteredForSummit(companyId, hasRegisteredForSummit);
+    }
+    
+    @Override
+    public boolean isShowSummitPopup(Long entityId, String entityType) throws InvalidInputException {
+         LOG.debug( "Method isShowSummitPopup called for entityId:" + entityId );
+         if ( entityId < 0l ) {
+            LOG.error( "Invalid entityId passed as argument " );
+            throw new InvalidInputException( "Invalid entityId passed as argument " );
+         }
+    
+         return organizationUnitSettingsDao.isShowSummitPopup(entityId,entityType).isShowSummitPopup();
+    }
 
 
 
-	@Override
-	public void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException {
-		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
-	     if ( companyId < 0l ) {
-	    	LOG.error( "Invalid company id passed as argument " );
-	       	throw new InvalidInputException( "Invalid company id passed as argument " );
-	     }
-	     
-	     organizationUnitSettingsDao.updateShowSummitPopup(companyId, isShowSummitPopup);
-	}
+    @Override
+    public void setShowSummitPopup(Long entityId, String entityType, boolean isShowSummitPopup) throws InvalidInputException {
+         LOG.debug( "Method hasRegisteredForSummit called for entityId:" + entityId );
+         if ( entityId < 0l ) {
+            LOG.error( "Invalid entityId passed as argument " );
+            throw new InvalidInputException( "Invalid entityId passed as argument " );
+         }
+         
+         organizationUnitSettingsDao.updateShowSummitPopup(entityId, entityType, isShowSummitPopup);
+    }
 
     
      @Override 
@@ -10838,13 +10778,313 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return usersMap;
     }
 
+    @Override
+    @Transactional
+    public SocialMediaTokensPaginated fetchFbTokensPaginated( int skipCount, int batchSize )
+        throws InvalidInputException
+    {
+        LOG.info( "Inside method fetchFbTokensResponse" );
+        SocialMediaTokensPaginated socialMediaTokensPaginated = new SocialMediaTokensPaginated();
+        int totalRecord = 0;
+
+        // fetch companies media token
+        long companyTokensCount = organizationUnitSettingsDao
+            .getFacebookTokensCount( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        long regionTokensCount = organizationUnitSettingsDao
+            .getFacebookTokensCount( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        long branchTokensCount = organizationUnitSettingsDao
+            .getFacebookTokensCount( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        long agentTokensCount = organizationUnitSettingsDao
+            .getFacebookTokensCount( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        if ( skipCount < companyTokensCount ) {
+            List<SocialMediaTokenResponse> companiesMediaTokens = organizationUnitSettingsDao
+                .getFbTokensByCollection( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                    skipCount, batchSize );
+
+            totalRecord = companiesMediaTokens.size();
+
+            socialMediaTokensPaginated.setCompaniesTokens( companiesMediaTokens );
+
+            if ( totalRecord < batchSize ) {
+                List<SocialMediaTokenResponse> regionsMediaTokens = organizationUnitSettingsDao
+                    .getFbTokensByCollection( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, 0,
+                        batchSize - totalRecord );
+                totalRecord += regionsMediaTokens.size();
+
+                socialMediaTokensPaginated.setRegionsTokens( regionsMediaTokens );
+
+                if ( totalRecord < batchSize ) {
+                    List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
+                        .getFbTokensByCollection( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                            0, batchSize - totalRecord );
+                    totalRecord += branchMediaTokens.size();
+                    socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
+
+                    if ( totalRecord < batchSize ) {
+                        List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao
+                            .getFbTokensByCollection(
+                                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                                batchSize - totalRecord );
+                        totalRecord +=agentMediaTokens.size();
+                        socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+                    }
+                }
+            }
+        } else if ( skipCount < companyTokensCount + regionTokensCount ) {
+
+            List<SocialMediaTokenResponse> regionsMediaTokens = organizationUnitSettingsDao
+                .getFbTokensByCollection( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                    (int) ( skipCount - companyTokensCount ), batchSize );
+            totalRecord += regionsMediaTokens.size();
+
+            socialMediaTokensPaginated.setRegionsTokens( regionsMediaTokens );
+
+            if ( totalRecord < batchSize ) {
+                List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
+                    .getFbTokensByCollection( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, 0,
+                        batchSize - totalRecord );
+                totalRecord += branchMediaTokens.size();
+                socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
+
+                if ( totalRecord < batchSize ) {
+                    List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao
+                        .getFbTokensByCollection( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                            batchSize - totalRecord );
+                    totalRecord +=agentMediaTokens.size();
+                    socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+                }
+            }
+        } else if ( skipCount < companyTokensCount + regionTokensCount + branchTokensCount ) {
+            List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao.getFbTokensByCollection(
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                (int) ( skipCount - ( companyTokensCount + regionTokensCount ) ), batchSize );
+            totalRecord += branchMediaTokens.size();
+            socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
+
+            if ( totalRecord < batchSize ) {
+                List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao
+                    .getFbTokensByCollection( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                        batchSize - totalRecord );
+                totalRecord +=agentMediaTokens.size();
+                socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+            }
+        } else if ( skipCount < companyTokensCount + regionTokensCount + branchTokensCount + agentTokensCount ) {
+            List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao.getFbTokensByCollection(
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                (int) ( skipCount - ( companyTokensCount + regionTokensCount + branchTokensCount ) ), batchSize );
+            totalRecord +=agentMediaTokens.size();
+            socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+        }
+
+        socialMediaTokensPaginated.setTotalRecord(totalRecord);
+
+        setCompanyIdsMap( socialMediaTokensPaginated );
+
+        LOG.info( "End of method fetchSocialMediaTokensResponse" );
+        return socialMediaTokensPaginated;
+    }
+
+
+    @Override public BranchVO getBranchDetails( long iden ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        BranchVO branchVO;
+        if ( iden <= 0l ) {
+            throw new InvalidInputException( "Invalid branch id. : " + iden );
+        }
+        Branch branch = branchDao.findById( Branch.class, iden );
+        if ( branch == null ) {
+            throw new NoRecordsFetchedException( "No branch present in db for branchId : " + iden );
+        } else {
+             branchVO = new BranchVO();
+            branchVO.setBranchId( iden );
+            branchVO.setBranch( branch.getBranchName() );
+            branchVO.setRegionId( branch.getRegion().getRegionId() );
+            branchVO.setRegionName( branch.getRegion().getRegion() );
+        }
+        return branchVO;
+    }
+
+
+    @Override
+    public List<OrganizationUnitIds> getDetailsFromPlaceId( String placeId ) throws InvalidInputException, ProfileNotFoundException
+    {
+        String placeIdKey = "socialMediaTokens.googleBusinessToken.googleBusinessLink";
+        placeId = "https://search.google.com/local/writereview?placeid=".concat( placeId );
+        List<OrganizationUnitIds> ouIdList = new ArrayList<>();
+        // Agent Settings
+        List<OrganizationUnitSettings> agentSettingsList = organizationUnitSettingsDao.getOrganizationSettingsByKey( placeIdKey,
+            placeId, CommonConstants.AGENT_SETTINGS_COLLECTION );
+        if ( agentSettingsList != null && agentSettingsList.size() > 0 ) {
+            for ( OrganizationUnitSettings agentSettings : agentSettingsList ) {
+                OrganizationUnitIds ouId = new OrganizationUnitIds();
+                User user = userDao.findById( User.class, agentSettings.getIden() );
+                Map<String, Long> hierarchyMap = profileManagementService.getHierarchyDetailsByEntity( CommonConstants.AGENT_ID,
+                    agentSettings.getIden() );
+                ouId.setCompleteProfileUrl( agentSettings.getCompleteProfileUrl() );
+                ouId.setAgentName( user.getFirstName().concat( " " ).concat( user.getLastName() ) );
+                ouId.setAgentId( agentSettings.getIden() );
+                ouId.setBranchId( hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
+                ouId.setRegionId( hierarchyMap.get( CommonConstants.REGION_ID_COLUMN ) );
+                ouId.setCompanyId( hierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN ) );
+                ouId.setProfileType( CommonConstants.AGENT_SETTINGS_COLLECTION );
+                ouId.setSocialMediaLastFetched( agentSettings.getSocialMediaLastFetched() );
+                ouIdList.add( ouId );
+            }
+        }
+
+        // Branch Settings
+        List<OrganizationUnitSettings> branchSettingsList = organizationUnitSettingsDao
+            .getOrganizationSettingsByKey( placeIdKey, placeId, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+        if ( branchSettingsList != null && branchSettingsList.size() > 0 ) {
+            for ( OrganizationUnitSettings branchSettings : branchSettingsList ) {
+                OrganizationUnitIds ouId = new OrganizationUnitIds();
+                Branch branch = branchDao.findById( Branch.class, branchSettings.getIden() );
+                ouId.setBranchId( branch.getBranchId() );
+                ouId.setRegionId( branch.getRegion().getRegionId() );
+                ouId.setCompanyId( branch.getCompany().getCompanyId() );
+                ouId.setProfileType( CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                ouId.setSocialMediaLastFetched( branchSettings.getSocialMediaLastFetched() );
+                ouIdList.add( ouId );
+            }
+        }
+
+        // Region Settings
+        List<OrganizationUnitSettings> regionSettingsList = organizationUnitSettingsDao
+            .getOrganizationSettingsByKey( placeIdKey, placeId, CommonConstants.REGION_SETTINGS_COLLECTION );
+        if ( regionSettingsList != null && regionSettingsList.size() > 0 ) {
+            for ( OrganizationUnitSettings regionSettings : regionSettingsList ) {
+                OrganizationUnitIds ouId = new OrganizationUnitIds();
+                Region region = regionDao.findById( Region.class, regionSettings.getIden() );
+                ouId.setRegionId( region.getRegionId() );
+                ouId.setCompanyId( region.getCompany().getCompanyId() );
+                ouId.setProfileType( CommonConstants.REGION_SETTINGS_COLLECTION );
+                ouId.setSocialMediaLastFetched( regionSettings.getSocialMediaLastFetched() );
+                ouIdList.add( ouId );
+            }
+        }
+
+        // Company Settings
+        List<OrganizationUnitSettings> companySettingsList = organizationUnitSettingsDao
+            .getOrganizationSettingsByKey( placeIdKey, placeId, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        if ( companySettingsList != null && companySettingsList.size() > 0 ) {
+            for ( OrganizationUnitSettings companySettings : companySettingsList ) {
+                OrganizationUnitIds ouId = new OrganizationUnitIds();
+                ouId.setCompanyId( companySettings.getIden() );
+                ouId.setProfileType( CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                ouId.setSocialMediaLastFetched( companySettings.getSocialMediaLastFetched() );
+                ouIdList.add( ouId );
+            }
+        }
+        return ouIdList;
+    }
+
+
+    @Override
+    public boolean updateSocialMediaLastFetched( String profile, long iden, String socialMedia, long current, long previous )
+        throws InvalidInputException
+    {
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateSocialMediaLastFetched() called" );
+        }
+        String fieldToUpdate;
+        Object value;
+
+        if(profile == null || profile.isEmpty()) throw  new InvalidInputException( "Collection name is invalid" );
+
+        else if(iden <= 0) throw  new InvalidInputException( "iden is invalid" );
+
+        else if(current < 0 || previous < 0) throw  new InvalidInputException( " Invalid current/previous values " );
+
+        switch ( socialMedia ) {
+            case CommonConstants.SURVEY_SOURCE_FACEBOOK :
+                fieldToUpdate = "socialMediaLastFetched.fbReviewLastFetched";
+                value = new FBReviewLastFetched(previous,current);
+                break;
+            case CommonConstants.SURVEY_SOURCE_GOOGLE :
+                fieldToUpdate = "socialMediaLastFetched.googleReviewLastFetched";
+                value = new GoogleReviewLastFetched(previous, current);
+                break;
+
+            default :
+                LOG.error( "Invalid socialMedia" );
+                throw new InvalidInputException( "Invalid socialMedia {}", socialMedia );
+        }
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( fieldToUpdate, value, iden, profile );
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateSocialMediaToken() completed" );
+        }
+        return true;
+    }
+
+
+    @Override public boolean resetSocialMediaLastFetched( String profile, long iden, String socialMedia )
+        throws InvalidInputException
+    {
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method resetSocialMediaLastFetched() called" );
+        }
+
+        String fieldToUpdate = null;
+        Object value =null;
+
+        if(profile == null || profile.isEmpty()) throw  new InvalidInputException( "Collection name is invalid" );
+
+        else if(iden <= 0) throw  new InvalidInputException( "iden is invalid" );
+
+        /* First find the previous value of the socialMediaLastFetched to update the current value */
+        SocialMediaLastFetched socialMediaLastFetched = organizationUnitSettingsDao.fetchSocialMediaLastFetched(iden,profile)
+            .getSocialMediaLastFetched();
+
+        switch ( socialMedia ){
+            case CommonConstants.SURVEY_SOURCE_FACEBOOK :
+                if(socialMediaLastFetched.getFbReviewLastFetched() != null ){
+                    fieldToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_FBREVIEW_LASTFETCHED_CURRENT;
+                    value = socialMediaLastFetched.getFbReviewLastFetched().getPrevious();
+                }
+                break;
+            case CommonConstants.SURVEY_SOURCE_GOOGLE :
+                if(socialMediaLastFetched.getGoogleReviewLastFetched() != null ){
+                    fieldToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_REVIEW_LAST_FETCHED_CURRENT;
+                    value = socialMediaLastFetched.getGoogleReviewLastFetched().getPrevious();
+                }
+                break;
+
+            default:  LOG.error( "Invalid socialMedia {}", socialMedia );
+                throw new InvalidInputException( "Invalid socialMedia {}", socialMedia );
+        }
+
+        if(fieldToUpdate != null && value!= null)
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( fieldToUpdate, value, iden, profile );
+
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateSocialMediaToken() completed" );
+        }
+        return true;
+    }
+
+    //Unsets the key of a particular collection for a given iden
+    @Override
+    public boolean unsetKey( long iden, String keyToUpdate, String collectionName )
+        throws InvalidInputException
+    {
+        if ( iden <= 0 ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+
+        LOG.info( "unsetting key {} for {} with iden {}", keyToUpdate, collectionName , iden);
+        organizationUnitSettingsDao.removeKeyInOrganizationSettings( iden, keyToUpdate, collectionName );
+        LOG.debug( "Updated the record successfully" );
+
+        return true;
+    }
 
     @Override public void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey )
     {
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
             allowPartnerSurvey, unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
     }
-    
+
     @Override
     @Transactional
     public long getCompanyByProfileName( String profileName )
@@ -10858,5 +11098,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Company profile not found", profileNotFoundException );
         }
         return 0l;
+    }
+    
+    @Override
+    public void updateCompanySettings(OrganizationUnitSettings companySettings, String columnName, String columnValue) {
+        
+        LOG.info( "Method to update company settings, OrganizationManagementServiceImpl.updateCompanySettings() started." );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( columnName, columnValue, companySettings, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "Method to update company settings, OrganizationManagementServiceImpl.updateCompanySettings() finished." );
     }
 }

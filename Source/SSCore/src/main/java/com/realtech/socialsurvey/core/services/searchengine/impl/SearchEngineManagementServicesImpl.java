@@ -246,9 +246,10 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 		AddressGeoLocationVO addGeoLoc = organizationUnitSettingsDao.createAddressGeoLocationVo(contactDetails, null);
 		// update location for higher hierarchy
 		fetchLatLng(addGeoLoc);
+		String collectionName = getCollectionForEntity(entityType);
 		organizationUnitSettingsDao.updateLocation(addGeoLoc.getLatitude(), addGeoLoc.getLongitude(), entityId,
-				getCollectionForEntity(entityType));
-		if (!entityType.equals(CommonConstants.AGENT_SETTINGS_COLLECTION)) {
+				collectionName);
+		if (!collectionName.equals(CommonConstants.AGENT_SETTINGS_COLLECTION)) {
 			List<Long> userList = userProfileDao.findPrimaryUserProfile(entityType, entityId);
 			if (userList != null && !userList.isEmpty()) {
 				organizationUnitSettingsDao.updateAddressForLowerHierarchy(CommonConstants.AGENT_SETTINGS_COLLECTION,
@@ -262,8 +263,13 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 		LatLng location = new LatLng();
 		try {
 			location = geoUtils.getGoogleApiResultsLocation(googleGeoApi, createGoogleAddressFormat(addGeoLoc));
-			addGeoLoc.setLatitude(location.lat);
-			addGeoLoc.setLongitude(location.lng);
+			if(location != null) {
+				addGeoLoc.setLatitude(location.lat);
+				addGeoLoc.setLongitude(location.lng);
+			}else {
+				addGeoLoc.setLatitude(0);
+				addGeoLoc.setLongitude(0);
+			}
 		} catch (ApiException | InterruptedException | IOException exception) {
 			LOG.error("Exception caught while hitting google geocoding api" + exception.getMessage());
 		}
@@ -421,8 +427,42 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 		if( !StringUtils.isEmpty(advancedSearchVO.getCompanyProfileName()) ) {
 			companyId = organizationManagementService.getCompanyByProfileName(advancedSearchVO.getCompanyProfileName());
 		}		
-		return organizationUnitSettingsDao.getSearchResultsForCriteria(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId);		
-	}
+		// check if name search give two pattern's for first name and last name
+ 		if (advancedSearchVO.getFindBasedOn() != null && !advancedSearchVO.getFindBasedOn().isEmpty()) {
+ 			long startIndex = advancedSearchVO.getStartIndex();
+ 			long batchSize = advancedSearchVO.getBatchSize();
+ 			// search with pattern ^
+ 			long firstNameCount = organizationUnitSettingsDao.getSearchResultsForCriteriaCount(advancedSearchVO,
+ 					getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId, "^");
+ 			long fullDataCount = startIndex + batchSize;
+ 			if(firstNameCount > startIndex ) {
+ 				if(firstNameCount >= fullDataCount)
+ 					return organizationUnitSettingsDao.getSearchResultsForCriteria(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId, "^");
+ 				else  {
+ 					//initialise to get complete list
+ 					List<OrganizationUnitSettings> organisationUnitSettings= new ArrayList<>();
+ 					//if first name doesn't have full batch size break it
+ 					long fetchFromFirstCount = firstNameCount - advancedSearchVO.getStartIndex();
+ 					advancedSearchVO.setBatchSize(fetchFromFirstCount);
+ 					organisationUnitSettings.addAll(organizationUnitSettingsDao.getSearchResultsForCriteria(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId, "^"));
+ 					//find left out count
+ 					long fetchLastNameCount = batchSize - fetchFromFirstCount;
+ 					advancedSearchVO.setBatchSize(fetchLastNameCount);
+ 					advancedSearchVO.setStartIndex(0);
+ 					organisationUnitSettings.addAll(organizationUnitSettingsDao.getSearchResultsForCriteria(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId, " "));	
+ 					return organisationUnitSettings;
+ 				}
+ 			}else {
+ 				//find the exact start index for last name 
+ 				long startIndexForLast = startIndex - firstNameCount;
+ 				advancedSearchVO.setStartIndex(startIndexForLast);
+ 				return organizationUnitSettingsDao.getSearchResultsForCriteria(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId, " ");
+ 			}
+ 
+  		}
+ 		return organizationUnitSettingsDao.getSearchResultsForCriteria(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId, null);		
+ 	}	 		
+	
 	
 	@Override
 	public String getCollectionFromProfile(String profileFilter) {
@@ -464,7 +504,14 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 		if( !StringUtils.isEmpty(advancedSearchVO.getCompanyProfileName()) ) {
 		    companyId = organizationManagementService.getCompanyByProfileName(advancedSearchVO.getCompanyProfileName());
 		}
-		return organizationUnitSettingsDao.getSearchResultsForCriteriaCount(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId);
+		//check if name search give two pattern's for first name and last name 
+ 		if(advancedSearchVO.getFindBasedOn() != null && !advancedSearchVO.getFindBasedOn().isEmpty()) {
+ 			//search with pattern ^
+ 			long firstNameCount = organizationUnitSettingsDao.getSearchResultsForCriteriaCount(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId, "^");
+ 			long lastNameCount = organizationUnitSettingsDao.getSearchResultsForCriteriaCount(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId, " ");
+ 			return firstNameCount + lastNameCount;
+ 		}
+ 		return organizationUnitSettingsDao.getSearchResultsForCriteriaCount(advancedSearchVO, getCollectionFromProfile(advancedSearchVO.getProfileFilter()), null, companyId, null);
 		
 	}
 	

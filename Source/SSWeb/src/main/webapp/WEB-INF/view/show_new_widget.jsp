@@ -156,7 +156,15 @@
 						<input type="text" name="onld-rvw-cnt" id="onld-rvw-cnt" class="st-item-row-txt widget-select-bx wid-sel-bxl-num" autocomplete="off" value="" maxlength="3">
 				    </div>
 				</div>
-				
+
+				<div class="widget-conf-cont">
+				    <div class="widget-conf-txt float-left">Maximum Button Width</div>
+				    <div class="float-right" style="padding-top: 1%;">
+						<input type="text" name="onld-btn-size" id="onld-btn-size" class="st-item-row-txt widget-select-bx wid-sel-bxl-num" autocomplete="off" value="" maxlength="3">
+				    </div>
+				    <div class="clear-both">( in pixels )</div>
+				</div>
+						
 				<div class="widget-conf-cont">
 				    <div class="widget-conf-txt float-left">Maximum Button Width</div>
 				    <div class="float-right" style="padding-top: 1%;">

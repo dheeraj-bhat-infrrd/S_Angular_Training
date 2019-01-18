@@ -60,7 +60,10 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
             List<SocialResponseObject> socialResponseWrapper = (List<SocialResponseObject>) input.getValueByField("socialFeed");
             workbook = writeReportToWorkbook(socialResponseWrapper, reportRequest.getReportType(), enterAt );
             if ( workbook != null && status.equals(ReportStatus.PROCESSED.getValue()) ) {
-                fileName = reportRequest.getReportType() + "_" + ( Calendar.getInstance().getTimeInMillis()) + EXCEL_FILE_EXTENSION;
+                fileName = reportRequest.getReportType() + "_" + ( Calendar.getInstance().getTimeInMillis());
+                fileName = fileName.replaceAll("[^a-zA-Z0-9 _-]", "");
+                fileName = fileName.replaceAll( " ", "_" );
+                fileName = fileName + EXCEL_FILE_EXTENSION;
                 try {
                     file = FileUtils.createFileInLocal(fileName, workbook);
                     fileBytes = FileUtils.convertFileToBytes(file);

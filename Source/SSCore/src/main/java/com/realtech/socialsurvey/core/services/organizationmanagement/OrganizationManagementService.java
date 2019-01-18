@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.realtech.socialsurvey.core.vo.BranchVO;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -60,6 +61,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
 
 
 /**
@@ -1719,7 +1721,6 @@ public interface OrganizationManagementService
     public void unsetWebAddressInProfile( long entityId, String entityType ) throws NonFatalException;
 
 
-
     public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status );
 
     
@@ -1734,9 +1735,9 @@ public interface OrganizationManagementService
     
     public void setHasRegisteredForSummit(Long companyId, boolean isShowSummitPopup) throws InvalidInputException;
 
-	boolean isShowSummitPopup(Long companyId) throws InvalidInputException;
+	boolean isShowSummitPopup(Long entityId, String entityType) throws InvalidInputException;
 
-	void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException;
+	void setShowSummitPopup(Long entityId, String entityType, boolean isShowSummitPopup) throws InvalidInputException;
 
     /**
      * @param companyId
@@ -1824,6 +1825,24 @@ public interface OrganizationManagementService
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail,
         boolean sendMail, boolean isAddedByRealtechOrSSAdmin, String firstName, String lastName ) throws InvalidInputException;
 
+    /**
+     * Method to fetch all the facebook tokens across hierarchies
+     * @param skipCount
+     * @param batchSize
+     * @return
+     * @throws InvalidInputException
+     */
+    public SocialMediaTokensPaginated fetchFbTokensPaginated( int skipCount, int batchSize )
+        throws InvalidInputException;
+
+    /**
+     * Method to fetch branch details for given branch id
+     * @param iden
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    BranchVO getBranchDetails( long iden ) throws InvalidInputException, NoRecordsFetchedException;
 
     /**
      * Updates the allowPartner survey field for given unit settings
@@ -1833,6 +1852,50 @@ public interface OrganizationManagementService
     void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey );
 
 
+
 	long getCompanyByProfileName(String profileName);
 
+
+    /*
+     * This method returns all the idens associated with a placeId.
+     * @param placeId
+     * @return
+     * @throws InvalidInputException 
+     * @throws ProfileNotFoundException 
+     */
+    public List<OrganizationUnitIds> getDetailsFromPlaceId( String placeId ) throws InvalidInputException, ProfileNotFoundException;
+
+    /**
+     * Updated the socialMediaLastFetched key
+     * @param profile
+     * @param iden
+     * @param socialMedia
+     * @param current
+     * @param previous
+     * @return
+     */
+    boolean updateSocialMediaLastFetched( String profile, long iden, String socialMedia, long current, long previous )
+        throws InvalidInputException;
+
+    /**
+     * Resets the socialMediaLastFetched of the given social media
+     * @param profile
+     * @param iden
+     * @param socialMedia
+     * @return
+     */
+    boolean resetSocialMediaLastFetched( String profile, long iden, String socialMedia ) throws InvalidInputException;
+
+    //Unsets the key of a particular collection for a given iden
+    boolean unsetKey( long iden, String keyToUpdate, String collectionName )
+        throws InvalidInputException;
+    
+    /**
+     * Update CompanySettings based on given criteria
+     * 
+     * @param companySettings
+     * @param columnName
+     * @param columnValue
+     */
+    public void updateCompanySettings(OrganizationUnitSettings companySettings, String columnName, String columnValue);
 }

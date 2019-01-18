@@ -916,6 +916,12 @@
 													<c:when test="${reviewItem.source =='Zillow'}">
 														<div class='zillow-badge  verify-image-zillow float-right'></div>
 													</c:when>
+													<c:when test="${reviewItem.source =='facebook'}">
+														<div class='fb-verified-image verify-image-fb float-right'></div>
+													</c:when>
+													<c:when test="${reviewItem.source =='google'}">
+														<div class='google-verified-image verify-image-google float-right'></div>
+													</c:when>
 													<c:otherwise>
 														<div class='unverified-badge  verify-image-ss float-right'></div>
 													</c:otherwise>

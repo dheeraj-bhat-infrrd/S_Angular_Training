@@ -1,3 +1,145 @@
+@media (max-height: 425px){
+	.summit-popup-body{
+		height: 100vh;
+    	margin-top: 0;
+	}
+}
+	
+@media (max-width: 1119px){
+	.summit-popup-body{
+		width: 100%;
+    	background-size: contain;	
+    	height: calc(100vw/1.6);
+	}
+	
+	.summit-checkbox-cont {
+	    margin-bottom: 35px;
+	}
+	
+	.summit-popup-close-cont{
+		margin-top: 50px;
+	}
+	
+	@media (max-width: 1099){
+		.summit-ribbon-body{
+			width:100%
+		}
+		
+		.summit-popup-close-cont{
+			margin-top: 60px;
+		}
+		
+		.summit-popup-close-btn{
+			margin-right: 25px;
+		}
+	}
+	
+	@media (max-width: 1000px){
+		.summit-ribbon-body{
+			background-image: url(../images/TP_Ribbon_mobile_v2.png);
+			height: 50px;
+			background-size: cover;
+		}
+		
+		.summit-popup-close-cont{
+			margin-top: 45px;
+		}
+	}
+	
+	@media (max-width: 930px){
+		.summit-checkbox-cont{
+			margin-bottom:18px;
+		}
+	}
+	
+	@media (max-width: 870px){
+		.summit-checkbox-cont{
+			margin-bottom:2px;
+		}
+		
+		.summit-popup-close-cont{
+			margin-top: 30px;
+		}
+		
+		.summit-popup-close-btn{
+			margin-right: 35px;
+		}
+	}
+	
+	@media (max-width: 767px){
+		.summit-checkbox-cont{
+			margin-left: 5px;
+    		margin-bottom: 4px;
+		}
+		
+		.summit-check{
+			width: 13px;
+		    height: 13px;
+		    margin-top: 10px !important;
+		}
+		
+		.summit-check-text{
+			font-size: 11px;
+		}
+	}
+	
+	@media (max-width: 580px){
+		.summit-popup-body{
+			background-image: url(../images/TP_Banner_mobile_v2.png);
+		}
+		
+		.summit-ribbon-outer{
+			height: 30px;
+		}
+		
+		.summit-ribbon-body{
+			height: 30px;
+		}
+		
+		.summit-popup-close-cont{
+			margin-top: 15px;
+		}
+		
+		.summit-popup-close-btn{
+		    margin-right: 5px;
+		    width: 15px;
+		    height: 15px;
+		    border-width: 3px;
+		    line-height: 7px;
+		    font-size: 9px;
+		}
+		
+		.summit-ribbon-close-btn{
+			width: 15px;
+		    height: 15px;
+		    border-width: 3px;
+		    line-height: 7px;
+		    font-size: 9px;
+		    margin-right: 5px;
+		    margin-top: -5px;
+		}
+	}
+	
+	@media (max-width: 321px){
+		.summit-ribbon-body{
+			background-size: contain;
+		}
+		
+		.summit-checkbox-cont {
+		    margin-left: 5px;
+		    margin-bottom: -4px;
+		}
+		
+		.summit-popup-close-cont{
+			margin-top: 9px;
+		}
+		
+		.summit-popup-close-btn{
+		    margin-right: 2px;
+		}
+	}
+}
+
 @media (max-width: 769px){
 	.rep-prof-details{
     border-bottom: 1px solid #d2cdcd;
@@ -1695,6 +1837,9 @@
 	.reset-icon {
 	    margin: 15px 0 5px 0;
 	}
+	.reset-opt-out-icon {
+	    margin: 15px 0 5px 0;
+	}
 	.lp-disclaimer-row {
 		padding-left: 0;
 	} 
@@ -2122,115 +2267,10 @@
 	}
 	
 	
-	/*summit popup resp styles*/
-	
-	.summit-popup{
-	    width: 100%;
-    	height: 230px;
-    	top: 50px;
-    	background-image: url(../images/WOWworthy_EmmaM_Mobile_Banner.png);
-	}
-	
-	.close-summit-popup {
-    width: 20px;
-    height: 20px;
-    top: 18px;
-    right: 0px;
-	}
-	
-	.register-summit-btn {
-    left: 81px;
-    bottom: 51px;
-    width: 93px;
-    height: 22px;
-	}
-	
-	.summit-ribbon-con{
-		padding:0;
-	}
-	
-	.summit-ribbon{
-		margin: 0;
-		background-image: url(../images/CreateWowSummit_Ribbon_Daysof_mobile.png);
-	}
-	
-	.close-summit-ribbon{
-		width: 18px;
- 	    height: 18px;
-    	right: 0;
-    	top: 11px;
-	}
-	
 	.mismatch-popup-body-right{
 		margin-top: 15px;
 	}
 	
-	.summit-timer-back {
-	    width: 285px;
-	    height: 38px;
-	    background: #216dab;
-	    position: absolute;
-	    top: 36px;
-	    left: 10px;
-	}
-	
-	.summit-timer-img {
-	    margin-left: 6px;
-	    margin-top: 0px;
-	    width: 285px;
-	    height: 38px;
-	}
-	
-	.summit-timer-text {
-	    position: absolute;
-	    color: #ffcd32;
-	    font-size: 16px;
-	    font-weight: bold !important;
-	    top: 8px;
-	}
-	
-	.summit-timer-days {
-    	right: 140px;
-	}
-	
-	.summit-timer-hrs {
-    	right: 85px;
-	}
-	
-	.summit-timer-min {
-    	right: 32px;
-	}
-	
-	.summit-checkbox-cont {
-	    display: flex;
-	    position: absolute;
-	    bottom: 23px;
-	    margin-left: 32px;
-	    width: 100%;
-	}
-	
-	.summit-check-contain {
-	    padding-right: 0;
-	    margin-right: 25px;
-	}
-	
-	.summit-check {
-	    width: 10px;
-	    height: 10px;
-	    background-image: url(../images/checkbox-blank.png);
-	    background-position: center;
-	    background-size: contain;
-	    background-repeat: no-repeat;
-	    cursor: pointer;
-	    margin: 7px 0 0 !important;
-	}
-	
-	.summit-check-text {
-	    color: white;
-	    font-weight: bold !important;
-	    margin-left: 7px !important;
-	    font-size: 8px;
-	}
 }
 
 @media (min-width: 320px) and (max-width: 580px) and (orientation: portrait) {
@@ -2910,7 +2950,7 @@
 	
 	.lp-disclaimer-row {
 		padding-left: 0;
-	} 
+	}
 	
 }
 
@@ -3282,7 +3322,7 @@
     
 }
 
-/* ============== ANTHING ABOVE SMARTPHONES ==============*/
+/* ============== ANTHINGf ABOVE SMARTPHONES ==============*/
 @media (min-width: 768px) {
     .login-wrapper-resp{
         width: 457px;
@@ -3360,5 +3400,4 @@
 	.st-subject-input-cont{
 	 width:66%;
 	}
-	
 }

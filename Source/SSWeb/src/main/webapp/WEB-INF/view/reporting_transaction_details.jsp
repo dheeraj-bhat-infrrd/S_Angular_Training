@@ -88,11 +88,23 @@ hr{
 			<div id="zillow-lbl"><span class="trans-font-style">Zillow Reviews</span></div>
 			<div id="zillow-lbl-value"><span id="zillow-lbl-span" class="trans-font-style"></span></div>
 		</div>
-		<div id="third-party-reviews" class="inline-flex-class" style="margin-bottom:75px;">
+		<div id="third-party-reviews" class="inline-flex-class">
 			<div class="processed-background-rect"></div>
 			<div id="third-party-lbl-rect" class="social-posts-lbl-rect-div hide" style="margin-left: -15px;"></div>
 			<div id="third-party-lbl"><span class="trans-font-style">Third Party Reviews</span></div>
 			<div id="third-party-lbl-value"><span id="third-party-lbl-span" class="trans-font-style"></span></div>
+		</div>
+		<div id="google-reviews" class="inline-flex-class">
+			<div class="processed-background-rect"></div>
+			<div id="google-lbl-rect" class="social-posts-lbl-rect-div hide" style="margin-left: -15px;"></div>
+			<div id="google-lbl"><span class="trans-font-style">Google Reviews</span></div>
+			<div id="google-lbl-value"><span id="google-lbl-span" class="trans-font-style"></span></div>
+		</div>
+		<div id="facebook-reviews" class="inline-flex-class" style="margin-bottom:30px;">
+			<div class="processed-background-rect"></div>
+			<div id="facebook-lbl-rect" class="social-posts-lbl-rect-div hide" style="margin-left: -15px;"></div>
+			<div id="facebook-lbl"><span class="trans-font-style">Facebook Reviews</span></div>
+			<div id="facebook-lbl-value"><span id="facebook-lbl-span" class="trans-font-style"></span></div>
 		</div>
 	</div>
 </div>

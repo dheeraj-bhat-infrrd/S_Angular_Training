@@ -23,6 +23,7 @@ public class SocialMediaTokenResponse implements Serializable
     private String profileImageUrl;
     @Field("contact_details")
     private ContactDetails contactDetails;
+    private SocialMediaLastFetched socialMediaLastFetched;
 
     public long getIden()
     {
@@ -91,10 +92,22 @@ public class SocialMediaTokenResponse implements Serializable
     }
 
 
+    public SocialMediaLastFetched getSocialMediaLastFetched()
+    {
+        return socialMediaLastFetched;
+    }
+
+
+    public void setSocialMediaLastFetched( SocialMediaLastFetched socialMediaLastFetched )
+    {
+        this.socialMediaLastFetched = socialMediaLastFetched;
+    }
+
+
     @Override public String toString()
     {
         return "SocialMediaTokenResponse{" + "iden=" + iden + ", companyId=" + companyId + ", socialMediaTokens="
             + socialMediaTokens + ", profileType=" + profileType + ", profileImageUrl='" + profileImageUrl + '\''
-            + ", contactDetails=" + contactDetails + '\'' + '}';
+            + ", contactDetails=" + contactDetails + ", socialMediaLastFetched=" + socialMediaLastFetched + '}';
     }
 }

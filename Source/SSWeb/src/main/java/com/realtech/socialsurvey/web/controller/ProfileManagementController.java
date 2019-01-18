@@ -1498,6 +1498,8 @@ public class ProfileManagementController
                     state, city, zipcode );
                 contactDetailsSettings = profileManagementService.updateAgentContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
+                //set that it is self updated by making updated by system false
+                contactDetailsSettings.setUpdatedBySystem(false);
                 agentSettings.setContact_details( contactDetailsSettings );
                 //update location for agent
                 ssApiIntergrationBuilder.getIntegrationApi().updateHierarchyAddress(CommonConstants.AGENT_ID_COLUMN, agentSettings.getIden(), contactDetailsSettings );

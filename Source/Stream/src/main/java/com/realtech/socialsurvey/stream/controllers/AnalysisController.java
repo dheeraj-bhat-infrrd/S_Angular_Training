@@ -31,7 +31,8 @@ import io.swagger.annotations.ApiResponses;
 /**
  * Created by nishit on 04/01/18.
  */
-@RestController @RequestMapping ("api/v1/analyze") @Api (value = "Analysis APIs", description = "APIs for Analysis on stream data") public class AnalysisController
+@RestController @RequestMapping ("api/v1/analyze") @Api (value = "Analysis APIs", description = "APIs for Analysis on stream data")
+public class AnalysisController
 {
     private static final Logger LOG = LoggerFactory.getLogger( AnalysisController.class );
     
@@ -164,6 +165,5 @@ import io.swagger.annotations.ApiResponses;
 	        failedSocialPostService.queueFailedSocialPosts();
 	        return new ResponseEntity<>( HttpStatus.CREATED );
 	    }
-		    
- 
+
 }

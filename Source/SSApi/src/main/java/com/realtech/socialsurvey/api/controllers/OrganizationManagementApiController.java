@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +45,12 @@ import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.ftpmanagement.FTPManagement;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 import io.swagger.annotations.ApiOperation;
@@ -149,10 +152,10 @@ public class OrganizationManagementApiController
     
     @RequestMapping ( value = "/setshowsummitpopup", method = RequestMethod.POST)
     @ApiOperation ( value = "Set IsShowSummitPopup")
-    public ResponseEntity<?> setShowSummitPopup(long companyId, boolean isShowSummitPopup) throws SSApiException
+    public ResponseEntity<?> setShowSummitPopup(long entityId, String entityType, boolean isShowSummitPopup) throws SSApiException
     {
         try {
-            organizationManagementService.setShowSummitPopup(companyId, isShowSummitPopup);
+            organizationManagementService.setShowSummitPopup(entityId, entityType, isShowSummitPopup);
             LOGGER.info( "setShowSummitPopup completed successfully" );
             return new ResponseEntity<>( "Successfully updated", HttpStatus.OK );
                 
@@ -425,7 +428,8 @@ public class OrganizationManagementApiController
     
     @RequestMapping ( value = "/mismatched/emailId/{companyId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch mismatched survey for emailId")
-    public ResponseEntity<?> fetchMismatchedSurveyForEmail( @PathVariable long companyId, String transactionEmail , int startIndex, int batchSize, long count,  @RequestHeader ( "authorizationHeader") String authorizationHeader) throws  NonFatalException
+    public ResponseEntity<?> fetchMismatchedSurveyForEmail( @PathVariable long companyId, String transactionEmail , int startIndex, int batchSize, long count,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader) throws  NonFatalException
     {
         LOGGER.info( "Fetch mismatched survey for emailId for companyId : {} , transactionEmail : {}",companyId,transactionEmail );
        
@@ -438,5 +442,79 @@ public class OrganizationManagementApiController
         SurveyPreInitiationList surveyPreInitiationList = socialManagementService.getUnmatchedPreInitiatedSurveysForEmail( companyId, transactionEmail, startIndex, batchSize, count );
         return new ResponseEntity<>( surveyPreInitiationList, HttpStatus.OK );
     }
-    
+
+    @RequestMapping( value = "/branch/{id}", method = RequestMethod.GET)
+    @ApiOperation( value = "Gets the branch details")
+    public ResponseEntity<?> getBranchDetails(@PathVariable long id, @RequestHeader ( "authorizationHeader") String authorizationHeader)
+        throws SSApiException
+    {
+        LOGGER.info( " Method to fetch branch details with id {} started ", id );
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            return new ResponseEntity<>( organizationManagementService.getBranchDetails( id ), HttpStatus.OK );
+        } catch ( AuthorizationException e ) {
+            return new ResponseEntity<>( "AUTHORIZATION FAILED", HttpStatus.UNAUTHORIZED );
+        } catch ( NoRecordsFetchedException | InvalidInputException e ) {
+            throw new SSApiException( e.getMessage() );
+        }
+    }
+
+    @RequestMapping( value = "/organizationsettings/{placeId}/idens", method = RequestMethod.GET)
+    public ResponseEntity<List<OrganizationUnitIds>> getDetailsFromPlaceId(@PathVariable String placeId) {
+        List<OrganizationUnitIds> ouIds=null;
+        try {
+            ouIds = organizationManagementService.getDetailsFromPlaceId(placeId);
+        } catch ( InvalidInputException | ProfileNotFoundException e ) {
+            LOGGER.error( "Could not fetch oranization ids for place id.",e );
+        }
+        return new ResponseEntity<List<OrganizationUnitIds>>( ouIds, HttpStatus.OK );
+    }
+
+    @RequestMapping ( value = "/updateSocialMediaLastFetched/profile/{profile}/iden/{iden}/socialMedia/{socialMedia}/current/{current}/previous/{previous}",
+        method = RequestMethod.PUT)
+    @ApiOperation ( value = "Updates the given field of socialMediaToken with the value")
+    public ResponseEntity<?> updateSocialMediaLastFetched( HttpServletRequest request,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader, @PathVariable("profile") String profile,
+        @PathVariable("iden") long iden, @PathVariable("socialMedia") String socialMedia,
+        @PathVariable("current") long current, @PathVariable("previous") long previous)
+        throws SSApiException
+    {
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            LOGGER.info( "SocialMonitorController.updateSocialMediaLastFetched started" );
+            boolean updateStatus = organizationManagementService.updateSocialMediaLastFetched( profile, iden, socialMedia, current, previous );
+            LOGGER.info( "SocialMonitorController.updateSocialMediaLastFetched completed successfully" );
+            return new ResponseEntity<>( updateStatus, HttpStatus.OK );
+        } catch ( AuthorizationException authoriztionFailure ) {
+            return new ResponseEntity<>( "AUTHORIZATION FAILED", HttpStatus.UNAUTHORIZED );
+        }
+        catch ( InvalidInputException e ) {
+            throw new SSApiException( e.getMessage(), e );
+        }
+
+    }
+
+    @RequestMapping ( value = "/resetSocialMediaLastFetched/profile/{profile}/iden/{iden}/socialMedia/{socialMedia}",
+        method = RequestMethod.PUT)
+    @ApiOperation ( value = "Updates the given field of socialMediaToken with the value")
+    public ResponseEntity<?> resetSocialMediaLastFetched( HttpServletRequest request,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader, @PathVariable("profile") String profile,
+        @PathVariable("iden") long iden, @PathVariable("socialMedia") String socialMedia )
+        throws SSApiException
+    {
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            LOGGER.info( "SocialMonitorController.resetSocialMediaLastFetched started" );
+            boolean updateStatus = organizationManagementService.resetSocialMediaLastFetched( profile, iden, socialMedia );
+            LOGGER.info( "SocialMonitorController.resetSocialMediaLastFetched completed successfully" );
+            return new ResponseEntity<>( updateStatus, HttpStatus.OK );
+        } catch ( AuthorizationException authoriztionFailure ) {
+            return new ResponseEntity<>( "AUTHORIZATION FAILED", HttpStatus.UNAUTHORIZED );
+        }
+        catch ( InvalidInputException e ) {
+            throw new SSApiException( e.getMessage(), e );
+        }
+
+    }
+ 
 }

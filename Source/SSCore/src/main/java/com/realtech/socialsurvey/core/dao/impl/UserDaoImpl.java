@@ -622,7 +622,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             throw new DatabaseException( "HibernateException caught in getCompanyIdsForUserIds().", e );
         }
     }
-    
+
     /*
      * Method to fetch the list of cities and zipcodes in the state
      */
@@ -684,7 +684,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
 		return "";
 	}
     	
-    	/**
+   /**
      * Method to fetch admin of the company based on the companyId
      * @param companyId
      * @throws InvalidInputException

@@ -85,6 +85,12 @@
 					<c:when test="${reviewItem.source =='Zillow'}">
 						<div class='zillow-badge  verify-image-zillow float-right'></div>
 					</c:when>
+					<c:when test="${reviewItem.source =='facebook'}">
+						<div class='fb-verified-image verify-image-fb float-right'></div>
+					</c:when>
+					<c:when test="${reviewItem.source =='google'}">
+						<div class='google-verified-image verify-image-google float-right'></div>
+					</c:when>
 					<c:otherwise>
 						<div class='unverified-badge  verify-image-ss float-right'></div>
 					</c:otherwise>
@@ -190,6 +196,12 @@
 						<c:if test="${reviewItem.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
+						<c:if test="${reviewItem.source =='facebook'}">
+							<br><span><a class="view-fb-link hide" href="${reviewItem.facebookProfileUrl}"  target="_blank">View on Facebook</a></span>
+						</c:if>
+						<c:if test="${reviewItem.source =='google'}">
+							<br><span><a class="view-goo-link hide" href="${reviewItem.googleBusinessProfileUrl}"  target="_blank">View on Google</a></span>
+						</c:if>
 						<span class="review-less-text">${fn:substring(review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
 					</div>
@@ -200,6 +212,12 @@
                             <c:if test="${reviewItem.source=='Zillow' }">
                               <br><span><a class="view-zillow-link" href="${reviewItem.sourceId}"  target="_blank">View on zillow</a></span>
                             </c:if>
+                            <c:if test="${reviewItem.source =='facebook'}">
+								<br><span><a class="view-fb-link" href="${reviewItem.facebookProfileUrl}"  target="_blank">View on Facebook</a></span>
+							</c:if>
+							<c:if test="${reviewItem.source =='google'}">
+								<br><span><a class="view-goo-link" href="${reviewItem.googleBusinessProfileUrl}"  target="_blank">View on Google</a></span>
+							</c:if>
 					</div>
 				</c:otherwise>
 			</c:choose>

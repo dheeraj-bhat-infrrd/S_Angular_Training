@@ -1,18 +1,13 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.sql.Timestamp;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.CommandResult;
+import com.mongodb.DBObject;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -20,25 +15,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
-import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.CommandResult;
-import com.mongodb.DBObject;
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.*;
 import com.mongodb.WriteResult;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
-import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
@@ -49,8 +39,6 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-
 
 /*
  * Provides list of operations to be performed on SurveyDetails collection of mongo. SurveyDetails
@@ -2184,6 +2172,28 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
         return surveys.get( CommonConstants.INITIAL_INDEX );
     }
+    
+    @Override
+    public List<SurveyDetails> getSurveyBySourceSourceIdAndMongoCollection( long iden, String entityType )
+    {
+        Query query = new Query();
+
+        if ( entityType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+            query.addCriteria( Criteria.where( entityType ).is( iden ) );
+        } else if ( entityType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.REGION_ID_COLUMN ).is( iden ) );
+        } else if ( entityType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( iden ) );
+        } else if ( entityType.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( iden ) );
+        }
+        query.fields().include( "_id" );
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.size() == 0 )
+            return null;
+        LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
+        return surveys;
+    }
 
 
     // Commented as Zillow surveys are not stored in database, SS-1276
@@ -2221,12 +2231,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public void removeExistingZillowSurveysByEntity( String entityType, long entityId )
+    public void removeExistingZillowSurveysByEntity( String entityType, long entityId, String source )
     {
         LOG.debug( "Method removeExistingZillowSurveysByEntity() started" );
 
         Query query = new Query(
-            Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
+            Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is( source ) );
         query.addCriteria( Criteria.where( entityType ).is( entityId ) );
         if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
             query.addCriteria( Criteria.where( CommonConstants.REGION_ID_COLUMN ).is( 0 ) );
@@ -2242,7 +2252,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.remove( query, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method removeExistingZillowSurveysByEntity() finished" );
     }
-
+    
 
     @Override
     public long getSurveysReporetedAsAbusiveCount()
@@ -2869,7 +2879,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * @throws InvalidInputException
      * */
     @Override
-    public SurveyDetails getZillowReviewByQueryMap( Map<String, Object> queries ) throws InvalidInputException
+    public SurveyDetails getReviewByQueryMap( Map<String, Object> queries ) throws InvalidInputException
     {
         if ( queries == null || queries.isEmpty() ) {
             throw new InvalidInputException(
@@ -2877,7 +2887,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
         LOG.debug( "Method getZillowReviewByEntityAndReviewUrl() to find Zillow reviews based on queries started." );
         Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
         for ( String columnName : queries.keySet() ) {
             if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 query.addCriteria( Criteria.where( CommonConstants.REGION_ID_COLUMN ).is( 0 ) );
@@ -2894,6 +2903,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             } else
                 query.addCriteria( Criteria.where( columnName ).is( queries.get( columnName ) ) );
         }
+        LOG.info( "Existinf survey find query {}", query );
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method getZillowReviewByEntityAndReviewUrl() to find Zillow reviews based on queries finished." );
         if ( surveys == null || surveys.isEmpty() ) {
@@ -3745,7 +3755,71 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     {
         return mongoTemplate.getCollection( SURVEY_DETAILS_COLLECTION ).distinct(field, new Query( Criteria.where( queryKey ).is( value ) ).getQueryObject() );
     }
+
+
+    @Override
+    public int bulkUpdateReviews( List<SurveyDetails> existingReviews )
+    {
+        LOG.debug( "Updating reviews in bulk" );
+        List<Pair<Query, Update>> updates = new ArrayList<>(  );
+        Query query;
+        Update update;
+        for(SurveyDetails surveyDetail: existingReviews){
+            query = new Query().addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN )
+                .is( new ObjectId( surveyDetail.get_id() ) ) );
+            update = new Update().set( CommonConstants.REVIEW_COLUMN, surveyDetail.getReview()  )
+                .set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, surveyDetail.getSurveyUpdatedDate() )
+                .set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+
+            updates.add( Pair.of( query, update  ));
+        }
+        int count = mongoTemplate.bulkOps( BulkOperations.BulkMode.UNORDERED, SURVEY_DETAILS_COLLECTION )
+            .updateMulti( updates ).execute().getModifiedCount();
+
+        return count ;
+    }
+
+
+    @Override
+    public SurveyDetails fetchSurveyWithConditions( Map<String, Object> queryMap )
+    {
+        Query query = new Query();
+        for(String columnName : queryMap.keySet()) {
+            query.addCriteria( Criteria.where( columnName ).is( queryMap.get( columnName ) ) );
+        }
+        SurveyDetails surveyDetails = mongoTemplate.findOne( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        return surveyDetails;
+    }
     
+    @Override
+    public List<SurveyDetails> fetchSurveyForParticularHierarchyAndSource(long entityId, String entityType, String source){
+        Query query = new Query( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).is( source ) );
+        
+        query.addCriteria( Criteria.where( entityType ).is( entityId ) );
+        if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.REGION_ID_COLUMN ).is( 0 ) );
+            query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( 0 ) );
+            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( 0 ) );
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( 0 ) );
+            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( 0 ) );
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( 0 ) );
+        }
+        
+        return mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+    }
+    
+    /*
+     * Method to insert survey details into the SURVEY_DETAILS collection.
+     */
+    @Override
+    public void insertSurveyDetails( List<SurveyDetails> surveyDetails )
+    {
+        LOG.debug( "Method insertSurveyDetails() to bulk insert details of survey started." );
+        mongoTemplate.bulkOps( BulkOperations.BulkMode.UNORDERED, SURVEY_DETAILS_COLLECTION  ).insert( surveyDetails ).execute();
+        LOG.debug( "Method insertSurveyDetails() to bulk insert details of survey finished." );
+    }
 
     @Override
     public Map<String, Long> getSurveyCountForGatewayResponses(String entityType, long entityId)
@@ -3849,5 +3923,4 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	LOG.debug( "Method updateSurveyDetailsFields() to update participantType and surveySentDate finished." );
     	return 0;
     }
-    
 }

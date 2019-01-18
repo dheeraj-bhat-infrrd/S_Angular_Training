@@ -21,6 +21,7 @@
 	<input type="hidden" id="srchEngBasedOn" value="${basedOn}">
 	<input type="hidden" id="srchEngIsPubPageSearch" value="${isPubPageSearch}">
 	<input type="hidden" id="srchEngCompanyProfileName" value="${companyProfileName}">
+	<input type="hidden" id="srchEngLocFromBrowser" value="false">
 	
 	<div class="overlay-loader hide"></div>
 	<div class="body-wrapper">
@@ -153,6 +154,7 @@
 			$('#srch-eng-cat-inp').val(basedOn);
 			$('#srch-eng-loc-inp').attr('data-lat', 0);
 			$('#srch-eng-loc-inp').attr('data-lng', 0);
+			$('#srchEngLocFromBrowser').val(false);
 			
 			getLOSearchList();
 		}else{

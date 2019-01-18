@@ -78,6 +78,12 @@ public class OverviewUserMonth implements Serializable
     
     @Column ( name = "unsubscribed_count")
     private int unsubscribed;
+    
+    @Column ( name = "google")
+    private int google;
+    
+    @Column ( name = "faceebook")
+    private int facebook;
 
     public String getOverviewUserMonthId()
     {
@@ -285,6 +291,26 @@ public class OverviewUserMonth implements Serializable
         this.unsubscribed = unsubscribed;
     }
 
+    public int getGoogle()
+    {
+        return google;
+    }
+
+    public void setGoogle( int google )
+    {
+        this.google = google;
+    }
+
+    public int getFacebook()
+    {
+        return facebook;
+    }
+
+    public void setFacebook( int facebook )
+    {
+        this.facebook = facebook;
+    }
+
     @Override
     public String toString()
     {
@@ -294,7 +320,7 @@ public class OverviewUserMonth implements Serializable
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
             + totalReview + ", thirdParty=" + thirdParty + ", month=" + month + ", year=" + year + ", unsubscribed="
-            + unsubscribed + "]";
+            + unsubscribed + ", google=" + google + ", facebook=" + facebook + "]";
     }
 
 

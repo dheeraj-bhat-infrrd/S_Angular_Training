@@ -112,6 +112,8 @@ public class OrganizationUnitSettings implements Serializable
     private boolean hasRegisteredForSummit;
     
     private boolean isShowSummitPopup;
+
+    private SocialMediaLastFetched socialMediaLastFetched;
     
     private List<TransactionSourceFtp> transactionSourceFtpList;
     
@@ -129,6 +131,9 @@ public class OrganizationUnitSettings implements Serializable
     private double distanceField;
     
     private long companyId;
+    
+    private String optoutText;
+    private Boolean isLoginEnableAllowed;
     
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
@@ -1044,7 +1049,42 @@ public class OrganizationUnitSettings implements Serializable
 	}
 
 
-	@Override
+    public SocialMediaLastFetched getSocialMediaLastFetched()
+    {
+        return socialMediaLastFetched;
+    }
+
+
+    public void setSocialMediaLastFetched( SocialMediaLastFetched socialMediaLastFetched )
+    {
+        this.socialMediaLastFetched = socialMediaLastFetched;
+    }
+
+    public String getOptoutText()
+    {
+        return optoutText;
+    }
+
+
+    public void setOptoutText( String optoutText )
+    {
+        this.optoutText = optoutText;
+    }
+
+
+    public Boolean getIsLoginEnableAllowed()
+    {
+        return isLoginEnableAllowed;
+    }
+
+
+    public void setIsLoginEnableAllowed( Boolean isLoginEnableAllowed )
+    {
+        this.isLoginEnableAllowed = isLoginEnableAllowed;
+    }
+
+
+    @Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier
@@ -1076,7 +1116,8 @@ public class OrganizationUnitSettings implements Serializable
             + ", isAgentProfileDisabled=" + isAgentProfileDisabled + ", swearWords=" + Arrays.toString( swearWords )
             + ", hasRegisteredForSummit=" + hasRegisteredForSummit + ", isShowSummitPopup=" + isShowSummitPopup
             + ", transactionSourceFtpList=" + transactionSourceFtpList + ", entityAlertDetails=" + entityAlertDetails
-            + ", widgetConfiguration=" + widgetConfiguration + ", allowPartnerSurvey=" + allowPartnerSurvey + "]";
+            + ", widgetConfiguration=" + widgetConfiguration + ", socialMediaLastFetched=" + socialMediaLastFetched
+            + ", allowPartnerSurvey=" + allowPartnerSurvey + "]";
     }
 
 }

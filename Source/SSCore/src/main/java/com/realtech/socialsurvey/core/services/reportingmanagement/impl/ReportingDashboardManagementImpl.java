@@ -1799,7 +1799,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         User user = userManagementService.getUserByUserId( userId );
         // file is too big for windows hence uncomment the alternative
         String fileName = "Survey_Stats_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-            + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+            + ( Calendar.getInstance().getTimeInMillis() );
+        fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadSurveyStatsForReporting( entityId, entityType );
         return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
@@ -1836,7 +1838,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         User user = userManagementService.getUserByUserId( userId );
         // file is too big for windows hence uncomment the alternative
         String fileName = "Verified_Users_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-            + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+            + ( Calendar.getInstance().getTimeInMillis() );
+        fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadUserAdoptionForReporting( entityId, entityType );
         return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
@@ -1869,7 +1873,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         User user = userManagementService.getUserByUserId( userId );
         // file is too big for windows hence uncomment the alternative
         String fileName = "Company_User_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-            + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+            + ( Calendar.getInstance().getTimeInMillis() );
+        fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadCompanyUserForReporting( entityId, entityType );
         return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
@@ -1904,7 +1910,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         User user = userManagementService.getUserByUserId( userId );
         LOG.debug( "Found user {}", user );
         String fileName = "Survey_Results_Report_" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-            + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+            + ( Calendar.getInstance().getTimeInMillis() );
+        fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
         LOG.debug( "fileName {} ", fileName );
         XSSFWorkbook workbook = this.downloadSurveyResultsReport( entityId, entityType, startDate, endDate );
         LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
@@ -1986,7 +1994,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         User user = userManagementService.getUserByUserId( userId );
         LOG.debug( "Found user {}", user );
         String fileName = "Incomplete_Survey_Results_Report_" + entityType + "-" + user.getFirstName() + "_"
-            + user.getLastName() + "-" + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+            + user.getLastName() + "-" + ( Calendar.getInstance().getTimeInMillis() );
+        fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
         LOG.debug( "fileName {} ", fileName );
         XSSFWorkbook workbook = this.downloadIncompleteSurveyResultsReport( entityId, entityType, startDate, endDate );
         LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
@@ -2058,7 +2068,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		int year = cal.get(Calendar.YEAR);
         // file is too big for windows hence uncomment the alternative
         String fileName = "Survey_Transaction_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-            + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+            + ( Calendar.getInstance().getTimeInMillis() );
+        fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadSurveyTransactionForReporting( entityId, entityType, month, year );
         return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
@@ -2096,7 +2108,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         int month = calender.get( Calendar.MONTH ) + 1;
         // file is too big for windows hence uncomment the alternative
         String fileName = "User_Ranking_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
-            + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+            + ( Calendar.getInstance().getTimeInMillis() );
+        fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadUserRankingForReporting( entityId, entityType, year, month, type );
         return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
@@ -4314,8 +4328,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         throws UnsupportedEncodingException, NonFatalException
     {
         LOG.info( "Generating account statistics report for enitityId {}, entityType {}", entityId, entityType );
-        String fileName = "Account_Statistics_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() )
-            + CommonConstants.EXCEL_FILE_EXTENSION;
+        String fileName = "Account_Statistics_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() );
+        fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
         LOG.debug( "fileName {} ", fileName );
         XSSFWorkbook workbook = this.downloadCompanyDetailsReport( entityId, entityType );
         LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
@@ -4462,8 +4477,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
             throw new InvalidInputException( "ProfileValue or profileLevel is not valid" );
         }
         LOG.info( "Generating NPS report for profileValue {}, profileLevel {}", profileValue, profileLevel );
-        String fileName = "NPS_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() )
-            + CommonConstants.EXCEL_FILE_EXTENSION;
+        String fileName = "NPS_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() );
+        fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
         LOG.debug( "fileName {} ", fileName );
         Calendar calendar = Calendar.getInstance();
         calendar.setTime( startDate );
@@ -5004,8 +5020,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		int year = calendar.get(Calendar.YEAR);
 		int month = calendar.get(Calendar.MONTH) + 1;
 		String fileName = "Branch_Ranking_Report_Month" + profileValue + "-" + user.getFirstName() + "_"
-				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis())
-				+ CommonConstants.EXCEL_FILE_EXTENSION;
+				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis());
+		fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
 		XSSFWorkbook workbook = this.downloadBranchRankingReportMonth(profileValue, profileLevel, year, month);
 		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
 	}
@@ -5036,8 +5053,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		calendar.setTimeInMillis(startDate.getTime());
 		int year = calendar.get(Calendar.YEAR);
 		String fileName = "Branch_Ranking_Report_Year" + profileValue + "-" + user.getFirstName() + "_"
-				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis())
-				+ CommonConstants.EXCEL_FILE_EXTENSION;
+				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis());
+		fileName = CommonUtils.generateCleanFileName( fileName );
+        fileName = fileName + CommonConstants.EXCEL_FILE_EXTENSION;
 		XSSFWorkbook workbook = this.downloadBranchRankingReportYear(profileValue, profileLevel, year);
 		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
 	}

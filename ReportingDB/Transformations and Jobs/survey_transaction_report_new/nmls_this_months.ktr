@@ -133,8 +133,9 @@
   <order>
   <hop> <from>Database join Company</from><to>Database join FOR NMLS</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join FOR NMLS</from><to>Database join for license</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join for license</from><to>Update survey transaction report nmls</to><enabled>Y</enabled> </hop>
   <hop> <from>survey transaction report input</from><to>Database join Company</to><enabled>Y</enabled> </hop>
+  <hop> <from>Database join for license</from><to>Filter rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows</from><to>Update survey transaction report nmls</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Database join Company</name>
@@ -220,7 +221,7 @@
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>829</xloc>
+      <xloc>834</xloc>
       <yloc>65</yloc>
       <draw>Y</draw>
       </GUI>
@@ -283,8 +284,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>833</xloc>
-      <yloc>177</yloc>
+      <xloc>590</xloc>
+      <yloc>190</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -311,6 +312,54 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>117</xloc>
       <yloc>65</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Update survey transaction report nmls</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>month</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>year</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>user_id</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>834</xloc>
+      <yloc>190</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

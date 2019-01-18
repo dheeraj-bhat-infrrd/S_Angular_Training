@@ -404,7 +404,7 @@ public class CloudUploadServiceImpl implements FileUploadService
 
     @Transactional
     @Override
-    public void updateFileUploadRecord( FileUpload fileUpload ) throws InvalidInputException
+    public void updateFileUploadRecord( FileUpload fileUpload ) throws InvalidInputException, Exception
     {
         LOG.info( "Check if files need to be uploaded" );
         if ( fileUpload == null ) {

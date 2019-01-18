@@ -18,6 +18,7 @@ public class SocialMediaTokenResponse implements Serializable
     private ProfileType profileType;
     private String profileImageUrl;
     private ContactDetails contactDetails;
+    private SocialMediaLastFetched socialMediaLastFetched;
 
     public long getIden()
     {
@@ -84,5 +85,17 @@ public class SocialMediaTokenResponse implements Serializable
     public void setContactDetails( ContactDetails contactDetails )
     {
         this.contactDetails = contactDetails;
+    }
+
+
+    public SocialMediaLastFetched getSocialMediaLastFetched()
+    {
+        return socialMediaLastFetched;
+    }
+
+
+    public void setSocialMediaLastFetched( SocialMediaLastFetched socialMediaLastFetched )
+    {
+        this.socialMediaLastFetched = socialMediaLastFetched;
     }
 }
