@@ -492,4 +492,10 @@ public interface OrganizationUnitSettingsDao
 			LOSearchEngine loSearchEngine, long companyIdFilter, String pattern);
 
 
+	List<Long> fetchCompaniesWithHiddenSection();
+
+
+	List<Long> fetchActiveUserForCompany(long companyId);
+
+
 }

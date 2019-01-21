@@ -114,5 +114,23 @@ public class SurveyProcessorController
 	    		}
       		
     }
+    
+    @RequestMapping(value = "/surveystats/updatehiddensection", method = RequestMethod.GET)
+	@ApiOperation(value = "Getting survey stats data for entities to process a completed survey.")
+    public boolean updateHiddenSectionForAgents( HttpServletResponse response) 
+    {
+    		LOGGER.info("Method updateHiddenSectionForAgents started");
+			try {
+				
+				LOGGER.info("Method updateHiddenSectionForAgents finished");
+				response.setStatus(HttpServletResponse.SC_OK);
+				return searchEngineManagementServices.updateHiddenSectionForAllAgents();
+			} catch (InvalidInputException e) {
+				LOGGER.error("Error in api call updateHiddenSectionForAgents", e);
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				return false;
+	    		}
+      		
+    }
 
 }

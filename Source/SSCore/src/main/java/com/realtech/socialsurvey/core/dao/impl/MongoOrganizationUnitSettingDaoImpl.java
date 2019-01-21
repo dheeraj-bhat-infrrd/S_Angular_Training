@@ -2072,26 +2072,53 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 					.add(Aggregation.match(Criteria.where(KEY_VERTICAL).in(advancedSearchVO.getCategoryFilterList())));
 			
 		
-		//add company id filter if need to search with in company
-				if (companyIdFilter > 0l)
-					if(checkLoc)
-						query.addCriteria(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter));
-					else
-					    operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
+		// add company id filter if need to search with in company
+		if (companyIdFilter > 0l)
+			if (checkLoc)
+				query.addCriteria(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter));
+			else
+				operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
+		
+		// add criteria to ignore hidden section and hide page by default
+		if (checkLoc) {
+			if(collectionName.equals(AGENT_SETTINGS_COLLECTION)) {
+				query.addCriteria(new Criteria().orOperator(Criteria.where(KEY_HIDDEN_SECTION).exists(false),
+						Criteria.where(KEY_HIDDEN_SECTION).is(false).orOperator(
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}else {
+				query.addCriteria(new Criteria().orOperator(
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false)));
+			}
+		} else {
+			if(collectionName.equals(AGENT_SETTINGS_COLLECTION)) {
+				operations.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDDEN_SECTION).exists(false),
+						Criteria.where(KEY_HIDDEN_SECTION).is(false))));
+				operations
+						.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}else {
+				operations
+				.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+						Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}
+			
+		}
 					
-				// add near query only if lat and lng is given
-				if (checkLoc) {
-					// get based on distance
-					// give lat and lng
-					Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
-					NearQuery nearQuery = NearQuery.near(point)
-							.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true).num(2000000000);
-					nearQuery.query(query);
-					operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
-					isLocationSearch = true;
-				}
 
-				
+		// add near query only if lat and lng is given
+		if (checkLoc) {
+			// get based on distance
+			// give lat and lng
+			Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
+			NearQuery nearQuery = NearQuery.near(point)
+					.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true).num(2000000000);
+			nearQuery.query(query);
+			operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
+			isLocationSearch = true;
+		}
+
 		// sort Criteria where default is best match
 		operations.add(getSortByAggOperation(advancedSearchVO.getSortBy(), isLocationSearch, isTextSearch));
 		// add skip which is start index
@@ -2215,24 +2242,51 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 					.add(Aggregation.match(Criteria.where(KEY_VERTICAL).in(advancedSearchVO.getCategoryFilterList())));
 			
 		
-		//add company id filter if need to search with in company
-				if (companyIdFilter > 0l)
-					if(checkLoc)
-						query.addCriteria(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter));
-					else
-					    operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
-					
-				// add near query only if lat and lng is given
-				if (checkLoc) {
-					// get based on distance
-					// give lat and lng
-					Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
-					NearQuery nearQuery = NearQuery.near(point)
-							.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true).num(2000000000);
-					nearQuery.query(query);
-					operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
-					isLocationSearch = true;
-				}
+		// add company id filter if need to search with in company
+		if (companyIdFilter > 0l)
+			if (checkLoc)
+				query.addCriteria(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter));
+			else
+				operations.add(Aggregation.match(Criteria.where(KEY_COMPANY_ID).is(companyIdFilter)));
+		
+		// add criteria to ignore hidden section and hide page by default
+		if (checkLoc) {
+			if(collectionName.equals(AGENT_SETTINGS_COLLECTION)) {
+				query.addCriteria(new Criteria().orOperator(Criteria.where(KEY_HIDDEN_SECTION).exists(false),
+						Criteria.where(KEY_HIDDEN_SECTION).is(false).orOperator(
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}else {
+				query.addCriteria(new Criteria().orOperator(
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false)));
+			}
+		} else {
+			if(collectionName.equals(AGENT_SETTINGS_COLLECTION)) {
+				operations.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDDEN_SECTION).exists(false),
+						Criteria.where(KEY_HIDDEN_SECTION).is(false))));
+				operations
+						.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}else {
+				operations
+				.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+						Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}
+			
+		}
+
+		// add near query only if lat and lng is given
+		if (checkLoc) {
+			// get based on distance
+			// give lat and lng
+			Point point = new Point(advancedSearchVO.getNearLocation().lng, advancedSearchVO.getNearLocation().lat);
+			NearQuery nearQuery = NearQuery.near(point)
+					.maxDistance(advancedSearchVO.getDistanceCriteria(), Metrics.MILES).spherical(true).num(2000000000);
+			nearQuery.query(query);
+			operations.add(Aggregation.geoNear(nearQuery, KEY_DISTANCE_FIELD));
+			isLocationSearch = true;
+		}
 
 		// sort Criteria where default is best match
 		operations.add(getSortByAggOperation(advancedSearchVO.getSortBy(), isLocationSearch, isTextSearch));
@@ -2250,5 +2304,59 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		return count;
 
 	}
+    
+    @Override
+    public List<Long> fetchCompaniesWithHiddenSection()
+    {
+        LOG.debug( "Fetch companies with hidden section ");
+        Query query = new Query();
+
+        query.addCriteria( Criteria.where( KEY_ACCOUNT_DISABLED ).is( false ) );
+
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        
+        query.addCriteria(Criteria.where(KEY_DEFAULT_BY_SYSTEM).is(false));
+        
+        query.addCriteria(Criteria.where(KEY_HIDDEN_SECTION).is(true));
+        
+        query.fields().include(KEY_IDEN);
+
+        List<OrganizationUnitSettings> settingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
+            COMPANY_SETTINGS_COLLECTION );
+        List<Long> companyIdList = new ArrayList<>();
+        for(OrganizationUnitSettings setting : settingsList) {
+        	companyIdList.add(setting.getIden());
+        }
+        return companyIdList;
+    }
+    
+    @Override
+    public List<Long> fetchActiveUserForCompany(long companyId)
+    {
+        LOG.debug( "Fetch active user's for companyId : {}",companyId);
+        Query query = new Query();
+
+        query.addCriteria( Criteria.where( KEY_ACCOUNT_DISABLED ).is( false ) );
+
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        
+        query.addCriteria(Criteria.where(KEY_DEFAULT_BY_SYSTEM).is(false));
+        
+        query.addCriteria(Criteria.where(KEY_COMPANY_ID).is(companyId));
+        
+        query.fields().include(KEY_IDEN);
+                
+
+        List<OrganizationUnitSettings> settingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
+            AGENT_SETTINGS_COLLECTION );
+        List<Long> userIdList = new ArrayList<>();
+        for(OrganizationUnitSettings setting : settingsList) {
+        	userIdList.add(setting.getIden());
+        }
+        return userIdList;
+    }
+
     
 }
