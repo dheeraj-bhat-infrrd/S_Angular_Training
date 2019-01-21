@@ -154,8 +154,8 @@
       <schema/>
       <table>nps_report_month</table>
       <key>
-        <name>branch_id</name>
-        <field>branch_id</field>
+        <name>company_id</name>
+        <field>company_id</field>
         <condition>&#x3d;</condition>
         <name2/>
         </key>
@@ -166,8 +166,8 @@
         <name2/>
         </key>
       <key>
-        <name>company_id</name>
-        <field>company_id</field>
+        <name>branch_id</name>
+        <field>branch_id</field>
         <condition>&#x3d;</condition>
         <name2/>
         </key>
