@@ -384,6 +384,11 @@ $(document).ready(function() {
 	if("${allowPartnerSurvey}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
 		$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
 	}
+	
+	if("${includeForTransactionMonitor}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
+		$('#incld-fr-trans-mntr-chk-box').addClass('bd-check-img-checked');
+	}
+	
 	if("${copyToClipBoard}" == "false"){
 		$('#copyto-clipboard-chk-box').addClass('bd-check-img-checked');
 	}
