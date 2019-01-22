@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.ApplicationSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -878,4 +879,40 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 			LOG.error("Could not stream failed survey processors", e);
 		}
 	}
+	
+	@Override
+	public boolean updateHiddenSectionForAllAgents() throws InvalidInputException
+	{
+		LOG.info("Method updateCompanyIdForAllEntities started");
+		
+		for (long companyId : organizationUnitSettingsDao.fetchCompaniesWithHiddenSection()) {
+			List<Long> userList = organizationUnitSettingsDao.fetchActiveUserForCompany(companyId);
+			for (long userId : userList) {
+				LOG.info(" updating hiddenSection For userId {}", userId);
+				organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden("hiddenSection", true,
+						userId, getCollectionForEntity("agentId"));
+			}
+		}
+		
+		return true;
+	}
+	
+	@Override
+	public boolean updateHiddenSectionForAgentsOfCompany(long companyId, String collection, String flagToBeUpdated, Boolean flag ) throws InvalidInputException
+	{
+		LOG.info("Method updateHiddenSectionForAgentsOfCompany started");
+
+		//only do update if it's company settings 
+		if(flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDDEN_SECTION) && collection.equals(CommonConstants.COMPANY_SETTINGS_COLLECTION)) {
+			List<Long> userList = organizationUnitSettingsDao.fetchActiveUserForCompany(companyId);
+			for (long userId : userList) {
+				LOG.info(" updating hiddenSection For userId {}", userId);
+				organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(flagToBeUpdated, flag, userId,
+						getCollectionForEntity("agentId"));
+			}
+
+		}
+		return true;
+	}
+	
 }

@@ -164,4 +164,10 @@ public interface SearchEngineManagementServices {
 	 * 
 	 */
 	void retryFailedSurveyProcessor();
+
+	boolean updateHiddenSectionForAllAgents() throws InvalidInputException;
+
+
+	boolean updateHiddenSectionForAgentsOfCompany(long companyId, String collection, String flagToBeUpdated,
+			Boolean flag) throws InvalidInputException;
 }

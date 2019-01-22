@@ -203,6 +203,31 @@
     </step>
 
   <step>
+    <name>Generate random value</name>
+    <type>RandomValue</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>nps_report_month_id</name>
+        <type>random uuid</type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>959</xloc>
+      <yloc>238</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Insert &#x2f; Update nps_report_month</name>
     <type>InsertUpdate</type>
     <description/>
@@ -220,6 +245,12 @@
       <schema/>
       <table>nps_report_month</table>
       <key>
+        <name>COMPANY_ID</name>
+        <field>company_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
         <name>REGION_ID</name>
         <field>region_id</field>
         <condition>&#x3d;</condition>
@@ -228,12 +259,6 @@
       <key>
         <name>BRANCH_ID</name>
         <field>branch_id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>COMPANY_ID</name>
-        <field>company_id</field>
         <condition>&#x3d;</condition>
         <name2/>
       </key>
@@ -608,31 +633,6 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>505</xloc>
-      <yloc>238</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Generate random value</name>
-    <type>RandomValue</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>nps_report_month_id</name>
-        <type>random uuid</type>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>959</xloc>
       <yloc>238</yloc>
       <draw>Y</draw>
       </GUI>
