@@ -68,6 +68,9 @@
 <script type="text/javascript">
 	var globalStrings = new Array();
 	globalStrings['label.admin.key'] = "<spring:theme code='label.admin.key' text='Admin' javaScriptEscape='true' />";
+	globalStrings['label.companyadmin.key'] = "<spring:theme code='label.companyadmin.key' text='Company Admin' javaScriptEscape='true' />";
+	globalStrings['label.regionadmin.key'] = "<spring:theme code='label.regionadmin.key' text='Region Admin' javaScriptEscape='true' />";
+	globalStrings['label.branchadmin.key'] = "<spring:theme code='label.branchadmin.key' text='Branch Admin' javaScriptEscape='true' />";
 	globalStrings['label.user.key'] = "<spring:theme code='label.user.key' text='User' javaScriptEscape='true' />";
 	bindUserLoginEvent();
 </script>
