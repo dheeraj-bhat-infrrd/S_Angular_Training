@@ -120,8 +120,14 @@ public class HierarchyFacadeImpl implements HierarchyFacade
             for ( Region region : regions ) {
                 RegionVO regionVO = new RegionVO();
                 regionVO.setRegion( region.getRegion() );
-                regionVO.setAddress1( region.getAddress1() );
-                regionVO.setAddress2( region.getAddress2() );
+                if(region.getAddress1() != null)
+                    regionVO.setAddress1( region.getAddress1() );
+                else
+                    regionVO.setAddress1("");
+                if(region.getAddress2() != null)
+                    regionVO.setAddress2( region.getAddress2() );
+                else
+                    regionVO.setAddress2("");
                 regionVO.setRegionId( region.getRegionId() );
                 regionVO.setRegionName( region.getRegionName() );
                 regionVOs.add( regionVO );
@@ -143,8 +149,14 @@ public class HierarchyFacadeImpl implements HierarchyFacade
             for ( Branch branch : branches ) {
                 BranchVO branchVO = new BranchVO();
                 branchVO.setBranch( branch.getBranch() );
-                branchVO.setAddress1( branch.getAddress1() );
-                branchVO.setAddress2( branch.getAddress2() );
+                if(branch.getAddress1() != null)
+                    branchVO.setAddress1( branch.getAddress1());
+                else
+                    branchVO.setAddress1("");
+                if(branch.getAddress2() != null)
+                    branchVO.setAddress2( branch.getAddress2());
+                else
+                    branchVO.setAddress2("");
                 branchVO.setBranchId( branch.getBranchId() );
                 branchVOs.add( branchVO );
             }
