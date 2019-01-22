@@ -132,7 +132,7 @@ function drawWidgetDataEntities($, widgetDetails) {
 				$('#ss-widget-options-arrow').hide();
 				$('#ss-widget-rev-options').removeClass('hide');
 			} else {
-				$('#ss-widget-options-dropdown').addClass('hide');
+				$('#ss-widget-options-dropdown').hide();
 				$('#ss-widget-options-arrow').show();
 			}
 		}else{
@@ -397,7 +397,18 @@ function paintWidgetReviews($, reviews, resourcesHost, ssHost) {
 		drawWidgetRatingStars($, $('#ss-widget-review-container').find('.ss-widget-rev-stars'), rating)
 		$('#ss-widget-review-container').find('.ss-widget-rev-score').html(rating.toPrecision(2));
 		$('#ss-widget-review-container').find('.ss-widget-rev-cust-name').html(customerName);
-		$('#ss-widget-review-container').find('.ss-widget-rev-cust-addr').html(' -' + customerCity + ', ' + customerState);
+		
+		var customerPlace = "";
+		if(customerCity != null && customerCity != 'null' && customerCity != undefined && customerCity != ''){
+			customerPlace += ' &#8722; ' + customerCity;
+			if(customerState != null && customerState != 'null' && customerState != undefined && customerState != ''){
+				customerPlace += ', ' + customerState; 
+			}
+		}else if(customerState != null && customerState != 'null' && customerState != undefined && customerState != ''){
+			customerPlace += ' &#8722; ' + customerState;
+		}
+		
+		$('#ss-widget-review-container').find('.ss-widget-rev-cust-addr').html(customerPlace);
 		$('#ss-widget-review-container').find('.ss-widget-review-text').html(review);
 
 		if (reviewSource == 'Zillow') {
@@ -1018,7 +1029,19 @@ function paintWidgetReviewsForLoadMore($, reviews, resourcesHost, ssHost) {
 		drawWidgetRatingStars($, $('#ss-widget-review-container').find('.ss-widget-rev-stars'), rating)
 		$('#ss-widget-review-container').find('.ss-widget-rev-score').html(rating);
 		$('#ss-widget-review-container').find('.ss-widget-rev-cust-name').html(customerName);
-		$('#ss-widget-review-container').find('.ss-widget-rev-cust-addr').html(' -' + customerCity + ', ' + customerState);
+
+		var customerPlace = "";
+		if(customerCity != null && customerCity != 'null' && customerCity != undefined && customerCity != ''){
+			customerPlace += ' &#8722; ' + customerCity;
+			if(customerState != null && customerState != 'null' && customerState != undefined && customerState != ''){
+				customerPlace += ', ' + customerState; 
+			}
+		}else if(customerState != null && customerState != 'null' && customerState != undefined && customerState != ''){
+			customerPlace += ' &#8722; ' + customerState;
+		}
+		
+		$('#ss-widget-review-container').find('.ss-widget-rev-cust-addr').html(customerPlace);
+		
 		$('#ss-widget-review-container').find('.ss-widget-review-text').html(review);
 
 		if (reviewSource == 'Zillow') {

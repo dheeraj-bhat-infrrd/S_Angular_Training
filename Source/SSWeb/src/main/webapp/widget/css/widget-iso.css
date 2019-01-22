@@ -187,6 +187,7 @@
   width: 50px !important;
   height: 50px !important;
   border-radius: 50% !important;
+  margin: 0 !important;
 }
 #ss-widget-container .ss-widget-rev-prof-details {
   margin-left: 15px !important;
@@ -216,7 +217,7 @@
   padding-left: 0 !important;
 }
 #ss-widget-container .ss-widget-rev-cust-addr {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: bold !important;
   color: #999;
 }
@@ -432,6 +433,10 @@
 
 #ss-widget-container #ss-widget-rev-options{
 	font-weight:bold !important;
+}
+
+#ss-widget-container .ss-widget-rev-cust-name-div{
+	padding-left:0 !important;	
 }
 
 @media (max-width: 767px) {
