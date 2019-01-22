@@ -2142,7 +2142,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String agentName,
-        String mood, String rating, String surveySourceId, String surveyDetail )
+        String mood, String rating, String surveySourceId, String surveyDetail, String loanId )
         throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -2166,6 +2166,8 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "surveyDetail parameter is empty or null for sending survey completion mail " );
         }
 
+        if(loanId == null) loanId = "N/A";
+
         String[] mailIds = recipientMailId.split( "," );
         List<String> mailIdList = new ArrayList<String>();
 
@@ -2185,9 +2187,13 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, customerName, customerMailId,
             agentName, mood, rating, surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId, surveyDetail ) );
 
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLAINT_HANDLER_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( loanId, customerName ) );
+
         LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithBodyReplacements( emailEntity,
-            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLAINT_HANDLER_MAIL_SUBJECT,
+        sendEmailWithSubjectAndBodyReplacements( emailEntity,messageSubjectReplacements,
             messageBodyReplacements, false, false );
         LOG.debug( "Successfully sent survey completion mail" );
     }
