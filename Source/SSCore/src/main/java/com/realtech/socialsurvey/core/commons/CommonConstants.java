@@ -1725,6 +1725,7 @@ public interface CommonConstants
     public static final String WIDGET_HIDE_CONTACT = "hideContactBtn";
     public static final String WIDGET_HIDE_REVIEW = "hideReviewBtn";
     public static final String WIDGET_MAX_BUTTON_SIZE = "maxWidgetBtnSize";
+    public static final String WIDGET_ENABLE_MOB_VIEW = "enableMobView";
     
     public static final String WIDGET_ORDER_NEWEST_FIRST = "newestFirst";
     public static final String WIDGET_ORDER_OLDEST_FIRST = "oldestFirst";
@@ -1749,6 +1750,7 @@ public interface CommonConstants
     public static final String WIDGET_DEFAULT_HIDE_CONTACT = "false";
     public static final String WIDGET_DEFAULT_HIDE_REVIEW = "false";
     public static final String WIDGET_DEFAULT_BUTTON_SIZE = "205";
+    public static final String WIDGET_DEFAULT_ENABLE_MOB_VIEW = "false";
 
     public static final String WIDGET_DEFAULT_BUTTON1_OPACITY = "0.7";
     public static final String WIDGET_DEFAULT_BUTTON2_TEXT = "WRITE A REVIEW";

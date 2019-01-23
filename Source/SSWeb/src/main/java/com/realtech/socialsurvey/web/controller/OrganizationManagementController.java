@@ -4684,6 +4684,7 @@ public class OrganizationManagementController
             widgetConfigurationRequest.setHideContactBtn( request.getParameter( CommonConstants.WIDGET_HIDE_CONTACT ) );
             widgetConfigurationRequest.setHideReviewBtn( request.getParameter( CommonConstants.WIDGET_HIDE_REVIEW ) );
             widgetConfigurationRequest.setMaxWidgetBtnSize( request.getParameter( CommonConstants.WIDGET_MAX_BUTTON_SIZE) );
+            widgetConfigurationRequest.setEnableMobView(request.getParameter( CommonConstants.WIDGET_ENABLE_MOB_VIEW ) );
             
             HttpSession session = request.getSession();
             User user = sessionHelper.getCurrentUser();

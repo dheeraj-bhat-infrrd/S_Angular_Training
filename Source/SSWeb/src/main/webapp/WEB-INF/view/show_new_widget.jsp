@@ -52,8 +52,12 @@
 			
 			<!-- new widget configuration -->			
 			<div class="clearfix float-right st-score-rt pos-relative widget-code" style="width: 59%;">
+				<div class="widget-conf-cont widget-chk-adj-resp">
+   				    <div id="enable-mob-view-chk-box" class="float-left wid-chk-adj bd-check-img" style="height: 40px"></div>
+   				    <div class="widget-conf-txt float-left">Enable Mobile view on Larger screens</div>
+				</div>
 				
-				<div class="widget-conf-cont" style="padding-top: 1%;">
+				<div class="widget-conf-cont">
 				    <div class="widget-conf-txt float-left">Background Color</div>
 					<div class="float-right" style="padding-top: 1%;"><input type="text" id="widget-bg-clr"></div>
 				</div>
@@ -157,14 +161,6 @@
 				    </div>
 				</div>
 
-				<div class="widget-conf-cont">
-				    <div class="widget-conf-txt float-left">Maximum Button Width</div>
-				    <div class="float-right" style="padding-top: 1%;">
-						<input type="text" name="onld-btn-size" id="onld-btn-size" class="st-item-row-txt widget-select-bx wid-sel-bxl-num" autocomplete="off" value="" maxlength="3">
-				    </div>
-				    <div class="clear-both">( in pixels )</div>
-				</div>
-						
 				<div class="widget-conf-cont">
 				    <div class="widget-conf-txt float-left">Maximum Button Width</div>
 				    <div class="float-right" style="padding-top: 1%;">
