@@ -12777,25 +12777,6 @@ b{
     width: 85px;
 }
 
-.ss-page-not-found-txt {
-    font-family: OpenSansBold;
-    font-size: 16px;
-    color: white;
-    text-align: center;
-    margin-top: 20px;
-}
-
-.ss-404-img-cont {
-    height: 200px;
-    width: 500px;
-    margin: 0 auto;
-    margin-top: 100px;
-}
-
-body.ss-not-found-page{
-	 background: url(../images/ss-notfound-bg.jpg);
-}
-
 /*Banner and ribbon styles*/
 .summit-popup-outer {
     width: 100%;
@@ -12902,4 +12883,44 @@ body.ss-not-found-page{
     font-weight: bold !important;
     line-height: 12px;
     color: #2f69aa;
+}
+
+/*new 404 page*/
+body.ss-not-found-page {
+    background-color: #fdfdfd;
+}
+
+.ss-page-not-found {
+    display: grid;
+    margin-top: 60px;
+}
+
+.ss-404-img-cont {
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+}
+
+.ss-404-text {
+    font-size: 200px;
+    font-family: OpenSansBold;
+    color: #247bc4;
+}
+
+.ss-404-not-found-txt {
+    position: absolute;
+    bottom: 105px;
+    font-size: 35px;
+    background-color: #fdfdfd;
+    width: 100%;
+    text-align: center;
+    font-family: OpenSansBold;
+    color: #848484;
+}
+
+.ss-page-not-found-txt {
+    font-family: OpenSansBold;
+    font-size: 21px;
+    color: #848484;
+    text-align: center;
 }

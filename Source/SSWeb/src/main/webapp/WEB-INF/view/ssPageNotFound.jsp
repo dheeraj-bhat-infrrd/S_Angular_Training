@@ -31,9 +31,10 @@
 		</div>
 	</div>
 	<div class="ss-page-not-found">
-		<div class="ss-404-img-cont">
-			<img src="${initParam.resourcesPath}/resources/images/ss-404-not-found.png" alt="404 Not Found">
-		</div>
+	    <div class="ss-404-img-cont">
+	    	<div class="ss-404-text">404</div>
+	        <div class="ss-404-not-found-txt">Not Found</div>
+	    </div>    
 		<div class="ss-page-not-found-txt">Page not found</div>
 	</div>
 	<script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
