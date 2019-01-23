@@ -160,7 +160,10 @@ public interface SearchEngineManagementServices {
 
 	public boolean updateCompanyIdForAllEntities() throws InvalidInputException;
 
-
+	/**
+	 * 
+	 */
+	void retryFailedSurveyProcessor();
 
 	boolean updateHiddenSectionForAllAgents() throws InvalidInputException;
 

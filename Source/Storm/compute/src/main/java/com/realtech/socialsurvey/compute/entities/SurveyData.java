@@ -12,6 +12,8 @@ public class SurveyData  implements Serializable
 
 	private String id; //default mongo id _id
 	
+	private long surveyId;
+	
 	private long agentId;
 	private long branchId;
 	private long regionId;
@@ -99,4 +101,11 @@ public class SurveyData  implements Serializable
 	public void setMood(String mood) {
 		this.mood = mood;
 	}
+	public long getSurveyId() {
+		return surveyId;
+	}
+	public void setSurveyId(long surveyId) {
+		this.surveyId = surveyId;
+	}
+	
 }

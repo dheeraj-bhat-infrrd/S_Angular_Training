@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.services;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
 import com.realtech.socialsurvey.compute.entities.SurveyDetailsVO;
+import com.realtech.socialsurvey.compute.entities.SurveyData;
 import com.realtech.socialsurvey.compute.entities.UserEvent;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 
@@ -69,5 +70,12 @@ public interface FailedMessagesService
      */
     public boolean insertUnsavedUserEvent( UserEvent userEvent, boolean willRetry, int retryCount, boolean wasRetrySuccessful,
         boolean isPermanentlyFailed, Throwable thrw );
+
+	/**
+	 * @param surveyData
+	 */
+	public void insertTemporaryFailedSurveyProcessor(SurveyData surveyData);
+
+	int deleteFailedSurveyProcessor(long surveyId);
 
 }

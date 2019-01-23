@@ -2,14 +2,11 @@ package com.realtech.socialsurvey.core.services.searchengine.impl;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -42,13 +39,15 @@ import com.realtech.socialsurvey.core.entities.LOSearchEngine;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyStats;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.factories.ApplicationSettingsInstanceProvider;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.searchengine.SearchEngineManagementServices;
@@ -97,9 +96,9 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
     
     @Autowired
     private OrganizationManagementService organizationManagementService;
-
+    
     @Autowired
-    private UserManagementService userManagementService;
+    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
 	
     
     
@@ -869,6 +868,16 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public void retryFailedSurveyProcessor() {
+		LOG.info("Starting retryFailedSurveyProcessor method.");
+		try {
+			streamApiIntegrationBuilder.getStreamApi().queueFailedSurveyProcessor();
+		} catch (StreamApiException | StreamApiConnectException e) {
+			LOG.error("Could not stream failed survey processors", e);
+		}
 	}
 	
 	@Override

@@ -54,4 +54,7 @@ public interface StreamApi
     @POST ( "/api/v1/stream/survey/process")
     public Response sendsurveyProcessRequest( @Body SurveyProcessData surveyProcessData );
     
+    @GET("/api/v1/analyze/failed/surveyprocessor")
+    public Response queueFailedSurveyProcessor();
+    
 }

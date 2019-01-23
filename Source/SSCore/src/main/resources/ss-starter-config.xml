@@ -460,7 +460,20 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
-
+	
+	<!-- Setting social-monitor feed retry job detail -->
+	<bean id="surveyprocessorretryjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.RetryFailedSurveyProcessor" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="searchEngineManagementServices" value-ref="searchEngineManagementServices" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
 	<bean id="surveysourceidupdater"
 		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
@@ -797,7 +810,15 @@
 		<property name="jobDetail" ref="socialfeedretryjobdetail" />
 		<property name="cronExpression" value="0 0 0/1 1/1 * ?" />
 	</bean>
-
+	
+	<!-- setting cron for social-monitor feed retry -->
+	<bean id="surveyprocessorretrycron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="surveyprocessorretryjobdetail" />
+		
+		<property name="cronExpression" value="0 0 0/1 1/1 * ? *" />
+	</bean>
+	
 	<bean id="surveysourceidupdatercron"
 		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="surveysourceidupdater" />
@@ -895,6 +916,7 @@
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
 				<ref bean="surveyimporterjobdetail" />
 				<ref bean="socialfeedretryjobdetail" />
+				<ref bean="surveyprocessorretryjobdetail" />
 				<!-- <ref bean="deleteUsedVendastaTickets" />-->
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
 				<!-- <ref bean="updateExistingCompanyPrice" /> -->
@@ -941,6 +963,7 @@
 				<ref bean="zillowreviewprocessandautopostcron" />
 				<ref bean="surveyimportercron" />
 				<ref bean="socialfeedretrycron" />
+				<ref bean="surveyprocessorretrycron" />
 				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
 				<!-- <ref bean="updateExistingCompanyPricecron" /> -->
 				<!-- <ref bean="hideUsersFromSearchcron" /> -->
