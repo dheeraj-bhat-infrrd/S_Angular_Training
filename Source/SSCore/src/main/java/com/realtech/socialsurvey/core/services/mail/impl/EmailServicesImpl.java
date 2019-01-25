@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import com.realtech.socialsurvey.core.dao.EmailDao;
 import com.realtech.socialsurvey.core.dao.ForwardMailDetailsDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -45,6 +47,7 @@ import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
@@ -140,11 +143,18 @@ public class EmailServicesImpl implements EmailServices
     private StreamMessagesService streamMessagesService;
 
     private DigestMailHelper digestMailHelper;
+    
+    private UserProfileDao userProfileDao;
 
     @javax.annotation.Resource
     @Qualifier ( "branch")
     private BranchDao branchDao;
-
+    
+    @Autowired
+    public void setBranchDao (@Qualifier ( "branch") BranchDao branchDao)
+    {
+    	this.branchDao = branchDao;
+    }
 
     @Autowired
     public void setForwardMailDetailsDao( ForwardMailDetailsDao forwardMailDetailsDao )
@@ -234,6 +244,12 @@ public class EmailServicesImpl implements EmailServices
     public void setDigestMailHelper( DigestMailHelper digestMailHelper )
     {
         this.digestMailHelper = digestMailHelper;
+    }
+    
+    @Autowired
+    public void setUserProfileDao( UserProfileDao userProfileDao )
+    {
+        this.userProfileDao = userProfileDao;
     }
 
 
@@ -3034,8 +3050,21 @@ public class EmailServicesImpl implements EmailServices
         String userEmailId = socialFeedsActionUpdate.getUserEmailId();
         String feedType = socialResponseObject.getType().toString().toLowerCase();
         
+        long branchId = socialResponseObject.getBranchId();
+        long regionId = socialResponseObject.getRegionId();
+        List<UserProfile> recipient = null;
+        
+        if(branchId != 0 || regionId != 0)
+        {
+        	if(branchId != 0)
+        	{
+        		regionId=branchDao.getRegionIdByBranchId(branchId);
+        	}
+        	recipient=userProfileDao.getImmediateAdminForRegionOrBranch(socialResponseObject.getCompanyId(), regionId, branchId);
+        }
+        
 		LOG.info( "method sendSocialMonitorActionMail started" );
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+        if ( (recipientMailId == null || recipientMailId.isEmpty()) && (recipient==null || recipient.isEmpty())) {
             LOG.error( "Recipient email Id is empty or null for sendSocialMonitorActionMail " );
             throw new InvalidInputException(
                 "Recipient email Id is empty or null for sendSocialMonitorActionMail " );
@@ -3044,39 +3073,88 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "mailBody is empty or null for sendSocialMonitorActionMail " );
             throw new InvalidInputException( "Mail body is empty or null for sendSocialMonitorActionMail " );
         }
-
         
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        
+        List<UserProfile> admins = userProfileDao.getImmediateAdminForAgent(socialResponseObject.getAgentId(),socialResponseObject.getCompanyId());
         
         // Set
         String senderEmailAddress = "post-"+ socialResponseObject.getId() +"@" + defaultSendGridMeEmailDomain;
-        emailEntity.setSenderEmailId(senderEmailAddress);
-        
-        // Setting default name
-        emailEntity.setSenderName( defaultSendName );
-        
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_SUBJECT;
-
+                + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_SUBJECT;
+     
         String message = null;
+        
         if ( previousStatus != null && currentStatus != null ) {
             message = "Your " + feedType + " post was moved from <b>" + previousStatus + "</b> to <b>" + currentStatus
                 + "</b> by " + userName + " [" + userEmailId + "] with message,";
         } else {
             message = "Your " + feedType + " post has a message from " + userName + " [" + userEmailId + "] " + ",";
         }
-        String postLinkText= "Here is link to your post - " + socialResponseObject.getPostLink();
-                
+        String postLinkText= "Here is a link to the post - " + socialResponseObject.getPostLink();
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs(
-            Arrays.asList( appLogoUrl, recipientName, message, mailBody, postLinkText ) );
+        
+        if(recipientMailId != null) {
+        	EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        	// Setting default name
+        	emailEntity.setSenderName( defaultSendName );
+        	emailEntity.setSenderEmailId(senderEmailAddress); 
+        	emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER );
+        	messageBodyReplacements.setReplacementArgs(
+        			Arrays.asList( appLogoUrl, recipientName, message, mailBody, postLinkText ) );
            
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false,
-            false, socialResponseObject.getType().toString() );
+        	LOG.trace( "Calling email sender to send mail" );
+        	sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false,
+        			false, socialResponseObject.getType().toString() );
+        }
+        
+        if(recipient != null)
+        {
+        	Iterator<UserProfile> iterator = recipient.iterator();
+        	while (iterator.hasNext())
+        	{
+        		EmailEntity emailEntityRecipient;
+        		UserProfile res = iterator.next();
+        		emailEntityRecipient = prepareEmailEntityForSendingEmail(res.getEmailId());
+        		emailEntityRecipient.setSenderEmailId(senderEmailAddress);
+        		emailEntityRecipient.setSenderName( defaultSendName );
+        		emailEntityRecipient.setMailType( CommonConstants.EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_ADMIN );
+        		messageBodyReplacements.setReplacementArgs(
+        				Arrays.asList( appLogoUrl, recipientName, message, mailBody, postLinkText ) );
+        		LOG.trace("Calling email sender to send email for owner");
+        		sendEmailWithBodyReplacements( emailEntityRecipient, subjectFileName, messageBodyReplacements, false, false,
+        				false, socialResponseObject.getType().toString() );
+        	}
+        }
+        
+        if(!admins.isEmpty() && admins != null )
+        {
+        	String adminMessage=null;
+    		if ( previousStatus != null && currentStatus != null ) {
+    			adminMessage = recipientName+"'s " + feedType + " post was moved from <b>" + previousStatus + "</b> to <b>" + currentStatus
+    					+ "</b> by " + userName + " [" + userEmailId + "] with message,";
+    		} else {
+    			adminMessage = recipientName+"'s " + feedType + " post has a message from " + userName + " [" + userEmailId + "] " + ",";
+    		}
+    		String postLinkTextAdmin= "Here is a link to the post - " + socialResponseObject.getPostLink();
+        	Iterator<UserProfile> iterator = admins.iterator();
+        	while (iterator.hasNext())
+        	{
+        		EmailEntity emailEntityAdmin;
+        		UserProfile admin = iterator.next();
+        		emailEntityAdmin = prepareEmailEntityForSendingEmail(admin.getEmailId());
+        		emailEntityAdmin.setSenderEmailId(senderEmailAddress);
+        		emailEntityAdmin.setSenderName( defaultSendName );
+        		emailEntityAdmin.setMailType( CommonConstants.EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_ADMIN );
+        		messageBodyReplacements.setReplacementArgs(
+        				Arrays.asList( appLogoUrl, "Administrator", adminMessage, mailBody, postLinkTextAdmin ) );
+        		LOG.trace("Calling email sender to send email for admin");
+        		sendEmailWithBodyReplacements( emailEntityAdmin, subjectFileName, messageBodyReplacements, false, false,
+        				false, socialResponseObject.getType().toString() );
+        	}    	
+        }
+        
         LOG.debug( "method sendSocialMonitorActionMail ended" );
 	}
     

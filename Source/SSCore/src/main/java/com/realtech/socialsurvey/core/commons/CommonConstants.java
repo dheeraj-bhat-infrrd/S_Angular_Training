@@ -183,6 +183,7 @@ public interface CommonConstants
     public static final String USER_INVITE_INVITATION_VALID_UNTIL_COLUMN = "invitationValidUntil";
     public static final String USER_COLUMN = "user";
     public static final String PROFILE_MASTER_COLUMN = "profilesMaster";
+    public static final String PROFILE_ID ="profileId";
     public static final String AUTO_PAYMENT_MODE = "A";
     public static final int INITIAL_PAYMENT_RETRIES = 0;
     public static final String PAYMENT_GATEWAY = "Braintree";
@@ -1577,6 +1578,7 @@ public interface CommonConstants
     public static final String EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
     public static final String EMAIL_TYPE_SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
     public static final String EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER = "EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER";
+    public static final String EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_ADMIN = "SOCIAL_MONITOR_ACTION_MAIL_TO_ADMIN";
     public static final String EMAIL_TYPE_ABUSIVE_HANDLE_MAIL = "ABUSIVE_HANDLE_MAIL";
     public static final String EMAIL_TYPE_USER_ADDITION_MAIL = "USER_ADDITION_MAIL";
     public static final String EMAIL_TYPE_USER_DELETION_MAIL = "USER_DELETION_MAIL";
