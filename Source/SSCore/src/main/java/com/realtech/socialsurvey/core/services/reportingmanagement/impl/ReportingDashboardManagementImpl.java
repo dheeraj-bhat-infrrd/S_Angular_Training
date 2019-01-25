@@ -894,11 +894,13 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 } else {
                     companyUserReportList.add( "" );
                 }
+                
                 companyUserReportList.add( companyUserReport.getTotalReviews() );
                 companyUserReportList.add( companyUserReport.getSsReviews() );
                 companyUserReportList.add( companyUserReport.getZillowReviews() );
                 companyUserReportList.add( companyUserReport.getAbusiveReviews() );
                 companyUserReportList.add( companyUserReport.getThirdPartyReviews() );
+                companyUserReportList.add( companyUserReport.getOptedOut() );
                 companyUser.add( companyUserReportList );
             }
         }
