@@ -352,10 +352,6 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>hidePublicPage</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>      <field>        <name>isLoginPrevented</name>
         <rename/>
         <length>-2</length>
