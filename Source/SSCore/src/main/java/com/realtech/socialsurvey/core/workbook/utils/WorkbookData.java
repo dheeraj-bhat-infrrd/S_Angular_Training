@@ -1042,6 +1042,7 @@ public class WorkbookData
         surveyTransactionReportToPopulate.add("Zillow Reviews");
         surveyTransactionReportToPopulate.add("Abusive Reviews");
         surveyTransactionReportToPopulate.add("3rd Party Reviews");
+	surveyTransactionReportToPopulate.add("Account Status");
         companyUserData.put( 1, surveyTransactionReportToPopulate );
         surveyTransactionReportToPopulate = new ArrayList<>();
         
@@ -1084,7 +1085,7 @@ public class WorkbookData
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
-        surveyTransactionReportToPopulate.add("Account Status");
+        surveyTransactionReportToPopulate.add("");
         companyUserData.put( 2, surveyTransactionReportToPopulate );
         
         return companyUserData;
