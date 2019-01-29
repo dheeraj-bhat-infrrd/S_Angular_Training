@@ -5930,6 +5930,7 @@ function testLoneConnectionCallBack(response) {
 
 var isEncompassValid;
 function validateEncompassInput(elementId) {
+    console.log("IN validate encompass")
 	isEncompassValid = true;
 	var isFocussed = false;
 
@@ -5954,7 +5955,14 @@ function validateEncompassInput(elementId) {
 			isFocussed = true;
 		}
 	}
-
+    if (!validateAlertEmail('alert-email')) {
+            console.log("IN validate alertmail")
+    		isEncompassValid = false;
+    		if (!isFocussed) {
+    			$('#alert-email').focus();
+    			isFocussed = true;
+    		}
+    }
 	return isEncompassValid;
 }
 
@@ -6069,6 +6077,9 @@ $('body').on('blur', '#encompass-password', function() {
 });
 $('body').on('blur', '#encompass-url', function() {
 	validateURL(this.id);
+});
+$('body').on('blur', '#alert-email', function() {
+	validateAlertEmail(this.id);
 });
 // Lone Wolf input
 
@@ -22215,3 +22226,78 @@ function summitTimer() {
 	return { d: d, h: h, m: m};
 }
 
+$(document).on('click','#close-enc-banner',function(e){
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	disableEncompassBanner();
+	
+});
+
+function disableEncompassBanner(){
+	
+	var message = "";
+	var url = "./disableencompassnotification.do"
+		
+	$.ajax({
+		async : false,
+		url : url,
+		type : "PUT",
+		cache : false,
+		dataType : "text",
+		success : function(data) {
+			if(data == true || data == 'true'){
+				message = "Successfully disabled Encompass Notification.";
+				$('#dsh-enc-banner').hide();
+			}else if(data == false || data == 'false'){
+				message = "Unable to disable the Encompass notification."; 
+			}
+			
+			$('#overlay-toast').html(message);
+			showToast();
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html("Unable to disable the Encompass notification.");
+			showToast();
+		}
+	});
+}
+
+$('body').on('blur', '#enc-alert-mail-recipients', function() {
+	
+	// format email IDs
+	var emails = $("#enc-alert-mail-recipients").val();
+	
+	if( emails == undefined || emails == "" || emails.length == 0){
+		$('#overlay-toast').html("Encompass alert reciepients cannot be blank");
+		showToast();
+		$("#enc-alert-mail-recipients").val($('#encompass-alert-mails').val());
+		return;
+	}
+	
+	var payload = {
+		"alertMails" : emails
+	};
+	
+	callAjaxPostWithPayloadData("./updateencompassalertmail.do", function(data) {
+		
+		var emailList = data;
+		var status;
+		
+		if(emailList == "INPUT_ERROR"){
+			status = "Invalid email address inserted. Encompass alert recipients updation Failed!";
+			$("#enc-alert-mail-recipients").val($('#encompass-alert-mails').val());
+		}else {
+			status = "Encompass alert recipients updated successfully!";
+		}
+		
+		$('#overlay-toast').html(status);
+		showToast();
+	}, payload, true);
+	
+});

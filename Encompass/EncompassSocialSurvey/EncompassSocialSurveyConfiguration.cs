@@ -100,6 +100,22 @@ namespace EncompassSocialSurvey
             }
         }
 
+        public static string sendErrorMailUrl
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SEND_ERROR_MAIL_URL];
+            }
+        }
+
+        public static string sendErrorNotificationUrl
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SEND_ERROR_NOTIFICATION_URL];
+            }
+        }
+
         public static int MaxNoOfParallelThreads
         { 
             get

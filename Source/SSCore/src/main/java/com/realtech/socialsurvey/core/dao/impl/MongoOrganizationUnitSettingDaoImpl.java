@@ -235,6 +235,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_GOOGLE_REVIEW_LASTFETCHED = "socialMediaLastFetched.googleReviewLastFetched";
     public static final String KEY_GOOGLE_REVIEW_LAST_FETCHED_CURRENT = "socialMediaLastFetched.googleReviewLastFetched.current";
 
+    public static final String NOTIFICATION = "notification";
+    public static final String NOTIFICATION_MESSAGE = "notification.message";
+    public static final String NOTIFICATION_ISDISABLED = "notification.isDisabled";
+
+    public static final String KEY_ALERT_EMAIL = "crm_info.alertEmail";
+
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
 
@@ -1694,8 +1700,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         return transactionSourceFtpList;
         
     }
-    
-    
+
     @Override
     public void updateFtpTransaction(long companyId , List<TransactionSourceFtp> transactionSourceFtp) {
         LOG.debug( "The method fetchFileHeaderMapper() to fetch file header started for companyId: {} ",companyId);
@@ -1709,6 +1714,35 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         
     }
 
+    @Override public Notification fetchNotification( long companyId, String message )
+    {
+        Query query = new Query(  );
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) )
+                .addCriteria( Criteria.where( NOTIFICATION ).exists( true ) )
+                .addCriteria( Criteria.where( NOTIFICATION_MESSAGE ).is( message ) );
+        query.fields().include( NOTIFICATION ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+
+        return mongoTemplate.findOne( query, Notification.class, COMPANY_SETTINGS_COLLECTION );
+    }
+
+
+    /**
+     * Method to add notification into organisation settings
+     * @param companyId
+     * @param newNotification
+     */
+    @Override public void saveNotification( long companyId, Notification newNotification )
+    {
+        Query query = new Query(  );
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+
+        Update update = new Update();
+        update.set( NOTIFICATION, newNotification );
+        update.set( KEY_MODIFIED_ON, System.currentTimeMillis() );
+
+        mongoTemplate.updateMulti( query, update, COMPANY_SETTINGS_COLLECTION );
+    }
+    
     @Override
     public List<SocialMediaTokenResponse> getFbTokensByCollection( String collectionName, int skipCount, int batchSize )
     {
@@ -2357,6 +2391,4 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         }
         return userIdList;
     }
-
-    
 }

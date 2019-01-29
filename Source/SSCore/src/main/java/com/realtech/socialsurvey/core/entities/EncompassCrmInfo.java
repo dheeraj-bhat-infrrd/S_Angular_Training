@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
+
 public class EncompassCrmInfo extends CRMInfo
 {
 
@@ -30,6 +33,8 @@ public class EncompassCrmInfo extends CRMInfo
 	private String customFieldThree;
 	private String customFieldFour;
 	private String customFieldFive;
+
+	private List<String> alertEmail;
     
 
     public String getVersion()
@@ -288,7 +293,19 @@ public class EncompassCrmInfo extends CRMInfo
 	}
 
 
-	@Override
+    public List<String> getAlertEmail()
+    {
+        return alertEmail;
+    }
+
+
+    public void setAlertEmail( List<String> alertEmail )
+    {
+        this.alertEmail = alertEmail;
+    }
+
+
+    @Override
     public String toString()
     {
         return "crm_username: " + crm_username;

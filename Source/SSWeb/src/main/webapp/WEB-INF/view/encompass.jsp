@@ -26,6 +26,9 @@
 					<c:set var="loanProcessorEmail" value="${ appSettings.crm_info.loanProcessorEmail }" />
 					<c:set var="loanProcessorName" value="${ appSettings.crm_info.loanProcessorName }" />
 				</c:if>
+				<c:if test="${alertEmails != null}">
+				    <c:set var="alertEmail" value="${ alertEmails }" />
+				</c:if>
 				<form id="encompass-form">
 					<input id="encompass-state" type="hidden" value="${ encompassstate }" />
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
@@ -254,7 +257,7 @@
 					</div>
 					
 					<!-- ENCOMPASS SDK VERSION -->
-					
+
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding overflow-hidden">
 							<div class="um-item-row-left width-offset text-right">SDK Version</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
@@ -266,9 +269,22 @@
 								<div id="encompass-version-error" class="hm-item-err-2" style="display: none;"></div>
 							</div>
 					</div>
-					
-					
-					
+
+					<!-- ALERT EMAIL -->
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
+                        <div class="hm-item-row item-row-OR clearfix float-left">
+                            <div class="um-item-row-left width-offset text-right">
+                                <spring:message code="label.crm.alertEmail.key" />
+                            </div>
+                            <div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+                                <div class="rfr_icn icn-url en-icn"></div>
+                                <input id="alert-email" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Alert Emails" name="alert-email" value="${alertEmail}">
+                                <div id="encompass-url-error" class="hm-item-err-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
 					<div class="encompass-btn clearfix">
 						<div>
 							<div id="en-dry-save" class="float-left enc-state-icon cursor-pointer">Save</div>

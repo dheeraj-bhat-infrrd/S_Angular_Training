@@ -61,8 +61,8 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import org.springframework.web.bind.annotation.RequestBody;
 import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
-
 
 /**
  * @author Ustav
@@ -1825,6 +1825,9 @@ public interface OrganizationManagementService
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail,
         boolean sendMail, boolean isAddedByRealtechOrSSAdmin, String firstName, String lastName ) throws InvalidInputException;
 
+    void saveNotification( long companyId, String errorMessage, long receivedOn, @RequestBody String jsonString )
+        throws InvalidInputException;
+
     /**
      * Method to fetch all the facebook tokens across hierarchies
      * @param skipCount
@@ -1852,6 +1855,7 @@ public interface OrganizationManagementService
     void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey );
 
 
+    void disableNotification( long companyId );
 
 	long getCompanyByProfileName(String profileName);
 
@@ -1898,4 +1902,6 @@ public interface OrganizationManagementService
      * @param columnValue
      */
     public void updateCompanySettings(OrganizationUnitSettings companySettings, String columnName, String columnValue);
+
+    void updateCompanySettings( long companyId, String columnName, Object columnValue );
 }

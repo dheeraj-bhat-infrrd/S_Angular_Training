@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
 import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
+import com.realtech.socialsurvey.core.vo.EncompassAlertMailsVO;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.FtpCreateRequest;
@@ -22,6 +23,7 @@ import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.Payment;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
@@ -494,4 +496,10 @@ public interface SSApiIntegration
 
     @GET("/v1/users/{companyId}/owner")
     public Response getOwnerForCompany(@Path("companyId") Long companyId);
+    
+    @PUT ( "/v1/disablenotification/{companyId}")
+    public Response disableNotification (@Path ( "companyId") long companyId);
+
+    @POST( "/v1/updateencompassalertemailids" )
+    Response updateEncompassAlertEmailIds(@Body EncompassAlertMailsVO encompassAlertMailsVO);
 }

@@ -34,7 +34,7 @@ public abstract class CRMInfo {
     {
         this.companyId = companyId;
     }
-    
+
     @Override
 	public String toString() {
 		return "crm_source: " + crm_source + "\t connection_successful: " + connection_successful;

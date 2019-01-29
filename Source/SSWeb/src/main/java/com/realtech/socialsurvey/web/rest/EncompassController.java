@@ -1,15 +1,18 @@
 package com.realtech.socialsurvey.web.rest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.entities.CompanyEncompassInfo;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfoVO;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.exception.*;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,25 +24,14 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.CompanyEncompassInfo;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.exception.BaseRestException;
-import com.realtech.socialsurvey.core.exception.EncompassErrorCode;
-import com.realtech.socialsurvey.core.exception.InternalServerException;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+import java.util.*;
 
 
 @Controller
@@ -50,6 +42,9 @@ public class EncompassController extends AbstractController
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
+
+    @Autowired
+    private EmailServices emailServices;
 
     @Value ( "${ENCOMPASS_APP_URL}")
     private String encompassTestUrl;
@@ -242,4 +237,46 @@ public class EncompassController extends AbstractController
         return success;
     }
 
+
+    /**
+     * API to send encompass alert mail to encompass admin emailId when any error is thrown from encompass
+     * Calls   {@link EmailServices#sendCustomMail(String, String, String, String, List)}
+     * @param jsonData - consists of companyId and error message
+     */
+    @RequestMapping ( value = "/senderrormail", method = RequestMethod.POST)
+    public void sendErrorMailToAdmin( @RequestBody String jsonData ) {
+        LOG.info( "Sending encompass alert mail" );
+        try{
+            LOG.debug( "JsonString = {}", jsonData.toString() );
+            JSONObject jsonObject = new JSONObject(jsonData);
+            long companyId = jsonObject.getLong( "companyId" );
+            String message =  new Utils().convertDateToTimeZone( System.currentTimeMillis(),
+                CommonConstants.TIMEZONE_EST )+" "+jsonObject.getString( "message" );
+
+            if(companyId <= 0)
+                throw new InvalidInputException(  "Invalid companyId : " + companyId  );
+
+            final OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+
+            if ( companySettings == null ) {
+                throw new InvalidInputException( "Company Settings was not found for companyId : " + companyId );
+            }  else if ( companySettings.getCrm_info() == null || companySettings.getCrm_info().getCrm_source() == null
+                || companySettings.getCrm_info().getCrm_source().isEmpty()
+                || !( companySettings.getCrm_info().getCrm_source().equals( CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) ) {
+                throw new InvalidInputException( "No Encompass CRM Info was found for the company : " + companyId );
+            }
+
+            EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+            if( encompassCrmInfo.getAlertEmail() == null || encompassCrmInfo.getAlertEmail().isEmpty() ) {
+                throw new InvalidInputException( "No AlertEmail found to send encompass alert mail !!!" );
+            }
+
+            String subject = CommonConstants.ENCOMPASS_ALERT_MAIL_SUBJECT;
+            emailServices.sendCustomMail("admin", encompassCrmInfo.getAlertEmail(), subject,
+                message, null);
+
+        } catch ( Exception e ) {
+            LOG.error( "An exception occured while sending email to encompass admin ", e );
+        }
+    }
 }
