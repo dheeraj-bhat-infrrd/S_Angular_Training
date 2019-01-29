@@ -123,6 +123,7 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
 import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
@@ -164,6 +165,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.CommonUtils;
 import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
@@ -357,6 +359,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
     
     @Autowired
     private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
+    
+    @Autowired
+    private SurveyBuilder surveyBuilder;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -3054,7 +3059,8 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 
 
     @Override
-    public List<List<Object>> getScoreStatsForQuestion( Long entityId, String entityType, int currentMonth, int currentYear )
+    public List<List<Object>> getScoreStatsForQuestion( Long entityId, String entityType, int currentMonth, int currentYear,
+        long userId ) throws InvalidInputException
     {
         LOG.debug( "Service method call for get score stats for questions." );
         List<List<Object>> scoreStatsForQuestion = new ArrayList<>();
@@ -3068,10 +3074,16 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         } else if ( currentMonth == 12 ) {
             startMonth = 1;
         }
+        List<SurveyQuestionDetails> surveyQuestions = surveyBuilder
+            .getAllActiveQuestionsOfMappedSurvey( userManagementService.getUserByUserId( userId ) );
+        List<Long> questionIds = new ArrayList<>();
+        for(SurveyQuestionDetails details : surveyQuestions) {
+            questionIds.add( details.getQuestionId() );
+        }
 
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             for ( ScoreStatsQuestionCompany scoreStatsQuestionCompany : scoreStatsQuestionCompanyDao
-                .fetchScoreStatsQuestionForCompany( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
+                .fetchScoreStatsQuestionForCompany( entityId, startMonth, startYear, currentMonth, currentYear, questionIds ) ) {
                 List<Object> scoreStatsQuestionCompanyList = new ArrayList<>();
                 double averageScore = scoreStatsQuestionCompany.getAvgScore();
                 scoreStatsQuestionCompanyList.add( scoreStatsQuestionCompany.getQuestionId() );
@@ -3084,7 +3096,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             for ( ScoreStatsQuestionRegion scoreStatsQuestionRegion : scoreStatsQuestionRegionDao
-                .fetchScoreStatsQuestionForRegion( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
+                .fetchScoreStatsQuestionForRegion( entityId, startMonth, startYear, currentMonth, currentYear, questionIds ) ) {
                 List<Object> scoreStatsQuestionRegionList = new ArrayList<>();
                 double averageScore = scoreStatsQuestionRegion.getAvgScore();
                 scoreStatsQuestionRegionList.add( scoreStatsQuestionRegion.getQuestionId() );
@@ -3097,7 +3109,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             for ( ScoreStatsQuestionBranch scoreStatsQuestionBranch : scoreStatsQuestionBranchDao
-                .fetchScoreStatsQuestionForBranch( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
+                .fetchScoreStatsQuestionForBranch( entityId, startMonth, startYear, currentMonth, currentYear, questionIds ) ) {
                 List<Object> scoreStatsQuestionBranchList = new ArrayList<>();
                 double averageScore = scoreStatsQuestionBranch.getAvgScore();
                 scoreStatsQuestionBranchList.add( scoreStatsQuestionBranch.getQuestionId() );
@@ -3110,7 +3122,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
 
             for ( ScoreStatsQuestionUser scoreStatsQuestionUser : scoreStatsQuestionUserDao
-                .fetchScoreStatsQuestionForUser( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
+                .fetchScoreStatsQuestionForUser( entityId, startMonth, startYear, currentMonth, currentYear, questionIds ) ) {
                 List<Object> scoreStatsQuestionUserList = new ArrayList<>();
                 double averageScore = scoreStatsQuestionUser.getAvgScore();
                 scoreStatsQuestionUserList.add( scoreStatsQuestionUser.getQuestionId() );

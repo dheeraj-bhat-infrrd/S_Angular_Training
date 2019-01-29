@@ -23,12 +23,14 @@ public class ScoreStatsQuestionUserDaoImpl extends GenericReportingDaoImpl<Score
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<ScoreStatsQuestionUser> fetchScoreStatsQuestionForUser(Long userId , int startMonth, int startYear , int endMonth , int endYear) {
+    public List<ScoreStatsQuestionUser> fetchScoreStatsQuestionForUser( Long userId, int startMonth, int startYear,
+        int endMonth, int endYear, List<Long> questionIds )
+    {
 		LOG.debug( "Method to fetch all the score stats question for user,fetchScoreStatsQuestionForUser() started." );
         Criteria criteria = getSession().createCriteria( ScoreStatsQuestionUser.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.USER_ID, userId ) );
-            criteria.add(Restrictions.ne(CommonConstants.QUESTION_ID, CommonConstants.DEFAULT_QUESTION_ID));
+            criteria.add(Restrictions.in(CommonConstants.QUESTION_ID, questionIds));
             Criterion rest1= Restrictions.and(Restrictions.eq( CommonConstants.YEAR_VAL, endYear ), 
                 Restrictions.le( CommonConstants.MONTH_VAL, endMonth ));
             if( startMonth != 1){

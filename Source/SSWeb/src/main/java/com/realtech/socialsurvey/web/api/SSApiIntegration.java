@@ -252,7 +252,7 @@ public interface SSApiIntegration
 
     @GET ( "/v1/getscorestatsquestion")
     Response getScoreStatsQuestion( @Query ( "entityId") Long entityId, @Query ( "entityType") String entityType,
-        @Query ( "currentMonth") int currentMonth, @Query ( "currentYear") int currentYear );
+        @Query ( "currentMonth") int currentMonth, @Query ( "currentYear") int currentYear, @Query("userId") Long userId );
 
 
     @GET ( "/v1/getaccountstatisticsreportstatus")

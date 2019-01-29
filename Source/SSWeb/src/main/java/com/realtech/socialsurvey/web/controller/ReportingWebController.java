@@ -1267,6 +1267,7 @@ public class ReportingWebController
         String currentYearStr = request.getParameter( "currentYear" );
         String currentMonthStr = request.getParameter( "currentMonth" );
         Response response = null;
+        User user = sessionHelper.getCurrentUser();
 
         if ( ( entityType == null || entityType.isEmpty() ) ) {
             LOG.warn( "Invalid value (null/empty) passed for entityType." );
@@ -1289,7 +1290,7 @@ public class ReportingWebController
         }
 
         response = ssApiIntergrationBuilder.getIntegrationApi().getScoreStatsQuestion( entityId, entityType, currentMonth,
-            currentYear );
+            currentYear, user.getUserId() );
 
         LOG.info( "Method to get score stats for questions finished." );
         String responseString = null;

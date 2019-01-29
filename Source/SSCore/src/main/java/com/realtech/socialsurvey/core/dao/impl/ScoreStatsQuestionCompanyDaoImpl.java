@@ -23,13 +23,15 @@ public class ScoreStatsQuestionCompanyDaoImpl extends GenericReportingDaoImpl<Sc
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<ScoreStatsQuestionCompany> fetchScoreStatsQuestionForCompany(Long companyId , int startMonth, int startYear , int endMonth , int endYear) {
+    public List<ScoreStatsQuestionCompany> fetchScoreStatsQuestionForCompany( Long companyId, int startMonth, int startYear,
+        int endMonth, int endYear, List<Long> questionIds )
+    {
 		LOG.debug( "Method to fetch all the score stats question for company,fetchScoreStatsQuestionForCompany() started." );
         Criteria criteria = getSession().createCriteria( ScoreStatsQuestionCompany.class );
         try {
             //the end month query will startmonth-1 and end year will be startyear+1
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add(Restrictions.ne(CommonConstants.QUESTION_ID, CommonConstants.DEFAULT_QUESTION_ID));
+            criteria.add(Restrictions.in(CommonConstants.QUESTION_ID, questionIds));
             Criterion rest1= Restrictions.and(Restrictions.eq( CommonConstants.YEAR_VAL, endYear ), 
                 Restrictions.le( CommonConstants.MONTH_VAL, endMonth ));
             if( startMonth != 1){

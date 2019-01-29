@@ -23,12 +23,14 @@ public class ScoreStatsQuestionBranchDaoImpl extends GenericReportingDaoImpl<Sco
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<ScoreStatsQuestionBranch> fetchScoreStatsQuestionForBranch(Long branchId , int startMonth, int startYear , int endMonth , int endYear) {
+    public List<ScoreStatsQuestionBranch> fetchScoreStatsQuestionForBranch( Long branchId, int startMonth, int startYear,
+        int endMonth, int endYear, List<Long> questionIds )
+    {
 		LOG.debug( "Method to fetch all the score stats question for branch,fetchScoreStatsQuestionForBranch() started." );
         Criteria criteria = getSession().createCriteria( ScoreStatsQuestionBranch.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
-            criteria.add(Restrictions.ne(CommonConstants.QUESTION_ID, CommonConstants.DEFAULT_QUESTION_ID));
+            criteria.add(Restrictions.in(CommonConstants.QUESTION_ID, questionIds));
             Criterion rest1= Restrictions.and(Restrictions.eq( CommonConstants.YEAR_VAL, endYear ), 
                 Restrictions.le( CommonConstants.MONTH_VAL, endMonth ));
             if( startMonth != 1){
