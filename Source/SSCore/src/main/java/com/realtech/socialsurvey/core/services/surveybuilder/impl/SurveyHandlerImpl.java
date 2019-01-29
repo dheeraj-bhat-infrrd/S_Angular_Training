@@ -178,8 +178,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private EmailServices emailServices;
-
-
+    
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
@@ -289,6 +288,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     
     @Autowired
     private RegionDao regionDao;
+    
+    @Autowired
+    private GenericDao<SurveyPreInitiationTemp, Long> surveyPreinitiationTempDao;
 
     private static final int USER_EMAIL_ID_INDEX = 3;
     private static final int SURVEY_SOURCE_ID_INDEX = 2;
@@ -5541,5 +5543,65 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 		LOG.info("Method streamSurveyProcessRequest finished for survey with id {} " , surveyDetails.get_id());
 
 	}
+    
+    @Override
+    @Transactional
+    public SurveyPreInitiation saveSurveyPreInitiationTempObject( SurveyPreInitiation surveyPreInitiation )
+        throws InvalidInputException
+    {
+        if ( surveyPreInitiation == null ) {
+            LOG.debug( "SurveyPreInitiation object passed null for insert" );
+            throw new InvalidInputException( "SurveyPreInitiation object passed null for insert" );
+        }
+        LOG.debug( "Inside method saveSurveyPreInitiationObject " );
+        SurveyPreInitiationTemp surveyPreInitiationTemp = new SurveyPreInitiationTemp();
+        surveyPreInitiationTemp = surveyPreinitiationTempDao.save( convertToSpTemp(surveyPreInitiation) );
+        //sending the survey id in response 
+        surveyPreInitiation.setSurveyPreIntitiationId(surveyPreInitiationTemp.getSurveyPreIntitiationId());
+        return surveyPreInitiation;
+    }
+    
+    private SurveyPreInitiationTemp convertToSpTemp(SurveyPreInitiation surveyPreInitiation ) {
+    	SurveyPreInitiationTemp surveyPreInitiationTemp = new SurveyPreInitiationTemp();
+    	surveyPreInitiationTemp.setAgentEmailId(surveyPreInitiation.getAgentEmailId());
+    	surveyPreInitiationTemp.setAgentId(surveyPreInitiation.getAgentId());
+    	surveyPreInitiationTemp.setAgentName(surveyPreInitiation.getAgentName());
+    	surveyPreInitiationTemp.setBranchCollectionId(surveyPreInitiation.getBranchCollectionId());
+    	surveyPreInitiationTemp.setCity(surveyPreInitiation.getCity());
+    	surveyPreInitiationTemp.setCollectionName(surveyPreInitiation.getCollectionName());
+    	surveyPreInitiationTemp.setCompanyId(surveyPreInitiation.getCompanyId());
+    	surveyPreInitiationTemp.setCreatedOn(surveyPreInitiation.getCreatedOn());
+    	surveyPreInitiationTemp.setCustomerEmailId(surveyPreInitiation.getCustomerEmailId());
+    	surveyPreInitiationTemp.setCustomerFirstName(surveyPreInitiation.getCustomerFirstName());
+    	surveyPreInitiationTemp.setCustomerInteractionDetails(surveyPreInitiation.getCustomerInteractionDetails());
+    	surveyPreInitiationTemp.setCustomerLastName(surveyPreInitiation.getCustomerLastName());
+    	surveyPreInitiationTemp.setEngagementClosedTime(surveyPreInitiation.getEngagementClosedTime());
+    	surveyPreInitiationTemp.setErrorCode(surveyPreInitiation.getErrorCode());
+    	surveyPreInitiationTemp.setErrorCodeDescription(surveyPreInitiation.getErrorCodeDescription());
+    	surveyPreInitiationTemp.setIsSurveyRequestSent(surveyPreInitiation.getIsSurveyRequestSent());
+    	surveyPreInitiationTemp.setLastReminderTime(surveyPreInitiation.getLastReminderTime());
+    	surveyPreInitiationTemp.setLoanProcessorEmail(surveyPreInitiation.getLoanProcessorEmail());
+    	surveyPreInitiationTemp.setLoanProcessorName(surveyPreInitiation.getLoanProcessorName());
+    	surveyPreInitiationTemp.setModifiedOn(surveyPreInitiation.getModifiedOn());
+    	surveyPreInitiationTemp.setParticipantType(surveyPreInitiation.getParticipantType());
+    	surveyPreInitiationTemp.setPropertyAddress(surveyPreInitiation.getPropertyAddress());
+    	surveyPreInitiationTemp.setRegionCollectionId(surveyPreInitiation.getRegionCollectionId());
+    	surveyPreInitiationTemp.setReminderCounts(surveyPreInitiation.getReminderCounts());
+    	surveyPreInitiationTemp.setState(surveyPreInitiation.getState());
+    	surveyPreInitiationTemp.setStatus(surveyPreInitiation.getStatus());
+    	surveyPreInitiationTemp.setSurveyPreIntitiationId(surveyPreInitiation.getSurveyPreIntitiationId());
+    	surveyPreInitiationTemp.setSurveySource(surveyPreInitiation.getSurveySource());
+    	surveyPreInitiationTemp.setSurveySourceId(surveyPreInitiation.getSurveySourceId());
+    	surveyPreInitiationTemp.setTransactionType(surveyPreInitiation.getTransactionType());
+    	surveyPreInitiationTemp.setUser(surveyPreInitiation.getUser());
+    	surveyPreInitiationTemp.setCustomFieldFive(surveyPreInitiation.getCustomFieldFive());
+    	surveyPreInitiationTemp.setCustomFieldFour(surveyPreInitiation.getCustomFieldFour());
+    	surveyPreInitiationTemp.setCustomFieldThree(surveyPreInitiation.getCustomFieldThree());
+    	surveyPreInitiationTemp.setCustomFieldTwo(surveyPreInitiation.getCustomFieldTwo());
+    	surveyPreInitiationTemp.setCustomFieldOne(surveyPreInitiation.getCustomFieldOne());
+    	return surveyPreInitiationTemp;
+    	
+    }
+
 }
 

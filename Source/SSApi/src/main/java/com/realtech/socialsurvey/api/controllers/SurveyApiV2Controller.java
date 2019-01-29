@@ -894,7 +894,7 @@ public class SurveyApiV2Controller
                 transactionSurveyPreInitiations = surveyHandler.validatePreinitiatedRecord(transactionSurveyPreInitiations, companyId);
                 //save validated object
                 for (SurveyPreInitiation surveyPreInitiation : transactionSurveyPreInitiations) {
-                    surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject(surveyPreInitiation);
+                    surveyPreInitiation = surveyHandler.saveSurveyPreInitiationTempObject(surveyPreInitiation);
                     if(surveyPreInitiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED)
                         surveyIds.put(surveyPreInitiation.getParticipantType(), surveyPreInitiation.getSurveyPreIntitiationId());
                 }
