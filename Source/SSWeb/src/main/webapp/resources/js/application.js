@@ -20722,7 +20722,7 @@ $(document).on('click','#register-summit-btn',function(e){
 	e.preventDefault();
 	
 	closeSummitPopup( false );
-	window.open('https://facebook.com/SocialSurveybusiness/videos/710505045999294/', '_blank');
+	window.open('https://youtu.be/yDs1A7Yan8I', '_blank');
 	
 });
 
@@ -20735,7 +20735,7 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
-	window.open('http://www.socialsurvey.com/top-performers-2018', '_blank');
+	window.open('https://youtu.be/yDs1A7Yan8I', '_blank');
 });
 
 $(document).on('click','#summit-ribbon-close-btn',function(e){
@@ -20749,7 +20749,7 @@ $(document).on('click','#summit-popup-body',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
-	window.open('http://www.socialsurvey.com/top-performers-2018', '_blank');
+	window.open('https://youtu.be/yDs1A7Yan8I', '_blank');
 });
 
 function sendClickedEventInfo( event ){
