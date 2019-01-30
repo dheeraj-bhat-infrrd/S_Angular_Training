@@ -3006,6 +3006,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         user.setModifiedBy( String.valueOf( user.getUserId() ) );
         user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
+        //Set AdoptionCompletionDate
+        user.setAdoptionCompletionDate( new Timestamp( System.currentTimeMillis() ) );
         /**
          * Set the new password
          */

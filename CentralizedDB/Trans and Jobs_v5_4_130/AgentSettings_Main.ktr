@@ -247,7 +247,6 @@
   <hop> <from>Update Yelp isDeleted </from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Update Zillow isDeleted</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Alter isDeleted FB</from><to>Update FB isDeleted</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows FB Token</from><to>Insert &#x2f; Update FB Token</to><enabled>Y</enabled> </hop>
   <hop> <from>Alter isDeleted GB</from><to>Update GB isDeleted</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows GoogleBusiness</from><to>Insert &#x2f; Update Google Business Token</to><enabled>Y</enabled> </hop>
   <hop> <from>Alter isDeleted Google</from><to>Update GoogleToken isDeleted</to><enabled>Y</enabled> </hop>
@@ -264,6 +263,7 @@
   <hop> <from>Alter isDeleted twitter</from><to>Update Twitter isDeleted</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows Zillow Token</from><to>Insert &#x2f; Update Zillow</to><enabled>Y</enabled> </hop>
   <hop> <from>Update isDeleted Zillow</from><to>Update Zillow isDeleted</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows FB Token</from><to>Insert &#x2f; Update FB Token</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AgentConstant</name>
@@ -778,7 +778,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>tokenExpiryAlertSent</name>
+      </field>      <field>        <name>facebookTokenExpiryAlertSent</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -795,7 +795,22 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
+      <meta>        <name>facebookTokenExpiryAlertSent</name>
+        <rename>facebookTokenExpiryAlertSent</rename>
+        <type>Boolean</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>482</xloc>
       <yloc>29</yloc>
@@ -814,7 +829,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Insert &#x2f; Update FB Token</send_true_to>
+<send_true_to/>
 <send_false_to>Alter isDeleted FB</send_false_to>
     <compare>
 <condition>
@@ -1226,7 +1241,7 @@
       </value>
       <value>
         <name>TOKEN_EXPIRY_ALERT_SENT</name>
-        <rename>tokenExpiryAlertSent</rename>
+        <rename>facebookTokenExpiryAlertSent</rename>
         <update>Y</update>
       </value>
       <value>
@@ -1247,8 +1262,8 @@
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>981</xloc>
-      <yloc>27</yloc>
+      <xloc>972</xloc>
+      <yloc>28</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1527,8 +1542,8 @@
         <update>Y</update>
       </value>
       <value>
-        <name>TOKEN_EXPIRY_ALERT_EMAIL</name>
-        <rename>tokenExpiryAlertSent</rename>
+        <name>TOKEN_EXPIRY_ALERT_SENT</name>
+        <rename>linkedinTokenExpiryAlertSent</rename>
         <update>Y</update>
       </value>
       <value>
@@ -1908,7 +1923,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>tokenExpiryAlertSent</name>
+      </field>      <field>        <name>linkedinTokenExpiryAlertSent</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1925,7 +1940,22 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
+      <meta>        <name>linkedinTokenExpiryAlertSent</name>
+        <rename>linkedinTokenExpiryAlertSent</rename>
+        <type>Boolean</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>484</xloc>
       <yloc>757</yloc>
@@ -2116,7 +2146,7 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>tokenExpiryAlertSent</field_name>
+        <field_name>linkedinTokenExpiryAlertSent</field_name>
 
         <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 
@@ -2804,7 +2834,7 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>tokenExpiryAlertSent_1</field_name>
+        <field_name>facebookTokenExpiryAlertSent</field_name>
 
         <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
 

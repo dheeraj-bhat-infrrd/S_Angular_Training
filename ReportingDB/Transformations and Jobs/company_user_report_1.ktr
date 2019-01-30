@@ -159,7 +159,6 @@
   <hop> <from>Generate random value</from><to>If field value is null</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupAgentForBranch</from><to>SortRowsOnUserId 3</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByRegionId</from><to>SortRowsOnUserId 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>If field value is null</from><to>Table output</to><enabled>Y</enabled> </hop>
   <hop> <from>LastPostScript</from><to>SortRowsOnUserId 8</to><enabled>Y</enabled> </hop>
   <hop> <from>Memory Group by</from><to>SortRowsOnUserId 5</to><enabled>Y</enabled> </hop>
   <hop> <from>Memory Group by 2</from><to>SortRowsOnUserId 4</to><enabled>Y</enabled> </hop>
@@ -260,6 +259,8 @@
   <hop> <from>Merge Join 2 2</from><to>Modified Java Script Value 4 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value 4 2</from><to>SortByUserIdAndProfile</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join 3</from><to>finalUserUserProfile</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>Select values</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>Table output</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Branch</name>
@@ -648,7 +649,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>select T1.FACEBOOK_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29; AS FACEBOOK_POST_DATE&#xd;&#xa;FROM facebook_token T1 , facebook_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>select T1.FACEBOOK_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29; AS FACEBOOK_POST_DATE, T1.FACEBOOK_ACCESS_TOKEN_CREATED_ON&#xd;&#xa;FROM facebook_token T1 , facebook_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -682,7 +683,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>&#xd;&#xa;Select T1.LINKED_IN_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29;  AS LINKEDIN_POST_DATE&#xd;&#xa;FROM linked_in_token T1 ,linkedin_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>&#xd;&#xa;Select T1.LINKED_IN_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29;  AS LINKEDIN_POST_DATE, T1.LINKED_IN_ACCESS_TOKEN_CREATED_ON&#xd;&#xa;FROM linked_in_token T1 ,linkedin_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -716,7 +717,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>Select T1.TWITTER_PAGE_LINK,MAX&#x28;T2.POST_DATE&#x29; AS TWITTER_POST_DATE&#xd;&#xa;FROM twitter_token T1 ,twitter_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>Select T1.TWITTER_PAGE_LINK,MAX&#x28;T2.POST_DATE&#x29; AS TWITTER_POST_DATE, T1.TWITTER_ACCESS_TOKEN_CREATED_ON&#xd;&#xa;FROM twitter_token T1 ,twitter_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -1293,7 +1294,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var MAIN_USER_ID_POST &#x3d; null&#x3b;&#xd;&#xa;if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID &#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_3&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_3&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_4&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_4&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_5&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_5&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_6&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_6&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_7&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_7&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var socially_connected &#x3d; &#x22;No&#x22;&#x3b;&#xd;&#xa;if&#x28;fb_data_connection &#x3d;&#x3d; &#x22;Yes&#x22;&#x29;&#xd;&#xa;&#x7b; &#xd;&#xa;	socially_connected &#x3d; &#x22;Yes&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;else if&#x28;linkedin_data_connection &#x3d;&#x3d; &#x22;Yes&#x22;&#x29;&#xd;&#xa;&#x7b; &#xd;&#xa;	socially_connected &#x3d; &#x22;Yes&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;else if&#x28;twitter_data_connection &#x3d;&#x3d; &#x22;Yes&#x22;&#x29;&#xd;&#xa;&#x7b; &#xd;&#xa;	socially_connected &#x3d; &#x22;Yes&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var posted_date &#x3d; null&#x3b;&#xd;&#xa;if&#x28;FACEBOOK_POST_DATE &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	posted_date &#x3d; FACEBOOK_POST_DATE &#x3b; &#xd;&#xa;&#x7d;else if&#x28;LINKEDIN_POST_DATE &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	posted_date &#x3d; LINKEDIN_POST_DATE &#x3b; &#xd;&#xa;&#x7d;else if&#x28;TWITTER_POST_DATE &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	posted_date &#x3d; TWITTER_POST_DATE &#x3b; &#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var MAIN_USER_ID_POST &#x3d; null&#x3b;&#xd;&#xa;if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID &#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_3&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_3&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_4&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_4&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_5&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_5&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_6&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_6&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID_7&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	MAIN_USER_ID_POST &#x3d; USER_ID_7&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var socially_connected &#x3d; &#x22;No&#x22;&#x3b;&#xd;&#xa;if&#x28;fb_connection_established_date &#x21;&#x3d; null&#x29;&#xd;&#xa;&#x7b; &#xd;&#xa;	socially_connected &#x3d; &#x22;Yes&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;else if&#x28;linkedin_connection_established_date &#x21;&#x3d; null&#x29;&#xd;&#xa;&#x7b; &#xd;&#xa;	socially_connected &#x3d; &#x22;Yes&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;else if&#x28;twitter_connection_established_date &#x21;&#x3d; null&#x29;&#xd;&#xa;&#x7b; &#xd;&#xa;	socially_connected &#x3d; &#x22;Yes&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var posted_date &#x3d; null&#x3b;&#xd;&#xa;if&#x28;FACEBOOK_POST_DATE &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	posted_date &#x3d; FACEBOOK_POST_DATE &#x3b; &#xd;&#xa;&#x7d;else if&#x28;LINKEDIN_POST_DATE &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	posted_date &#x3d; LINKEDIN_POST_DATE &#x3b; &#xd;&#xa;&#x7d;else if&#x28;TWITTER_POST_DATE &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	posted_date &#x3d; TWITTER_POST_DATE &#x3b; &#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>MAIN_USER_ID_POST</name>
         <rename>MAIN_USER_ID_POST</rename>
         <type>Number</type>
@@ -1881,9 +1882,9 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var fb_data_connection &#x3d; &#x22;No&#x22;&#x3b;&#xd;&#xa;var fb_connection_status&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_fb &#x3d; FACEBOOK_POST_DATE&#x3b;&#xd;&#xa;if&#x28;FACEBOOK_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	fb_data_connection &#x3d; &#x22;Yes&#x22;&#x3b;&#xd;&#xa;	if&#x28;TOKEN_EXPIRY_ALERT_SENT &#x21;&#x3d; null &#x26;&#x26; TOKEN_EXPIRY_ALERT_SENT &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;		fb_connection_status&#x3d;&#x22;disconnected&#x22;&#x3b;&#xd;&#xa;	&#x7d;else&#x7b;&#xd;&#xa;		fb_connection_status&#x3d;&#x22;connected&#x22;&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>fb_data_connection</name>
-        <rename>fb_data_connection</rename>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var fb_connection_established_date &#x3d; FACEBOOK_ACCESS_TOKEN_CREATED_ON&#x3b;&#xd;&#xa;var fb_connection_status&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_fb &#x3d; FACEBOOK_POST_DATE&#x3b;&#xa;var fb_page_url &#x3d; FACEBOOK_PAGE_LINK&#x3b;&#xd;&#xa;if&#x28;FACEBOOK_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	&#xd;&#xa;	if&#x28;TOKEN_EXPIRY_ALERT_SENT &#x21;&#x3d; null &#x26;&#x26; TOKEN_EXPIRY_ALERT_SENT &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;		fb_connection_status&#x3d;&#x22;disconnected&#x22;&#x3b;&#xd;&#xa;	&#x7d;else&#x7b;&#xd;&#xa;		fb_connection_status&#x3d;&#x22;connected&#x22;&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>fb_connection_established_date</name>
+        <rename>fb_connection_established_date</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1896,6 +1897,12 @@
         <replace>N</replace>
       </field>      <field>        <name>last_post_date_fb</name>
         <rename>last_post_date_fb</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>fb_page_url</name>
+        <rename>fb_page_url</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1923,9 +1930,9 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var linkedin_data_connection &#x3d; &#x22;No&#x22;&#x3b;&#xd;&#xa;var linkedin_connection_status&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_linkedin &#x3d; LINKEDIN_POST_DATE&#x3b;&#xd;&#xa;if&#x28;LINKED_IN_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	linkedin_data_connection &#x3d; &#x22;Yes&#x22;&#x3b;&#xd;&#xa;	if&#x28;TOKEN_EXPIRY_ALERT_SENT &#x21;&#x3d; null &#x26;&#x26; TOKEN_EXPIRY_ALERT_SENT &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;		linkedin_connection_status&#x3d;&#x22;disconnected&#x22;&#x3b;&#xd;&#xa;	&#x7d;else&#x7b;&#xd;&#xa;		linkedin_connection_status&#x3d;&#x22;connected&#x22;&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>linkedin_data_connection</name>
-        <rename>linkedin_data_connection</rename>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var linkedin_connection_established_date &#x3d; LINKED_IN_ACCESS_TOKEN_CREATED_ON&#x3b;&#xd;&#xa;var linkedin_connection_status&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_linkedin &#x3d; LINKEDIN_POST_DATE&#x3b;&#xa;var linkedin_profile_url &#x3d; LINKED_IN_PAGE_LINK&#x3b;&#xd;&#xa;if&#x28;LINKED_IN_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	if&#x28;TOKEN_EXPIRY_ALERT_SENT &#x21;&#x3d; null &#x26;&#x26; TOKEN_EXPIRY_ALERT_SENT &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;		linkedin_connection_status&#x3d;&#x22;disconnected&#x22;&#x3b;&#xd;&#xa;	&#x7d;else&#x7b;&#xd;&#xa;		linkedin_connection_status&#x3d;&#x22;connected&#x22;&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>linkedin_connection_established_date</name>
+        <rename>linkedin_connection_established_date</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1938,6 +1945,12 @@
         <replace>N</replace>
       </field>      <field>        <name>last_post_date_linkedin</name>
         <rename>last_post_date_linkedin</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>linkedin_profile_url</name>
+        <rename>linkedin_profile_url</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1965,9 +1978,9 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var twitter_data_connection &#x3d; &#x22;No&#x22;&#x3b;&#xd;&#xa;var twitter_connection_status &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_twitter &#x3d; TWITTER_POST_DATE&#x3b;&#xd;&#xa;if&#x28;TWITTER_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	twitter_data_connection &#x3d; &#x22;Yes&#x22;&#x3b;&#xd;&#xa;    twitter_connection_status &#x3d; &#x22;connected&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>twitter_data_connection</name>
-        <rename>twitter_data_connection</rename>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var twitter_connection_established_date &#x3d; TWITTER_ACCESS_TOKEN_CREATED_ON&#xd;&#xa;var twitter_connection_status &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_twitter &#x3d; TWITTER_POST_DATE&#x3b;&#xa;var twitter_profile_url &#x3d; TWITTER_PAGE_LINK&#x3b;&#xd;&#xa;if&#x28;TWITTER_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;    twitter_connection_status &#x3d; &#x22;connected&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>twitter_connection_established_date</name>
+        <rename>twitter_connection_established_date</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1980,6 +1993,12 @@
         <replace>N</replace>
       </field>      <field>        <name>last_post_date_twitter</name>
         <rename>last_post_date_twitter</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>twitter_profile_url</name>
+        <rename>twitter_profile_url</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -4163,8 +4182,8 @@
           <stream_name>profile_verified</stream_name>
         </field>
         <field>
-          <column_name>fb_data_connection</column_name>
-          <stream_name>fb_data_connection</stream_name>
+          <column_name>fb_connection_established_date</column_name>
+          <stream_name>fb_connection_established_date</stream_name>
         </field>
         <field>
           <column_name>fb_connection_status</column_name>
@@ -4175,16 +4194,16 @@
           <stream_name>last_post_date_fb</stream_name>
         </field>
         <field>
-          <column_name>twitter_data_connection</column_name>
-          <stream_name>twitter_data_connection</stream_name>
+          <column_name>twitter_connection_established_date</column_name>
+          <stream_name>twitter_connection_established_date</stream_name>
         </field>
         <field>
           <column_name>last_post_date_twitter</column_name>
           <stream_name>last_post_date_twitter</stream_name>
         </field>
         <field>
-          <column_name>linkedin_data_connection</column_name>
-          <stream_name>linkedin_data_connection</stream_name>
+          <column_name>linkedin_connection_established_date</column_name>
+          <stream_name>linkedin_connection_established_date</stream_name>
         </field>
         <field>
           <column_name>linkedin_connection_status</column_name>
@@ -4270,11 +4289,27 @@
           <column_name>opted_out</column_name>
           <stream_name>OPTED_OUT</stream_name>
         </field>
+        <field>
+          <column_name>fb_url</column_name>
+          <stream_name>fb_page_url</stream_name>
+        </field>
+        <field>
+          <column_name>linkedin_url</column_name>
+          <stream_name>linkedin_profile_url</stream_name>
+        </field>
+        <field>
+          <column_name>twitter_url</column_name>
+          <stream_name>twitter_profile_url</stream_name>
+        </field>
+        <field>
+          <column_name>adoption_completed_date</column_name>
+          <stream_name>ADOPTION_COMPLETED_DATE_EST</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>2108</xloc>
-      <yloc>1006</yloc>
+      <yloc>1129</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4342,7 +4377,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID as USER_COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;, LAST_LOGIN_EST&#xd;&#xa;FROM users WHERE STATUS in &#x28;1,2&#x29; &#xd;&#xa;order by USER_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID as USER_COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;, LAST_LOGIN_EST&#xa;, ADOPTION_COMPLETED_DATE_EST&#xa;, LAST_USER_LOGIN_EST&#xd;&#xa;FROM users WHERE STATUS in &#x28;1,2&#x29; &#xd;&#xa;order by USER_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -4518,6 +4553,56 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>104</xloc>
       <yloc>2049</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>ADOPTION_COMPLETED_DATE_EST</name>
+        <rename>ADOPTION_COMPLETED_DATE_EST</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LAST_USER_LOGIN_EST</name>
+        <rename>LAST_USER_LOGIN_EST</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2108</xloc>
+      <yloc>964</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

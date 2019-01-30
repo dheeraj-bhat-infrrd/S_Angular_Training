@@ -810,7 +810,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>tokenExpiryAlertSent</name>
+      </field>      <field>        <name>fbTokenExpiryAlertSent</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -819,8 +819,8 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>tokenExpiryAlertSent</name>
-        <rename>tokenExpiryAlertSent</rename>
+      <meta>        <name>fbTokenExpiryAlertSent</name>
+        <rename>fbTokenExpiryAlertSent</rename>
         <type>Boolean</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -1265,7 +1265,7 @@
       </value>
       <value>
         <name>TOKEN_EXPIRY_ALERT_SENT</name>
-        <rename>tokenExpiryAlertSent</rename>
+        <rename>fbTokenExpiryAlertSent</rename>
         <update>Y</update>
       </value>
       <value>
@@ -1572,7 +1572,7 @@
       </value>
       <value>
         <name>TOKEN_EXPIRY_ALERT_SENT</name>
-        <rename>tokenExpiryAlertSent</rename>
+        <rename>linkdinTokenExpiryAlertSent</rename>
         <update>Y</update>
       </value>
       <value>
@@ -1947,7 +1947,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>tokenExpiryAlertSent</name>
+      </field>      <field>        <name>linkdinTokenExpiryAlertSent</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1964,8 +1964,8 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>tokenExpiryAlertSent</name>
-        <rename>tokenExpiryAlertSent</rename>
+      <meta>        <name>linkdinTokenExpiryAlertSent</name>
+        <rename>linkdinTokenExpiryAlertSent</rename>
         <type>Boolean</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -2674,7 +2674,7 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>tokenExpiryAlertSent_1</field_name>
+        <field_name>fbTokenExpiryAlertSent</field_name>
 
         <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
 
@@ -2770,7 +2770,7 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>tokenExpiryAlertSent</field_name>
+        <field_name>linkdinTokenExpiryAlertSent</field_name>
 
         <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 

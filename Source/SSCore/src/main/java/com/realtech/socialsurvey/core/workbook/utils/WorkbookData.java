@@ -928,7 +928,6 @@ public class WorkbookData
                 else{
                     surveyTransactionReportToPopulate.add("");
                 }
-                
                 if(!row.get(9).isEmpty()){
                     surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 9 ) ));
                 }
@@ -942,10 +941,15 @@ public class WorkbookData
                 }
                 else{
                     surveyTransactionReportToPopulate.add("");
-                }           
+                }
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 12 ) ));
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 13 ) ));
-                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 14 ) ));
+                if(!row.get(14).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 14 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 15 ) ));
                 if(!row.get(16).isEmpty()){
                     surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 16 ) ));
@@ -953,16 +957,20 @@ public class WorkbookData
                 else{
                     surveyTransactionReportToPopulate.add("");
                 }
-             
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 17 ) ));
-                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 18 ) ));
-                if(!row.get(19).isEmpty()){
-                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 19 ) ));
+                if(!row.get(18).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 18 ) ));
                 }
                 else{
                     surveyTransactionReportToPopulate.add("");
                 }
-                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 20 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 19 ) ));
+                if(!row.get(20).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 20 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 21 ) ));
                 if(!row.get(22).isEmpty()){
                     surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 22 ) ));
@@ -971,7 +979,12 @@ public class WorkbookData
                     surveyTransactionReportToPopulate.add("");
                 }
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 23 ) ));
-                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 24 ) ));
+                if(!row.get(24).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 24 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 25 ) ));
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 26 ) ));
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 27 ) ));
@@ -981,12 +994,15 @@ public class WorkbookData
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 31 ) ));
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 32 ) ));
                 surveyTransactionReportToPopulate.add(String.valueOf( row.get( 33 ) ));
-                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 34 ) ));
-                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 35 ) ));
-                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 36 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 34 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 35 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 36 ) ));
                 surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 37 ) ));
                 surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 38 ) ));
-                if(row.get( 39 ) == null || Integer.valueOf( row.get( 39 ) ) == 0) {
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 39 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 40 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 41 ) ));
+                if(row.get( 42 ) == null || Integer.valueOf( row.get( 42 ) ) == 0) {
                  
                     surveyTransactionReportToPopulate.add("Opted In");
                 }
@@ -1020,10 +1036,13 @@ public class WorkbookData
         surveyTransactionReportToPopulate.add("Facebook");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("Twitter");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("Linkedin");
+        surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("Google");
@@ -1042,7 +1061,7 @@ public class WorkbookData
         surveyTransactionReportToPopulate.add("Zillow Reviews");
         surveyTransactionReportToPopulate.add("Abusive Reviews");
         surveyTransactionReportToPopulate.add("3rd Party Reviews");
-	surveyTransactionReportToPopulate.add("Account Status");
+        surveyTransactionReportToPopulate.add("Account Status");
         companyUserData.put( 1, surveyTransactionReportToPopulate );
         surveyTransactionReportToPopulate = new ArrayList<>();
         
@@ -1063,12 +1082,15 @@ public class WorkbookData
         surveyTransactionReportToPopulate.add("Date connection established");
         surveyTransactionReportToPopulate.add("Connection Status");
         surveyTransactionReportToPopulate.add("Date of last post");
+        surveyTransactionReportToPopulate.add("Profile Url");
         surveyTransactionReportToPopulate.add("Date connection established");
         surveyTransactionReportToPopulate.add("Connection Status");
         surveyTransactionReportToPopulate.add("Date of last post");
+        surveyTransactionReportToPopulate.add("Profile Url");
         surveyTransactionReportToPopulate.add("Date connection established");
         surveyTransactionReportToPopulate.add("Connection Status");
         surveyTransactionReportToPopulate.add("Date of last post");
+        surveyTransactionReportToPopulate.add("Profile Url");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");

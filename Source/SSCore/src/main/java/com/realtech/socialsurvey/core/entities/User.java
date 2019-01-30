@@ -63,6 +63,9 @@ public class User implements UserDetails, Serializable
 
     @Column ( name = "LAST_LOGIN")
     private Timestamp lastLogin;
+    
+    @Column ( name = "LAST_USER_LOGIN")
+    private Timestamp lastUserLogin;
 
     @Column ( name = "NUM_OF_LOGINS")
     private long numOfLogins;
@@ -108,6 +111,9 @@ public class User implements UserDetails, Serializable
     
     @Column ( name = "LAST_INVITATION_SENT_DATE")
     private Timestamp lastInvitationSentDate;
+    
+    @Column ( name = "ADOPTION_COMPLETION_DATE")
+    private Timestamp adoptionCompletionDate;
 
     @Transient
     private boolean agent;
@@ -280,6 +286,18 @@ public class User implements UserDetails, Serializable
     public void setLastLogin( Timestamp lastLogin )
     {
         this.lastLogin = lastLogin;
+    }
+
+
+    public Timestamp getLastUserLogin()
+    {
+        return lastUserLogin;
+    }
+
+
+    public void setLastUserLogin( Timestamp lastUserLogin )
+    {
+        this.lastUserLogin = lastUserLogin;
     }
 
 
@@ -711,5 +729,17 @@ public class User implements UserDetails, Serializable
     public void setMappedEmails( String mappedEmails )
     {
         this.mappedEmails = mappedEmails;
+    }
+
+
+    public Timestamp getAdoptionCompletionDate()
+    {
+        return adoptionCompletionDate;
+    }
+
+
+    public void setAdoptionCompletionDate( Timestamp adoptionCompletionDate )
+    {
+        this.adoptionCompletionDate = adoptionCompletionDate;
     }
 }

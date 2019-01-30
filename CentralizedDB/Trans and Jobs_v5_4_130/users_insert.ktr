@@ -69,7 +69,7 @@
   <created_date>2017&#x2f;12&#x2f;13 17&#x3a;31&#x3a;41.001</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;12&#x2f;13 17&#x3a;31&#x3a;41.001</modified_date>
-    <key_for_session_key/>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -150,7 +150,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; sdf.format&#x28;CREATED_ON&#x29;&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; sdf.format&#x28;MODIFIED_ON&#x29;&#x3b;&#xd;&#xa;var LAST_LOGIN_EST &#x3d; sdf.format&#x28;LAST_LOGIN&#x29;&#x3b;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; sdf.format&#x28;CREATED_ON&#x29;&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; sdf.format&#x28;MODIFIED_ON&#x29;&#x3b;&#xd;&#xa;var LAST_LOGIN_EST &#x3d; sdf.format&#x28;LAST_LOGIN&#x29;&#x3b;&#xa;&#xa;var ADOPTION_COMPLETED_DATE_EST &#x3d; &#x27;&#x27;&#x3b;&#xa;if&#x28;ADOPTION_COMPLETION_DATE &#x21;&#x3d; null&#x29; &#x7b;&#xa;	ADOPTION_COMPLETED_DATE_EST &#x3d; sdf.format&#x28;ADOPTION_COMPLETION_DATE&#x29;&#x3b;&#xa;&#x7d;&#xa;var LAST_USER_LOGIN_EST &#x3d; &#x27;&#x27;&#x3b;&#xa;if&#x28;LAST_USER_LOGIN &#x21;&#x3d; null&#x29; &#x7b;&#xa;	LAST_USER_LOGIN_EST &#x3d; sdf.format&#x28;LAST_USER_LOGIN&#x29;&#x3b;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>CREATED_ON_EST</name>
         <rename>CREATED_ON_EST</rename>
         <type>String</type>
@@ -169,6 +169,18 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
+      </field>      <field>        <name>ADOPTION_COMPLETED_DATE_EST</name>
+        <rename>ADOPTION_COMPLETED_DATE_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>LAST_USER_LOGIN_EST</name>
+        <rename>LAST_USER_LOGIN_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>335</xloc>
@@ -178,8 +190,8 @@
     </step>
 
   <step>
-    <name>Users input</name>
-    <type>TableInput</type>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -188,16 +200,9 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xd;&#xa;FROM USERS&#xd;&#xa;WHERE CREATED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;&#x3b;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>182</xloc>
+      <xloc>648</xloc>
       <yloc>191</yloc>
       <draw>Y</draw>
       </GUI>
@@ -340,6 +345,22 @@
           <column_name>LAST_LOGIN_EST</column_name>
           <stream_name>LAST_LOGIN_EST</stream_name>
         </field>
+        <field>
+          <column_name>ADOPTION_COMPLETED_DATE</column_name>
+          <stream_name>ADOPTION_COMPLETION_DATE</stream_name>
+        </field>
+        <field>
+          <column_name>ADOPTION_COMPLETED_DATE_EST</column_name>
+          <stream_name>ADOPTION_COMPLETED_DATE_EST</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_USER_LOGIN</column_name>
+          <stream_name>LAST_USER_LOGIN</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_USER_LOGIN_EST</column_name>
+          <stream_name>LAST_USER_LOGIN_EST</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -350,8 +371,8 @@
     </step>
 
   <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
+    <name>Users input</name>
+    <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -360,9 +381,16 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
+    <connection>SS_INFO_CONNECTION</connection>
+    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xa;, ADOPTION_COMPLETION_DATE&#xa;, LAST_USER_LOGIN&#xd;&#xa;FROM USERS&#xd;&#xa;WHERE CREATED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;&#x3b;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>648</xloc>
+      <xloc>182</xloc>
       <yloc>191</yloc>
       <draw>Y</draw>
       </GUI>
