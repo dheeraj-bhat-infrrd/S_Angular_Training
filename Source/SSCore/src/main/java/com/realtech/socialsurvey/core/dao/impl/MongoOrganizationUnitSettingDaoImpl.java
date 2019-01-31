@@ -191,6 +191,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_LINKEDIN_ACCESS_TOKEN = "socialMediaTokens.linkedInToken.linkedInAccessToken";
     
     public static final String SOCIAL_MONITOR_ENABLED = "isSocialMonitorEnabled";
+    public static final String INCOMPLETE_SURVEY_DELETE_ENABLED = "isIncompleteSurveyDeleteEnabled";
     public static final String HAS_REGISTERED_FOR_SUMMIT = "hasRegisteredForSummit";
     public static final String IS_SHOW_SUMMIT_POPUP = "isShowSummitPopup";
     

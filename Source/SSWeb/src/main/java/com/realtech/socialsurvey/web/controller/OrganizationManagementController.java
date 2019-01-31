@@ -912,6 +912,8 @@ public class OrganizationManagementController
             // add isSocialMonitorEnabled flag
             model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
             
+            // add isIncompleteSurveyDeleteEnabled flag
+            model.addAttribute( "isIncompleteSurveyDeleteEnabled", unitSettings.isIncompleteSurveyDeleteEnabled());
             
             // add isEnableLoginButton flag
             model.addAttribute( "isEnableLogin", companySettings.getIsLoginEnableAllowed() );
@@ -4803,5 +4805,23 @@ public class OrganizationManagementController
                 .getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
         }
+	
+	@RequestMapping ( value = "/enableincompletesurveydeletetoggle", method = RequestMethod.POST)
+	@ResponseBody
+	public String enableIncompleteSurveyDeleteToggle( HttpServletRequest request )
+	{
+		LOG.info( "Method enableIncompleteSurveyDeleteToggle started" );
+		HttpSession session = request.getSession();
+
+		long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+		try {
+			return String.valueOf( organizationManagementService.enableIncompleteSurveyDeleteToggle( companyId,
+					Boolean.parseBoolean( request.getParameter( "isIncompleteSurveyDeleteEnabled" ) ) ) );
+		} catch ( Exception error ) {
+			LOG.error( "Exception occured in enableIncompleteSurveyDeleteToggle() while updating incomplete survey delete flag. Nested exception is ",error );
+			return "false";
+		}
+	}
 }
 // JIRA: SS-24 BY RM02 EOC

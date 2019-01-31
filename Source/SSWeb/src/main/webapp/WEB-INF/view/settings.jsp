@@ -138,6 +138,12 @@
 									<input type="hidden" id="copyto-clipboard-cb" name="copytoclipboard" value="${copyToClipBoard}">
 									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Copy review text to clip-board</div>
 								</c:if>
+								
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+									<div id="incomplete-survey-delete-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="incomplete-survey-delete-access-cb" name="deletecheckbox" value="${isIncompleteSurveyDeleteEnabled}">
+									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Enable Incomplete Survey Delete</div>
+								</c:if>
 
 								<c:if test="${ isRealTechOrSSAdmin == true }">
 									<div id="soc-mon-access-chk-box" class="float-left bd-check-img clear-both"></div>
@@ -399,6 +405,10 @@ $(document).ready(function() {
 	
 	if("${isSocialMonitorEnabled}" == "false"){
 		$('#soc-mon-access-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${isIncompleteSurveyDeleteEnabled}" == "false"){
+		$('#incomplete-survey-delete-chk-box').addClass('bd-check-img-checked');
 	}
 	
 	if("${hidePublicPage}" == "false"){

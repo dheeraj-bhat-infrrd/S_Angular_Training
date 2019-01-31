@@ -3415,13 +3415,28 @@ function resendMultipleIncompleteSurveyRequestsForNewDashboard(incompleteSurveyI
 }
 
 
-$(document).on('click', '#rep-del-mult-sur-icn.mult-sur-icn-active', function() {
+$(document).on('click', '#rep-del-mult-sur-icn.mult-sur-icn-active', function(e) {
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
 	var selectedSurveys = $('#rep-icn-sur-popup-cont').data('selected-survey');
-	removeMultipleIncompleteSurveyRequestForNewDashboard(selectedSurveys);
+	confirmDeleteSurveys(selectedSurveys);
 });
+
+function confirmDeleteSurveys(selectedSurveys) {
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Delete");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Delete Incomplete Surveys");
+	$('#overlay-text').html("Are you sure you want to delete the incomplete surveys ?");
+	$('#overlay-continue').attr("onclick", "removeMultipleIncompleteSurveyRequestForNewDashboard('" + selectedSurveys + "');");
+}
 
 
 function removeMultipleIncompleteSurveyRequestForNewDashboard(incompleteSurveyIds) {
+	$('#overlay-continue').removeAttr("onclick");
+	$('#overlay-main').hide();
 	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete=" + incompleteSurveyIds, function(data) {
 		if (data == "success") {
 

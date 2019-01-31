@@ -1898,4 +1898,7 @@ public interface OrganizationManagementService
      * @param columnValue
      */
     public void updateCompanySettings(OrganizationUnitSettings companySettings, String columnName, String columnValue);
+
+
+    public boolean enableIncompleteSurveyDeleteToggle(long companyId, boolean incompleteSurveyDeleteFlag) throws InvalidInputException, NoRecordsFetchedException;
 }

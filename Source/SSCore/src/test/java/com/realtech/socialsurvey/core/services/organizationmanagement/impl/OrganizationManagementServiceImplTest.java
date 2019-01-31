@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +65,8 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentExceptio
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+
+import junit.framework.Assert;
 
 
 public class OrganizationManagementServiceImplTest
@@ -2368,5 +2371,36 @@ public class OrganizationManagementServiceImplTest
     public void testUpdateCompanySettings() {
         
         organizationManagementServiceImpl.updateCompanySettings( new OrganizationUnitSettings(), "optoutText", "Your Login is currently disabled by your company admin" );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testEnableIncompleteSurveyDeleteToggleWithInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
+    {
+    	organizationManagementServiceImpl.enableIncompleteSurveyDeleteToggle(0, true);
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testEnableIncompleteSurveyDeleteToggleForCompanyWithoutSettings() throws InvalidInputException, NoRecordsFetchedException
+    {
+    	Mockito.doReturn(null).when(organizationManagementServiceImpl).getCompanySettings(5);
+    	organizationManagementServiceImpl.enableIncompleteSurveyDeleteToggle(5, true);
+    }
+    
+    @Test
+    public void testEnableIncompleteSurveyDeleteToggleForSetFlagToTrue() throws InvalidInputException, NoRecordsFetchedException
+    {
+    	OrganizationUnitSettings unitSettings = new OrganizationUnitSettings();
+    	Mockito.doReturn(unitSettings).when(organizationManagementServiceImpl).getCompanySettings(5);
+    	Mockito.doNothing().when(organizationUnitSettingsDao).updateParticularKeyOrganizationUnitSettings("isIncompleteSurveyDeleteEnabled",true,unitSettings,"COMPANY_SETTINGS");
+    	Assert.assertEquals(true, organizationManagementServiceImpl.enableIncompleteSurveyDeleteToggle(5, true));
+    }
+    
+    @Test
+    public void testEnableIncompleteSurveyDeleteToggleForSetFlagToFalse() throws InvalidInputException, NoRecordsFetchedException
+    {
+    	OrganizationUnitSettings unitSettings = new OrganizationUnitSettings();
+    	Mockito.doReturn(unitSettings).when(organizationManagementServiceImpl).getCompanySettings(5);
+    	Mockito.doNothing().when(organizationUnitSettingsDao).updateParticularKeyOrganizationUnitSettings("isIncompleteSurveyDeleteEnabled",false,unitSettings,"COMPANY_SETTINGS");
+    	Assert.assertEquals(true, organizationManagementServiceImpl.enableIncompleteSurveyDeleteToggle(5, false));
     }
 }

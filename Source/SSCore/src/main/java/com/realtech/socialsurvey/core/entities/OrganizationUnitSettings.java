@@ -134,7 +134,19 @@ public class OrganizationUnitSettings implements Serializable
     
     private String optoutText;
     private Boolean isLoginEnableAllowed;
+    private boolean isIncompleteSurveyDeleteEnabled;
     
+    
+    public boolean isIncompleteSurveyDeleteEnabled() {
+    	return isIncompleteSurveyDeleteEnabled;
+    }
+
+
+    public void setIncompleteSurveyDeleteEnabled(boolean isIncompleteSurveyDeleteEnabled) {
+    	this.isIncompleteSurveyDeleteEnabled = isIncompleteSurveyDeleteEnabled;
+    }
+
+
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
 	}
