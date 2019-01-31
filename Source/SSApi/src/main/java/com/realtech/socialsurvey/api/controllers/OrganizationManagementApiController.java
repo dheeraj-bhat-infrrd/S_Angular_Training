@@ -2,15 +2,19 @@ package com.realtech.socialsurvey.api.controllers;
 
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+
+import com.realtech.socialsurvey.api.models.request.NotificationRequest;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +35,6 @@ import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.models.request.FailedStormMessage;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.AgentDisableApiEntity;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.entities.ftp.FtpUploadRequest;
 import com.realtech.socialsurvey.core.entities.integration.stream.FailedStreamMessage;
@@ -50,6 +50,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.vo.EncompassAlertMailsVO;
 import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
@@ -443,6 +444,61 @@ public class OrganizationManagementApiController
         return new ResponseEntity<>( surveyPreInitiationList, HttpStatus.OK );
     }
 
+
+    /**
+     * Api to save the notification into mongo
+     * Calls {@link OrganizationManagementService#saveNotification(long, String, long, String)}
+     * @param notificationRequest
+     * @return either true or false representing success/failure
+     */
+    @RequestMapping(value = "/notification", method = RequestMethod.POST)
+    public boolean saveNotification( @RequestBody NotificationRequest notificationRequest ) {
+        LOGGER.info( "Method to save error details to crmInfo has started" );
+        boolean success = true ;
+
+        long companyId = notificationRequest.getCompanyId();
+        String message = notificationRequest.getMessage();
+        String type = notificationRequest.getType();
+        long receivedOn = notificationRequest.getReceivedOn();
+
+        try {
+            if ( companyId <= 0l || StringUtils.isEmpty( message ) || receivedOn <= 0 ) {
+                throw new InvalidInputException( "Invalid details provided comapanyId = " + companyId + " ,error = " + message +
+                    "errorOccuredOn = " + receivedOn);
+            }
+            organizationManagementService.saveNotification(companyId, message, receivedOn, type);
+
+        }catch ( Exception e ) {
+            LOGGER.error( "An exception occured while saving CRM error details "+ e.getMessage());
+
+            success = false;
+        }
+        return success;
+    }
+
+    /**
+     * Api disbable notification ie, changes {@link com.realtech.socialsurvey.core.entities.Notification#isDisabled} to true
+     * Calls {@link OrganizationManagementService#disableNotification(long)}}
+     * @param companyId
+     * @return
+     */
+    @RequestMapping(value = "/disablenotification/{companyId}", method = RequestMethod.PUT)
+    public ResponseEntity<Boolean> disableNotification(@PathVariable long companyId ) throws SSApiException
+    {
+        LOGGER.info( "Method to disbale notification started" );
+
+        try {
+            if ( companyId <= 0l ) {
+                throw new InvalidInputException( "Invalid details provided comapanyId = " + companyId);
+            }
+            organizationManagementService.disableNotification(companyId);
+            return new ResponseEntity<>(true, HttpStatus.CREATED );
+
+        }catch ( Exception e ) {
+            throw new SSApiException( e.getMessage() );
+        }
+    }
+
     @RequestMapping( value = "/branch/{id}", method = RequestMethod.GET)
     @ApiOperation( value = "Gets the branch details")
     public ResponseEntity<?> getBranchDetails(@PathVariable long id, @RequestHeader ( "authorizationHeader") String authorizationHeader)
@@ -516,5 +572,57 @@ public class OrganizationManagementApiController
         }
 
     }
- 
+
+    /**
+     * Api for saving alert emails to {@link EncompassCrmInfo} which is a part of
+     * {@link OrganizationUnitSettings}
+     * Calls {@link OrganizationManagementService#updateCompanySettings(long, String, Object)} }}
+     * @param companyId
+     * @return
+     */
+    @RequestMapping(value = "/updateencompassalertemailids", method = RequestMethod.POST)
+    public ResponseEntity<?> updateEncompassAlertEmailIds(@RequestBody EncompassAlertMailsVO encompassAlertMailsVO ) throws SSApiException
+    {
+        LOGGER.info( "Method to update alert emails started" );
+        try {
+            
+            LOGGER.info( "encompassAlertMailsVO = {}", encompassAlertMailsVO.toString() );
+            long companyId = encompassAlertMailsVO.getCompanyId();
+            String alertEmailIds = encompassAlertMailsVO.getAlertMails();
+            
+            if ( companyId <= 0l && StringUtils.isEmpty( alertEmailIds ) ) {
+                throw new InvalidInputException( "Invalid details provided comapanyId = " + companyId + " alertEmailIds : " + alertEmailIds );
+            }
+
+            List<String> alertEmails = new ArrayList<>(  );
+
+            if( !StringUtils.isEmpty( alertEmailIds ) && !alertEmailIds.contains( "," )
+                && organizationManagementService.validateEmail( alertEmailIds ))
+                alertEmails.add( alertEmailIds );
+            else if( !StringUtils.isEmpty( alertEmailIds ) && alertEmailIds.contains( "," ) ){
+                String mailIds[] = alertEmailIds.split( "," );
+
+                if ( mailIds.length == 0 )
+                    throw new InvalidInputException( "Alert Emails - " + alertEmailIds+ " entered to input is empty",
+                        DisplayMessageConstants.GENERAL_ERROR );
+
+                for ( String mailID : mailIds ) {
+                    if ( !alertEmails.contains( mailID.trim().toLowerCase() ) ) {
+                        if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                            throw new InvalidInputException( "Alert EMail id - " + mailID + " entered amongst the mail ids to input is invalid",
+                                DisplayMessageConstants.GENERAL_ERROR );
+                        else {
+                            alertEmails.add( mailID.trim().toLowerCase() );
+                        }
+                    }
+                }
+            }
+
+            organizationManagementService.updateCompanySettings(companyId, MongoOrganizationUnitSettingDaoImpl.KEY_ALERT_EMAIL, alertEmails);
+            return new ResponseEntity<>( alertEmails, HttpStatus.ACCEPTED );
+
+        }catch ( Exception e ) {
+            throw new SSApiException( e.getMessage(), e );
+        }
+    }
 }

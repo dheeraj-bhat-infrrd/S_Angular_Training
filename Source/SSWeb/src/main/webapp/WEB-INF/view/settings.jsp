@@ -172,6 +172,12 @@
 								</div>
 							</c:if>
 							
+							<c:if test="${ columnName == 'companyId' }">
+								<div class="float-left clear-both comp-mail-thrs-txt"><spring:message code="label.encompass.alert.mail.key" /></div>
+								<input type="hidden" id="encompass-alert-mails" value="${encompassAlertEmails}">
+								<textarea id="enc-alert-mail-recipients" class="dig-recp" style="margin-bottom:40px" placeholder="<spring:message code="label.placehoder.encompass.alert.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${encompassAlertEmails}</textarea>
+							</c:if>
+							
 							<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
 								<div class="clearfix padding-bottom-twenty">

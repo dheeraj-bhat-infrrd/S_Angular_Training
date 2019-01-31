@@ -37,6 +37,10 @@ namespace EncompassSocialSurvey
 
         public const string DISABLE_GENERATE_REPORT_URL = "disable_generate_report_url";
 
+        public const string SEND_ERROR_MAIL_URL = "send_error_mail_url";
+
+        public const string SEND_ERROR_NOTIFICATION_URL = "send_error_notification_url";
+
         public const string MAX_NO_OF_PARALLEL_THREADS = "MaxNoOfParallelThreads";
         //Summit Company ID
         public const string SUMMIT_ID = "summit_company_id";
@@ -127,6 +131,12 @@ namespace EncompassSocialSurvey
 
         public const string SSAPI_URL = "ssapiUrl";
 
+        //Encompass errors
+        public const string INVALID_PWD_MESSAGE = "The password for Encompass is either incorrect or has expired, please reset the password and contact your CSM or support@socialsurvey.com";
+        public const string VERSION_MISMATCH_MESSAGE = "Encompass connection failed due to version mismatch, if you recently upgraded/downgraded encompass version please inform your CSM or email support@socialsurvey.com";
+        public const string USER_NOTFOUND_MESSAGE = "Encompass connection failed as the credentials provided are incorrect, please confirm the socialsurvey user exists with appropriate permissions and contact your CSM or support@socialsurvey.com";
+        public const string USER_LOCKED_MESSAGE = "Encompass connection failed as the user access for socialsurvey has been locked, please reset the password for socialsurvey user in encompass and contact your CSM or email support@socialsurvey.com";
+        public const string TECHNICAIL_ERROR_MESSAGE = "A technical issue caused encompass connection to fail, please contact your CSM or support@socialsurvey.com for further details";
 
         // UTF-8 code page
         public const int CIPHER_BYTE_CODING_TYPE = 65001;

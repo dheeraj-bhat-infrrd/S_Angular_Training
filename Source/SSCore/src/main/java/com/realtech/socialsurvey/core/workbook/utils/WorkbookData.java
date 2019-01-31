@@ -986,7 +986,14 @@ public class WorkbookData
                 surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 36 ) ));
                 surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 37 ) ));
                 surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 38 ) ));
-
+                if(row.get( 39 ) == null || Integer.valueOf( row.get( 39 ) ) == 0) {
+                 
+                    surveyTransactionReportToPopulate.add("Opted In");
+                }
+                else {
+                    
+                    surveyTransactionReportToPopulate.add("Opted Out");
+                }
 
                 companyUserData.put(++companyUserCounter ,surveyTransactionReportToPopulate );
                 surveyTransactionReportToPopulate = new ArrayList<>();
@@ -1035,6 +1042,7 @@ public class WorkbookData
         surveyTransactionReportToPopulate.add("Zillow Reviews");
         surveyTransactionReportToPopulate.add("Abusive Reviews");
         surveyTransactionReportToPopulate.add("3rd Party Reviews");
+	surveyTransactionReportToPopulate.add("Account Status");
         companyUserData.put( 1, surveyTransactionReportToPopulate );
         surveyTransactionReportToPopulate = new ArrayList<>();
         
@@ -1073,6 +1081,7 @@ public class WorkbookData
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("(SS + Zillow + 3rd Party Reviews)");
+        surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");
         surveyTransactionReportToPopulate.add("");

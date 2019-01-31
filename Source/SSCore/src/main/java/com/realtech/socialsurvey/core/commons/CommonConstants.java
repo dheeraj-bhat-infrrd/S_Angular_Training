@@ -538,6 +538,7 @@ public interface CommonConstants
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT = "Survey completed successfully";
     public static final String SOCIAL_POST_REMINDER_MAIL_SUBJECT = "Thanks again!";
     public static final String RESTART_SURVEY_MAIL_SUBJECT = "Invitation to update existing survey ";
+    String ENCOMPASS_ALERT_MAIL_SUBJECT = "Alert! Encompass message";
     public static final String AGENT_PROFILE_FIXED_URL = "pages";
     public static final String BRANCH_PROFILE_FIXED_URL = "pages";
     public static final String REGION_PROFILE_FIXED_URL = "pages";
@@ -1829,4 +1830,7 @@ public interface CommonConstants
     public static final String ZIPCODE_COL = "zipcode";
     public static final String STATE_NAME = "state";
     public static final String CITY_STATE_NAME = "citystate";
+
+    //constant for encompass alert emails
+    String ENCOMPASS_ALERT_EMAILS = "alertEmails";
 }

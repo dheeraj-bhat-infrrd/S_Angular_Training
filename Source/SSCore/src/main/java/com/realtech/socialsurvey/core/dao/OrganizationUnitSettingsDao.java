@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.realtech.socialsurvey.core.entities.*;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
@@ -391,6 +392,9 @@ public interface OrganizationUnitSettingsDao
      */
     public List<TransactionSourceFtp> fetchTransactionFtpListActive( long companyId );
 
+    Notification fetchNotification( long companyId, String message );
+
+    void saveNotification( long companyId, Notification newNotification );
     /**
      * Get all facebook tokens by collection name
      * @param collectionName
@@ -496,6 +500,4 @@ public interface OrganizationUnitSettingsDao
 
 
 	List<Long> fetchActiveUserForCompany(long companyId);
-
-
 }

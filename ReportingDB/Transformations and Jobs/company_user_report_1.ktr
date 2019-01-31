@@ -4266,6 +4266,10 @@
           <column_name>ss_invite_sent_date</column_name>
           <stream_name>SURVEY_INVITE_SENT</stream_name>
         </field>
+        <field>
+          <column_name>opted_out</column_name>
+          <stream_name>OPTED_OUT</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -4416,7 +4420,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  AGENT_SETTINGS_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_BY&#xd;&#xa;, CREATED_ON_MONGO&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, MODIFIED_ON_MONGO&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA&#xd;&#xa;, ALLOW_ZILLOW_AUTO_POST&#xd;&#xa;, DISCLAIMER&#xd;&#xa;, EXPERTISE&#xd;&#xa;, HIDDEN_AGENT_NAME&#xd;&#xa;, HIDDEN_SECTION&#xd;&#xa;, HOBBIES&#xd;&#xa;, IS_ACCOUNT_DISABLED&#xd;&#xa;, IS_DEFAULT_BY_SYSTEM&#xd;&#xa;, IS_LOCATION_ENABLED&#xd;&#xa;, IS_LOGO_IMAGE_PROCESSED&#xd;&#xa;, IS_PROFILE_IMAGE_PROCESSED&#xd;&#xa;, IS_SEO_CONTENT_MODIFIED&#xd;&#xa;, LOGO&#xd;&#xa;, LOGO_THUMBNAIL&#xd;&#xa;, PROFILE_COMPLETION&#xd;&#xa;, PROFILE_IMAGE_URL&#xd;&#xa;, PROFILE_IMAGE_URL_THUMBNAIL&#xd;&#xa;, PROFILE_NAME&#xd;&#xa;, PROFILE_URL&#xd;&#xa;, REVIEW_COUNT&#xd;&#xa;, SEND_EMAIL_FROM_COMPANY&#xd;&#xa;, USER_ENCRYPTED_ID&#xd;&#xa;, VENDASTA_ACCESSIBLE&#xd;&#xa;, VERTICAL&#xd;&#xa;, ZILLOW_REVIEW_AVERAGE&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ASSOCIATIONS&#xd;&#xa;, ACHIEVMENTS&#xd;&#xa;, LICENSES&#xd;&#xa;FROM agent_settings&#xd;&#xa;order by USER_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  AGENT_SETTINGS_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, SOCIAL_MEDIA_TOKENS_ID&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_BY&#xd;&#xa;, CREATED_ON_MONGO&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, MODIFIED_ON_MONGO&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA&#xd;&#xa;, ALLOW_ZILLOW_AUTO_POST&#xd;&#xa;, DISCLAIMER&#xd;&#xa;, EXPERTISE&#xd;&#xa;, HIDDEN_AGENT_NAME&#xd;&#xa;, HIDDEN_SECTION&#xd;&#xa;, HOBBIES&#xd;&#xa;, IS_ACCOUNT_DISABLED&#xd;&#xa;, IS_DEFAULT_BY_SYSTEM&#xd;&#xa;, IS_LOCATION_ENABLED&#xd;&#xa;, IS_LOGO_IMAGE_PROCESSED&#xd;&#xa;, IS_PROFILE_IMAGE_PROCESSED&#xd;&#xa;, IS_SEO_CONTENT_MODIFIED&#xd;&#xa;, LOGO&#xd;&#xa;, LOGO_THUMBNAIL&#xd;&#xa;, PROFILE_COMPLETION&#xd;&#xa;, PROFILE_IMAGE_URL&#xd;&#xa;, PROFILE_IMAGE_URL_THUMBNAIL&#xd;&#xa;, PROFILE_NAME&#xd;&#xa;, PROFILE_URL&#xd;&#xa;, REVIEW_COUNT&#xd;&#xa;, SEND_EMAIL_FROM_COMPANY&#xd;&#xa;, USER_ENCRYPTED_ID&#xd;&#xa;, VENDASTA_ACCESSIBLE&#xd;&#xa;, VERTICAL&#xd;&#xa;, ZILLOW_REVIEW_AVERAGE&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ASSOCIATIONS&#xd;&#xa;, ACHIEVMENTS&#xd;&#xa;, LICENSES&#xa;, OPTED_OUT&#xd;&#xa;FROM agent_settings&#xd;&#xa;order by USER_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -4425,7 +4429,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>278</xloc>
-      <yloc>881</yloc>
+      <yloc>882</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

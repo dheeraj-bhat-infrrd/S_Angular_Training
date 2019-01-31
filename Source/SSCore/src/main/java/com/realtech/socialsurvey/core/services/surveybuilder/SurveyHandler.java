@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiationTemp;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -459,5 +460,9 @@ public interface SurveyHandler
 
 
 	public void streamSurveyProcessRequest(SurveyDetails surveyDetails);
+
+
+	SurveyPreInitiation saveSurveyPreInitiationTempObject(SurveyPreInitiation surveyPreInitiation)
+			throws InvalidInputException;
 
 }

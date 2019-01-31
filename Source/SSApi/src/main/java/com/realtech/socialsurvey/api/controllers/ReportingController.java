@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.activitymanager.ActivityManagementService;
@@ -576,7 +577,8 @@ public class ReportingController
 
     @RequestMapping ( value = "/getscorestatsquestion", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Score Stats Question")
-    public String getScoreStatsQuestion( Long entityId, String entityType, int currentMonth, int currentYear )
+    public String getScoreStatsQuestion( Long entityId, String entityType, int currentMonth, int currentYear, Long userId )
+        throws InvalidInputException
     {
 
         LOGGER.debug( "Fetching Score Stats for Questions." );
@@ -584,7 +586,7 @@ public class ReportingController
         String json = null;
         List<List<Object>> scoreStatsQuestion;
         scoreStatsQuestion = reportingDashboardManagement.getScoreStatsForQuestion( entityId, entityType, currentMonth,
-                currentYear );
+                currentYear, userId );
         json = new Gson().toJson( scoreStatsQuestion );
         return json;
     }

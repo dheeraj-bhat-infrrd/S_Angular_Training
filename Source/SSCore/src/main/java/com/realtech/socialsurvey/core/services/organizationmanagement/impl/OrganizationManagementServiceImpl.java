@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Resource;
 
 import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.enums.*;
 import com.realtech.socialsurvey.core.vo.BranchVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -73,11 +74,6 @@ import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
 import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
-import com.realtech.socialsurvey.core.enums.AccountType;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.OrganizationUnit;
-import com.realtech.socialsurvey.core.enums.ProfileType;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -116,6 +112,7 @@ import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
 import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 @DependsOn ( "generic")
@@ -11083,10 +11080,58 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return true;
     }
 
+    /**
+     * Save the notification details in the {@link OrganizationUnitSettings}
+     * But make sure the same notification is not saved again avoiding
+     * overwriting the {@link Notification#recievedOn} using {@link OrganizationUnitSettingsDao#fetchNotification(long, String)}
+     * Calls {@link OrganizationUnitSettingsDao#saveNotification(long, Notification)}
+     * @param companyId
+     * @param errorMessage
+     * @param receivedOn
+     * @param type
+     */
+    @Override public void saveNotification( long companyId, String errorMessage, long receivedOn, String type )
+        throws InvalidInputException
+    {
+        LOG.debug( "Saving notification details in COMPANY" );
+        Notification notification = organizationUnitSettingsDao.fetchNotification( companyId, errorMessage );
+        NotificationType notificationType;
+        //if the error is not present then save it
+
+        if( notification == null ){
+            if(type.equalsIgnoreCase( NotificationType.ERROR.name() ))
+                notificationType = NotificationType.ERROR;
+            else if(type.equalsIgnoreCase( NotificationType.SUCCESS.name() ))
+                notificationType = NotificationType.SUCCESS;
+            else
+                throw new InvalidInputException( " Invalid notification type {}", type );
+
+            Notification newNotification = new Notification( errorMessage, receivedOn, notificationType, false );
+            organizationUnitSettingsDao.saveNotification( companyId, newNotification );
+
+        }
+        //else ignore it
+        else
+            LOG.info( "Notification is already present!!! Ignoring" );
+    }
+
     @Override public void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey )
     {
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
             allowPartnerSurvey, unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+    }
+    
+    /**
+     * Updates {@link Notification#isDisabled} to true
+     * Calls {@link OrganizationUnitSettingsDao#updateParticularKeyOrganizationUnitSettingsByIden(String, Object, long, String)}
+     * (long, Notification)}
+     * @param companyId
+     */
+    @Override public void disableNotification( long companyId )
+    {
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
+            MongoOrganizationUnitSettingDaoImpl.NOTIFICATION_ISDISABLED, true, companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
     }
 
     @Override
@@ -11137,4 +11182,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     	LOG.debug( "method enableIncompleteSurveyDeleteToggle() finished." );
     	return true;
     }
+
+    @Override public void updateCompanySettings( long companyId, String columnName, Object columnValue )
+    {
+        LOG.info( "Method to update company settings using companyId started." );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( columnName,
+            columnValue, companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "Method to update company settings using companyId finished" );
+    }
+
+
 }

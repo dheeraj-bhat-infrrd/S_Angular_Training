@@ -3157,7 +3157,7 @@ public class EmailServicesImpl implements EmailServices
         
         LOG.debug( "method sendSocialMonitorActionMail ended" );
 	}
-    
+
     @Async
     @Override
     public void sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId,
@@ -3284,6 +3284,48 @@ public class EmailServicesImpl implements EmailServices
         sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
             false );
         LOG.debug( "Successfully sent ftp success mail" );
+    }
+
+
+    /**
+     * Sends custom mail to list of recipients
+     * @param recipientName
+     * @param recipientMailIds
+     * @param subject
+     * @param body
+     * @param attachments
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    @Override public void sendCustomMail( String recipientName, List<String> recipientMailIds, String subject, String body,
+        List<EmailAttachment> attachments ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "Method sendCustomMail() started." );
+        if ( recipientMailIds == null || recipientMailIds.isEmpty() ) {
+            LOG.warn( "Recipient email Id is empty or null for sending custom mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending custom mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailIds );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_CUSTOM_MAIL );
+        if ( attachments != null && !attachments.isEmpty() )
+            emailEntity.setAttachments( attachments );
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CUSTOM_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( subject ) );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CUSTOM_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, body ) );
+
+        LOG.trace( "Calling email sender to send mail" );
+        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, true,
+            false );
+
+        LOG.debug( "Method sendCustomReportMail() finished." );
     }
 
 }

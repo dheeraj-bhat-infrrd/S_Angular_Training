@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 
+import com.realtech.socialsurvey.core.commons.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
@@ -104,6 +105,7 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
+import com.realtech.socialsurvey.core.vo.EncompassAlertMailsVO;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
@@ -720,6 +722,13 @@ public class OrganizationManagementController
             model.addAttribute( CommonConstants.ENCOMPASS_VERSION_LIST,
                 organizationManagementService.getActiveEncompassSdkVersions() );
 
+            if(unitSettings.getCrm_info() != null &&  unitSettings.getCrm_info() instanceof EncompassCrmInfo  ){
+                EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) unitSettings.getCrm_info();
+                String alertEmailsWithBrackets = Arrays.toString( encompassCrmInfo.getAlertEmail().toArray() );
+                String alertEmails = alertEmailsWithBrackets.substring( 1,alertEmailsWithBrackets.length()-1 );
+                model.addAttribute( CommonConstants.ENCOMPASS_ALERT_EMAILS, alertEmails );
+
+            }
             //REALTECH_USER_ID is set only for real tech and SS admin
             boolean isRealTechOrSSAdmin = false;
             Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
@@ -921,6 +930,15 @@ public class OrganizationManagementController
             //Add OptOutText
             model.addAttribute( "optOutText", companySettings.getOptoutText() );            
             
+            if(companySettings.getCrm_info() instanceof EncompassCrmInfo) {
+                EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+                if(encompassCrmInfo != null) {
+                    String encompassAlertEmailsStr = encompassCrmInfo.getAlertEmail().toString();
+                    model.addAttribute( "encompassAlertEmails", encompassAlertEmailsStr.substring( 1, encompassAlertEmailsStr.length()-1 ) );
+                }
+            }
+            
+            
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason : ", e );
             model.addAttribute( "message",
@@ -965,11 +983,14 @@ public class OrganizationManagementController
         String loanOfficerEmail = request.getParameter( "loan-officer-email" );
         String loanOfficerName = request.getParameter( "loan-officer-name" );
 
+        String alertEmails = request.getParameter( "alert-email" );
+
         String version = request.getParameter( "sdk-version-selection-list" );
 
         Map<String, Object> responseMap = new HashMap<String, Object>();
         String message;
         boolean status = true;
+        List<String> mailIdList = new ArrayList<>();
 
         try {
 
@@ -1075,6 +1096,35 @@ public class OrganizationManagementController
             } else {
             	encompassCrmInfo.setLoanProcessorEmail("");            	            	
             }
+
+            if(StringUtils.isNotEmpty( alertEmails ) && !alertEmails.contains( "," ) ){
+                if( organizationManagementService.validateEmail( alertEmails ) )
+                    encompassCrmInfo.setAlertEmail( Arrays.asList( alertEmails ) );
+                else
+                    throw new InvalidInputException( "Alert Emails - " + alertEmails+ " entered is invalid",
+                        DisplayMessageConstants.GENERAL_ERROR );
+            }
+            else if( StringUtils.isNotEmpty( alertEmails ) && alertEmails.contains( "," ) ){
+                String mailIds[] = alertEmails.split( "," );
+
+                if ( mailIds.length == 0 )
+                    throw new InvalidInputException( "Alert Emails - " + alertEmails+ " entered to input is empty",
+                        DisplayMessageConstants.GENERAL_ERROR );
+
+
+                for ( String mailID : mailIds ) {
+                    if ( !mailIdList.contains( mailID.trim().toLowerCase() ) ) {
+                        if ( !organizationManagementService.validateEmail( mailID.trim() ) )
+                            throw new InvalidInputException( "Alert EMail id - " + mailID + " entered amongst the mail ids to input is invalid",
+                                DisplayMessageConstants.GENERAL_ERROR );
+                        else {
+                            mailIdList.add( mailID.trim().toLowerCase() );
+                        }
+                    }
+                }
+                encompassCrmInfo.setAlertEmail( mailIdList );
+            }
+
 
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
@@ -4806,6 +4856,7 @@ public class OrganizationManagementController
                 .getMessage();
         }
 	
+
 	@RequestMapping ( value = "/enableincompletesurveydeletetoggle", method = RequestMethod.POST)
 	@ResponseBody
 	public String enableIncompleteSurveyDeleteToggle( HttpServletRequest request )
@@ -4823,5 +4874,38 @@ public class OrganizationManagementController
 			return "false";
 		}
 	}
+
+    @ResponseBody
+    @RequestMapping ( value = "/disableencompassnotification", method = RequestMethod.PUT)
+    public String disableNotificationForCompany( HttpServletRequest request, Model model )
+    {
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().disableNotification( companyId );
+        
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/updateencompassalertmail", method = RequestMethod.POST)
+    public String updateEncompassAlertMail( HttpServletRequest request, Model model, @RequestParam ("alertMails") String alertMails )
+    {
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        EncompassAlertMailsVO encompassAlertMailsVO =  new EncompassAlertMailsVO();
+        encompassAlertMailsVO.setCompanyId( companyId );
+        encompassAlertMailsVO.setAlertMails( alertMails );
+        
+        try {
+            Response response = ssApiIntergrationBuilder.getIntegrationApi().updateEncompassAlertEmailIds( encompassAlertMailsVO );
+            
+            return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        }catch(SSAPIException e) {
+            return "INPUT_ERROR";
+        }
+       
+    }
 }
 // JIRA: SS-24 BY RM02 EOC

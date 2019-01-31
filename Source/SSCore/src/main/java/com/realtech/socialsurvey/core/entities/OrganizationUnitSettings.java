@@ -123,6 +123,8 @@ public class OrganizationUnitSettings implements Serializable
     private ZillowShareConfig zillowShareConfig;
     
     private CustomFieldsNameMapping customFieldsNameMapping;
+
+    private Notification notification;
     
     private GeoJsonPoint geoLocation;
     
@@ -1095,6 +1097,17 @@ public class OrganizationUnitSettings implements Serializable
         this.isLoginEnableAllowed = isLoginEnableAllowed;
     }
 
+
+    public Notification getNotification()
+    {
+        return notification;
+    }
+
+
+    public void setNotification( Notification notification )
+    {
+        this.notification = notification;
+    }
 
     @Override
     public String toString()

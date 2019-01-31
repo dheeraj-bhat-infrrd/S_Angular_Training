@@ -497,7 +497,7 @@ public interface EmailServices
 			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked )
 			throws InvalidInputException, UndeliveredEmailException;
 
-    
+
     public void sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId, User addedUser,
         OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException;
 
@@ -523,7 +523,7 @@ public interface EmailServices
     public void sendFtpSuccessMail( String CompanyName, String fileDate, String fileName, FtpSurveyResponse ftpSurveyResponse,
         String agentMailId, String recipientMailId ) throws InvalidInputException, UndeliveredEmailException;
 
-
-
+    public void sendCustomMail( String recipientName, List<String> recipientMailIds, String subject, String body,
+        List<EmailAttachment> attachments) throws InvalidInputException, UndeliveredEmailException;
 
 }

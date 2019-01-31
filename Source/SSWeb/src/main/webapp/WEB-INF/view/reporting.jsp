@@ -101,6 +101,92 @@
 	</div>
 </div>
 
+<%-- <c:if test="${profilemasterid == 1}">
+	<c:if test="${isEncompassDisabled == false}">
+		<c:choose>
+			<c:when test="${encompassStatus == 'SUCCESS'}">
+				<div id="dsh-enc-banner" class="hm-header-main-wrapper hm-hdr-bord-bot" style="background:#5fba7d">
+					<div class="container">
+						<div class="hm-header-row clearfix">
+							<div class="float-left last-run-time-div">
+								<div class="align-center">
+									<c:if test='${encompassNotification != "" && encompassNotification != null && encompassNotification !=undefined}'>
+										<span class="incomplete-trans-span rep-disc-span last-run-time-span">${encompassNotification}</span>
+									</c:if>
+								</div>
+							</div>
+							<c:if test="${ isRealTechOrSSAdmin == true}">
+								<div class="close-enc-banner float-right">
+		                            <div id="close-enc-banner" class="close-enc-circle">x</div>
+		    					</div>
+	    					</c:if>
+						</div>
+					</div>
+				</div>
+			</c:when>
+			<c:when test="${encompassStatus == 'ERROR'}">
+				<div id="dsh-enc-banner" class="hm-header-main-wrapper hm-hdr-bord-bot" style="background:#e87c68">
+					<div class="container">
+						<div class="hm-header-row clearfix">
+							<div class="float-left last-run-time-div">
+								<div class="align-center">
+									<c:if test='${encompassNotification != "" && encompassNotification != null && encompassNotification !=undefined}'>
+										<span class="incomplete-trans-span rep-disc-span last-run-time-span">${encompassNotification}</span>
+									</c:if>
+								</div>
+							</div>
+							<c:if test="${ isRealTechOrSSAdmin == true}">
+								<div class="close-enc-banner float-right">
+		                            <div id="close-enc-banner" class="close-enc-circle">x</div>
+		    					</div>
+	    					</c:if>
+						</div>
+					</div>
+				</div>
+			</c:when>
+		</c:choose>
+	</c:if>
+</c:if> --%>
+
+<c:if test="${profilemasterid == 1}">
+	<c:if test="${isEncompassDisabled == false}">
+		<c:choose>
+			<c:when test="${encompassStatus == 'SUCCESS'}">
+				<div id="dsh-enc-banner" class="enc-banner-outer enc-banner-success">
+					<div class="container">
+						<div class="enc-banner-body">
+							<div class="enc-banner-txt">
+								<c:if test='${encompassNotification != "" && encompassNotification != null && encompassNotification !=undefined}'>
+									${encompassNotification}
+								</c:if>
+							</div>
+							<c:if test="${ isRealTechOrSSAdmin == true}">
+								<div id="close-enc-banner" class="enc-banner-close cursor-pointer">x</div>
+		    				</c:if>
+						</div>
+					</div>
+				</div>
+			</c:when>
+			<c:when test="${encompassStatus == 'ERROR'}">
+				<div id="dsh-enc-banner" class="enc-banner-outer enc-banner-error">
+					<div class="container">
+						<div class="enc-banner-body">
+							<div class="enc-banner-txt">
+								<c:if test='${encompassNotification != "" && encompassNotification != null && encompassNotification !=undefined}'>
+									${encompassNotification}
+								</c:if>
+							</div>
+							<c:if test="${ isRealTechOrSSAdmin == true}">
+								<div id="close-enc-banner" class="enc-banner-close cursor-pointer">x</div>
+		    				</c:if>
+						</div>
+					</div>
+				</div>
+			</c:when>
+		</c:choose>
+	</c:if>
+</c:if>
+
 <div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background:#2f69aa">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -278,7 +364,7 @@
 
 		updateViewAsScroll();
 		
-	$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
+		$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
 			e.stopPropagation();
 			if (colName == 'agentId') {
 				sendSurveyInvitation('#dsh-btn1');
