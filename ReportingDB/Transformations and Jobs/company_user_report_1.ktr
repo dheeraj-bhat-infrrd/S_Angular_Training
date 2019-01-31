@@ -649,7 +649,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>select T1.FACEBOOK_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29; AS FACEBOOK_POST_DATE, T1.FACEBOOK_ACCESS_TOKEN_CREATED_ON&#xd;&#xa;FROM facebook_token T1 , facebook_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>select T1.FACEBOOK_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29; AS FACEBOOK_POST_DATE, T1.CREATED_ON_EST&#xd;&#xa;FROM facebook_token T1 , facebook_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -683,7 +683,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>&#xd;&#xa;Select T1.LINKED_IN_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29;  AS LINKEDIN_POST_DATE, T1.LINKED_IN_ACCESS_TOKEN_CREATED_ON&#xd;&#xa;FROM linked_in_token T1 ,linkedin_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>&#xd;&#xa;Select T1.LINKED_IN_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29;  AS LINKEDIN_POST_DATE, T1.CREATED_ON_EST&#xd;&#xa;FROM linked_in_token T1 ,linkedin_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -717,7 +717,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>Select T1.TWITTER_PAGE_LINK,MAX&#x28;T2.POST_DATE&#x29; AS TWITTER_POST_DATE, T1.TWITTER_ACCESS_TOKEN_CREATED_ON&#xd;&#xa;FROM twitter_token T1 ,twitter_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>Select T1.TWITTER_PAGE_LINK,MAX&#x28;T2.POST_DATE&#x29; AS TWITTER_POST_DATE, T1.CREATED_ON_EST&#xd;&#xa;FROM twitter_token T1 ,twitter_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -2209,6 +2209,56 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1621</xloc>
       <yloc>133</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>ADOPTION_COMPLETED_DATE_EST</name>
+        <rename>ADOPTION_COMPLETED_DATE_EST</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LAST_USER_LOGIN_EST</name>
+        <rename>LAST_USER_LOGIN_EST</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2108</xloc>
+      <yloc>964</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -4122,60 +4172,36 @@
     <return_field/>
     <fields>
         <field>
+          <column_name>3rd_party_reviews</column_name>
+          <stream_name>third_party_count</stream_name>
+        </field>
+        <field>
+          <column_name>abusive_reviews</column_name>
+          <stream_name>abusive_count</stream_name>
+        </field>
+        <field>
+          <column_name>address</column_name>
+          <stream_name>Address_complete</stream_name>
+        </field>
+        <field>
+          <column_name>adoption_completed_date</column_name>
+          <stream_name>ADOPTION_COMPLETED_DATE_EST</stream_name>
+        </field>
+        <field>
+          <column_name>company_id</column_name>
+          <stream_name>final_company_id</stream_name>
+        </field>
+        <field>
           <column_name>company_user_table_id</column_name>
           <stream_name>company_user_table_id</stream_name>
-        </field>
-        <field>
-          <column_name>social_survey_access_level</column_name>
-          <stream_name>SocialSurveyAccessLevel</stream_name>
-        </field>
-        <field>
-          <column_name>office_branch_assignment</column_name>
-          <stream_name>OfficeAssignment</stream_name>
-        </field>
-        <field>
-          <column_name>region_assignment</column_name>
-          <stream_name>RegionAssignment</stream_name>
-        </field>
-        <field>
-          <column_name>office_admin</column_name>
-          <stream_name>BranchAdmin</stream_name>
-        </field>
-        <field>
-          <column_name>region_admin</column_name>
-          <stream_name>RegionAdmin</stream_name>
-        </field>
-        <field>
-          <column_name>profile_complete</column_name>
-          <stream_name>Profile_complete</stream_name>
-        </field>
-        <field>
-          <column_name>first_name</column_name>
-          <stream_name>FIRST_NAME</stream_name>
-        </field>
-        <field>
-          <column_name>last_name</column_name>
-          <stream_name>LAST_NAME</stream_name>
-        </field>
-        <field>
-          <column_name>email</column_name>
-          <stream_name>final_email</stream_name>
-        </field>
-        <field>
-          <column_name>user_id</column_name>
-          <stream_name>MAIN_USER_ID</stream_name>
         </field>
         <field>
           <column_name>disclaimer</column_name>
           <stream_name>DISCLAIMER</stream_name>
         </field>
         <field>
-          <column_name>last_login_date</column_name>
-          <stream_name>LAST_LOGIN</stream_name>
-        </field>
-        <field>
-          <column_name>address</column_name>
-          <stream_name>Address_complete</stream_name>
+          <column_name>email</column_name>
+          <stream_name>final_email</stream_name>
         </field>
         <field>
           <column_name>email_verified</column_name>
@@ -4190,16 +4216,52 @@
           <stream_name>fb_connection_status</stream_name>
         </field>
         <field>
+          <column_name>fb_url</column_name>
+          <stream_name>fb_page_url</stream_name>
+        </field>
+        <field>
+          <column_name>first_name</column_name>
+          <stream_name>FIRST_NAME</stream_name>
+        </field>
+        <field>
+          <column_name>gb_url</column_name>
+          <stream_name>GOOGLE_BUSINESS_LINK</stream_name>
+        </field>
+        <field>
+          <column_name>google_plus_url</column_name>
+          <stream_name>PROFILE_LINK</stream_name>
+        </field>
+        <field>
+          <column_name>last_login_date</column_name>
+          <stream_name>LAST_USER_LOGIN_EST</stream_name>
+        </field>
+        <field>
+          <column_name>last_name</column_name>
+          <stream_name>LAST_NAME</stream_name>
+        </field>
+        <field>
           <column_name>last_post_date_fb</column_name>
           <stream_name>last_post_date_fb</stream_name>
         </field>
         <field>
-          <column_name>twitter_connection_established_date</column_name>
-          <stream_name>twitter_connection_established_date</stream_name>
+          <column_name>last_post_date_linkedin</column_name>
+          <stream_name>last_post_date_linkedin</stream_name>
         </field>
         <field>
           <column_name>last_post_date_twitter</column_name>
           <stream_name>last_post_date_twitter</stream_name>
+        </field>
+        <field>
+          <column_name>last_survey_posted_date</column_name>
+          <stream_name>posted_date</stream_name>
+        </field>
+        <field>
+          <column_name>last_survey_sent_date</column_name>
+          <stream_name>last_survey_sent_date</stream_name>
+        </field>
+        <field>
+          <column_name>lendingtree_url</column_name>
+          <stream_name>LENDING_TREE_PROFILE_LINK</stream_name>
         </field>
         <field>
           <column_name>linkedin_connection_established_date</column_name>
@@ -4210,100 +4272,88 @@
           <stream_name>linkedin_connection_status</stream_name>
         </field>
         <field>
-          <column_name>socially_connected</column_name>
-          <stream_name>socially_connected</stream_name>
+          <column_name>linkedin_url</column_name>
+          <stream_name>linkedin_profile_url</stream_name>
         </field>
         <field>
-          <column_name>last_post_date_linkedin</column_name>
-          <stream_name>last_post_date_linkedin</stream_name>
+          <column_name>office_admin</column_name>
+          <stream_name>BranchAdmin</stream_name>
         </field>
         <field>
-          <column_name>zillow_url</column_name>
-          <stream_name>ZILLOW_PROFILE_LINK</stream_name>
-        </field>
-        <field>
-          <column_name>google_plus_url</column_name>
-          <stream_name>PROFILE_LINK</stream_name>
-        </field>
-        <field>
-          <column_name>realtor_url</column_name>
-          <stream_name>REALTOR_PROFILE_LINK</stream_name>
-        </field>
-        <field>
-          <column_name>yelp_url</column_name>
-          <stream_name>YELP_PAGE_LINK</stream_name>
-        </field>
-        <field>
-          <column_name>gb_url</column_name>
-          <stream_name>GOOGLE_BUSINESS_LINK</stream_name>
-        </field>
-        <field>
-          <column_name>total_reviews</column_name>
-          <stream_name>total_reviews</stream_name>
-        </field>
-        <field>
-          <column_name>ss_reviews</column_name>
-          <stream_name>ss_review_count</stream_name>
-        </field>
-        <field>
-          <column_name>zillow_reviews</column_name>
-          <stream_name>zillow_count</stream_name>
-        </field>
-        <field>
-          <column_name>abusive_reviews</column_name>
-          <stream_name>abusive_count</stream_name>
-        </field>
-        <field>
-          <column_name>3rd_party_reviews</column_name>
-          <stream_name>third_party_count</stream_name>
-        </field>
-        <field>
-          <column_name>ss_profile</column_name>
-          <stream_name>PROFILE_URL</stream_name>
-        </field>
-        <field>
-          <column_name>last_survey_sent_date</column_name>
-          <stream_name>last_survey_sent_date</stream_name>
-        </field>
-        <field>
-          <column_name>twitter_connection_status</column_name>
-          <stream_name>twitter_connection_status</stream_name>
-        </field>
-        <field>
-          <column_name>lendingtree_url</column_name>
-          <stream_name>LENDING_TREE_PROFILE_LINK</stream_name>
-        </field>
-        <field>
-          <column_name>company_id</column_name>
-          <stream_name>final_company_id</stream_name>
-        </field>
-        <field>
-          <column_name>last_survey_posted_date</column_name>
-          <stream_name>posted_date</stream_name>
-        </field>
-        <field>
-          <column_name>ss_invite_sent_date</column_name>
-          <stream_name>SURVEY_INVITE_SENT</stream_name>
+          <column_name>office_branch_assignment</column_name>
+          <stream_name>OfficeAssignment</stream_name>
         </field>
         <field>
           <column_name>opted_out</column_name>
           <stream_name>OPTED_OUT</stream_name>
         </field>
         <field>
-          <column_name>fb_url</column_name>
-          <stream_name>fb_page_url</stream_name>
+          <column_name>profile_complete</column_name>
+          <stream_name>Profile_complete</stream_name>
         </field>
         <field>
-          <column_name>linkedin_url</column_name>
-          <stream_name>linkedin_profile_url</stream_name>
+          <column_name>realtor_url</column_name>
+          <stream_name>REALTOR_PROFILE_LINK</stream_name>
+        </field>
+        <field>
+          <column_name>region_admin</column_name>
+          <stream_name>RegionAdmin</stream_name>
+        </field>
+        <field>
+          <column_name>region_assignment</column_name>
+          <stream_name>RegionAssignment</stream_name>
+        </field>
+        <field>
+          <column_name>social_survey_access_level</column_name>
+          <stream_name>SocialSurveyAccessLevel</stream_name>
+        </field>
+        <field>
+          <column_name>socially_connected</column_name>
+          <stream_name>socially_connected</stream_name>
+        </field>
+        <field>
+          <column_name>ss_invite_sent_date</column_name>
+          <stream_name>SURVEY_INVITE_SENT</stream_name>
+        </field>
+        <field>
+          <column_name>ss_profile</column_name>
+          <stream_name>PROFILE_URL</stream_name>
+        </field>
+        <field>
+          <column_name>ss_reviews</column_name>
+          <stream_name>ss_review_count</stream_name>
+        </field>
+        <field>
+          <column_name>total_reviews</column_name>
+          <stream_name>total_reviews</stream_name>
+        </field>
+        <field>
+          <column_name>twitter_connection_established_date</column_name>
+          <stream_name>twitter_connection_established_date</stream_name>
+        </field>
+        <field>
+          <column_name>twitter_connection_status</column_name>
+          <stream_name>twitter_connection_status</stream_name>
         </field>
         <field>
           <column_name>twitter_url</column_name>
           <stream_name>twitter_profile_url</stream_name>
         </field>
         <field>
-          <column_name>adoption_completed_date</column_name>
-          <stream_name>ADOPTION_COMPLETED_DATE_EST</stream_name>
+          <column_name>user_id</column_name>
+          <stream_name>MAIN_USER_ID</stream_name>
+        </field>
+        <field>
+          <column_name>yelp_url</column_name>
+          <stream_name>YELP_PAGE_LINK</stream_name>
+        </field>
+        <field>
+          <column_name>zillow_reviews</column_name>
+          <stream_name>zillow_count</stream_name>
+        </field>
+        <field>
+          <column_name>zillow_url</column_name>
+          <stream_name>ZILLOW_PROFILE_LINK</stream_name>
         </field>
     </fields>
      <cluster_schema/>
@@ -4553,56 +4603,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>104</xloc>
       <yloc>2049</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Select values</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>ADOPTION_COMPLETED_DATE_EST</name>
-        <rename>ADOPTION_COMPLETED_DATE_EST</rename>
-        <type>Date</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>LAST_USER_LOGIN_EST</name>
-        <rename>LAST_USER_LOGIN_EST</rename>
-        <type>Date</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2108</xloc>
-      <yloc>964</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
