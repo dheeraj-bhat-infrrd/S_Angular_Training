@@ -355,237 +355,237 @@
       <value>
         <name>BRANCH_ID</name>
         <rename>BRANCH_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>COMPANY_ID</name>
         <rename>COMPANY_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>REGION_ID</name>
         <rename>REGION_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SOURCE_ID</name>
         <rename>SOURCE_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_PRE_INTITIATION_ID</name>
         <rename>SURVEY_PRE_INTITIATION_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>AGENT_ID</name>
         <rename>AGENT_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>AGENT_NAME</name>
         <rename>AGENT_NAME</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>AGREED_TO_SHARE</name>
         <rename>AGREED_TO_SHARE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CITY</name>
         <rename>CITY</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>COMPLETE_PROFILE_URL</name>
         <rename>COMPLETE_PROFILE_URL</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CUSTOMER_EMAIL</name>
         <rename>CUSTOMER_EMAIL</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CUSTOMER_FIRST_NAME</name>
         <rename>CUSTOMER_FIRST_NAME</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CUSTOMER_LAST_NAME</name>
         <rename>CUSTOMER_LAST_NAME</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>EDITABLE</name>
         <rename>EDITABLE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_ABUSE_REP_BY_USER</name>
         <rename>IS_ABUSE_REP_BY_USER</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>IS_ABUSIVE</name>
         <rename>IS_ABUSIVE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>LAST_REMINDER_FOR_SOCIAL_POST</name>
         <rename>LAST_REMINDER_FOR_SOCIAL_POST</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>MOOD</name>
         <rename>MOOD</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>REMINDER_COUNT</name>
         <rename>REMINDER_COUNT</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>REMINDERS_FOR_SOCIAL_POSTS</name>
         <rename>REMINDERS_FOR_SOCIAL_POSTS</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>RETAKE_SURVEY</name>
         <rename>RETAKE_SURVEY</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>REVIEW</name>
         <rename>REVIEW</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SCORE</name>
         <rename>SCORE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SHOW_SURVEY_ON_UI</name>
         <rename>SHOW_SURVEY_ON_UI</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SOCIAL_POSTS_REMINDER</name>
         <rename>SOCIAL_POSTS_REMINDER</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SOURCE</name>
         <rename>SOURCE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>STAGE</name>
         <rename>STAGE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>STATE</name>
         <rename>STATE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SUMMARY</name>
         <rename>SUMMARY</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_CLICKED</name>
         <rename>SURVEY_CLICKED</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>UNDER_RESOLUTION</name>
         <rename>UNDER_RESOLUTION</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>URL</name>
         <rename>URL</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CREATED_ON</name>
         <rename>CREATED_ON</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>MODIFIED_ON</name>
         <rename>MODIFIED_ON</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_COMPLETED_DATE</name>
         <rename>SURVEY_COMPLETED_DATE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_TRANSACTION_DATE</name>
         <rename>SURVEY_TRANSACTION_DATE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_UPDATED_DATE</name>
         <rename>SURVEY_UPDATED_DATE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CREATED_ON_EST</name>
         <rename>CREATED_ON_EST</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>MODIFIED_ON_EST</name>
         <rename>MODIFIED_ON_EST</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_COMPLETED_DATE_EST</name>
         <rename>SURVEY_COMPLETED_DATE_EST</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_TRANSACTION_DATE_EST</name>
         <rename>SURVEY_TRANSACTION_DATE_EST</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_UPDATED_DATE_EST</name>
         <rename>SURVEY_UPDATED_DATE_EST</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>LAST_REMINDER_FOR_SOCIAL_POST_EST</name>
         <rename>LAST_REMINDER_FOR_SOCIAL_POST_EST</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>NPS_SCORE</name>
         <rename>NPS_SCORE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>PARTICIPANT_TYPE</name>
         <rename>participantType</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_SENT_DATE</name>
         <rename>SURVEY_SENT_DATE</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>SURVEY_SENT_DATE_EST</name>
         <rename>SURVEY_SENT_DATE_EST</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
