@@ -8403,10 +8403,8 @@ function showMasterQuestionPage() {
 		
 		if( isAbusive == false ){
 			if (mood != 'Great') {
-				$('#social-post-links').find('*').not('#google-business-btn, #google-btn').remove();
+				$('#social-post-links').find('*').remove();
 				$('#social-post-links').addClass('review-abusive-share-parent');
-				$('#social-post-links').find('#google-business-btn').addClass('review-abusive-share-btn');
-				$('#social-post-links').find('#google-btn').addClass('review-abusive-share-btn');
 			}
 			$('#social-post-links').show();
 
