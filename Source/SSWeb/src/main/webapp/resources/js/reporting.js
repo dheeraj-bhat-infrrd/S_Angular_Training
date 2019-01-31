@@ -3429,7 +3429,7 @@ function confirmDeleteSurveys(selectedSurveys) {
 	$('#overlay-continue').html("Delete");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-header').html("Delete Incomplete Surveys");
-	$('#overlay-text').html("Are you sure you want to delete the incomplete surveys ?");
+	$('#overlay-text').html("Are you sure you want to delete the incomplete survey(s) ?");
 	$('#overlay-continue').attr("onclick", "removeMultipleIncompleteSurveyRequestForNewDashboard('" + selectedSurveys + "');");
 }
 
