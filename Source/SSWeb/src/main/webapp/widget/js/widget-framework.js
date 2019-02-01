@@ -30,7 +30,12 @@ function drawWidgetFramework($, widgetOuterContainer, widgetDetails, profileName
 	if(enableMobView == 'true' || enableMobView == true){
 		widgetOuterContainer.html(widgetFrameworkMobView);
 	}else{
-		widgetOuterContainer.html(widgetFramework);
+		
+		if (widgetOuterContainer.width() < 270) {
+			widgetOuterContainer.html(widgetFrameworkMobView);
+		}else{
+			widgetOuterContainer.html(widgetFramework);
+		}
 		
 		if (widgetOuterContainer.width() < 768) {
 			$('#ss-widget-options').css('width', '100%');
