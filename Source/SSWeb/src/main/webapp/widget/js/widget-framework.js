@@ -20,7 +20,11 @@ var widgetFrameworkMobView = '<div id="ss-widget-container" class="col-lg-12 col
 
 var widgetReviewTemplate = '<div id="ss-widget-review-container" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev hide" data-index=0>' + '<div class="w-100 ss-widget-date-pow-cont">' + '<div class="float-left ss-widget-rev-date ss-widget-rev-font"></div>' + '<div class="float-right ss-widget-prov-by ss-widget-pow-by ss-widget-rev-font">provided by <div class=" ss-wi-verified-partner-badge ss-wi-verify-partner-image ss-widget-verified-badge ss-wi-verified-badge  ss-wi-verify-image ss-wi-zillow-badge  ss-wi-verify-image-zillow ss-wi-unverified-badge  ss-wi-verify-image-ss ss-fb-verified-image ss-verify-image-fb float-right" ></div></div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-details">' + '<div class="ss-widget-prof-pic-cont"><img src="/resources/images/image_pt.png" class="ss-widget-prof-pic"></div>' + '<div class="ss-widget-rev-prof-details">' + '<div class="ss-widget-prov-by  ss-widget-rev-font">In reference to a transaction with</div>' + '<div class="ss-widget-rev-prof-name ss-widget-rev-font"></div>' + '<div class="ss-widget-rev-prof-title ss-widget-rev-font"> | NMLS# </div>' + '</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-stars">' + '<div class="ss-widget-star1 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star2 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star3 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star4 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-star5 ss-widget-star-container"><div class="widget-black-star hide">&#9733;</div><div class="widget-white-star">&#9734;</div></div>' + '<div class="ss-widget-rev-score  ss-widget-rev-font">0.0</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-cust-name-div  ss-widget-rev-font"><span class="ss-widget-rev-cust-name  ss-widget-rev-font">Stacey M </span><span class="ss-widget-rev-cust-addr  ss-widget-rev-font">- Los Angeles, CA</span></div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ss-widget-rev-text-cont">' + '<div class="ss-widget-rev-text-quote">&#10075;</div>' + '<div class="ss-widget-rev-text-quote">&#10075;</div>' + '<div class="ss-widget-rev-text">' + '<p class="ss-widget-review-text ss-widget-rev-font">Sample</p>' + '<p class="ss-widget-text-bold ss-widget-read-more cursor-pointer ss-widget-rev-font">... read more</p>' + '</div>' + '</div>' + '</div>';
 
+var widgetOuterCon;
+
 function drawWidgetFramework($, widgetOuterContainer, widgetDetails, profileName, profileLevel, companyProfileName, resourcesHost, ssHost) {
+	
+	widgetOuterCon = widgetOuterContainer;
 	
 	var enableMobView = widgetDetails.widgetConfiguration.enableMobView;
 	if(enableMobView == 'true' || enableMobView == true){
@@ -63,6 +67,16 @@ function drawWidgetFramework($, widgetOuterContainer, widgetDetails, profileName
 		$('.ss-widget-rating-btn-cont').addClass('ss-widget-rating-btn-cont-xs');
 		$('#widget-contact-us-btn').addClass('widget-btns').removeClass('widget-btns-sm');
 		$('#widget-write-rev-btn').addClass('widget-btns').removeClass('widget-btns-sm');
+	}
+	
+	if(widgetOuterContainer.width() < 200){
+		$('#ss-widget-options-dropdown').css('display','grid');
+		$('.ss-widget-opt').css('width','100%');
+		$('.ss-widget-order-cont').css('width','100%');
+		$('.ss-widget-order-cont').css('padding-left','10px');
+		$('.ss-widget-order-cont').css('padding-bottom','10px');
+		$('.ss-widget-order-cont').addClass('ss-widget-left-align-text');
+		
 	}
 }
 
@@ -550,6 +564,15 @@ function paintWidgetReviewStyles($, widgetDetails) {
 	var borderOpacity = 0.6;
 	var borderColor = 'rgba('+borderColorR+','+borderColorG+','+borderColorB+','+borderOpacity+')';
 	$('.ss-widget-rev').css('border-color',borderColor);
+	
+	if(widgetOuterCon.width() < 240){
+		$('.ss-widget-rev-prof-name').css('font-size','10px');
+		$('.ss-widget-review-text').css('font-size','10px');
+	}
+	
+	if(widgetOuterCon.width() <= 160){
+		$('.ss-widget-rev').css('max-height','300px');
+	}
 
 }
 
