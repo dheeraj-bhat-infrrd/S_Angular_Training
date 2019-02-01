@@ -13,7 +13,7 @@ namespace EncompassSocialSurvey
         private static readonly int MAX_DEGREE_OF_PARALLELISM = EncompassSocialSurveyConfiguration.MaxNoOfParallelThreads;
 
         #endregion
-
+        
         static void Main(string[] args)
         {
             log4net.Config.BasicConfigurator.Configure();
@@ -124,6 +124,11 @@ namespace EncompassSocialSurvey
                                 {
                                     noOfRecordsInserted = loanSerivce.InsertLoans(loansVM);
 
+                                    string successMessage = "Successfully received " + noOfRecordsInserted + " transactions via encompass today";
+                                    //send success notification 
+                                    _ccService.SendNotification(forCompCredential.EncompassCredential.CompanyId,successMessage,
+                                        GetCurrentMilli(), "SUCCESS");
+                                    
                                 }
                                 CRMBatchTrackerEntity crmBatchTracker = loanSerivce.getCrmBatchTracker(forCompCredential.EncompassCredential.CompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
                                 if (crmBatchTracker != null)
@@ -198,7 +203,37 @@ namespace EncompassSocialSurvey
                     String Subject = "Error while connecting to encompass";
                     String BodyText = "An error has been occurred while connecting to encompass for company : " + forCompCredential.CompanyName + " with id : " + forCompCredential.EncompassCredential.CompanyId + " on " + DateTime.Now + ".";
                     BodyText += ex.Message;
+                    //send mail to socialsurvey admin
                     CommonUtility.SendMailToAdmin(Subject, BodyText);
+
+                    String errorMessage;
+                    
+                    if (ex.Message.Contains("InvalidPassword"))
+                    {
+                        errorMessage = EncompassSocialSurveyConstant.INVALID_PWD_MESSAGE;
+                    }
+                    else if(ex.Message.Contains("Version mismatch"))
+                    {
+                        errorMessage = EncompassSocialSurveyConstant.VERSION_MISMATCH_MESSAGE;
+                    }
+                    else if (ex.Message.Contains("UserNotFound"))
+                    {
+                        errorMessage = EncompassSocialSurveyConstant.USER_NOTFOUND_MESSAGE;
+                    }
+                    else if (ex.Message.Contains("UserLocked"))
+                    {
+                        errorMessage = EncompassSocialSurveyConstant.USER_LOCKED_MESSAGE;
+                    }
+                    else
+                    {
+                        errorMessage = EncompassSocialSurveyConstant.TECHNICAIL_ERROR_MESSAGE;
+                    }
+
+                    //save the error notification
+                    _ccService.SendNotification(forCompCredential.EncompassCredential.CompanyId, errorMessage,
+                        GetCurrentMilli(), "ERROR");
+                    //send mail to encompass admin
+                    _ccService.SendMailToEncompassAdmin(forCompCredential.EncompassCredential.CompanyId, errorMessage);
                 }
                 finally
                 {
@@ -215,6 +250,12 @@ namespace EncompassSocialSurvey
             Logger.Info("Exiting the method ProcessLoanForCompanies.ProcessLoanForCompanies()");
         }
 
+        public static long GetCurrentMilli()
+        {
+            DateTime Jan1970 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan javaSpan = DateTime.UtcNow - Jan1970;
+            return (long)javaSpan.TotalMilliseconds;
+        }
 
         #endregion
     }

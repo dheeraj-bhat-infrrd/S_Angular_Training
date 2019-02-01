@@ -147,6 +147,19 @@ public class CompanyUserReport implements Serializable
     
     @Column ( name = "3rd_party_reviews")
     private long thirdPartyReviews;
+    
+    @Column ( name = "opted_out")
+    private Integer optedOut;
+
+    public Integer getOptedOut()
+    {
+        return optedOut;
+    }
+
+    public void setOptedOut( Integer optedOut )
+    {
+        this.optedOut = optedOut;
+    }
 
     public String getCompanyUserTableId()
     {

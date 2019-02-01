@@ -183,6 +183,7 @@ public interface CommonConstants
     public static final String USER_INVITE_INVITATION_VALID_UNTIL_COLUMN = "invitationValidUntil";
     public static final String USER_COLUMN = "user";
     public static final String PROFILE_MASTER_COLUMN = "profilesMaster";
+    public static final String PROFILE_ID ="profileId";
     public static final String AUTO_PAYMENT_MODE = "A";
     public static final int INITIAL_PAYMENT_RETRIES = 0;
     public static final String PAYMENT_GATEWAY = "Braintree";
@@ -537,6 +538,7 @@ public interface CommonConstants
     public static final String SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT = "Survey completed successfully";
     public static final String SOCIAL_POST_REMINDER_MAIL_SUBJECT = "Thanks again!";
     public static final String RESTART_SURVEY_MAIL_SUBJECT = "Invitation to update existing survey ";
+    String ENCOMPASS_ALERT_MAIL_SUBJECT = "Alert! Encompass message";
     public static final String AGENT_PROFILE_FIXED_URL = "pages";
     public static final String BRANCH_PROFILE_FIXED_URL = "pages";
     public static final String REGION_PROFILE_FIXED_URL = "pages";
@@ -1577,6 +1579,7 @@ public interface CommonConstants
     public static final String EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
     public static final String EMAIL_TYPE_SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
     public static final String EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER = "EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER";
+    public static final String EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_ADMIN = "SOCIAL_MONITOR_ACTION_MAIL_TO_ADMIN";
     public static final String EMAIL_TYPE_ABUSIVE_HANDLE_MAIL = "ABUSIVE_HANDLE_MAIL";
     public static final String EMAIL_TYPE_USER_ADDITION_MAIL = "USER_ADDITION_MAIL";
     public static final String EMAIL_TYPE_USER_DELETION_MAIL = "USER_DELETION_MAIL";
@@ -1829,4 +1832,7 @@ public interface CommonConstants
     public static final String ZIPCODE_COL = "zipcode";
     public static final String STATE_NAME = "state";
     public static final String CITY_STATE_NAME = "citystate";
+
+    //constant for encompass alert emails
+    String ENCOMPASS_ALERT_EMAILS = "alertEmails";
 }

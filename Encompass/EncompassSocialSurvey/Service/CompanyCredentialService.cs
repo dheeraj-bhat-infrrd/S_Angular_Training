@@ -44,6 +44,81 @@ namespace EncompassSocialSurvey.Service
               
         }
 
+        public void SendMailToEncompassAdmin(long companyId, String errorMessage)
+        {
+            Logger.Info("Inside method sendErrorMail for companyId : " + companyId);
+
+            HttpClient client = new HttpClient();
+            
+            var url = EncompassSocialSurveyConfiguration.sendErrorMailUrl ;
+            Logger.Debug("url for http request is :" + url);
+
+            var jsonString = "{\"companyId\":"+companyId+",\"message\":"+ "\""+errorMessage+"\""+"}";
+
+            Logger.Info("Json : " + jsonString);
+
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            var response = client.PostAsync(url, httpContent).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = response.Content;
+                // by calling .Result you are synchronously reading the result
+                string responseString = responseContent.ReadAsStringAsync().Result;
+                Logger.Debug("Response of http request is : " + responseString);
+            }
+            else
+            {
+                Logger.Debug("Error while sending error notification mail to admin for companyId : " + companyId);
+                string Subject = "Error while sending error notification mail to admin";
+                string BodyText = "An error occured while sending error notification mail to admin for companyID   : " + companyId + " on " + DateTime.Now + ".";
+                BodyText += " \n Response of HTTP request is : " + response.ToString();
+                CommonUtility.SendMailToAdmin(Subject, BodyText);
+            }
+
+
+            Logger.Info("method SendErrorMail for companyId : " + companyId + "ended");
+
+        }
+
+        public void SendNotification(long companyId, String errorMessage, long receivedOn, String type)
+        {
+            Logger.Info("Inside method SendNotification for companyId : " + companyId);
+
+            HttpClient client = new HttpClient();
+
+            var url = EncompassSocialSurveyConfiguration.sendErrorNotificationUrl;
+            Logger.Debug("url for http request is :" + url);
+
+            var jsonString = "{\"companyId\":" + companyId + ",\"message\":" + "\""+errorMessage+"\"" +
+                ",\"type\":" + "\""+type+"\"" + ",\"receivedOn\":" + receivedOn + "}";
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            
+            var response = client.PostAsync(url, httpContent).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = response.Content;
+                // by calling .Result you are synchronously reading the result
+                string responseString = responseContent.ReadAsStringAsync().Result;
+                Logger.Debug("Response of http request is : " + responseString);
+            }
+            else
+            {
+                Logger.Debug("Error while sending notification to SSAPI for companyId : " + companyId);
+                string Subject = "Error while sending notification to SSAPI";
+                string BodyText = "An error has occurred while sending notification to SSAPI for companyID   : " + companyId + " on " + DateTime.Now + ".";
+                BodyText += " \n Response of HTTP request is : " + response.ToString();
+                CommonUtility.SendMailToAdmin(Subject, BodyText);
+            }
+
+
+            Logger.Info("method SendNotification for companyId : " + companyId + "ended");
+
+        }
+
         // based on the given json object get the company details
         public List<CompanyCredential> GetCompanyCredentials(string companyRecordType)
         {

@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.xmlbeans.impl.xb.xsdschema.RestrictionDocument.Restriction;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -27,7 +29,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -44,8 +45,6 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 @Component ( "userProfile")
 public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implements UserProfileDao
 {
-	@Autowired
-	CompanyDao companyDao;
 
     private static final Logger LOG = LoggerFactory.getLogger( UserProfileDaoImpl.class );
     private final String regionUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME ASC";
@@ -713,6 +712,167 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         List<UserProfile> userProfiles = criteria.list();
         LOG.debug( "Method to find userProfile for userId: " + userId + " finished." );        
         return userProfiles;
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<UserProfile> getImmediateAdminForAgent (long agentId, long companyId)
+    {
+    	LOG.debug("Method getImmediateAdminForAgent for agentId {}", agentId);
+    	try 
+    	{
+    		if(agentId != 0)
+    		{
+    			Criteria criteria = getSession().createCriteria( UserProfile.class );
+    			criteria.add(Restrictions.eq(CommonConstants.COMPANY_COLUMN + "." + CommonConstants.COMPANY_ID_COLUMN, companyId));
+    			criteria.add(Restrictions.eq(CommonConstants.AGENT_ID, agentId));
+    			criteria.add(Restrictions.eq(CommonConstants.PROFILE_MASTER_COLUMN + "." + CommonConstants.PROFILE_ID,CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
+    			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN,CommonConstants.STATUS_ACTIVE));
+    			criteria.add(Restrictions.eq(CommonConstants.IS_PRIMARY_COLUMN,CommonConstants.YES));
+    			List<UserProfile> userProfiles = criteria.list();
+    			if(userProfiles != null && !userProfiles.isEmpty())
+    			{
+    				List<UserProfile> admins;
+    				Iterator<UserProfile> iterator = userProfiles.iterator();
+    				while (iterator.hasNext())
+    				{
+    					UserProfile userProfile = (UserProfile)iterator.next();
+    					long branchId = userProfile.getBranchId();
+    					long regionId = userProfile.getRegionId();
+    					admins = getBranchAdminsForBranchId(branchId);
+    					if(admins != null && !admins.isEmpty())
+    					{
+    						return admins;
+    					}
+    					admins = getRegionAdminsForRegionId(regionId);
+    					if(admins != null && !admins.isEmpty())
+    					{
+    						return admins;
+    					}
+    				}
+    				admins = getCompanyAdminForCompanyId(companyId);
+    				if(admins != null && !admins.isEmpty())
+    				{
+    					return admins;
+    				}
+    			}
+    		}
+    	}catch(HibernateException hibernateException){
+    	LOG.error("Exception caught in getImmediateAdminForAgent() ", hibernateException);
+		throw new DatabaseException("Exception caught in getImmediateAdminForAgent() ", hibernateException);
+    	}
+    	return null;
+    }
+    
+    @Override
+    public List<UserProfile> getImmediateAdminForRegionOrBranch (long companyId, long regionId, long branchId)
+    {
+    	LOG.debug("Method getImmediateAdminForRegionOrBranch started");
+    	try 
+    	{
+    		List<UserProfile> admins;
+    		if(branchId != 0)
+    		{
+    			admins = getBranchAdminsForBranchId(branchId);
+				if(admins != null && !admins.isEmpty())
+				{
+					return admins;
+				}
+    		}
+    		if(regionId != 0)
+    		{
+    			admins = getRegionAdminsForRegionId(regionId);
+				if(admins != null && !admins.isEmpty())
+				{
+					return admins;
+				}
+    		}
+			admins = getCompanyAdminForCompanyId(companyId);
+			if(admins != null && !admins.isEmpty())
+			{
+				return admins;
+			}
+    	}catch(HibernateException hibernateException){
+    		LOG.error("Exception caught in getImmediateAdminForRegionOrBranch() ", hibernateException);
+    		throw new DatabaseException("Exception caught in getImmediateAdminForRegionOrBranch() ", hibernateException);
+    	}
+    	return null;
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<UserProfile> getBranchAdminsForBranchId(long branchId)
+    {
+    	LOG.debug("Method to getBranchAdminsForBranchId for branchId {} started", branchId);
+    	Criteria branchAdmin = getSession().createCriteria( UserProfile.class );
+    	try 
+    	{
+    		branchAdmin.add(Restrictions.eq(CommonConstants.BRANCH_ID_COLUMN,branchId));
+    		branchAdmin.add(Restrictions.eq(CommonConstants.PROFILE_MASTER_COLUMN + "." + CommonConstants.PROFILE_ID,CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
+    		branchAdmin.add(Restrictions.eq(CommonConstants.STATUS_COLUMN,CommonConstants.STATUS_ACTIVE));
+    	}catch(HibernateException hibernateException) {
+    		LOG.warn("Exception caught in getBranchAdminsForBranchId() ", hibernateException);
+    		throw new DatabaseException("Exception caught in getBranchAdminsForBranchId() ", hibernateException);
+    	}
+    	LOG.debug("Method to getBranchAdminsForBranchId for branchId {} finished", branchId);
+    	return branchAdmin.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<UserProfile> getRegionAdminsForRegionId(long regionId)
+    {
+    	LOG.debug("Method to getRegionAdminsForRegionId for regionId {} started", regionId);
+    	Criteria regionAdmin = getSession().createCriteria( UserProfile.class );
+    	try 
+    	{
+    		regionAdmin.add(Restrictions.eq(CommonConstants.REGION_ID_COLUMN, regionId));
+    		regionAdmin.add(Restrictions.eq(CommonConstants.PROFILE_MASTER_COLUMN + "." + CommonConstants.PROFILE_ID,CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
+    		regionAdmin.add(Restrictions.eq(CommonConstants.STATUS_COLUMN,CommonConstants.STATUS_ACTIVE));
+    	}catch(HibernateException hibernateException) {
+    		LOG.warn("Exception caught in getRegionAdminsForRegionId() ", hibernateException);
+    		throw new DatabaseException("Exception caught in getRegionAdminsForRegionId() ", hibernateException);
+    	}
+    	LOG.debug("Method to getRegionAdminsForRegionId for regionId {} finished", regionId);
+    	return regionAdmin.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<UserProfile> getSMAdminsForCompanyId(long companyId)
+    {
+    	LOG.debug("Method to getSMAdminsForCompanyId for companyId {} started", companyId);
+    	Criteria smAdmin = getSession().createCriteria( UserProfile.class );
+    	try 
+    	{
+    		smAdmin.add(Restrictions.eq(CommonConstants.COMPANY_COLUMN + "." + CommonConstants.COMPANY_ID_COLUMN, companyId));
+    		smAdmin.add(Restrictions.eq(CommonConstants.PROFILE_MASTER_COLUMN + "." + CommonConstants.PROFILE_ID,CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID));
+    		smAdmin.add(Restrictions.eq(CommonConstants.STATUS_COLUMN,CommonConstants.STATUS_ACTIVE));
+    	}catch(HibernateException hibernateException) {
+    		LOG.warn("Exception caught in getSMAdminsForCompanyId() ", hibernateException);
+    		throw new DatabaseException("Exception caught in getSMAdminsForCompanyId() ", hibernateException);
+    	}
+    	LOG.debug("Method to getSMAdminsForCompanyId for companyId {} finished", companyId);
+    	return smAdmin.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<UserProfile> getCompanyAdminForCompanyId(long companyId)
+    {
+    	LOG.debug("Method to getCompanyAdminsForCompanyId for companyId {} started", companyId);
+    	Criteria companyAdmin = getSession().createCriteria( UserProfile.class );
+    	try 
+    	{
+    		companyAdmin.add(Restrictions.eq(CommonConstants.COMPANY_COLUMN + "." + CommonConstants.COMPANY_ID_COLUMN, companyId));
+    		companyAdmin.add(Restrictions.eq(CommonConstants.PROFILE_MASTER_COLUMN + "." + CommonConstants.PROFILE_ID,CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID));
+    		companyAdmin.add(Restrictions.eq(CommonConstants.STATUS_COLUMN,CommonConstants.STATUS_ACTIVE));
+    	}catch(HibernateException hibernateException) {
+    		LOG.warn("Exception caught in getCompanyAdminsForCompanyId() ", hibernateException);
+    		throw new DatabaseException("Exception caught in getCompanyAdminsForCompanyId() ", hibernateException);
+    	}
+    	LOG.debug("Method to getCompanyAdminsForCompanyId for companyId {} finished", companyId);
+    	return companyAdmin.list();
     }
     
     //create map of maps, one map is for region and the other for branch

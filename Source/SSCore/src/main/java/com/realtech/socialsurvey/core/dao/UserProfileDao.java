@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.dao;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -97,6 +96,24 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
 
     public List<UserProfile> getUserProfiles( long userId );
+    
+    
+    public List<UserProfile> getImmediateAdminForAgent (long agentId, long companyId);
+    
+    
+    public List<UserProfile> getImmediateAdminForRegionOrBranch (long companyId, long regionId, long branchId);
+    
+    
+    public List<UserProfile> getBranchAdminsForBranchId(long branchId);
+    
+
+    public List<UserProfile> getRegionAdminsForRegionId(long regionId);
+    
+    
+    public List<UserProfile> getSMAdminsForCompanyId(long companyId);
+    
+    
+    public List<UserProfile> getCompanyAdminForCompanyId(long companyId);
 
 
     /**

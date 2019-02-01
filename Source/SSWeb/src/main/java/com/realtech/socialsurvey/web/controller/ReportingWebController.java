@@ -15,6 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.enums.NotificationType;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +32,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.GenericReportingObject;
-import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.RankingRequirements;
-import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -393,8 +389,23 @@ public class ReportingWebController
         
         model.addAttribute( "profileSettings", profileSettings );
         model.addAttribute( "lastSuccessfulRun", lastSuccessfulRun );
+
         model.addAttribute( CommonConstants.HAS_BRANCH, hasBranch );
         model.addAttribute( CommonConstants.HAS_REGION, hasRegion );
+
+        Notification notification = companySettings.getNotification();
+        String notificationMessage = null ;
+        if(notification != null && notification.getMessage()!= null){
+            if(notification.getNotificationType() == NotificationType.ERROR )
+                 notificationMessage = new Utils().convertDateToTimeZone( notification.getRecievedOn(),
+                     CommonConstants.TIMEZONE_EST )+" "+notification.getMessage();
+            else if(notification.getNotificationType().equals( NotificationType.SUCCESS )){
+                notificationMessage = notification.getMessage();
+            }
+            model.addAttribute( "encompassStatus",notification.getNotificationType() );
+            model.addAttribute( "encompassNotification", notificationMessage );
+            model.addAttribute( "isEncompassDisabled", notification.isDisabled() );
+        }
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
         model.addAttribute( "vertical", profileSettings.getVertical().toLowerCase() );
         return JspResolver.REPORTING_DASHBOARD;
@@ -1256,6 +1267,7 @@ public class ReportingWebController
         String currentYearStr = request.getParameter( "currentYear" );
         String currentMonthStr = request.getParameter( "currentMonth" );
         Response response = null;
+        User user = sessionHelper.getCurrentUser();
 
         if ( ( entityType == null || entityType.isEmpty() ) ) {
             LOG.warn( "Invalid value (null/empty) passed for entityType." );
@@ -1278,7 +1290,7 @@ public class ReportingWebController
         }
 
         response = ssApiIntergrationBuilder.getIntegrationApi().getScoreStatsQuestion( entityId, entityType, currentMonth,
-            currentYear );
+            currentYear, user.getUserId() );
 
         LOG.info( "Method to get score stats for questions finished." );
         String responseString = null;

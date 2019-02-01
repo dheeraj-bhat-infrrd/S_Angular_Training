@@ -5930,6 +5930,7 @@ function testLoneConnectionCallBack(response) {
 
 var isEncompassValid;
 function validateEncompassInput(elementId) {
+    console.log("IN validate encompass")
 	isEncompassValid = true;
 	var isFocussed = false;
 
@@ -5954,7 +5955,14 @@ function validateEncompassInput(elementId) {
 			isFocussed = true;
 		}
 	}
-
+    if (!validateAlertEmail('alert-email')) {
+            console.log("IN validate alertmail")
+    		isEncompassValid = false;
+    		if (!isFocussed) {
+    			$('#alert-email').focus();
+    			isFocussed = true;
+    		}
+    }
 	return isEncompassValid;
 }
 
@@ -6069,6 +6077,9 @@ $('body').on('blur', '#encompass-password', function() {
 });
 $('body').on('blur', '#encompass-url', function() {
 	validateURL(this.id);
+});
+$('body').on('blur', '#alert-email', function() {
+	validateAlertEmail(this.id);
 });
 // Lone Wolf input
 
@@ -8392,10 +8403,8 @@ function showMasterQuestionPage() {
 		
 		if( isAbusive == false ){
 			if (mood != 'Great') {
-				$('#social-post-links').find('*').not('#google-business-btn, #google-btn').remove();
+				$('#social-post-links').find('*').remove();
 				$('#social-post-links').addClass('review-abusive-share-parent');
-				$('#social-post-links').find('#google-business-btn').addClass('review-abusive-share-btn');
-				$('#social-post-links').find('#google-btn').addClass('review-abusive-share-btn');
 			}
 			$('#social-post-links').show();
 
@@ -20711,7 +20720,7 @@ $(document).on('click','#register-summit-btn',function(e){
 	e.preventDefault();
 	
 	closeSummitPopup( false );
-	window.open('https://facebook.com/SocialSurveybusiness/videos/710505045999294/', '_blank');
+	window.open('https://youtu.be/yDs1A7Yan8I', '_blank');
 	
 });
 
@@ -20724,7 +20733,7 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
-	window.open('http://www.socialsurvey.com/top-performers-2018', '_blank');
+	window.open('https://youtu.be/yDs1A7Yan8I', '_blank');
 });
 
 $(document).on('click','#summit-ribbon-close-btn',function(e){
@@ -20738,7 +20747,7 @@ $(document).on('click','#summit-popup-body',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
-	window.open('http://www.socialsurvey.com/top-performers-2018', '_blank');
+	window.open('https://youtu.be/yDs1A7Yan8I', '_blank');
 });
 
 function sendClickedEventInfo( event ){
@@ -22215,3 +22224,78 @@ function summitTimer() {
 	return { d: d, h: h, m: m};
 }
 
+$(document).on('click','#close-enc-banner',function(e){
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	disableEncompassBanner();
+	
+});
+
+function disableEncompassBanner(){
+	
+	var message = "";
+	var url = "./disableencompassnotification.do"
+		
+	$.ajax({
+		async : false,
+		url : url,
+		type : "PUT",
+		cache : false,
+		dataType : "text",
+		success : function(data) {
+			if(data == true || data == 'true'){
+				message = "Successfully disabled Encompass Notification.";
+				$('#dsh-enc-banner').hide();
+			}else if(data == false || data == 'false'){
+				message = "Unable to disable the Encompass notification."; 
+			}
+			
+			$('#overlay-toast').html(message);
+			showToast();
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html("Unable to disable the Encompass notification.");
+			showToast();
+		}
+	});
+}
+
+$('body').on('blur', '#enc-alert-mail-recipients', function() {
+	
+	// format email IDs
+	var emails = $("#enc-alert-mail-recipients").val();
+	
+	if( emails == undefined || emails == "" || emails.length == 0){
+		$('#overlay-toast').html("Encompass alert reciepients cannot be blank");
+		showToast();
+		$("#enc-alert-mail-recipients").val($('#encompass-alert-mails').val());
+		return;
+	}
+	
+	var payload = {
+		"alertMails" : emails
+	};
+	
+	callAjaxPostWithPayloadData("./updateencompassalertmail.do", function(data) {
+		
+		var emailList = data;
+		var status;
+		
+		if(emailList == "INPUT_ERROR"){
+			status = "Invalid email address inserted. Encompass alert recipients updation Failed!";
+			$("#enc-alert-mail-recipients").val($('#encompass-alert-mails').val());
+		}else {
+			status = "Encompass alert recipients updated successfully!";
+		}
+		
+		$('#overlay-toast').html(status);
+		showToast();
+	}, payload, true);
+	
+});

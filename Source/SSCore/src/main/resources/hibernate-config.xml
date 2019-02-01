@@ -65,6 +65,7 @@
 				<value>com.realtech.socialsurvey.core.entities.RemovedUser</value>
 				<value>com.realtech.socialsurvey.core.entities.VerticalCrmMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.VerticalsMaster</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyPreInitiationTemp</value>
 				<value>com.realtech.socialsurvey.core.entities.CrmMaster</value>
 				<value>com.realtech.socialsurvey.core.entities.FeedStatus</value>
 				<value>com.realtech.socialsurvey.core.entities.UsercountModificationNotification</value>
