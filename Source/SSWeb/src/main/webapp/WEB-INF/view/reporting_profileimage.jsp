@@ -37,11 +37,11 @@
 
 <input type="text" id="default-prof-image" class="hidden" value="${defaultprofimageclass}">
 <input type="file" id="rep-prof-image" class="hidden">
-
+<div class="hide" id="ss-prof-img-fix-trigger">
 
 <c:choose>
 	<c:when test="${not empty profileimage}">
-		<img id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer rep-prof-pic" src="${profileimage}"></img>
+		<img id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer rep-prof-pic" src="${profileimage}" onload="checkProfImage(this);"></img>
 	</c:when>
 	<c:otherwise>
 		<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer rep-prof-pic"></div>
@@ -53,6 +53,7 @@
     <img class="rep-prof-pic-del-icon" src="${initParam.resourcesPath}/resources/images/delete.png">
 </div>
 
+<script src="${initParam.resourcesPath}/resources/js/modernizr-custom.js"></script>
 <script>
 $(document).ready(function(){
 	$(document).off('click','.rep-prof-pic-edit-icon');
@@ -80,5 +81,9 @@ $(document).ready(function(){
 			showToast();
 		}, true);
 	})
-})
+});
+
+function checkProfImage(ele){
+	checkImgForProfile(ele);
+}
 </script>
