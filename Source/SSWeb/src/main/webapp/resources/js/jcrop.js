@@ -16,6 +16,112 @@ $(document).on('change', '#rep-prof-image', function() {
 	initiateJcrop(this, true);
 });
 
+function initiatePopupForImgFix(){
+	profImg = $('#prof-image-edit').attr('src');
+	createPopupCanvasForImgFix();
+	initiateJcropForImgFix(profImg,true);
+}
+
+function createPopupCanvasForImgFix() {
+	var canvas = '<img src="" id="target" class="hide jcrop-img-upload" style="position:absoulte;"/>'
+			+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
+	$('.ss-prof-img-popup-cropper').html(canvas).css('position', 'relative');
+}
+
+function initiateJcropForImgFix(profImg,forNewDashboard) {
+
+		var reader = new FileReader();
+		var myImage = new Image();
+		myImage.src = profImg;
+		
+		$('#target').attr('src', profImg);
+		$('#target').removeClass('hide');
+			
+		$('#target').load(function() {
+			$('#target').attr('data-original-width',myImage.width);
+			$('#target').attr('data-original-height',myImage.height);
+			
+			if (myImage.width > myImage.height && myImage.width > imageMaxWidth) {
+				// landscape image
+				$('#target').width(imageMaxWidth);
+			}
+			else if (myImage.width <= myImage.height && myImage.height > imageMaxHeight) {
+				// portrait image
+				$('#target').height(imageMaxHeight);
+			}
+			/*else {
+				$('#target').width(imageMaxWidth);
+				$('#target').height(imageMaxHeight);
+		}*/
+		
+			
+			ratio = $('#target').width() / myImage.width;
+
+			$('#target').Jcrop({
+				aspectRatio : 1,
+				setSelect : [ 50, 50, 300, 300 ],
+				onSelect : updatePreview,
+				onChange : updatePreview,
+				trackDocument : true
+			});
+		});
+			
+		$('.ss-prof-img-popup-confirm').click(function() {
+			var canvas = $('#target')[0];
+			var dataurl = canvas.src;
+			if (isNaN(selected_x)) {
+				selected_x = 50;
+			}
+			if (isNaN(selected_y)) {
+				selected_y = 50;
+			}
+			if (isNaN(selected_w)) {
+				selected_w = 100;
+			}
+			if (isNaN(selected_h)) {
+				selected_h = 100;
+			}
+			
+			
+			var originalWidth = $('#target').attr('data-original-width');
+			var boxWidth = $('#target').width();
+			
+			var boxToOriginalRatio = originalWidth / boxWidth;
+			
+			var formData = new FormData();
+			formData.append("selected_x", Math.round(selected_x * boxToOriginalRatio));
+			formData.append("selected_y", Math.round(selected_y * boxToOriginalRatio));
+			formData.append("selected_w", Math.round(selected_w * boxToOriginalRatio));
+			formData.append("selected_h", Math.round(selected_h * boxToOriginalRatio));
+			formData.append("width", Math.round($('#target').width() * boxToOriginalRatio));
+			formData.append("height", Math.round($('#target').height() * boxToOriginalRatio));
+			formData.append("imageFileName", forNewDashboard == true ? $('#rep-prof-container').attr('data-prof-name') :"");
+			formData.append("imageBase64", dataurl);
+			formData.append("forNewDashboard",forNewDashboard == true ? true : false );
+			formData.append("forProfileImageFix",true );
+			
+			$.ajax({
+				url : "updateprofileimage.do",
+				type : "POST",
+				contentType : false,
+				processData : false,
+				cache : false,
+				data : formData,
+				success : callBackOnProfileImageUpload,
+				complete : function() {
+					if( forNewDashboard == true ){
+						$('#rep-prof-image').val('');
+					} else {
+						$('#prof-image').val('');
+					}
+				},
+				error : function(e) {
+					
+				}
+			});
+		});
+}
+
 function createPopupCanvas() {
 	var canvas = '<img src="" id="target" class="hide jcrop-img-upload" style="position:absoulte;"/>'
 			+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
@@ -103,6 +209,7 @@ function initiateJcrop(input, forNewDashboard) {
 			formData.append("imageFileName", forNewDashboard == true ? $('#rep-prof-image').prop("files")[0].name : $('#prof-image').prop("files")[0].name);
 			formData.append("imageBase64", dataurl);
 			formData.append("forNewDashboard",forNewDashboard == true ? true : false );
+			formData.append("forProfileImageFix",false );
 			
 			overlayRevert();
 			$.ajax({
