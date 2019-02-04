@@ -386,6 +386,17 @@ var socialSurveyJavascriptWidget = {
 			socialSurveyJavascriptWidget.displayPreview();
 
 		});
+		
+		$('#enable-mob-view-chk-box').on('click', function() {
+			if ($('#enable-mob-view-chk-box').hasClass("bd-check-img-checked")) {
+				$('#enable-mob-view-chk-box').removeClass("bd-check-img-checked")
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.enableMobView = "true";
+			} else {
+				$('#enable-mob-view-chk-box').addClass("bd-check-img-checked")
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.enableMobView = "false";
+			}
+			socialSurveyJavascriptWidget.displayPreview();
+		});
 
 		$('#hide-bg-initly-chk-box').on('click', function() {
 			if ($('#hide-bg-initly-chk-box').hasClass("bd-check-img-checked")) {
@@ -716,6 +727,12 @@ var socialSurveyJavascriptWidget = {
 			$('#dsc-tg-txt').val(socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.seoDescription);
 		}
 
+		if ("false" == socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.enableMobView) {
+			$('#enable-mob-view-chk-box').addClass("bd-check-img-checked");
+		} else {
+			$('#enable-mob-view-chk-box').removeClass("bd-check-img-checked");
+		}
+		
 		if ("false" == socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.hideBarGraph) {
 			$('#hide-bg-initly-chk-box').addClass("bd-check-img-checked");
 		} else {
