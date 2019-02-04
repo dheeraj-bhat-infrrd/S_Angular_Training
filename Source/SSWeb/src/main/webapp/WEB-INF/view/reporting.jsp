@@ -62,7 +62,7 @@
 <input type="hidden"  id="reporting-data-div" data-profile-master-id="${profilemasterid}" data-user-id="${userId}" data-column-name="${columnName}" data-column-value="${columnValue}">
 <div id="rep-prof-container" data-profile-master-id="${profilemasterid}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
-			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
+			data-column-value="${columnValue}" data-prof-name="${profileSettings.profileName}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
 			<div id="top-dash" class="hide" ></div>
 </div>
 <div>
@@ -220,6 +220,24 @@
 		</div>
 	</div>
 </div> --%>
+
+<div class="ss-prof-img-fix-popup">
+	<div class="ss-prof-img-fix-popup-body">
+		<div clas="ss-prof-img-popup-close-cont">
+			<div class="ss-prof-img-fix-popup-close-btn cursor-pointer">x</div>
+		</div>
+		<div class="ss-prof-img-popup-note">
+			The profile image uploaded on your profile is of the wrong size. This may affect few of the design in the website. Please crop the image to avoid this issue
+		</div>
+		<div class="ss-prof-img-popup-cropper">
+		
+		</div>
+		<div class="ss-prof-img-popup-btn-cont">
+			<div class="ss-prof-img-popup-confirm ss-prof-img-popup-btn">Confirm</div>
+			<div class="ss-prof-img-popup-cancel ss-prof-img-popup-btn">Cancel</div>
+		</div>
+	</div>
+</div>
 
 <c:if test='${vertical == "mortgage"}'>
 <div id="summit-ribbon-outer" class="summit-ribbon-outer">

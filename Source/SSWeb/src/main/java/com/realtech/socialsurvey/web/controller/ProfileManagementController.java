@@ -1984,6 +1984,8 @@ public class ProfileManagementController
 
                 String imageBase64 = request.getParameter( "imageBase64" );
                 String imageFileName = request.getParameter( "imageFileName" );
+                String forProfileImageFix = request.getParameter( "forProfileImageFix" );
+                
                 if ( imageBase64 == null || imageBase64.isEmpty() ) {
                     throw new InvalidInputException( "image passed is null or empty" );
                 }

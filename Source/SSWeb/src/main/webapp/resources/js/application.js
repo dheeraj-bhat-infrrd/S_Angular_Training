@@ -22299,3 +22299,22 @@ $('body').on('blur', '#enc-alert-mail-recipients', function() {
 	}, payload, true);
 	
 });
+
+function checkImgForProfile(ele){
+	var realWidth = 0;
+	var realHeight = 0;
+	var profiImg = document.querySelector('#prof-image-edit');
+	
+	if (Modernizr.canvas) {
+		realWidth = profiImg.naturalWidth;
+		realHeight = profiImg.naturalHeight;
+		
+		console.log("html5");
+	} else {
+		realWidth = $(ele).width;
+		realHeight = $(ele).height;
+		
+	}
+	
+	initiatePopupForImgFix();
+}
