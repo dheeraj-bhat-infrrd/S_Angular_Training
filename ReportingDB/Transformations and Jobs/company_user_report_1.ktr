@@ -1882,7 +1882,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var fb_connection_established_date &#x3d; FACEBOOK_ACCESS_TOKEN_CREATED_ON&#x3b;&#xd;&#xa;var fb_connection_status&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_fb &#x3d; FACEBOOK_POST_DATE&#x3b;&#xa;var fb_page_url &#x3d; FACEBOOK_PAGE_LINK&#x3b;&#xd;&#xa;if&#x28;FACEBOOK_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	&#xd;&#xa;	if&#x28;TOKEN_EXPIRY_ALERT_SENT &#x21;&#x3d; null &#x26;&#x26; TOKEN_EXPIRY_ALERT_SENT &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;		fb_connection_status&#x3d;&#x22;disconnected&#x22;&#x3b;&#xd;&#xa;	&#x7d;else&#x7b;&#xd;&#xa;		fb_connection_status&#x3d;&#x22;connected&#x22;&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var fb_connection_established_date &#x3d; CREATED_ON_EST&#x3b;&#xd;&#xa;var fb_connection_status&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_fb &#x3d; FACEBOOK_POST_DATE&#x3b;&#xa;var fb_page_url &#x3d; FACEBOOK_PAGE_LINK&#x3b;&#xd;&#xa;if&#x28;FACEBOOK_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	&#xd;&#xa;	if&#x28;TOKEN_EXPIRY_ALERT_SENT &#x21;&#x3d; null &#x26;&#x26; TOKEN_EXPIRY_ALERT_SENT &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;		fb_connection_status&#x3d;&#x22;disconnected&#x22;&#x3b;&#xd;&#xa;	&#x7d;else&#x7b;&#xd;&#xa;		fb_connection_status&#x3d;&#x22;connected&#x22;&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>fb_connection_established_date</name>
         <rename>fb_connection_established_date</rename>
         <type>String</type>
@@ -1930,7 +1930,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var linkedin_connection_established_date &#x3d; LINKED_IN_ACCESS_TOKEN_CREATED_ON&#x3b;&#xd;&#xa;var linkedin_connection_status&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_linkedin &#x3d; LINKEDIN_POST_DATE&#x3b;&#xa;var linkedin_profile_url &#x3d; LINKED_IN_PAGE_LINK&#x3b;&#xd;&#xa;if&#x28;LINKED_IN_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	if&#x28;TOKEN_EXPIRY_ALERT_SENT &#x21;&#x3d; null &#x26;&#x26; TOKEN_EXPIRY_ALERT_SENT &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;		linkedin_connection_status&#x3d;&#x22;disconnected&#x22;&#x3b;&#xd;&#xa;	&#x7d;else&#x7b;&#xd;&#xa;		linkedin_connection_status&#x3d;&#x22;connected&#x22;&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var linkedin_connection_established_date &#x3d; CREATED_ON_EST&#x3b;&#xd;&#xa;var linkedin_connection_status&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_linkedin &#x3d; LINKEDIN_POST_DATE&#x3b;&#xa;var linkedin_profile_url &#x3d; LINKED_IN_PAGE_LINK&#x3b;&#xd;&#xa;if&#x28;LINKED_IN_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;	if&#x28;TOKEN_EXPIRY_ALERT_SENT &#x21;&#x3d; null &#x26;&#x26; TOKEN_EXPIRY_ALERT_SENT &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;		linkedin_connection_status&#x3d;&#x22;disconnected&#x22;&#x3b;&#xd;&#xa;	&#x7d;else&#x7b;&#xd;&#xa;		linkedin_connection_status&#x3d;&#x22;connected&#x22;&#x3b;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>linkedin_connection_established_date</name>
         <rename>linkedin_connection_established_date</rename>
         <type>String</type>
@@ -1978,7 +1978,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var twitter_connection_established_date &#x3d; TWITTER_ACCESS_TOKEN_CREATED_ON&#xd;&#xa;var twitter_connection_status &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_twitter &#x3d; TWITTER_POST_DATE&#x3b;&#xa;var twitter_profile_url &#x3d; TWITTER_PAGE_LINK&#x3b;&#xd;&#xa;if&#x28;TWITTER_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;    twitter_connection_status &#x3d; &#x22;connected&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var twitter_connection_established_date &#x3d; CREATED_ON_EST&#x3b;&#xd;&#xa;var twitter_connection_status &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var last_post_date_twitter &#x3d; TWITTER_POST_DATE&#x3b;&#xa;var twitter_profile_url &#x3d; TWITTER_PAGE_LINK&#x3b;&#xd;&#xa;if&#x28;TWITTER_PAGE_LINK &#x21;&#x3d; null&#x29; &#x7b;&#xd;&#xa;    twitter_connection_status &#x3d; &#x22;connected&#x22;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>twitter_connection_established_date</name>
         <rename>twitter_connection_established_date</rename>
         <type>String</type>
