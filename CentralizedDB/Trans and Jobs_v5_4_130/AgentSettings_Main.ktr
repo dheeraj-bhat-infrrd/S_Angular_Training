@@ -829,7 +829,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>Insert &#x2f; Update FB Token</send_true_to>
 <send_false_to>Alter isDeleted FB</send_false_to>
     <compare>
 <condition>
