@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1992,21 +1993,29 @@ public class ProfileManagementController
                 if ( imageFileName == null || imageFileName.isEmpty() ) {
                     throw new InvalidInputException( "image passed is null or empty" );
                 }
-
+                
                 // reading image
                 File dir = new File( CommonConstants.IMAGE_DIR );
                 if ( !dir.exists() ) {
                     dir.mkdirs();
                 }
                 String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR + CommonConstants.IMAGE_NAME;
+                
+                BufferedImage bufferedImage = null;
+                if ( forProfileImageFix == "false" ) {
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    byte[] decodedBytes = decoder.decodeBuffer( imageBase64.split( "," )[1] );
+                    ByteArrayInputStream bis = new ByteArrayInputStream( decodedBytes );
 
-                BASE64Decoder decoder = new BASE64Decoder();
-                byte[] decodedBytes = decoder.decodeBuffer( imageBase64.split( "," )[1] );
-                ByteArrayInputStream bis = new ByteArrayInputStream( decodedBytes );
+                    // resizing image
+                    LOG.debug( "Dimensions for resizing: resizeWidth: " + resizeWidth + " resizeHeight: " + resizeHeight );
+                    bufferedImage = ImageIO.read( bis );
 
-                // resizing image
-                LOG.debug( "Dimensions for resizing: resizeWidth: " + resizeWidth + " resizeHeight: " + resizeHeight );
-                BufferedImage bufferedImage = ImageIO.read( bis );
+                } else {
+                    URL url = new URL( imageBase64 );
+                    LOG.debug( "Dimensions for resizing: resizeWidth: " + resizeWidth + " resizeHeight: " + resizeHeight );
+                    bufferedImage = ImageIO.read( url );
+                }
                 FileOutputStream fileOuputStream = new FileOutputStream( filePath );
                 ImageIO.write( bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream );
                 fileOuputStream.close();
