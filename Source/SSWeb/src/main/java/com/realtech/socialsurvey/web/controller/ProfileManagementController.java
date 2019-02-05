@@ -1993,7 +1993,6 @@ public class ProfileManagementController
                 if ( imageFileName == null || imageFileName.isEmpty() ) {
                     throw new InvalidInputException( "image passed is null or empty" );
                 }
-                
                 // reading image
                 File dir = new File( CommonConstants.IMAGE_DIR );
                 if ( !dir.exists() ) {
