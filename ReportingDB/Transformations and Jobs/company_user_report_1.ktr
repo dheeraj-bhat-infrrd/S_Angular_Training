@@ -649,7 +649,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>select T1.FACEBOOK_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29; AS FACEBOOK_POST_DATE, T1.CREATED_ON_EST&#xd;&#xa;FROM facebook_token T1 , facebook_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>select T1.FACEBOOK_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29; AS FACEBOOK_POST_DATE, T1.CREATED_ON_EST&#xd;&#xa;FROM facebook_token T1 , facebook_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f; AND T1.IS_DELETED &#x3d; 0&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -683,7 +683,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>&#xd;&#xa;Select T1.LINKED_IN_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29;  AS LINKEDIN_POST_DATE, T1.CREATED_ON_EST&#xd;&#xa;FROM linked_in_token T1 ,linkedin_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>&#xd;&#xa;Select T1.LINKED_IN_PAGE_LINK,T1.TOKEN_EXPIRY_ALERT_SENT,MAX&#x28;T2.POST_DATE&#x29;  AS LINKEDIN_POST_DATE, T1.CREATED_ON_EST&#xd;&#xa;FROM linked_in_token T1 ,linkedin_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f; AND T1.IS_DELETED &#x3d; 0&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
@@ -717,7 +717,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>Select T1.TWITTER_PAGE_LINK,MAX&#x28;T2.POST_DATE&#x29; AS TWITTER_POST_DATE, T1.CREATED_ON_EST&#xd;&#xa;FROM twitter_token T1 ,twitter_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f;&#x3b;</sql>
+    <sql>Select T1.TWITTER_PAGE_LINK,MAX&#x28;T2.POST_DATE&#x29; AS TWITTER_POST_DATE, T1.CREATED_ON_EST&#xd;&#xa;FROM twitter_token T1 ,twitter_post_response_list T2&#xd;&#xa;WHERE T1.type &#x3d; 4 AND T1.id &#x3d; &#x3f; AND T2.type &#x3d; 4 AND T2.id &#x3d; &#x3f; AND T1.IS_DELETED &#x3d; 0&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
