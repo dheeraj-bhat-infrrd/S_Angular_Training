@@ -7,6 +7,7 @@ import com.realtech.socialsurvey.core.commons.MacrosComparator;
 import com.realtech.socialsurvey.core.dao.*;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
 import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.entities.integration.Agent;
 import com.realtech.socialsurvey.core.enums.*;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
@@ -115,9 +116,11 @@ public class SocialFeedServiceImpl implements SocialFeedService
             socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(), socialFeedFilter.isCompanySet(),
             socialFeedFilter.isFromTrustedSource(), socialFeedFilter.isSocMonOnLoad() );
         if ( socialResponseObjects != null && !socialResponseObjects.isEmpty() ) {
+        	//fetch all profile url map
+        	Map<String, String> profileUrls = getAllProfileUrls(socialResponseObjects);
             for ( SocialResponseObject socialResponseObject : socialResponseObjects ) {
                 SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
-                if ( socialResponseObject.getProfileType().equals( ProfileType.COMPANY ) ) {
+                /*if ( socialResponseObject.getProfileType().equals( ProfileType.COMPANY ) ) {
                     organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getCompanyId(),
                         CommonConstants.COMPANY_SETTINGS_COLLECTION );
                 } else if ( socialResponseObject.getProfileType().equals( ProfileType.REGION ) ) {
@@ -129,14 +132,14 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 } else {
                     organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getAgentId(),
                         CommonConstants.AGENT_SETTINGS_COLLECTION );
-                }
+                }*/
                 socialMonitorFeedData.setType( socialResponseObject.getType() );
                 socialMonitorFeedData.setStatus( socialResponseObject.getStatus() );
                 socialMonitorFeedData.setText( socialResponseObject.getText() );
                 socialMonitorFeedData.setMediaEntities( socialResponseObject.getMediaEntities() );
                 socialMonitorFeedData.setOwnerName( socialResponseObject.getOwnerName() );
-                if ( organizationUnitSettings != null ) {
-                    socialMonitorFeedData.setOwnerProfileImage( organizationUnitSettings.getProfileImageUrl() );
+                if ( profileUrls != null ) {
+                    socialMonitorFeedData.setOwnerProfileImage( profileUrls.get(createKeyForObj(socialResponseObject)) );
                 }
                 socialMonitorFeedData.setCompanyId( socialResponseObject.getCompanyId() );
                 socialMonitorFeedData.setRegionId( socialResponseObject.getRegionId() );
@@ -182,7 +185,81 @@ public class SocialFeedServiceImpl implements SocialFeedService
         return socialMonitorResponseData;
     }
 	
+    //this method is used to avoid the call made for each object in List<SocialResponseObject> to fetch the response
+    //and reduced to 4 calls 
+    private Map<String, String> getAllProfileUrls(List<SocialResponseObject> socialResponseObjects){
+    	LOG.debug( "Fetching profile url's" );
+    	Map<String, String> profileUrlMap = new HashMap<>();
+    	Set<Long> companyIds = new HashSet<>();
+    	Set<Long> regionIds = new HashSet<>();
+    	Set<Long> branchIds = new HashSet<>();
+    	Set<Long> agentIds = new HashSet<>();
+    	 List<OrganizationUnitSettings> organizationUnitSettings;
+    	for(SocialResponseObject socialResponseObject : socialResponseObjects) {
+    		if ( socialResponseObject.getProfileType().equals( ProfileType.COMPANY ) ) {
+                companyIds.add(socialResponseObject.getCompanyId());
+            } else if ( socialResponseObject.getProfileType().equals( ProfileType.REGION ) ) {
+               regionIds.add(socialResponseObject.getRegionId());
+            } else if ( socialResponseObject.getProfileType().equals( ProfileType.BRANCH ) ) {
+               branchIds.add(socialResponseObject.getBranchId());
+            } else {
+               agentIds.add(socialResponseObject.getAgentId());
+            }
+    	}
+    	
+    	if(!companyIds.isEmpty()) {
+    		organizationUnitSettings = mongoSocialFeedDao.getAllProfileImageUrl(companyIds,  CommonConstants.COMPANY_SETTINGS_COLLECTION );
+    		profileUrlMap.putAll(createMap(organizationUnitSettings,ProfileType.COMPANY));
+    	}
+    	if(!regionIds.isEmpty()) {
+    		organizationUnitSettings = mongoSocialFeedDao.getAllProfileImageUrl(regionIds, CommonConstants.REGION_SETTINGS_COLLECTION);
+    		profileUrlMap.putAll(createMap(organizationUnitSettings, ProfileType.REGION));
+    	}
+    	if(!branchIds.isEmpty()) {
+    		organizationUnitSettings = mongoSocialFeedDao.getAllProfileImageUrl(branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION);
+    		profileUrlMap.putAll(createMap(organizationUnitSettings, ProfileType.BRANCH));
+    	}
+    	if(!agentIds.isEmpty()) {
+    		organizationUnitSettings = mongoSocialFeedDao.getAllProfileImageUrl(agentIds, CommonConstants.AGENT_SETTINGS_COLLECTION);
+    		profileUrlMap.putAll(createMap(organizationUnitSettings, ProfileType.AGENT));
+    	}
+    	LOG.debug( "Finished fetching profile url's" );
+    	return profileUrlMap;
+    	
+    }
 
+    private Map<String, String> createMap(List<OrganizationUnitSettings> organizationUnitSettings, ProfileType appendString){
+    	Map<String, String> profileUrlMap = new HashMap<>();
+    	if(organizationUnitSettings != null && !organizationUnitSettings.isEmpty()) {
+    		for(OrganizationUnitSettings unitSetting : organizationUnitSettings) {
+    			profileUrlMap.put(createKey(appendString, unitSetting.getIden()), unitSetting.getProfileImageUrl());
+    			LOG.debug("Created map for ProfileType:{} , iden:{} for profileImageUrl : {}",appendString, unitSetting.getIden(), unitSetting.getProfileImageUrl());
+    		}
+    	}
+    	return profileUrlMap;
+    }
+    
+    private String createKey(ProfileType appendString, long iden) {
+    	StringBuilder key = new StringBuilder().append(appendString).append("_").append(iden);
+    	return key.toString();
+    }
+    
+    private String createKeyForObj(SocialResponseObject socialResponseObject) {
+    	switch (socialResponseObject.getProfileType()) {
+		case COMPANY:
+			return createKey(socialResponseObject.getProfileType(), socialResponseObject.getCompanyId());
+		case REGION:
+			return createKey(socialResponseObject.getProfileType(), socialResponseObject.getRegionId());
+		case BRANCH:
+			return createKey(socialResponseObject.getProfileType(), socialResponseObject.getBranchId());
+		case AGENT:
+			return createKey(socialResponseObject.getProfileType(), socialResponseObject.getAgentId());
+
+		default:
+			return null;
+		}
+    }
+    
     @Override
     public SocialFeedActionResponse updateActionForFeeds( SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId,
         boolean duplicateFlag ) throws InvalidInputException

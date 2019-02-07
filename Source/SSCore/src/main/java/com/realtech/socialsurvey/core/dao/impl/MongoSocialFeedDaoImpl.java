@@ -647,5 +647,15 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     }
 
 
+    @Override
+    public List<OrganizationUnitSettings> getAllProfileImageUrl( Set<Long> entityIds, String collectionName )
+    {
+        LOG.debug("Fetching profile image for id {} with profileType {}", entityIds, collectionName);
+        Query query = new  Query();
+        query.addCriteria(Criteria.where(IDEN).in(entityIds));
+        query.fields().exclude( KEY_IDENTIFIER ).include(PROFILE_IMAGE_URL).include(IDEN);
+        return mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
+
+    }
 
 }
