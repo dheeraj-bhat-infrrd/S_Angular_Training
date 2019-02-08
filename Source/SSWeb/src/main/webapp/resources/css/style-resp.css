@@ -91,6 +91,10 @@
 		.summit-check-text{
 			font-size: 11px;
 		}
+		
+		.summit-popup-close-btn {
+		    margin-right: 6px;
+		}
 	}
 	
 	@media (max-width: 640px){
