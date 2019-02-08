@@ -30,11 +30,11 @@
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 60px;
+			margin-top: 40px;
 		}
 		
 		.summit-popup-close-btn{
-			margin-right: 25px;
+			margin-right: 16px;
 		}
 	}
 	
@@ -64,6 +64,7 @@
 	@media (max-width: 870px){
 		.summit-checkbox-cont{
 			margin-bottom:15px;
+			margin-left: 40px;
 		}
 		
 		.summit-popup-close-cont{
@@ -71,7 +72,7 @@
 		}
 		
 		.summit-popup-close-btn{
-			margin-right: 20px;
+			margin-right: 30px;
 		}
 	}
 	
@@ -105,7 +106,7 @@
 	
 	@media (max-width: 580px){
 		.summit-popup-body{
-			background-image: url(../images/TP_We_Ready_Mobile_Banner_v6.gif);
+			background-image: url(../images/WOWworthy_EmmaM_Mobile_Banner.png);
 		}
 		
 		.summit-ribbon-outer{
@@ -117,11 +118,11 @@
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 22px;
+			margin-top: 13px;
 		}
 		
 		.summit-popup-close-btn{
-		    margin-right: 15px;
+		    margin-right: 4px;
 		    width: 15px;
 		    height: 15px;
 		    border-width: 3px;
@@ -173,11 +174,11 @@
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 12px;
+			margin-top: 7px;
 		}
 		
 		.summit-popup-close-btn{
-		    margin-right: 8px;
+		    margin-right: 4px;
 		}
 	}
 }

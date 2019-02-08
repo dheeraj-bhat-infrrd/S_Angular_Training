@@ -20720,7 +20720,14 @@ $(document).on('click','#register-summit-btn',function(e){
 	e.preventDefault();
 	
 	closeSummitPopup( false );
-	window.open('https://youtu.be/yDs1A7Yan8I', '_blank');
+	
+	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
+	
+	if(profileMasterId == 1){
+		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
+	}else{
+		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
+	}
 	
 });
 
@@ -20733,7 +20740,14 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
-	window.open('https://youtu.be/yDs1A7Yan8I', '_blank');
+
+	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
+	
+	if(profileMasterId == 1){
+		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
+	}else{
+		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
+	}
 });
 
 $(document).on('click','#summit-ribbon-close-btn',function(e){
@@ -20747,7 +20761,15 @@ $(document).on('click','#summit-popup-body',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
-	window.open('https://youtu.be/yDs1A7Yan8I', '_blank');
+	closeSummitPopup();
+	
+	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
+	
+	if(profileMasterId == 1){
+		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
+	}else{
+		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
+	}
 });
 
 function sendClickedEventInfo( event ){
