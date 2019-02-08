@@ -243,8 +243,9 @@ public class EncompassController extends AbstractController
      * Calls   {@link EmailServices#sendCustomMail(String, String, String, String, List)}
      * @param jsonData - consists of companyId and error message
      */
+    @ResponseBody
     @RequestMapping ( value = "/senderrormail", method = RequestMethod.POST)
-    public void sendErrorMailToAdmin( @RequestBody String jsonData ) {
+    public boolean sendErrorMailToAdmin( @RequestBody String jsonData ) {
         LOG.info( "Sending encompass alert mail" );
         try{
             LOG.debug( "JsonString = {}", jsonData.toString() );
@@ -274,9 +275,10 @@ public class EncompassController extends AbstractController
             String subject = CommonConstants.ENCOMPASS_ALERT_MAIL_SUBJECT;
             emailServices.sendCustomMail("admin", encompassCrmInfo.getAlertEmail(), subject,
                 message, null);
-
+            return true;
         } catch ( Exception e ) {
             LOG.error( "An exception occured while sending email to encompass admin ", e );
+            return false;
         }
     }
 }
