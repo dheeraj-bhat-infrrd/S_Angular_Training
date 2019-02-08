@@ -498,6 +498,7 @@ var socialSurveyJavascriptWidget = {
 		if (lockHistory != undefined && lockHistory != null && lockHistory.length > 0 && lockHistory[lockHistory.length - 1].action == "lock") {
 			lockHierarchy = "";
 			socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.lockLowerHierarchy = "true";
+			socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.overrideLowerHierarchy = "true";
 		} else {
 			lockHierarchy = "bd-check-img-checked";
 		}
@@ -582,9 +583,11 @@ var socialSurveyJavascriptWidget = {
 			if ($("#lock-save-chk-box").hasClass('bd-check-img-checked')) {
 				$("#lock-save-chk-box").removeClass('bd-check-img-checked');
 				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.lockLowerHierarchy = "true";
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.overrideLowerHierarchy = "true";
 			} else {
 				$("#lock-save-chk-box").addClass('bd-check-img-checked');
 				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.lockLowerHierarchy = "false";
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.overrideLowerHierarchy = "false";
 			}
 
 		});
