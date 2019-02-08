@@ -278,7 +278,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             query.limit( limit );
         }
 
-        LOG.debug( "Query is : {}", query.toString() );
+        LOG.info( "Mongo query to  getAllSocialFeeds : {}", query.toString() );
         return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
     }
 

@@ -103,7 +103,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
     @Override
     public SocialMonitorResponseData getAllSocialPosts( SocialFeedFilter socialFeedFilter ) throws InvalidInputException
     {
-        LOG.debug( "Fetching social posts" );
+        LOG.info( "Fetching social posts using filter: {}", socialFeedFilter );
 
         SocialMonitorResponseData socialMonitorResponseData = new SocialMonitorResponseData();
         List<SocialMonitorFeedData> socialMonitorStreamDataList = new ArrayList<>();
@@ -181,14 +181,14 @@ public class SocialFeedServiceImpl implements SocialFeedService
         } else {
             LOG.warn( "List is empty" );
         }
-        LOG.debug( "End of getSocialPostsForStream{}" );
+        LOG.info( "Finished fetching social posts" );
         return socialMonitorResponseData;
     }
 	
     //this method is used to avoid the call made for each object in List<SocialResponseObject> to fetch the response
     //and reduced to 4 calls 
     private Map<String, String> getAllProfileUrls(List<SocialResponseObject> socialResponseObjects){
-    	LOG.debug( "Fetching profile url's" );
+    	LOG.info( "Fetching profile URLs for list of size {}", socialResponseObjects.size() );
     	Map<String, String> profileUrlMap = new HashMap<>();
     	Set<Long> companyIds = new HashSet<>();
     	Set<Long> regionIds = new HashSet<>();
