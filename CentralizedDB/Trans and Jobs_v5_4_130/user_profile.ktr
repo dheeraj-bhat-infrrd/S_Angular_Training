@@ -429,7 +429,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  USER_PROFILE_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, PROFILES_MASTER_ID&#xd;&#xa;, USER_PROFILE_TYPE&#xd;&#xa;, PROFILE_COMPLETION_STAGE&#xd;&#xa;, IS_PROFILE_COMPLETE&#xd;&#xa;, IS_PRIMARY&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;FROM USER_PROFILE&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_PROFILE_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, PROFILES_MASTER_ID&#xd;&#xa;, USER_PROFILE_TYPE&#xd;&#xa;, PROFILE_COMPLETION_STAGE&#xd;&#xa;, IS_PROFILE_COMPLETE&#xd;&#xa;, IS_PRIMARY&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;FROM USER_PROFILE&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27; and MODIFIED_ON &#x3c; &#x27;&#x24;&#x7b;jobStartTime&#x7d;&#x27;&#x3b;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

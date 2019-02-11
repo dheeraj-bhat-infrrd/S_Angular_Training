@@ -8403,10 +8403,8 @@ function showMasterQuestionPage() {
 		
 		if( isAbusive == false ){
 			if (mood != 'Great') {
-				$('#social-post-links').find('*').not('#google-business-btn, #google-btn').remove();
+				$('#social-post-links').find('*').remove();
 				$('#social-post-links').addClass('review-abusive-share-parent');
-				$('#social-post-links').find('#google-business-btn').addClass('review-abusive-share-btn');
-				$('#social-post-links').find('#google-btn').addClass('review-abusive-share-btn');
 			}
 			$('#social-post-links').show();
 
@@ -20722,7 +20720,14 @@ $(document).on('click','#register-summit-btn',function(e){
 	e.preventDefault();
 	
 	closeSummitPopup( false );
-	window.open('https://facebook.com/SocialSurveybusiness/videos/710505045999294/', '_blank');
+	
+	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
+	
+	if(profileMasterId == 1){
+		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
+	}else{
+		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
+	}
 	
 });
 
@@ -20735,7 +20740,14 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
-	window.open('http://www.socialsurvey.com/top-performers-2018', '_blank');
+
+	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
+	
+	if(profileMasterId == 1){
+		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
+	}else{
+		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
+	}
 });
 
 $(document).on('click','#summit-ribbon-close-btn',function(e){
@@ -20749,7 +20761,15 @@ $(document).on('click','#summit-popup-body',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
-	window.open('http://www.socialsurvey.com/top-performers-2018', '_blank');
+	closeSummitPopup();
+	
+	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
+	
+	if(profileMasterId == 1){
+		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
+	}else{
+		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
+	}
 });
 
 function sendClickedEventInfo( event ){

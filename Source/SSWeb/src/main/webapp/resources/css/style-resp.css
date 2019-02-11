@@ -20,56 +20,66 @@
 		margin-top: 50px;
 	}
 	
+	.summit-popup-close-btn{
+		margin-right: 20px;
+	}
+	
 	@media (max-width: 1099){
 		.summit-ribbon-body{
 			width:100%
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 60px;
+			margin-top: 40px;
 		}
 		
 		.summit-popup-close-btn{
-			margin-right: 25px;
+			margin-right: 16px;
 		}
 	}
 	
 	@media (max-width: 1000px){
 		.summit-ribbon-body{
-			background-image: url(../images/TP_Ribbon_mobile_v2.png);
+			background-image: url(../images/TP_We_Ready_Mobile_Ribbon.png);
 			height: 50px;
-			background-size: cover;
+			background-size: contain;
+			width:100%
 		}
 		
 		.summit-popup-close-cont{
 			margin-top: 45px;
 		}
+		
+		.summit-ribbon-close-btn {
+		    margin-right: 5px;
+		}
 	}
 	
 	@media (max-width: 930px){
 		.summit-checkbox-cont{
-			margin-bottom:18px;
+			margin-bottom:25px;
 		}
 	}
 	
 	@media (max-width: 870px){
 		.summit-checkbox-cont{
-			margin-bottom:2px;
+			margin-bottom:15px;
+			margin-left: 40px;
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 30px;
+			margin-top: 15px;
 		}
 		
 		.summit-popup-close-btn{
-			margin-right: 35px;
+			margin-right: 30px;
 		}
 	}
 	
 	@media (max-width: 767px){
 		.summit-checkbox-cont{
-			margin-left: 5px;
-    		margin-bottom: 4px;
+			margin-left: 20px;
+    		margin-bottom: 25px;
 		}
 		
 		.summit-check{
@@ -81,27 +91,42 @@
 		.summit-check-text{
 			font-size: 11px;
 		}
+		
+		.summit-popup-close-btn {
+		    margin-right: 6px;
+		}
+	}
+	
+	@media (max-width: 640px){
+	
+		.summit-ribbon-body{
+			width: 95%;
+		}
+		
+		.summit-ribbon-close-btn {
+			margin-right: -12px;
+		}
 	}
 	
 	@media (max-width: 580px){
 		.summit-popup-body{
-			background-image: url(../images/TP_Banner_mobile_v2.png);
+			background-image: url(../images/WOWworthy_EmmaM_Mobile_Banner.png);
 		}
 		
 		.summit-ribbon-outer{
-			height: 30px;
+			height: 40px;
 		}
 		
 		.summit-ribbon-body{
-			height: 30px;
+			height: 40px;
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 15px;
+			margin-top: 13px;
 		}
 		
 		.summit-popup-close-btn{
-		    margin-right: 5px;
+		    margin-right: 4px;
 		    width: 15px;
 		    height: 15px;
 		    border-width: 3px;
@@ -115,8 +140,30 @@
 		    border-width: 3px;
 		    line-height: 7px;
 		    font-size: 9px;
-		    margin-right: 5px;
-		    margin-top: -5px;
+		    margin-right: -10px;
+		    margin-top: 0px;
+		}
+	}
+	
+	@media (max-width: 450px){
+		.summit-checkbox-cont {
+		    margin-left: 15px;
+		    margin-bottom: 15px;
+		}
+		
+		.summit-ribbon-close-btn{
+			margin-right: -15px;
+		}
+		
+		.summit-ribbon-body{
+			margin-left: 0;
+		}
+	}
+	
+	@media (max-width: 360px){
+		.summit-checkbox-cont {
+		    margin-left: 15px;
+		    margin-bottom: 6px;
 		}
 	}
 	
@@ -126,16 +173,16 @@
 		}
 		
 		.summit-checkbox-cont {
-		    margin-left: 5px;
-		    margin-bottom: -4px;
+		    margin-left: 10px;
+		    margin-bottom: 0px;
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 9px;
+			margin-top: 7px;
 		}
 		
 		.summit-popup-close-btn{
-		    margin-right: 2px;
+		    margin-right: 4px;
 		}
 	}
 }
