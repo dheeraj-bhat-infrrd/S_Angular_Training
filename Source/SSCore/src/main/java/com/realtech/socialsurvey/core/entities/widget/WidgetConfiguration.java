@@ -39,9 +39,19 @@ public class WidgetConfiguration
     private String hideReviewBtn;
     private String hideContactBtn;
     private String maxWidgetBtnSize;
+    public String enableMobView;
+
+    public String getEnableMobView() {
+		return enableMobView;
+	}
 
 
-    public String getMaxWidgetBtnSize() {
+	public void setEnableMobView(String enableMobView) {
+		this.enableMobView = enableMobView;
+	}
+
+
+	public String getMaxWidgetBtnSize() {
 		return maxWidgetBtnSize;
 	}
 
@@ -456,7 +466,8 @@ public class WidgetConfiguration
 				+ seoKeywords + ", seoDescription=" + seoDescription + ", lockHistory=" + lockHistory
 				+ ", actionByProfileId=" + actionByProfileId + ", actionByProfileLevel=" + actionByProfileLevel
 				+ ", actionOn=" + actionOn + ", lockFlag=" + lockFlag + ", hideReviewBtn=" + hideReviewBtn
-				+ ", hideContactBtn=" + hideContactBtn + ", maxWidgetBtnSize=" + maxWidgetBtnSize + "]";
+				+ ", hideContactBtn=" + hideContactBtn + ", maxWidgetBtnSize=" + maxWidgetBtnSize + ", enableMobView="
+				+ enableMobView + "]";
 	}
-
+    
 }

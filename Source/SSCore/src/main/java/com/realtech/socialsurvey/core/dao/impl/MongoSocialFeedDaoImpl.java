@@ -278,7 +278,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             query.limit( limit );
         }
 
-        LOG.debug( "Query is : {}", query.toString() );
+        LOG.info( "Mongo query to  getAllSocialFeeds : {}", query.toString() );
         return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
     }
 
@@ -647,5 +647,15 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     }
 
 
+    @Override
+    public List<OrganizationUnitSettings> getAllProfileImageUrl( Set<Long> entityIds, String collectionName )
+    {
+        LOG.debug("Fetching profile image for id {} with profileType {}", entityIds, collectionName);
+        Query query = new  Query();
+        query.addCriteria(Criteria.where(IDEN).in(entityIds));
+        query.fields().exclude( KEY_IDENTIFIER ).include(PROFILE_IMAGE_URL).include(IDEN);
+        return mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
+
+    }
 
 }

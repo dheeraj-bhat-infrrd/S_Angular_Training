@@ -82,109 +82,162 @@
 							
 							<c:if test="${ columnName != 'agentId'  or isRealTechOrSSAdmin == true }">
 								<div id="customized-setting-div" class="st-score-rt-top" style="">Customized Feature Settings:</div>
-								<c:if test="${ isRealTechOrSSAdmin == true and columnName != 'companyId' }">	
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName != 'companyId' }">
+								<div class="ss-admin-comp-settings" style="">	
 									<div id="hide-pp-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="hide-pp-cb" name="hidepublicpage" value="${hidePublicPage}">
 									<div class="float-left customized-settings-child cust-resp-txt">Hide public page</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
+								<div class="ss-admin-comp-settings" style="">
 									<div id="hide-bread-crumb-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="hide-bc-cb" name="hidebreadcrumb" value="${hideFromBreadCrumb}">
 								<div class="float-left customized-settings-child cust-resp-txt">Hide from bread crumb</div>
+								<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
 								</c:if>	
-								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">	
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+								<div class="ss-admin-comp-settings" style="">	
 									<div id="hide-pp-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="hide-pp-cb" name="hidepublicpage" value="${hidePublicPage}">
 									<div class="float-left customized-settings-child cust-resp-txt">Hide public page</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
+								<div class="ss-admin-comp-settings" style="">
 									<div id="hide-bread-crumb-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="hide-bc-cb" name="hidebreadcrumb" value="${hideFromBreadCrumb}">
 									<div class="float-left customized-settings-child cust-resp-txt">Hide from bread crumb</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
+								<div class="ss-admin-comp-settings" style="">
 									<div id="hidden-section-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="hidden-section-cb" name="hiddensection" value="${hiddenSection}">
 									<div class="float-left customized-settings-child cust-resp-txt">Hide public pages of all agents</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
+								<div class="ss-admin-comp-settings" style="">
 									<div id="mail-frm-cmpny-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="mail-frm-cmpny-cb" name="sendmailfromcompany" value="${sendEmailFromCompany}">
 									<div class="float-left customized-settings-child cust-resp-txt">Send all mails on behalf of company</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
+								<div class="ss-admin-comp-settings" style="">
 									<div id="ovride-sm-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="ovride-sm-cb" name="overridesm" value="${allowOverrideForSocialMedia}">
 									<div class="float-left customized-settings-child cust-resp-txt">Allow admins to override social media</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
 								</c:if>				
 								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+								<div class="ss-admin-comp-settings" style="">
 									<div id="atpst-lnk-usr-ste-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="at-pst-lnk-usr-ste-cb" name="autopostlinktousersite" value="${autoPostLinkToUserSite}">
 									<div class="float-left customized-settings-child cust-resp-txt">Allow autopost link to the user's website</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
 								</c:if>
 								
 								<!-- partner survey settings -->
 								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+								<div class="ss-admin-comp-settings" style="">
 									<div id="alw-ptnr-srvy-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="alw-ptnr-srvy-cb" name="allowpartnersurvey" value="${allowPartnerSurvey}">
 									<div class="float-left customized-settings-child cust-resp-txt">Allow partner survey</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
 								</c:if>
 								
 								<!-- transaction monitor settings -->
 								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+								<div class="ss-admin-comp-settings" style="">	
 									<div id="incld-fr-trans-mntr-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="incld-fr-trans-mntr-cb" name="includeForTransactionMonitor" value="${includeForTransactionMonitor}">
 									<div class="float-left customized-settings-child cust-resp-txt">Include for transaction monitor</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
 								</c:if>
 								
 								<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName != 'agentId' and accountMasterId != 1 }">
+								<div class="ss-admin-comp-settings" style="">
 									<div id="vndsta-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
 									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Allow access to Listings Manager</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
 								</c:if>
 								
 								<c:if test="${ columnName == 'companyId' }">
+								<div class="ss-comp-settings" style="">
 									<div id="copyto-clipboard-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="copyto-clipboard-cb" name="copytoclipboard" value="${copyToClipBoard}">
 									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Copy review text to clip-board</div>
+								</div>
 								</c:if>
 
 								<c:if test="${ isRealTechOrSSAdmin == true }">
+								<div class="ss-admin-comp-settings" style="">
 									<div id="soc-mon-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="soc-mon-access-cb" name="surveymailthrhld" value="${isSocialMonitorEnabled}">
 									<div class="float-left listing-access-txt cust-resp-txt">Enable Social Monitor</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
 								</c:if>
 								
 								<c:if test="${ columnName != 'agentId'}">
+								<div class="ss-comp-settings" style="">	
 									<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="survey-mail-thrhld-cb" name="surveymailthrhld" value="${sendMonthlyDigestMail}">
 									<div class="float-left listing-access-txt cust-resp-txt">Send Monthly Digest Mail</div>
+								</div>
+								<div class="ss-comp-settings" style="">	
 									<textarea id="digest-recipients" class="dig-recp"  placeholder="<spring:message code="label.placehoder.digest.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${digestRecipients}</textarea>
+								</div>
 									<c:if test="${ columnName == 'companyId' }">
+									<div class="ss-comp-settings" style="">
 										<div class="float-left listing-access-txt cust-resp-txt">Send user Add/Delete Notification Mail</div>
+									</div>
+									<div class="ss-comp-settings" style="">
 										<textarea id="user-notification-recipients" class="dig-recp" style="margin-bottom:40px" placeholder="<spring:message code="label.placehoder.user.notify.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${userNotifyRecipients}</textarea>
-									</c:if>	
+									</div>
+									</c:if>
 								</c:if>
 							</c:if>
 							
                             <c:if test="${ not empty companyAdminSwitchId or isRealTechOrSSAdmin == true or user.isOwner == 1 }">
+                            <div class="ss-comp-settings" style="">
 								<div class="float-left clear-both comp-mail-thrs-txt"><spring:message code="label.agent.notify.threshold.key" /></div>
 								<div class="float-left">
 									<!-- set the minimum threshold for sending completed mail to administrators and agents -->
 									<input type="text" name="survey-mail-threshold" id="survey-mail-threshold" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${surveyCompletedMailThreshold}">
 									<div class="st-dd-wrapper hide" id="st-dd-wrapper-survey-mail-thrs"></div>
 								</div>
+							</div>
 							</c:if>
-							
+			
 							<c:if test="${ columnName == 'companyId' }">
+							<div class="ss-comp-settings" style="">
 								<div class="float-left clear-both comp-mail-thrs-txt"><spring:message code="label.encompass.alert.mail.key" /></div>
 								<input type="hidden" id="encompass-alert-mails" value="${encompassAlertEmails}">
 								<textarea id="enc-alert-mail-recipients" class="dig-recp" style="margin-bottom:40px" placeholder="<spring:message code="label.placehoder.encompass.alert.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${encompassAlertEmails}</textarea>
+							</div>
 							</c:if>
 							
 							<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
+							<div class="ss-admin-comp-settings" style="height: 80px;padding-top: 5px;padding-left:0px;">
 								<div class="clearfix padding-bottom-twenty">
 									<div class="float-left st-score-rt-top email-setting-sel-lbl">
 										<spring:message code="label.send.email.via.key" />
 									</div>
 									<div class="email-sel-wrapper email-resp email-resp-margin">
-										<div class="email-sel-item">
+										<div class="email-sel-item" style="background: #f7f4f4;">
 											<input type="text" id="email-sel" class="float-left dd-arrow-dn cursor-pointer email-item-wrapper" spellcheck="false">
 										</div>
 										<div class="email-option-wrapper hide" id="email-options"></div>
 									</div>
 								</div>
+								<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+							</div>
 							</div>
 							</c:if>
 						</div>

@@ -199,6 +199,24 @@
 	</div>
 </div>
 
+<div class="ss-prof-img-fix-popup" style="display:none">
+	<div class="ss-prof-img-fix-popup-body">
+		<div class="ss-prof-img-popup-close-cont">
+			<div class="ss-prof-img-fix-popup-close-btn cursor-pointer">x</div>
+		</div>
+		<div class="ss-prof-img-popup-note">
+			The profile image uploaded on your profile is of the wrong size. This may affect few of the design in the website. Please crop the image to avoid this issue
+		</div>
+		<div class="ss-prof-img-popup-cropper">
+		
+		</div>
+		<div class="ss-prof-img-popup-btn-cont">
+			<div class="ss-prof-img-popup-confirm ss-prof-img-popup-btn">Confirm</div>
+			<div class="ss-prof-img-popup-cancel ss-prof-img-popup-btn">Cancel</div>
+		</div>
+	</div>
+</div>
+
 <div class="hm-header-main-wrapper">
 	<div>
 		<c:choose>

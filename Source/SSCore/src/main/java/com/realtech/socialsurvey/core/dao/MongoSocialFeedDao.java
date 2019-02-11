@@ -110,4 +110,11 @@ public interface MongoSocialFeedDao
 	 * @param socialFeedCollection
 	 */
 	void insertSocialFeeds( List<SocialResponseObject<?>> socialFeeds, String socialFeedCollection );
+
+	/**
+	 * @param entityIds
+	 * @param collectionName
+	 * @return
+	 */
+	List<OrganizationUnitSettings> getAllProfileImageUrl(Set<Long> entityIds, String collectionName);
 }

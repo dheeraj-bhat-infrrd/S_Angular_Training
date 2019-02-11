@@ -66,7 +66,11 @@ function initiateJcropForImgFix(profImg,forNewDashboard) {
 			});
 		});
 			
-		$('.ss-prof-img-popup-confirm').click(function() {
+		$('.ss-prof-img-popup-confirm').click(function(e) {
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			e.stopPropagation();
+			
 			var canvas = $('#target')[0];
 			var dataurl = canvas.src;
 			if (isNaN(selected_x)) {
@@ -114,9 +118,15 @@ function initiateJcropForImgFix(profImg,forNewDashboard) {
 					} else {
 						$('#prof-image').val('');
 					}
+					
+					$('.ss-prof-img-fix-popup').hide();
+					$('.ss-prof-img-popup-cropper').html('');
+					$('#overlay-toast').html('Updated profile image successfully.');
+					showToast();
 				},
 				error : function(e) {
-					
+					$('#overlay-toast').html('Failed to Update profile image.');
+					showToast();
 				}
 			});
 		});

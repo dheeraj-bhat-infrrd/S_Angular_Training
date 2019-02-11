@@ -429,8 +429,8 @@ function drawSearchResults(searchResultsData) {
 
 		$('#srch-eng-result-item').find('.srch-eng-result-rank').html(startIndex + i + 1);
 
-		if (searchResults[i].profileImageUrl != null && searchResults[i].profileImageUrl != undefined && searchResults[i].profileImageUrl.length != 0) {
-			$('#srch-eng-result-item').find('.srch-eng-result-prof-img').attr('src', searchResults[i].profileImageUrl);
+		if (searchResults[i].profileImageUrlThumbnail != null && searchResults[i].profileImageUrlThumbnail != undefined && searchResults[i].profileImageUrlThumbnail.length != 0) {
+			$('#srch-eng-result-item').find('.srch-eng-result-prof-img').attr('src', searchResults[i].profileImageUrlThumbnail);
 		} else {
 			$('#srch-eng-result-item').find('.srch-eng-result-prof-img').hide();
 			$('#srch-eng-result-item').find('.srch-eng-result-img').addClass('srch-eng-default-prof-img');
