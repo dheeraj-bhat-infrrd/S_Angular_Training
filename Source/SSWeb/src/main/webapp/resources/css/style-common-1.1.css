@@ -2011,6 +2011,7 @@ span.footer-ul a:hover {
 
 .widget-hist-adj {
 	width: 320px;
+	height: 55px;
 	height: fit-content;
     text-align: center;
     line-height: unset;
