@@ -37,7 +37,6 @@
 
 <input type="text" id="default-prof-image" class="hidden" value="${defaultprofimageclass}">
 <input type="file" id="rep-prof-image" class="hidden">
-<div class="hide" id="ss-prof-img-fix-trigger">
 
 <c:choose>
 	<c:when test="${not empty profileimage}">

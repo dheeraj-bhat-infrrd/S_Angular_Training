@@ -22330,13 +22330,31 @@ function checkImgForProfile(ele){
 	if (Modernizr.canvas) {
 		realWidth = profiImg.naturalWidth;
 		realHeight = profiImg.naturalHeight;
-		
-		console.log("html5");
 	} else {
 		realWidth = $(ele).width;
 		realHeight = $(ele).height;
-		
 	}
 	
-	initiatePopupForImgFix();
+	if(realWidth != realHeight){
+		$('.ss-prof-img-fix-popup').show();
+		initiatePopupForImgFix();
+		
+		$(document).on('click','.ss-prof-img-fix-popup-close-btn',function(e){
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			e.stopPropagation();
+			
+			$('.ss-prof-img-fix-popup').hide();
+			$('.ss-prof-img-popup-cropper').html('');
+		});
+
+		$(document).on('click','.ss-prof-img-popup-cancel',function(e){
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			e.stopPropagation();
+			
+			$('.ss-prof-img-fix-popup').hide();
+			$('.ss-prof-img-popup-cropper').html('');
+		});
+	}
 }

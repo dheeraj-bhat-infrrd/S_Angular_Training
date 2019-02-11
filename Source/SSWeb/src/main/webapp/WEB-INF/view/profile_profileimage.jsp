@@ -39,7 +39,7 @@
 <c:choose>
 	<c:when test="${not empty profileimage}">
 	<div class="prof-img-height padding-top-one-third">
-		<img id="prof-image-edit" class="prof-image prof-image-edit height-auto pos-relative" src="${profileimage}" style="height: 195px;clear: both;"></img>
+		<img id="prof-image-edit" class="prof-image prof-image-edit height-auto pos-relative" src="${profileimage}"  onload="checkProfImageForProfileEdit(this);" style="height: 195px;clear: both;"></img>
 	</div>
 	</c:when>
 	<c:otherwise>
@@ -88,4 +88,8 @@ $(document).ready(function(){
 		}, true);
 	})
 })
+
+function checkProfImageForProfileEdit(ele){
+	checkImgForProfile(ele);
+}
 </script>

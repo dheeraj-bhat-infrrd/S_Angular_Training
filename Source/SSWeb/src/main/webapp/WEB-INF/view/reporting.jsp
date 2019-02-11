@@ -221,9 +221,9 @@
 	</div>
 </div> --%>
 
-<div class="ss-prof-img-fix-popup">
+<div class="ss-prof-img-fix-popup" style="display:none">
 	<div class="ss-prof-img-fix-popup-body">
-		<div clas="ss-prof-img-popup-close-cont">
+		<div class="ss-prof-img-popup-close-cont">
 			<div class="ss-prof-img-fix-popup-close-btn cursor-pointer">x</div>
 		</div>
 		<div class="ss-prof-img-popup-note">
