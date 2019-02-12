@@ -4867,8 +4867,9 @@ public class OrganizationManagementController
 		long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
 
 		try {
-			return String.valueOf( organizationManagementService.enableIncompleteSurveyDeleteToggle( companyId,
-					Boolean.parseBoolean( request.getParameter( "isIncompleteSurveyDeleteEnabled" ) ) ) );
+			Response response = ssApiIntergrationBuilder.getIntegrationApi().enableIncompleteSurveyDeleteToggle( companyId,
+					Boolean.parseBoolean( request.getParameter( "isIncompleteSurveyDeleteEnabled" )));
+			return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
 		} catch ( Exception error ) {
 			LOG.error( "Exception occured in enableIncompleteSurveyDeleteToggle() while updating incomplete survey delete flag. Nested exception is ",error );
 			return "false";
