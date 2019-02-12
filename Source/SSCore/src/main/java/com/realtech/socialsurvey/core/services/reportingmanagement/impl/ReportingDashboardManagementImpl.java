@@ -793,8 +793,8 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 } else {
                     companyUserReportList.add( "" );
                 }
-                if ( companyUserReport.getFbDataConnection() != null && !companyUserReport.getFbDataConnection().isEmpty() ) {
-                    companyUserReportList.add( companyUserReport.getFbDataConnection() );
+                if ( companyUserReport.getFbConnectionEstablishedDate() != null ) {
+                    companyUserReportList.add( companyUserReport.getFbConnectionEstablishedDate() );
                 } else {
                     companyUserReportList.add( "" );
                 }
@@ -809,9 +809,13 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 } else {
                     companyUserReportList.add( "" );
                 }
-                if ( companyUserReport.getTwitterDataConnection() != null
-                    && !companyUserReport.getTwitterDataConnection().isEmpty() ) {
-                    companyUserReportList.add( companyUserReport.getTwitterDataConnection() );
+                if ( companyUserReport.getFbUrl() != null && !companyUserReport.getFbUrl().isEmpty()) {
+                    companyUserReportList.add( companyUserReport.getFbUrl() );
+                } else {
+                    companyUserReportList.add( "" );
+                }
+                if ( companyUserReport.getTwitterConnectionEstablishedDate() != null ) {
+                    companyUserReportList.add( companyUserReport.getTwitterConnectionEstablishedDate() );
                 } else {
                     companyUserReportList.add( "" );
                 }
@@ -826,9 +830,14 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 } else {
                     companyUserReportList.add( "" );
                 }
-                if ( companyUserReport.getLinkedinConnectionStatus() != null
-                    && !companyUserReport.getLinkedinConnectionStatus().isEmpty() ) {
-                    companyUserReportList.add( companyUserReport.getLinkedinDataConnection() );
+                if ( companyUserReport.getTwitterUrl() != null
+                    && !companyUserReport.getTwitterUrl().isEmpty() ) {
+                    companyUserReportList.add( companyUserReport.getTwitterUrl() );
+                } else {
+                    companyUserReportList.add( "" );
+                }
+                if ( companyUserReport.getLinkedinConnectionEstablishedDate() != null) {
+                    companyUserReportList.add( companyUserReport.getLinkedinConnectionEstablishedDate() );
                 } else {
                     companyUserReportList.add( "" );
                 }
@@ -840,6 +849,11 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 }
                 if ( companyUserReport.getLastPostDateLinkedin() != null ) {
                     companyUserReportList.add( companyUserReport.getLastPostDateLinkedin() );
+                } else {
+                    companyUserReportList.add( "" );
+                }
+                if ( companyUserReport.getLinkedinUrl() != null && !companyUserReport.getLinkedinUrl().isEmpty() ) {
+                    companyUserReportList.add( companyUserReport.getLinkedinUrl() );
                 } else {
                     companyUserReportList.add( "" );
                 }

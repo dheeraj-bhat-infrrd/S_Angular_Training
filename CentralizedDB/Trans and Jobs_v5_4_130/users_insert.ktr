@@ -150,7 +150,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; sdf.format&#x28;CREATED_ON&#x29;&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; sdf.format&#x28;MODIFIED_ON&#x29;&#x3b;&#xd;&#xa;var LAST_LOGIN_EST &#x3d; sdf.format&#x28;LAST_LOGIN&#x29;&#x3b;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; sdf.format&#x28;CREATED_ON&#x29;&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; sdf.format&#x28;MODIFIED_ON&#x29;&#x3b;&#xd;&#xa;var LAST_LOGIN_EST &#x3d; sdf.format&#x28;LAST_LOGIN&#x29;&#x3b;&#xa;&#xa;var ADOPTION_COMPLETED_DATE_EST &#x3d; &#x27;&#x27;&#x3b;&#xa;if&#x28;ADOPTION_COMPLETION_DATE &#x21;&#x3d; null&#x29; &#x7b;&#xa;	ADOPTION_COMPLETED_DATE_EST &#x3d; sdf.format&#x28;ADOPTION_COMPLETION_DATE&#x29;&#x3b;&#xa;&#x7d;&#xa;var LAST_USER_LOGIN_EST &#x3d; &#x27;&#x27;&#x3b;&#xa;if&#x28;LAST_USER_LOGIN &#x21;&#x3d; null&#x29; &#x7b;&#xa;	LAST_USER_LOGIN_EST &#x3d; sdf.format&#x28;LAST_USER_LOGIN&#x29;&#x3b;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>CREATED_ON_EST</name>
         <rename>CREATED_ON_EST</rename>
         <type>String</type>
@@ -165,6 +165,18 @@
         <replace>N</replace>
       </field>      <field>        <name>LAST_LOGIN_EST</name>
         <rename>LAST_LOGIN_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>ADOPTION_COMPLETED_DATE_EST</name>
+        <rename>ADOPTION_COMPLETED_DATE_EST</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>LAST_USER_LOGIN_EST</name>
+        <rename>LAST_USER_LOGIN_EST</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -332,6 +344,22 @@
         <field>
           <column_name>LAST_LOGIN_EST</column_name>
           <stream_name>LAST_LOGIN_EST</stream_name>
+        </field>
+        <field>
+          <column_name>ADOPTION_COMPLETED_DATE</column_name>
+          <stream_name>ADOPTION_COMPLETION_DATE</stream_name>
+        </field>
+        <field>
+          <column_name>ADOPTION_COMPLETED_DATE_EST</column_name>
+          <stream_name>ADOPTION_COMPLETED_DATE_EST</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_USER_LOGIN</column_name>
+          <stream_name>LAST_USER_LOGIN</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_USER_LOGIN_EST</column_name>
+          <stream_name>LAST_USER_LOGIN_EST</stream_name>
         </field>
     </fields>
      <cluster_schema/>
