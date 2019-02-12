@@ -72,8 +72,8 @@ public class CompanyUserReport implements Serializable
     @Column ( name = "socially_connected")
     private String sociallyConnected;
     
-    @Column ( name = "fb_data_connection")
-    private String fbDataConnection;
+    @Column ( name = "fb_connection_established_date")
+    private Date fbConnectionEstablishedDate;
     
     @Column ( name = "fb_connection_status")
     private String fbConnectionStatus;
@@ -81,8 +81,11 @@ public class CompanyUserReport implements Serializable
     @Column ( name = "last_post_date_fb")
     private Date lastPostDateFb;
     
-    @Column ( name = "twitter_data_connection")
-    private String twitterDataConnection;
+    @Column ( name = "fb_url")
+    private String fbUrl;
+    
+    @Column ( name = "twitter_connection_established_date")
+    private Date twitterConnectionEstablishedDate;
     
     @Column ( name = "twitter_connection_status")
     private String twitterConnectionStatus;
@@ -90,14 +93,20 @@ public class CompanyUserReport implements Serializable
     @Column ( name = "last_post_date_twitter")
     private Date lastPostDateTwitter;
     
-    @Column ( name = "linkedin_data_connection")
-    private String linkedinDataConnection;
+    @Column ( name = "twitter_url")
+    private String twitterUrl;
+    
+    @Column ( name = "linkedin_connection_established_date")
+    private Date linkedinConnectionEstablishedDate;
     
     @Column ( name = "linkedin_connection_status")
     private String linkedinConnectionStatus;
     
     @Column ( name = "last_post_date_linkedin")
     private Date lastPostDateLinkedin;
+    
+    @Column ( name = "linkedin_url")
+    private String linkedinUrl;
     
     @Column ( name = "google_plus_url")
     private String googlePlusUrl;
@@ -119,7 +128,6 @@ public class CompanyUserReport implements Serializable
     
     @Column ( name = "email_verified_date")
     private Date emailVerifiedDate;
-    
     
     @Column ( name = "adoption_completed_date")
     private Date adoptionCompletedDate;
@@ -343,14 +351,14 @@ public class CompanyUserReport implements Serializable
         this.sociallyConnected = sociallyConnected;
     }
 
-    public String getFbDataConnection()
+    public Date getFbConnectionEstablishedDate()
     {
-        return fbDataConnection;
+        return fbConnectionEstablishedDate;
     }
 
-    public void setFbDataConnection( String fbDataConnection )
+    public void setFbConnectionEstablishedDate( Date fbConnectionEstablishedDate )
     {
-        this.fbDataConnection = fbDataConnection;
+        this.fbConnectionEstablishedDate = fbConnectionEstablishedDate;
     }
 
     public String getFbConnectionStatus()
@@ -373,14 +381,24 @@ public class CompanyUserReport implements Serializable
         this.lastPostDateFb = lastPostDateFb;
     }
 
-    public String getTwitterDataConnection()
+    public String getFbUrl()
     {
-        return twitterDataConnection;
+        return fbUrl;
     }
 
-    public void setTwitterDataConnection( String twitterDataConnection )
+    public void setFbUrl( String fbUrl )
     {
-        this.twitterDataConnection = twitterDataConnection;
+        this.fbUrl = fbUrl;
+    }
+    
+    public Date getTwitterConnectionEstablishedDate()
+    {
+        return twitterConnectionEstablishedDate;
+    }
+
+    public void setTwitterConnectionEstablishedDate( Date twitterConnectionEstablishedDate )
+    {
+        this.twitterConnectionEstablishedDate = twitterConnectionEstablishedDate;
     }
 
     public String getTwitterConnectionStatus()
@@ -403,14 +421,24 @@ public class CompanyUserReport implements Serializable
         this.lastPostDateTwitter = lastPostDateTwitter;
     }
 
-    public String getLinkedinDataConnection()
+    public String getTwitterUrl()
     {
-        return linkedinDataConnection;
+        return twitterUrl;
     }
 
-    public void setLinkedinDataConnection( String linkedinDataConnection )
+    public void setTwitterUrl( String twitterUrl )
     {
-        this.linkedinDataConnection = linkedinDataConnection;
+        this.twitterUrl = twitterUrl;
+    }
+
+    public Date getLinkedinConnectionEstablishedDate()
+    {
+        return linkedinConnectionEstablishedDate;
+    }
+
+    public void setLinkedinConnectionEstablishedDate( Date linkedinConnectionEstablishedDate )
+    {
+        this.linkedinConnectionEstablishedDate = linkedinConnectionEstablishedDate;
     }
 
     public String getLinkedinConnectionStatus()
@@ -431,6 +459,16 @@ public class CompanyUserReport implements Serializable
     public void setLastPostDateLinkedin( Date lastPostDateLinkedin )
     {
         this.lastPostDateLinkedin = lastPostDateLinkedin;
+    }
+
+    public String getLinkedinUrl()
+    {
+        return linkedinUrl;
+    }
+
+    public void setLinkedinUrl( String linkedinUrl )
+    {
+        this.linkedinUrl = linkedinUrl;
     }
 
     public String getGooglePlusUrl()
@@ -604,9 +642,9 @@ public class CompanyUserReport implements Serializable
             + ", email=" + email + ", socialSurveyAccessLevel=" + socialSurveyAccessLevel + ", officeBranchAssignment=" + officeBranchAssignment 
             + ", regionAssignment=" + regionAssignment + ", ssInviteSentDate=" + ", ssInviteSentDate=" + emailVerified + ", emailVerified=" +", "
             + "lastLoginDate=" + lastLoginDate + ", profileComplete=" + profileComplete + ", disclaimer=" + disclaimer + ", address=" +
-            address + ", sociallyConnected=" +sociallyConnected + ", fbDataConnection=" +fbDataConnection + ", fbConnectionStatus=" +fbConnectionStatus + ", lastPostDateFb=" +
-            lastPostDateFb +", twitterDataConnection=" +twitterDataConnection +", twitterConnectionStatus=" +twitterConnectionStatus 
-            +", lastPostDateTwitter=" +lastPostDateTwitter +", linkedinDataConnection=" +linkedinDataConnection+ ", linkedinConnectionStatus=" +linkedinConnectionStatus+ 
+            address + ", sociallyConnected=" +sociallyConnected + ", fbConnectionEstablishedDate=" +fbConnectionEstablishedDate + ", fbConnectionStatus=" +fbConnectionStatus + ", lastPostDateFb=" +
+            lastPostDateFb +", twitterConnectionEstablishedDate=" +twitterConnectionEstablishedDate +", twitterConnectionStatus=" +twitterConnectionStatus 
+            +", lastPostDateTwitter=" +lastPostDateTwitter +", linkedinConnectionEstablishedDate=" +linkedinConnectionEstablishedDate+ ", linkedinConnectionStatus=" +linkedinConnectionStatus+ 
             ", lastPostDateLinkedin=" +lastPostDateLinkedin+ ",googlePlusUrl=" +googlePlusUrl+ ", zillowUrl=" +zillowUrl+ 
             ", yelpUrl=" +yelpUrl+ ",realtorUrl=" +realtorUrl+ ", gbUrl=" +gbUrl+ ", lendingtreeUrl=" +lendingtreeUrl+ 
             ", emailVerifiedDate=" +emailVerifiedDate+" , adoptionCompletedDate=" +adoptionCompletedDate+ ", lastSurveySentDate=" +lastSurveySentDate+ ", lastSurveyPostedDate=" +lastSurveyPostedDate+ 
