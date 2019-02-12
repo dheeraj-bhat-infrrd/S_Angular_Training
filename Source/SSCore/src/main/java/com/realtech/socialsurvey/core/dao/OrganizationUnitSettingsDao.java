@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.entities.LOSearchEngine;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SEOUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -500,4 +501,24 @@ public interface OrganizationUnitSettingsDao
 
 
 	List<Long> fetchActiveUserForCompany(long companyId);
+
+	/**
+	 * 
+	 * @param collectionName
+	 * @param vertical
+	 * @param locationType
+	 * @param excludedEntityIds
+	 * @return
+	 */
+	List<SEOUrlEntity> fetchSEOUrlEntty(String collectionName, int count, int limit, String locationType,
+			List<Long> excludedEntityIds);
+
+	/**
+	 * @param collectionName
+	 * @param locationType
+	 * @param excludedEntityIds
+	 * @return
+	 */
+	public long fetchSEOUrlCount(String collectionName, String locationType, List<Long> excludedEntityIds);
+
 }

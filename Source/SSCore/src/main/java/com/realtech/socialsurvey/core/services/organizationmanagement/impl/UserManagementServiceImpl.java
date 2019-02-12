@@ -4810,12 +4810,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     {
         List<Long> userIds = new ArrayList<Long>();
         List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao.fetchCompanyIdsWithHiddenSection();
+        if(companyIdsWithHiddenAttribute != null && !companyIdsWithHiddenAttribute.isEmpty()) {
         List<User> users = userDao.findByColumnForMultipleValues( User.class, "company.companyId",
             companyIdsWithHiddenAttribute );
         if ( users != null && !users.isEmpty() ) {
             for ( User user : users ) {
                 userIds.add( user.getUserId() );
             }
+        }
         }
         return userIds;
     }

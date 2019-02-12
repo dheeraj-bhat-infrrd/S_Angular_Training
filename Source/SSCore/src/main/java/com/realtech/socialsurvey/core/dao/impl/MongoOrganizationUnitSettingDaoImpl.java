@@ -1,12 +1,10 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,9 +14,6 @@ import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.core.entities.*;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.NestableRuntimeException;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.ejb.criteria.expression.BinaryArithmeticOperation.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -26,9 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.geo.Circle;
-import org.springframework.data.geo.GeoResult;
-import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -46,7 +38,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
@@ -57,6 +51,7 @@ import com.realtech.socialsurvey.core.entities.LOSearchEngine;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SEOUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -226,6 +221,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SURVEY_STATS_AVG_SCORE = "surveyStats.avgScore";
     public static final String KEY_SURVEY_STATS_SURVEY_COUNT = "surveyStats.surveyCount";
     public static final String KEY_SURVEY_STATS_SEARCH_RANKING_SCORE = "surveyStats.searchRankingScore";
+    
+    public static final Integer SEO_MIN_RESULT_COUNT = 3;
     
     
 
@@ -2041,6 +2038,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		boolean isLocationSearch = false;
 		Query query = new Query();
 		
+		//add criteria if it is a city or state search of seo request
+		if(advancedSearchVO.getCityName() != null && !advancedSearchVO.getCityName().isEmpty()) {
+			operations
+			.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_CITY).in(advancedSearchVO.getCityName())));
+		} else if(advancedSearchVO.getStateCode() != null && !advancedSearchVO.getStateCode().isEmpty()) {
+			operations
+			.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_STATE).in(advancedSearchVO.getStateCode())));
+		}
 		// check if it's normal search
 		// if normal get default values for reviews and sort criteria
 		//to find pattern irrespective of case sensitivity
@@ -2211,6 +2216,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		boolean isLocationSearch = false;
 		Query query = new Query();
 		
+		//check if it is a city or state search
+		if(advancedSearchVO.getCityName() != null && !advancedSearchVO.getCityName().isEmpty()) {
+			operations
+			.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_CITY).in(advancedSearchVO.getCityName())));
+		} else if(advancedSearchVO.getStateCode() != null && !advancedSearchVO.getStateCode().isEmpty()) {
+			operations
+			.add(Aggregation.match(Criteria.where(KEY_CONTACT_DETAILS_STATE).in(advancedSearchVO.getStateCode())));
+		}
 		// check if it's normal search
 		// if normal get default values for reviews and sort criteria
 		//to find pattern irrespective of case sensitivity
@@ -2337,6 +2350,145 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	        }
 		return count;
 
+	}
+
+
+	@Override
+	public List<SEOUrlEntity> fetchSEOUrlEntty(String collectionName, int count, int limit, String locationType , List<Long> excludedEntityIds) {
+		try {
+			TypedAggregation<SEOUrlEntity> aggregation = null;
+			List<AggregationOperation> operations = new ArrayList<>();
+	
+			//exclude default entities
+			operations.add(Aggregation.match(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false )));
+			
+			//exclude incomplete or deleted
+			operations.add(Aggregation.match(Criteria.where( KEY_STATUS )
+						.nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) )));
+			
+			operations.add(Aggregation.match(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1)));
+			if(collectionName.equals(AGENT_SETTINGS_COLLECTION)) {
+				operations.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDDEN_SECTION).exists(false),
+						Criteria.where(KEY_HIDDEN_SECTION).is(false))));
+				operations
+						.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}else {
+				operations
+				.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+						Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}
+			operations.add(Aggregation.match(Criteria.where(getLocationType(locationType)).exists(true).ne(null)));
+			
+			//operations.add(Aggregation.group("contact_details.zipcode").count().as("count"));	
+			DBObject obj = new BasicDBObject();
+			obj.put("location", "$" + getLocationType(locationType));
+			obj.put("vertical", "$" + KEY_VERTICAL);
+
+			if(locationType.equals("city")) {
+				obj.put("state", "$" + getLocationType("state"));
+				operations.add(new CustomAggregationOperation(new BasicDBObject( "$group",
+			            new BasicDBObject( "_id", obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
+			            .append("vertical", new BasicDBObject("$first" , "$" + KEY_VERTICAL))
+			            .append("state", new BasicDBObject("$first" , "$" + getLocationType("state")))
+			            .append( "count", new BasicDBObject( "$sum", 1 ) ) )));
+			} else {
+				operations.add(new CustomAggregationOperation(new BasicDBObject( "$group",
+			            new BasicDBObject( "_id", obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
+			            .append("vertical", new BasicDBObject("$first" , "$" + KEY_VERTICAL))
+			            .append( "count", new BasicDBObject( "$sum", 1 ) ) )));
+			}
+			
+			operations.add(Aggregation.match(Criteria.where("count").gte(SEO_MIN_RESULT_COUNT)));
+			
+			if (count != 0)
+				operations.add(Aggregation.skip(count));
+			// add limit
+			if (limit != 0) {
+				operations.add(Aggregation.limit(limit));
+			}
+			
+			aggregation = new TypedAggregation<>(SEOUrlEntity.class, operations);
+			LOG.info("Aggregation " + aggregation.toString());
+			AggregationResults<SEOUrlEntity> seoUrlEntity = mongoTemplate.aggregate(aggregation, collectionName,
+					SEOUrlEntity.class);
+			return seoUrlEntity.getMappedResults();
+		} catch(Exception e) {
+			LOG.error("Error in querying fetchSEOUrlEntity " + e.getMessage());
+			return null;
+		}
+		
+	}
+
+
+	private String getLocationType(String locationType) {
+		if(locationType.equalsIgnoreCase("state")) {
+			return KEY_CONTACT_DETAILS_STATE;
+		} else if(locationType.equalsIgnoreCase("city")) {
+			return KEY_CONTACT_DETAILS_CITY;
+		} else {
+			return KEY_CONTACT_DETAILS_ZIP_CODE;
+		}
+	}
+
+
+	@Override
+	public long fetchSEOUrlCount(String collectionName, String locationType, List<Long> excludedEntityIds) {
+		try {
+			TypedAggregation<SEOUrlEntity> aggregation = null;
+			List<AggregationOperation> operations = new ArrayList<>();
+	
+			//exclude default entities
+			operations.add(Aggregation.match(Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false )));
+			
+			//exclude incomplete or deleted
+			operations.add(Aggregation.match(Criteria.where( KEY_STATUS )
+						.nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) )));
+			operations.add(Aggregation.match(Criteria.where(KEY_SURVEY_STATS_SURVEY_COUNT).gte(1)));
+			if(collectionName.equals(AGENT_SETTINGS_COLLECTION)) {
+				operations.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDDEN_SECTION).exists(false),
+						Criteria.where(KEY_HIDDEN_SECTION).is(false))));
+				operations
+						.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+								Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}else {
+				operations
+				.add(Aggregation.match(new Criteria().orOperator(Criteria.where(KEY_HIDE_PUBLIC_PAGE).exists(false),
+						Criteria.where(KEY_HIDE_PUBLIC_PAGE).is(false))));
+			}
+			operations.add(Aggregation.match(Criteria.where(getLocationType(locationType)).exists(true).ne(null)));
+			
+			//operations.add(Aggregation.group("contact_details.zipcode").count().as("count"));	
+			DBObject obj = new BasicDBObject();
+			obj.put("location", "$" + getLocationType(locationType));
+			obj.put("vertical", "$" + KEY_VERTICAL);
+			
+			if(locationType.equals("city")) {
+				obj.put("state", "$" + getLocationType("state"));
+				operations.add(new CustomAggregationOperation(new BasicDBObject( "$group",
+			            new BasicDBObject( "_id", obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
+			            .append("vertical", new BasicDBObject("$first" , "$" + KEY_VERTICAL))
+			            .append("state", new BasicDBObject("$first" , "$" + getLocationType("state")))
+			            .append( "count", new BasicDBObject( "$sum", 1 ) ) )));
+			} else {
+				operations.add(new CustomAggregationOperation(new BasicDBObject( "$group",
+			            new BasicDBObject( "_id", obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
+			            .append("vertical", new BasicDBObject("$first" , "$" + KEY_VERTICAL))
+			            .append( "count", new BasicDBObject( "$sum", 1 ) ) )));
+			}
+			
+			operations.add(Aggregation.match(Criteria.where("count").gte(SEO_MIN_RESULT_COUNT)));
+			
+			aggregation = new TypedAggregation<>(SEOUrlEntity.class, operations);
+			
+			AggregationResults<SEOUrlEntity> seoUrlEntity = mongoTemplate.aggregate(aggregation, collectionName,
+					SEOUrlEntity.class);
+			return seoUrlEntity.getMappedResults().size();
+		} catch(Exception e) {
+			LOG.error("Error in querying fetchSEOUrlEntity " + e.getMessage());
+			return 0;
+		}
+		
 	}
     
     @Override

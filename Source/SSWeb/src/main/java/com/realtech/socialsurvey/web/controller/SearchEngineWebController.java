@@ -6,6 +6,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +47,7 @@ public class SearchEngineWebController
     {
 
         LOG.info( "Method showSearchEnginePage() called from SearchEngineWebController" );
-        
+        model.addAttribute("title" , "Search Professionals | SocialSurvey.me");
         if((basedOn == null || basedOn.isEmpty())&&(companyProfileName == null || companyProfileName.isEmpty())) {
             model.addAttribute( "isPubPageSearch", false );
             model.addAttribute( "companyProfileName", "" );
@@ -79,82 +82,77 @@ public class SearchEngineWebController
         
         AdvancedSearchVO advancedSearchVO = new AdvancedSearchVO();
 
-        String startIndexStr = request.getParameter( "startIndex" );
-        String batchSizeStr = request.getParameter( "batchSize" );
-        String sortBy = request.getParameter( "sortBy" );
-        String distanceCriteriaStr = request.getParameter( "distanceCriteria" );
-        String ratingCriteriaStr = request.getParameter( "ratingCriteria" );
-        String reviewCountCriteriaStr = request.getParameter( "reviewCountCriteria" );
-        String latStr = request.getParameter( "lat" );
-        String lngStr = request.getParameter( "lng" );
-        String profileFilter = request.getParameter( "profileFilter" );
-        String findBasedOn = request.getParameter( "findBasedOn" );
-        String categoryFilterListStr = request.getParameter( "categoryFilterList" );
-        String companyProfileName = request.getParameter( "companyProfileName" );
+        try {
+            JSONObject payload = new JSONObject(request.getParameter( "payload" ));
+            LOG.info( payload.toString() );
+            String companyProfileName = payload.getString( "companyProfileName" );
+            long startIndex = payload.getLong( "startIndex" );
+            long batchSize = payload.getLong( "batchSize" );
+            String lngStr = payload.getString( "lng" );
+            String latStr = payload.getString( "lat" );
+            String findBasedOn = payload.getString( "findBasedOn" );
+            JSONArray categoryFilterListJarray = payload.getJSONArray( "categoryFilterList" );
+            String sortBy = payload.getString( "sortBy" );
+            long distanceCriteriaStr= payload.getLong( "distanceCriteria" );
+            long reviewCountCriteriaStr = payload.getLong( "reviewCountCriteria" );
+            long ratingCriteria = payload.getLong( "ratingCriteria" );
+            String profileFilter = payload.getString( "profileFilter" );
+            String cityName = payload.getString("cityName");
+            String stateCode = payload.getString("stateCode");
+            
+            long distanceCriteria = CommonConstants.DEFAULT_DISTANCE_CRITERIA;
+            long reviewCountCriteria = CommonConstants.DEFAULT_REVIEW_COUNT_CRITERIA;
+            double lat = 0.0;
+            double lng = 0.0;
 
-        long startIndex = CommonConstants.SEARCH_ENGINE_START_INDEX;
-        long batchSize = CommonConstants.SEARCH_ENGINE_START_INDEX;
-        long distanceCriteria = CommonConstants.DEFAULT_DISTANCE_CRITERIA;
-        long ratingCriteria = CommonConstants.DEFAULT_RATING_CRITERIA;
-        long reviewCountCriteria = CommonConstants.DEFAULT_REVIEW_COUNT_CRITERIA;
-        double lat = 0.0;
-        double lng = 0.0;
-
-        if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
-            startIndex = Long.valueOf( startIndexStr );
-        }
-
-        if ( batchSizeStr != null && !batchSizeStr.isEmpty() ) {
-            batchSize = Long.valueOf( batchSizeStr );
-        }
-
-        if ( distanceCriteriaStr != null && !distanceCriteriaStr.isEmpty() ) {
-            distanceCriteria = Long.valueOf( distanceCriteriaStr );
-        }
-
-        if ( ratingCriteriaStr != null && !ratingCriteriaStr.isEmpty() ) {
-            ratingCriteria = Long.valueOf( ratingCriteriaStr );
-        }
-
-        if ( reviewCountCriteriaStr != null && !reviewCountCriteriaStr.isEmpty() ) {
-            reviewCountCriteria = Long.valueOf( reviewCountCriteriaStr );
-        }
-
-        if ( latStr != null && !latStr.isEmpty() ) {
-            lat = Double.valueOf( latStr );
-        }
-
-        if ( lngStr != null && !lngStr.isEmpty() ) {
-            lng = Double.valueOf( lngStr );
-        }
-        
-        List<String> categoryFilterList = new ArrayList<>();
-
-        if ( categoryFilterListStr != null && !categoryFilterListStr.isEmpty() ) {
-            for ( String categoryFilter : categoryFilterListStr.split( "," ) ) {
-                categoryFilterList.add( categoryFilter );
+            if ( distanceCriteriaStr != 0) {
+                distanceCriteria = Long.valueOf( distanceCriteriaStr );
             }
-        }
+            
+            if ( reviewCountCriteriaStr != 0) {
+                reviewCountCriteria = Long.valueOf( reviewCountCriteriaStr );
+            }
 
-        LatLng latLng = new LatLng( lat, lng );
-        
-        advancedSearchVO.setBatchSize( batchSize );
-        advancedSearchVO.setStartIndex( startIndex );
-        advancedSearchVO.setSortBy( sortBy );
-        advancedSearchVO.setProfileFilter( profileFilter );
-        advancedSearchVO.setFindBasedOn( findBasedOn );
-        advancedSearchVO.setCategoryFilterList( categoryFilterList );
-        advancedSearchVO.setDistanceCriteria( distanceCriteria );
-        if(!(lat==0 && lng==0)){
-            advancedSearchVO.setNearLocation( latLng );
-        }
-        advancedSearchVO.setRatingCriteria( ratingCriteria );
-        advancedSearchVO.setReviewCountCriteria( reviewCountCriteria );
-        advancedSearchVO.setCompanyProfileName(companyProfileName);
-        
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSearchResults( advancedSearchVO );
+            if ( latStr != null && !latStr.isEmpty() ) {
+                lat = Double.valueOf( latStr );
+            }
 
-        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+            if ( lngStr != null && !lngStr.isEmpty() ) {
+                lng = Double.valueOf( lngStr );
+            }
+            
+            List<String> categoryFilterList = new ArrayList<>();
+            for(int i=0;i<categoryFilterListJarray.length();i++) {
+                categoryFilterList.add( categoryFilterListJarray.getString( i ) );
+            }
+            
+            LatLng latLng = new LatLng( lat, lng );
+            
+            advancedSearchVO.setBatchSize( batchSize );
+            advancedSearchVO.setStartIndex( startIndex );
+            advancedSearchVO.setSortBy( sortBy );
+            advancedSearchVO.setProfileFilter( profileFilter );
+            advancedSearchVO.setFindBasedOn( findBasedOn );
+            advancedSearchVO.setCategoryFilterList( categoryFilterList );
+            advancedSearchVO.setDistanceCriteria( distanceCriteria );
+            if(!(lat==0 && lng==0)){
+                advancedSearchVO.setNearLocation( latLng );
+            }
+            advancedSearchVO.setRatingCriteria( ratingCriteria );
+            advancedSearchVO.setReviewCountCriteria( reviewCountCriteria );
+            advancedSearchVO.setCompanyProfileName(companyProfileName);
+            advancedSearchVO.setCityName(cityName);
+            advancedSearchVO.setStateCode(stateCode);
+            
+            Response response = ssApiIntergrationBuilder.getIntegrationApi().getSearchResults( advancedSearchVO );
+
+            return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+            
+        } catch ( JSONException e ) {
+            e.printStackTrace();
+            LOG.error( "Error while getting payload : " + e.getMessage());
+            return "error";
+        }        
     }
     
     @ResponseBody
@@ -191,79 +189,76 @@ public class SearchEngineWebController
         
         AdvancedSearchVO advancedSearchVO = new AdvancedSearchVO();
 
-        String startIndexStr = request.getParameter( "startIndex" );
-        String batchSizeStr = request.getParameter( "batchSize" );
-        String sortBy = request.getParameter( "sortBy" );
-        String distanceCriteriaStr = request.getParameter( "distanceCriteria" );
-        String ratingCriteriaStr = request.getParameter( "ratingCriteria" );
-        String reviewCountCriteriaStr = request.getParameter( "reviewCountCriteria" );
-        String latStr = request.getParameter( "lat" );
-        String lngStr = request.getParameter( "lng" );
-        String profileFilter = request.getParameter( "profileFilter" );
-        String findBasedOn = request.getParameter( "findBasedOn" );
-        String categoryFilterListStr = request.getParameter( "categoryFilterList" );
-        String companyProfileName = request.getParameter( "companyProfileName" );
+        try {
+            JSONObject payload = new JSONObject(request.getParameter( "payload" ));
+            LOG.info( payload.toString() );
+            String companyProfileName = payload.getString( "companyProfileName" );
+            long startIndex = payload.getLong( "startIndex" );
+            long batchSize = payload.getLong( "batchSize" );
+            String lngStr = payload.getString( "lng" );
+            String latStr = payload.getString( "lat" );
+            String findBasedOn = payload.getString( "findBasedOn" );
+            JSONArray categoryFilterListJarray = payload.getJSONArray( "categoryFilterList" );
+            String sortBy = payload.getString( "sortBy" );
+            long distanceCriteriaStr= payload.getLong( "distanceCriteria" );
+            long reviewCountCriteriaStr = payload.getLong( "reviewCountCriteria" );
+            long ratingCriteria = payload.getLong( "ratingCriteria" );
+            String profileFilter = payload.getString( "profileFilter" );
+            String cityName = payload.getString("cityName");
+            String stateCode = payload.getString("stateCode");
+            
+            long distanceCriteria = CommonConstants.DEFAULT_DISTANCE_CRITERIA;
+            long reviewCountCriteria = CommonConstants.DEFAULT_REVIEW_COUNT_CRITERIA;
+            double lat = 0.0;
+            double lng = 0.0;
 
-        long startIndex = CommonConstants.SEARCH_ENGINE_START_INDEX;
-        long batchSize = CommonConstants.SEARCH_ENGINE_START_INDEX;
-        long distanceCriteria = CommonConstants.DEFAULT_DISTANCE_CRITERIA;
-        long ratingCriteria = CommonConstants.DEFAULT_RATING_CRITERIA;
-        long reviewCountCriteria = CommonConstants.DEFAULT_REVIEW_COUNT_CRITERIA;
-        double lat = 0l;
-        double lng = 0l;
-
-        if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
-            startIndex = Long.valueOf( startIndexStr );
-        }
-
-        if ( batchSizeStr != null && !batchSizeStr.isEmpty() ) {
-            batchSize = Long.valueOf( batchSizeStr );
-        }
-
-        if ( distanceCriteriaStr != null && !distanceCriteriaStr.isEmpty() ) {
-            distanceCriteria = Long.valueOf( distanceCriteriaStr );
-        }
-
-        if ( ratingCriteriaStr != null && !ratingCriteriaStr.isEmpty() ) {
-            ratingCriteria = Long.valueOf( ratingCriteriaStr );
-        }
-
-        if ( reviewCountCriteriaStr != null && !reviewCountCriteriaStr.isEmpty() ) {
-            reviewCountCriteria = Long.valueOf( reviewCountCriteriaStr );
-        }
-
-        if ( latStr != null && !latStr.isEmpty() ) {
-            lat = Double.valueOf( latStr );
-        }
-
-        if ( lngStr != null && !lngStr.isEmpty() ) {
-            lng = Double.valueOf( lngStr );
-        }
-
-        List<String> categoryFilterList = new ArrayList<>();
-
-        if ( categoryFilterListStr != null && !categoryFilterListStr.isEmpty() ) {
-            for ( String categoryFilter : categoryFilterListStr.split( "," ) ) {
-                categoryFilterList.add( categoryFilter );
+            if ( distanceCriteriaStr != 0) {
+                distanceCriteria = Long.valueOf( distanceCriteriaStr );
             }
-        }
+            
+            if ( reviewCountCriteriaStr != 0) {
+                reviewCountCriteria = Long.valueOf( reviewCountCriteriaStr );
+            }
 
-        LatLng latLng = new LatLng( lat, lng );
-        
-        advancedSearchVO.setBatchSize( batchSize );
-        advancedSearchVO.setStartIndex( startIndex );
-        advancedSearchVO.setSortBy( sortBy );
-        advancedSearchVO.setProfileFilter( profileFilter );
-        advancedSearchVO.setFindBasedOn( findBasedOn );
-        advancedSearchVO.setCategoryFilterList( categoryFilterList );
-        advancedSearchVO.setDistanceCriteria( distanceCriteria );
-        advancedSearchVO.setNearLocation( latLng );
-        advancedSearchVO.setRatingCriteria( ratingCriteria );
-        advancedSearchVO.setReviewCountCriteria( reviewCountCriteria );
-        advancedSearchVO.setCompanyProfileName(companyProfileName);
-        
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSearchResultsCount( advancedSearchVO );
+            if ( latStr != null && !latStr.isEmpty() ) {
+                lat = Double.valueOf( latStr );
+            }
 
-        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+            if ( lngStr != null && !lngStr.isEmpty() ) {
+                lng = Double.valueOf( lngStr );
+            }
+            
+            List<String> categoryFilterList = new ArrayList<>();
+            for(int i=0;i<categoryFilterListJarray.length();i++) {
+                categoryFilterList.add( categoryFilterListJarray.getString( i ) );
+            }
+            
+            LatLng latLng = new LatLng( lat, lng );
+            
+            advancedSearchVO.setBatchSize( batchSize );
+            advancedSearchVO.setStartIndex( startIndex );
+            advancedSearchVO.setSortBy( sortBy );
+            advancedSearchVO.setProfileFilter( profileFilter );
+            advancedSearchVO.setFindBasedOn( findBasedOn );
+            advancedSearchVO.setCategoryFilterList( categoryFilterList );
+            advancedSearchVO.setDistanceCriteria( distanceCriteria );
+            if(!(lat==0 && lng==0)){
+                advancedSearchVO.setNearLocation( latLng );
+            }
+            advancedSearchVO.setRatingCriteria( ratingCriteria );
+            advancedSearchVO.setReviewCountCriteria( reviewCountCriteria );
+            advancedSearchVO.setCompanyProfileName(companyProfileName);
+            advancedSearchVO.setCityName(cityName);
+            advancedSearchVO.setStateCode(stateCode);
+            
+            Response response = ssApiIntergrationBuilder.getIntegrationApi().getSearchResultsCount( advancedSearchVO );
+
+            return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+            
+        } catch ( JSONException e ) {
+            e.printStackTrace();
+            LOG.error( "Error while getting payload : " + e.getMessage());
+            return "error";
+        }               
     }
 }
