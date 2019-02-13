@@ -53,6 +53,17 @@
 		</property>
 		<property name="durability" value="true" />
 	</bean>
+	
+	<!-- setting site map generetor job detail for lo search -->
+	<bean id="losearchsitemapjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SEOSiteMapCreatorJob" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="seositeMapService" value-ref="seositeMapService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 
 	<!-- Setting incomplete social post reminder job detail -->
 	<bean id="incompletesocialpostjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -603,6 +614,13 @@
 		<property name="jobDetail" ref="sitemapjobdetail" />
 		<property name="cronExpression" value="0 0 * * * ?" />
 	</bean>
+	
+	<!-- setting cron for Account deactivator -->
+	<bean id="losearchsitemapgeneratorcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="losearchsitemapjobdetail" />
+		<property name="cronExpression" value="0 0 1 * * ?" />
+	</bean>
 
 	<!-- setting cron for incomplete social post reminder -->
 	<bean id="incompletesocialpostcron"
@@ -932,6 +950,7 @@
 				<ref bean="archiveSocialFeedCollectionJob" />
 				<ref bean="ftpfileuploader" />
 				<!-- <ref bean="updatesurveyjobdetail"/> -->
+				<ref bean="losearchsitemapjobdetail" />
 			</list>
 		</property>
 
@@ -979,6 +998,7 @@
 				<ref bean="archiveSocialFeedCollectionCronTrigger" />
 				<ref bean="ftpfileuploadercron" />
 				<!-- <ref bean="updatesurveydetailcron"/> -->
+				<ref bean="losearchsitemapgeneratorcron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -1127,7 +1147,10 @@
 	<bean id="streamApiIntegrationBuilder"
 		  class="com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder" />
 
-	<!-- dependency for monthlyDigestStarter -->
-	<bean id="ftpManagement"
-		  class="com.realtech.socialsurvey.core.services.ftpmanagement.impl.FTPManagementImpl" />
+	<!-- dependency for monthlyDigestStarter -->	
+	<bean id="ftpManagement" 
+		class="com.realtech.socialsurvey.core.services.ftpmanagement.impl.FTPManagementImpl" />
+	<bean id="seositeMapService"
+		class="com.realtech.socialsurvey.core.services.generator.impl.SEOSiteMapServiceImpl" />
+
 </beans>

@@ -1251,6 +1251,9 @@ public class UserManagementController
             // updating session with aggregated user profiles, if not set
             sessionHelper.processAssignments( session, user );
 
+            //Update LastUserLogin
+            user.setLastUserLogin( new Timestamp( System.currentTimeMillis() ) );
+            
             // update the last login time and number of logins
             userManagementService.updateUserLoginTimeAndNum( user );
         } catch ( NonFatalException e ) {

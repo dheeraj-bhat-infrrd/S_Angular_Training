@@ -34,9 +34,20 @@ public class WidgetConfigurationRequest
     private String hideReviewBtn;
     private String hideContactBtn;
     private String maxWidgetBtnSize;
+    private String enableMobView;
 
 
-    public String getMaxWidgetBtnSize() {
+    public String getEnableMobView() {
+		return enableMobView;
+	}
+
+
+	public void setEnableMobView(String enableMobView) {
+		this.enableMobView = enableMobView;
+	}
+
+
+	public String getMaxWidgetBtnSize() {
 		return maxWidgetBtnSize;
 	}
 
@@ -417,7 +428,9 @@ public class WidgetConfigurationRequest
 				+ ", seoKeywords=" + seoKeywords + ", seoDescription=" + seoDescription + ", requestMessage="
 				+ requestMessage + ", overrideLowerHierarchy=" + overrideLowerHierarchy + ", lockLowerHierarchy="
 				+ lockLowerHierarchy + ", hideReviewBtn=" + hideReviewBtn + ", hideContactBtn=" + hideContactBtn
-				+ ", maxWidgetBtnSize=" + maxWidgetBtnSize + "]";
+				+ ", maxWidgetBtnSize=" + maxWidgetBtnSize + ", enableMobView=" + enableMobView + "]";
 	}
+
+    
 
 }

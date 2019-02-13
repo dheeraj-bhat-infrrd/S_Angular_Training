@@ -257,6 +257,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR = "SurveyCsvUploadProcessor";
     public static final String BATCH_TYPE_TRANSACTION_ACTIVITY_MONITOR = "transactionActivityMonitor";
     public static final String BATCH_TYPE_FTP_FILE_UPLOADER = "FTPFileUploader";
+    public static final String BATCH_TYPE_SEO_SITE_MAP_GENERATOR = "SEOSiteMapGenerator";
 
     
     //batch name constant for batch tracker
@@ -288,6 +289,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR = "Survey CSV file Upload Processor";
     public static final String BATCH_NAME_TRANSACTION_ACTIVITY_MONITOR = "Transaction Activity Monitor";
     public static final String BATCH_NAME_FTP_FILE_UPLOADER = "FTP files uploader";
+    public static final String BATCH_NAME_SEO_SITE_MAP_GENERATOR = "SEO Site Map Generator Batch";
 
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
@@ -1728,6 +1730,7 @@ public interface CommonConstants
     public static final String WIDGET_HIDE_CONTACT = "hideContactBtn";
     public static final String WIDGET_HIDE_REVIEW = "hideReviewBtn";
     public static final String WIDGET_MAX_BUTTON_SIZE = "maxWidgetBtnSize";
+    public static final String WIDGET_ENABLE_MOB_VIEW = "enableMobView";
     
     public static final String WIDGET_ORDER_NEWEST_FIRST = "newestFirst";
     public static final String WIDGET_ORDER_OLDEST_FIRST = "oldestFirst";
@@ -1752,6 +1755,7 @@ public interface CommonConstants
     public static final String WIDGET_DEFAULT_HIDE_CONTACT = "false";
     public static final String WIDGET_DEFAULT_HIDE_REVIEW = "false";
     public static final String WIDGET_DEFAULT_BUTTON_SIZE = "205";
+    public static final String WIDGET_DEFAULT_ENABLE_MOB_VIEW = "false";
 
     public static final String WIDGET_DEFAULT_BUTTON1_OPACITY = "0.7";
     public static final String WIDGET_DEFAULT_BUTTON2_TEXT = "WRITE A REVIEW";

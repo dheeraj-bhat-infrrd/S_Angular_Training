@@ -270,7 +270,8 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         historyMap.put( CommonConstants.WIDGET_HIDE_CONTACT, CommonConstants.WIDGET_DEFAULT_HIDE_CONTACT );
         historyMap.put( CommonConstants.WIDGET_HIDE_REVIEW, CommonConstants.WIDGET_DEFAULT_HIDE_REVIEW );
         historyMap.put( CommonConstants.WIDGET_MAX_BUTTON_SIZE, CommonConstants.WIDGET_DEFAULT_BUTTON_SIZE );
-
+        historyMap.put( CommonConstants.WIDGET_ENABLE_MOB_VIEW, CommonConstants.WIDGET_DEFAULT_ENABLE_MOB_VIEW );
+        
         return historyMap;
     }
 
@@ -443,6 +444,13 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
             }
         }
 
+        if ( StringUtils.isNotEmpty( widgetConfigurationRequest.getEnableMobView()) ) {
+            if ( !StringUtils.equals( widgetConfigurationRequest.getEnableMobView(), widgetConfiguration.getEnableMobView() ) ) {
+                historyMap.put( CommonConstants.WIDGET_ENABLE_MOB_VIEW, widgetConfigurationRequest.getEnableMobView() );
+                widgetConfiguration.setHideBarGraph( widgetConfigurationRequest.getEnableMobView() );
+            }
+        }
+        
         if ( StringUtils.isNotEmpty( widgetConfigurationRequest.getHideBarGraph() ) ) {
             if ( !StringUtils.equals( widgetConfigurationRequest.getHideBarGraph(), widgetConfiguration.getHideBarGraph() ) ) {
                 historyMap.put( CommonConstants.WIDGET_HIDE_BAR_GRAPH, widgetConfigurationRequest.getHideBarGraph() );
@@ -599,6 +607,7 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         widgetConfiguration.setHideOptions( CommonConstants.WIDGET_DEFAULT_HIDE_OPTIONS );
         widgetConfiguration.setReviewSortOrder( CommonConstants.WIDGET_DEFAULT_SORT_ORDER );
         widgetConfiguration.setAllowModestBranding( CommonConstants.WIDGET_DEFAULT_ALLOW_MODEST_BRANDING );
+        widgetConfiguration.setEnableMobView(CommonConstants.WIDGET_DEFAULT_ENABLE_MOB_VIEW);
         
         widgetConfiguration.setHideContactBtn(CommonConstants.WIDGET_DEFAULT_HIDE_CONTACT);
         widgetConfiguration.setHideReviewBtn(CommonConstants.WIDGET_DEFAULT_HIDE_REVIEW);
@@ -723,6 +732,10 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
 
                 if ( StringUtils.isEmpty( widgetConfiguration.getHideBarGraph() ) ) {
                     widgetConfiguration.setHideBarGraph( CommonConstants.WIDGET_DEFAULT_HIDE_BAR_GRAPH );
+                }
+                
+                if ( StringUtils.isEmpty( widgetConfiguration.getEnableMobView() ) ) {
+                    widgetConfiguration.setEnableMobView(CommonConstants.WIDGET_DEFAULT_ENABLE_MOB_VIEW);
                 }
 
                 if ( StringUtils.isEmpty( widgetConfiguration.getHideOptions() ) ) {

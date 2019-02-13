@@ -30,11 +30,11 @@
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 60px;
+			margin-top: 40px;
 		}
 		
 		.summit-popup-close-btn{
-			margin-right: 25px;
+			margin-right: 16px;
 		}
 	}
 	
@@ -42,11 +42,16 @@
 		.summit-ribbon-body{
 			background-image: url(../images/TP_We_Ready_Mobile_Ribbon.png);
 			height: 50px;
-			background-size: cover;
+			background-size: contain;
+			width:100%
 		}
 		
 		.summit-popup-close-cont{
 			margin-top: 45px;
+		}
+		
+		.summit-ribbon-close-btn {
+		    margin-right: 5px;
 		}
 	}
 	
@@ -59,6 +64,7 @@
 	@media (max-width: 870px){
 		.summit-checkbox-cont{
 			margin-bottom:15px;
+			margin-left: 40px;
 		}
 		
 		.summit-popup-close-cont{
@@ -66,7 +72,7 @@
 		}
 		
 		.summit-popup-close-btn{
-			margin-right: 20px;
+			margin-right: 30px;
 		}
 	}
 	
@@ -85,27 +91,42 @@
 		.summit-check-text{
 			font-size: 11px;
 		}
+		
+		.summit-popup-close-btn {
+		    margin-right: 6px;
+		}
+	}
+	
+	@media (max-width: 640px){
+	
+		.summit-ribbon-body{
+			width: 95%;
+		}
+		
+		.summit-ribbon-close-btn {
+			margin-right: -12px;
+		}
 	}
 	
 	@media (max-width: 580px){
 		.summit-popup-body{
-			background-image: url(../images/TP_We_Ready_Mobile_Banner_v6.gif);
+			background-image: url(../images/WOWworthy_EmmaM_Mobile_Banner.png);
 		}
 		
 		.summit-ribbon-outer{
-			height: 30px;
+			height: 40px;
 		}
 		
 		.summit-ribbon-body{
-			height: 30px;
+			height: 40px;
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 22px;
+			margin-top: 13px;
 		}
 		
 		.summit-popup-close-btn{
-		    margin-right: 15px;
+		    margin-right: 4px;
 		    width: 15px;
 		    height: 15px;
 		    border-width: 3px;
@@ -119,8 +140,8 @@
 		    border-width: 3px;
 		    line-height: 7px;
 		    font-size: 9px;
-		    margin-right: 5px;
-		    margin-top: -5px;
+		    margin-right: -10px;
+		    margin-top: 0px;
 		}
 	}
 	
@@ -128,6 +149,14 @@
 		.summit-checkbox-cont {
 		    margin-left: 15px;
 		    margin-bottom: 15px;
+		}
+		
+		.summit-ribbon-close-btn{
+			margin-right: -15px;
+		}
+		
+		.summit-ribbon-body{
+			margin-left: 0;
 		}
 	}
 	
@@ -149,11 +178,11 @@
 		}
 		
 		.summit-popup-close-cont{
-			margin-top: 12px;
+			margin-top: 7px;
 		}
 		
 		.summit-popup-close-btn{
-		    margin-right: 8px;
+		    margin-right: 4px;
 		}
 	}
 }

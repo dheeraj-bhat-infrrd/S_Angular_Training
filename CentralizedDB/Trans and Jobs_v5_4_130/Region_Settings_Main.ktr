@@ -748,7 +748,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>tokenExpiryAlertSent</name>
+      </field>      <field>        <name>fbTokenExpiryAlertSent</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -757,7 +757,22 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
+      <meta>        <name>fbTokenExpiryAlertSent</name>
+        <rename>fbTokenExpiryAlertSent</rename>
+        <type>Boolean</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>343</xloc>
       <yloc>8</yloc>
@@ -1193,7 +1208,7 @@
       </value>
       <value>
         <name>TOKEN_EXPIRY_ALERT_SENT</name>
-        <rename>tokenExpiryAlertSent</rename>
+        <rename>fbTokenExpiryAlertSent</rename>
         <update>Y</update>
       </value>
       <value>
@@ -1490,7 +1505,7 @@
       </value>
       <value>
         <name>TOKEN_EXPIRY_ALERT_SENT</name>
-        <rename>tokenExpiryAlertSent</rename>
+        <rename>linkdinTokenExpiryAlertSent</rename>
         <update>Y</update>
       </value>
       <value>
@@ -1870,7 +1885,7 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>tokenExpiryAlertSent</name>
+      </field>      <field>        <name>linkdinTokenExpiryAlertSent</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1887,7 +1902,22 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
+      <meta>        <name>linkdinTokenExpiryAlertSent</name>
+        <rename>linkdinTokenExpiryAlertSent</rename>
+        <type>Boolean</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>347</xloc>
       <yloc>911</yloc>
@@ -2590,7 +2620,7 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>tokenExpiryAlertSent</field_name>
+        <field_name>linkdinTokenExpiryAlertSent</field_name>
 
         <field_path>&#x24;.socialMediaTokens.linkedInToken.tokenExpiryAlertSent</field_path>
 
@@ -2598,7 +2628,7 @@
 
       </mongo_field>
       <mongo_field>
-        <field_name>tokenExpiryAlertSent_1</field_name>
+        <field_name>fbTokenExpiryAlertSent</field_name>
 
         <field_path>&#x24;.socialMediaTokens.facebookToken.tokenExpiryAlertSent</field_path>
 

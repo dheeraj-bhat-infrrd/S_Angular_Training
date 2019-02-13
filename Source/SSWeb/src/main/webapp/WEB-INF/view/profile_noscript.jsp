@@ -133,9 +133,9 @@
 	</c:choose>
 	<c:if test="${not empty averageRating}">
 		<fmt:formatNumber var="floatingAverageRating" type="number"
-			value="${averageRating}" maxFractionDigits="1" minFractionDigits="1" />
+			value="${averageRating}" maxFractionDigits="2" minFractionDigits="2" />
 		<fmt:formatNumber var="floatingAverageGoogleRating" type="number"
-			value="${averageRating}" maxFractionDigits="1" minFractionDigits="1" />
+			value="${averageRating}" maxFractionDigits="2" minFractionDigits="2" />
 		<fmt:formatNumber var="integerAverageRating" type="number"
 			value="${averageRating}" maxFractionDigits="0" />
 		<c:set var="integerAverageRating" value="${integerAverageRating}"></c:set>

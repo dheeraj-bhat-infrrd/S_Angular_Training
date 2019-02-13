@@ -11192,4 +11192,35 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Override
+	public Map<String, String> getStateCodeNameMap() {
+		LOG.info("getStateCodeNameMap start");
+		try {
+			List<StateLookup> stateLookupList = stateLookupDao.findAll(StateLookup.class);
+			if(stateLookupList != null && !stateLookupList.isEmpty()) {
+				LOG.info("Generating stateCOdeName map");
+				Map<String, String> stateCodeMap = new HashMap<String, String>();
+				for(StateLookup stateLookup : stateLookupList) {
+					stateCodeMap.put(stateLookup.getStatecode(), stateLookup.getStatename());
+				}
+				return stateCodeMap;
+			}
+		}catch(Exception e) {
+			LOG.error("Caught exception in getStateCodeNameMap " , e);
+		}
+		return null;
+	}
+	
+	public String getStateCodeByStateName(String stateName) {
+		LOG.info("getStateCodeByStateName start");
+		try {
+			List<StateLookup> statelookup = stateLookupDao.findByColumn(StateLookup.class, "statename", stateName);
+			if(statelookup != null && !statelookup.isEmpty()) {
+				return statelookup.get(0).getStatecode();
+			}
+		}catch(Exception e) {
+			LOG.error("Caught exception in getStateCodeByStateName " , e);
+		}
+		return null;
+	}
 }

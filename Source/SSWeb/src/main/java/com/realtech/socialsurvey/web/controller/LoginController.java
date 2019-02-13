@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Enumeration;
 // JIRA SS-21 : by RM-06 : BOC
 import java.util.List;
 import java.util.Map;
@@ -405,7 +407,6 @@ public class LoginController
                 LOG.error( "Realtech User id not present in session, direct user login" );
             }
 
-
             userManagementService.setProfilesOfUser( user );
             List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
             if ( licenseDetails != null && !licenseDetails.isEmpty() ) {
@@ -537,6 +538,19 @@ public class LoginController
                         // updating session with selected user profile if not set
                         sessionHelper.processAssignments( session, user );
 
+                        //Update LastUserLogin if Admin has not Logged As any User
+                        try {
+                            
+                            if(session.getAttribute( CommonConstants.IS_AUTO_LOGIN ) == null || !(Boolean)session.getAttribute( CommonConstants.IS_AUTO_LOGIN )) {
+                                
+                                user.setLastUserLogin( new Timestamp( System.currentTimeMillis() ) );
+                            }                            
+                        }
+                        catch(Exception exception) {
+                         
+                            LOG.error( "Invalid value of isAutoLogin attribute" + exception.getMessage() );
+                        }
+                        
                         // update the last login time and number of logins
                         userManagementService.updateUserLoginTimeAndNum( user );
                     }

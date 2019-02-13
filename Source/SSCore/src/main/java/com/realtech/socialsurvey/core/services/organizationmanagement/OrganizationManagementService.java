@@ -1908,5 +1908,17 @@ public interface OrganizationManagementService
 
     
     void updateCompanySettings( long companyId, String columnName, Object columnValue );
+    
+	/**
+	 * @return
+	 */
+	public Map<String, String> getStateCodeNameMap();
+	
+	/**
+	 * @param stateName
+	 * @return
+	 */
+	public String getStateCodeByStateName(String stateName);
+
 
 }

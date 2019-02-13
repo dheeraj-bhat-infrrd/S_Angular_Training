@@ -17,6 +17,24 @@ public class AdvancedSearchVO {
 	private long startIndex;
 	private long batchSize;
 	private String companyProfileName;
+	private String cityName;
+	private String stateCode;
+
+	public String getCityName() {
+		return cityName;
+	}
+
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+
+	public String getStateCode() {
+		return stateCode;
+	}
+
+	public void setStateCode(String stateCode) {
+		this.stateCode = stateCode;
+	}
 
 	public long getDistanceCriteria() {
 		return distanceCriteria;

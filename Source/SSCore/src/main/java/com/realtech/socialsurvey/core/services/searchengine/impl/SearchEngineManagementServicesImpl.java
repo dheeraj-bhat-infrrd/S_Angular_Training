@@ -484,7 +484,7 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 			Integer.parseInt(searchString);
 			return userDao.getZipcodeSuggestion(searchString, startIndex, batchSize, onlyUsFilter);
 		}catch(NumberFormatException exception) {
-			if (searchString.contains(",")) {
+			if (searchString.contains(",") && searchString.charAt(0) != ',') {
 				String[] commaSeparatedArr = searchString.split(",");
 				if (commaSeparatedArr.length > 1) {
 					searchString = commaSeparatedArr[0].trim() + "," + commaSeparatedArr[1].trim();

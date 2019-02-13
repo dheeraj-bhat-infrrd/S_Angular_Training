@@ -566,10 +566,12 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         if ( branchId <= 0l ) {
             throw new InvalidInputException( "Invalid branchId : " + branchId );
         }
-        String queryStr = "UPDATE USER_PROFILE SET REGION_ID = ? WHERE BRANCH_ID = ?";
+        String queryStr = "UPDATE USER_PROFILE SET REGION_ID = :regionId , MODIFIED_ON= :modifiedOn WHERE BRANCH_ID = :branchId ";
         Query query = getSession().createSQLQuery( queryStr );
-        query.setParameter( 0, regionId );
-        query.setParameter( 1, branchId );
+        query.setParameter( "regionId", regionId );
+        query.setParameter( "modifiedOn", new Timestamp( System.currentTimeMillis() ) );
+        query.setParameter( "branchId", branchId );
+        
         query.executeUpdate();
         LOG.debug( "Method to update regionId to " + regionId + " for branchId : " + branchId + " in USER_PROFILE finished." );
     }
@@ -595,10 +597,11 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
             throw new InvalidInputException( "EmailId cannot be empty" );
         }
 
-        String hqlUpdate = "update UserProfile up set up.emailId = :emailId where up.user.userId = :userId";
+        String hqlUpdate = "update UserProfile up set up.emailId = :emailId , MODIFIED_ON= :modifiedOn where up.user.userId = :userId";
         Query query = getSession().createQuery( hqlUpdate );
         query.setString( "emailId", emailId );
         query.setLong( "userId", userId );
+        query.setParameter( "modifiedOn", new Timestamp( System.currentTimeMillis() ) );
         query.executeUpdate();
         LOG.debug( "Method to update emailId to : " + emailId + " for user profiles of user ID : " + userId + " finished." );
     }
