@@ -1,14 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE">
+<!DOCTYPE html>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title><spring:message code="label.prolist.title.key" /></title>
-	<meta name="keywords" content="professional, online, reputation, social, survey, reviews, rating, SocialSurvey">
-	<meta name="description" content="Find professional reviews, ratings, reputation, and contact information on SocialSurvey">
+	<title>${title}</title>
+	<meta name="keywords" content="agents, top, best, ${vertical}, ${entity}, near, ${location} ${stateCode} , professional, online, reputation, social, survey, reviews, rating, SocialSurvey">
+	<meta name="description" content="top agents ${vertical} ${entity} near ${location} ${stateCode} , Best agents ${vertical} ${entity} in ${location} ${stateCode}, Find professional reviews, ratings, reputation, and contact information on SocialSurvey">
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/search-engine.css">
@@ -16,12 +16,23 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp.css">
+	<meta property="og:description" content="Find the top ${vertical} ${entity} near ${location}" />
+	<meta property="og:profileLevel" content="${entity}" />
+	<meta property="og:title" content="${title}" />
 </head>
 <body>
 	<input type="hidden" id="srchEngBasedOn" value="${basedOn}">
 	<input type="hidden" id="srchEngIsPubPageSearch" value="${isPubPageSearch}">
 	<input type="hidden" id="srchEngCompanyProfileName" value="${companyProfileName}">
 	<input type="hidden" id="srchEngLocFromBrowser" value="false">
+	<input type="hidden" id="isSEOSearch" value="${isSeoSearch}">
+	<input type="hidden" id="entity" value="${entity}">
+	<input type="hidden" id="vertical" value="${vertical}">
+	<input type="hidden" id="latitude" value="${latitude}">
+	<input type="hidden" id="longitude" value="${longitude}">
+	<input type="hidden" id="cityName" value="${cityName}">
+	<input type="hidden" id="stateCode" value="${stateCode}">
+	<input type="hidden" id="location" value="${location}">
 	
 	<div class="overlay-loader hide"></div>
 	<div class="body-wrapper">
@@ -116,7 +127,7 @@
 		<div class="srch-eng-result-hdr">
 			<div class="container srch-eng-result-hdr-txt">
 				<input id="srch-eng-pag-data" type="hidden" data-startIndex=0 data-batchSize=10 data-pageNo=1 data-count=0>
-				<div class="srch-eng-hdr-txt"><div class="srch-eng-result-hdr-vert">Top </div><div class="srch-eng-result-hdr-prof">Professionals </div><div class="srch-eng-result-hdr-loc"></div></div>
+				<h4><span class="srch-eng-hdr-txt"><span class="srch-eng-result-hdr-vert">Top </span><span class="srch-eng-result-hdr-prof">Professionals </span><span class="srch-eng-result-hdr-loc"></span></span></h4>
 				<div class="srch-eng-hdr-pagination">
 					  <div class="srch-eng-pag-icon srch-eng-pag-prev cursor-pointer" style="display:none">❮</div>
 					  <div class="srch-eng-page-no">1</div>
@@ -149,6 +160,8 @@
 		var basedOn = $('#srchEngBasedOn').val();
 		var isPubPageSearch = $('#srchEngIsPubPageSearch').val();
 		var companyProfileName = $('#srchEngCompanyProfileName').val();
+		var isSeoSearch = $('#isSEOSearch').val();
+		var cityName = $('#cityName').val();
 		
 		if(isPubPageSearch == true || isPubPageSearch == "true"){
 			$('#srch-eng-cat-inp').val(basedOn);
@@ -158,7 +171,28 @@
 			
 			getLOSearchList();
 		}else{
-			getSearchResultsForCurrentLocation();
+			
+			if(isSeoSearch == true || isSeoSearch == 'true'){
+				var order = findProfileOrder($('#entity').val());
+				$('#srch-eng-loc-inp').attr('data-lat', $('#latitude').val());
+				$('#srch-eng-loc-inp').attr('data-lng', $('#longitude').val());
+				
+				$('#srch-eng-prof-cont').find('[data-order='+order+']').attr('data-sel','true');
+				$('#srch-eng-prof-cont').find('[data-order='+order+']').attr('data-filter',$('#entity').val());
+				
+				$('#srch-eng-cat-cont').data('filters', new Array($('#vertical').val()));
+				
+				if(cityName != null && cityName != "" && cityName != undefined){
+					$('.srch-eng-result-hdr-loc').html(' near ' + cityName + ', ' + $('#stateCode').val());
+				} else {
+					$('.srch-eng-result-hdr-loc').html(' near ' + $('#location').val());
+				}
+				
+				getLOSearchList();
+				
+			} else {
+				getSearchResultsForCurrentLocation();
+			}
 		}
 		
 	});
