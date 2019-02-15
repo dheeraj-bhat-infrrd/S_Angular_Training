@@ -93,9 +93,10 @@ public class ModelAndViewHandler
 
         LOG.debug( "method publicProfileModelAndViewHandler() started." );
 
-        if(enviromment.equalsIgnoreCase( "P" ) && !StringUtils.isEmpty( profileAggregate.getProfile().getProfileImageUrlThumbnail() ))
-            profileAggregate.getProfile().setProfileImageUrlThumbnail(
-                Utils.convertCloudFrontUrlToS3Url(profileAggregate.getProfile().getProfileImageUrlThumbnail(), amazonEndpoint, amazonBucket));
+        if(enviromment.equalsIgnoreCase( "P" ) &&  profileAggregate.getProfile() != null &&
+            !StringUtils.isEmpty( profileAggregate.getProfile().getProfileImageUrlThumbnail() )){
+            Utils.convertCloudFrontUrlToS3Url(profileAggregate.getProfile().getProfileImageUrlThumbnail(), amazonEndpoint, amazonBucket);
+        }
 
         model.addAttribute( REVIEWS_COUNT, profileAggregate.getReviewCount() );
         model.addAttribute( PROFILE_JSON, profileAggregate.getProfileJson() );
