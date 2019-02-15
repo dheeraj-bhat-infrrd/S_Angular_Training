@@ -181,7 +181,7 @@ public class ModelAndViewHandler
         } else if ( error instanceof ProfileNotFoundException ) {
 
             LOG.error( "ProfileNotFoundException caught while fetching {} profile : {}", profileAggregate.getProfileLevel(),
-                error.getMessage(), error );
+                error.getMessage() );
             
             returnTemplate = JspResolver.SS_PAGE_NOT_FOUND;
            /* Map<String, String> nameMap = profileManagementService
