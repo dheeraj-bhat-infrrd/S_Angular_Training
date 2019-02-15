@@ -95,7 +95,8 @@ public class ModelAndViewHandler
 
         if(enviromment.equalsIgnoreCase( "P" ) &&  profileAggregate.getProfile() != null &&
             !StringUtils.isEmpty( profileAggregate.getProfile().getProfileImageUrlThumbnail() )){
-            Utils.convertCloudFrontUrlToS3Url(profileAggregate.getProfile().getProfileImageUrlThumbnail(), amazonEndpoint, amazonBucket);
+            profileAggregate.getProfile().setProfileImageUrlThumbnail(
+                Utils.convertCloudFrontUrlToS3Url(profileAggregate.getProfile().getProfileImageUrlThumbnail(), amazonEndpoint, amazonBucket));
         }
 
         model.addAttribute( REVIEWS_COUNT, profileAggregate.getReviewCount() );
