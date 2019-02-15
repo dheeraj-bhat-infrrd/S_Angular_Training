@@ -103,7 +103,7 @@
 <meta http-equiv="cache-control" content="max-age=0" />
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />
-<meta property="og:image" content="${profile.profileImageUrlThumbnail}" />
+<meta property="og:image:secure_url" content="${profile.profileImageUrlThumbnail}" />
 <meta property="og:description" content="${descriptionTag}" />
 <meta property="og:profileLevel" content="${profileLevel}" />
 <c:choose>

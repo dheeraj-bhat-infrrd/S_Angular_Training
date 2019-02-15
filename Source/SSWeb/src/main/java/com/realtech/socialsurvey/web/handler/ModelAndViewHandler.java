@@ -5,9 +5,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.realtech.socialsurvey.core.commons.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -76,10 +78,21 @@ public class ModelAndViewHandler
     @Autowired
     private ProfileManagementService profileManagementService;
 
+    @Value( "${AMAZON_ENV_PREFIX}" )
+    private String enviromment;
+
+    @Value( "${AMAZON_ENDPOINT}" )
+    private String amazonEndpoint;
+
+    @Value( "${AMAZON_BUCKET}" )
+    private String amazonBucket;
 
     public String handlePublicProfileModelAndView( Model model, PublicProfileAggregate profileAggregate, boolean isBotRequest )
         throws ProfileNotFoundException
     {
+        if(enviromment.equalsIgnoreCase( "P" ))
+         profileAggregate.getProfile().setProfileImageUrlThumbnail(
+             Utils.convertCloudFrontUrlToS3Url(profileAggregate.getProfile().getProfileImageUrlThumbnail(), amazonEndpoint, amazonBucket));
 
         LOG.debug( "method publicProfileModelAndViewHandler() started." );
         model.addAttribute( REVIEWS_COUNT, profileAggregate.getReviewCount() );
