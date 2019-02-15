@@ -90,11 +90,13 @@ public class ModelAndViewHandler
     public String handlePublicProfileModelAndView( Model model, PublicProfileAggregate profileAggregate, boolean isBotRequest )
         throws ProfileNotFoundException
     {
-        if(enviromment.equalsIgnoreCase( "P" ))
-         profileAggregate.getProfile().setProfileImageUrlThumbnail(
-             Utils.convertCloudFrontUrlToS3Url(profileAggregate.getProfile().getProfileImageUrlThumbnail(), amazonEndpoint, amazonBucket));
 
         LOG.debug( "method publicProfileModelAndViewHandler() started." );
+
+        if(enviromment.equalsIgnoreCase( "P" ) && !StringUtils.isEmpty( profileAggregate.getProfile().getProfileImageUrlThumbnail() ))
+            profileAggregate.getProfile().setProfileImageUrlThumbnail(
+                Utils.convertCloudFrontUrlToS3Url(profileAggregate.getProfile().getProfileImageUrlThumbnail(), amazonEndpoint, amazonBucket));
+
         model.addAttribute( REVIEWS_COUNT, profileAggregate.getReviewCount() );
         model.addAttribute( PROFILE_JSON, profileAggregate.getProfileJson() );
         model.addAttribute( AVG_RATING, profileAggregate.getAverageRating() );
