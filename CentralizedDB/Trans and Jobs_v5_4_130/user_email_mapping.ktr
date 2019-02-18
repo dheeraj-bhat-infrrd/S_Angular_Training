@@ -5,75 +5,9 @@
     <description/>
     <extended_description/>
     <trans_version/>
-    <trans_type>SerialSingleThreaded</trans_type>
-    <trans_status>0</trans_status>
+    <trans_type>Normal</trans_type>
     <directory>&#x2f;</directory>
     <parameters>
-        <parameter>
-            <name>mongo_host</name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mongo_port</name>
-            <default_value>27017</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_host</name>
-            <default_value>localhost</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_host</name>
-            <default_value>ss-rdbms-demo.c3n1qsdsmjxc.us-west-2.rds.amazonaws.com</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_password</name>
-            <default_value>shipra744772</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_port_no</name>
-            <default_value>3306</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_schema_name</name>
-            <default_value>ss_user</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_info_user_name</name>
-            <default_value>shipra</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_master_schema_name</name>
-            <default_value>ss_user</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_password</name>
-            <default_value>root</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_port_no</name>
-            <default_value>3306</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_schema_name</name>
-            <default_value>ss_centralized_mongodb</default_value>
-            <description/>
-        </parameter>
-        <parameter>
-            <name>mysql_user_name</name>
-            <default_value>root</default_value>
-            <description/>
-        </parameter>
     </parameters>
     <log>
 <trans-log-table><connection/>
@@ -132,68 +66,14 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;05&#x2f;25 17&#x3a;07&#x3a;15.120</created_date>
+  <created_date>2019&#x2f;02&#x2f;15 15&#x3a;03&#x3a;46.886</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;05&#x2f;25 17&#x3a;07&#x3a;15.120</modified_date>
+  <modified_date>2019&#x2f;02&#x2f;15 15&#x3a;03&#x3a;46.886</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
-  <connection>
-    <name>Local instance MySQL57</name>
-    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
-  <connection>
-    <name>MySql_Con</name>
-    <server>localhost</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>sakila</database>
-    <port>3306</port>
-    <username>&#x24;&#x7b;db_user_name&#x7d;</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
   <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
@@ -251,8 +131,16 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Table input</from><to>Convert to EST</to><enabled>Y</enabled> </hop>
-  <hop> <from>Convert to EST</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>USER_EMAIL_MAPPING input</from><to>Convert to EST</to><enabled>Y</enabled> </hop>
+  <hop> <from>Convert to EST</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows</from><to>Select values</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>user_email_mapping centralized input</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Switch &#x2f; Case</to><enabled>Y</enabled> </hop>
+  <hop> <from>Switch &#x2f; Case</from><to>user_email_mapping output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Switch &#x2f; Case</from><to>Update user_email_mapping</to><enabled>Y</enabled> </hop>
+  <hop> <from>user_email_mapping output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Update user_email_mapping</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Convert to EST</name>
@@ -284,15 +172,15 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>419</xloc>
-      <yloc>156</yloc>
+      <xloc>100</xloc>
+      <yloc>137</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Insert &#x2f; Update</name>
-    <type>InsertUpdate</type>
+    <name>Merge Rows &#x28;diff&#x29;</name>
+    <type>MergeRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -301,84 +189,255 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>10000</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>user_email_mapping</table>
-      <key>
-        <name>USER_EMAIL_MAPPING_ID</name>
-        <field>USER_EMAIL_MAPPING_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>USER_EMAIL_MAPPING_ID</name>
-        <rename>USER_EMAIL_MAPPING_ID</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>USER_ID</name>
-        <rename>USER_ID</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>COMPANY_ID</name>
-        <rename>COMPANY_ID</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>EMAIL_ID</name>
-        <rename>EMAIL_ID</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>STATUS</name>
-        <rename>STATUS</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>CREATED_ON</name>
-        <rename>CREATED_ON</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>CREATED_BY</name>
-        <rename>CREATED_BY</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_ON</name>
-        <rename>MODIFIED_ON</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_BY</name>
-        <rename>MODIFIED_BY</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>CREATED_ON_EST</name>
-        <rename>CREATED_ON_EST</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MODIFIED_ON_EST</name>
-        <rename>MODIFIED_ON_EST</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
+    <keys>
+      <key>USER_EMAIL_MAPPING_ID</key>
+    </keys>
+    <values>
+      <value>USER_ID</value>
+      <value>COMPANY_ID</value>
+      <value>EMAIL_ID</value>
+      <value>STATUS</value>
+      <value>CREATED_ON</value>
+      <value>CREATED_BY</value>
+      <value>MODIFIED_ON</value>
+      <value>MODIFIED_BY</value>
+      <value>CREATED_ON_EST</value>
+      <value>MODIFIED_ON_EST</value>
+    </values>
+<flag_field>flagfield</flag_field>
+<reference>user_email_mapping centralized input</reference>
+<compare>Select values</compare>
+    <compare>
+    </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>563</xloc>
-      <yloc>156</yloc>
+      <xloc>458</xloc>
+      <yloc>137</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Table input</name>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>USER_EMAIL_MAPPING_ID</name>
+        <rename>USER_EMAIL_MAPPING_ID</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>USER_ID</name>
+        <rename>USER_ID</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>COMPANY_ID</name>
+        <rename>COMPANY_ID</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>EMAIL_ID</name>
+        <rename>EMAIL_ID</rename>
+        <type>None</type>
+        <length>250</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>STATUS</name>
+        <rename>STATUS</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>CREATED_ON</name>
+        <rename>CREATED_ON</rename>
+        <type>None</type>
+        <length>0</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>CREATED_BY</name>
+        <rename>CREATED_BY</rename>
+        <type>None</type>
+        <length>45</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MODIFIED_ON</name>
+        <rename>MODIFIED_ON</rename>
+        <type>None</type>
+        <length>0</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MODIFIED_BY</name>
+        <rename>MODIFIED_BY</rename>
+        <type>None</type>
+        <length>45</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>325</xloc>
+      <yloc>137</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>USER_EMAIL_MAPPING_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>219</xloc>
+      <yloc>137</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>USER_EMAIL_MAPPING input</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -389,29 +448,273 @@
            <schema_name/>
            </partitioning>
     <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  USER_EMAIL_MAPPING_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;FROM USER_EMAIL_MAPPING&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_EMAIL_MAPPING_ID&#xd;&#xa;, USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;FROM USER_EMAIL_MAPPING&#x3b;&#xd;&#xa;&#x23;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
-    <variables_active>Y</variables_active>
+    <variables_active>N</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>296</xloc>
-      <yloc>156</yloc>
+      <xloc>100</xloc>
+      <yloc>17</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>user_email_mapping centralized input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xa;  USER_EMAIL_MAPPING_ID&#xa;, USER_ID&#xa;, COMPANY_ID&#xa;, EMAIL_ID&#xa;, STATUS&#xa;, CREATED_ON&#xa;, CREATED_BY&#xa;, MODIFIED_ON&#xa;, MODIFIED_BY&#xa;, CREATED_ON_EST&#xa;, MODIFIED_ON_EST&#xa;FROM user_email_mapping&#xa;order by USER_EMAIL_MAPPING_ID&#x3b;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>458</xloc>
+      <yloc>12</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Switch &#x2f; Case</name>
+    <type>SwitchCase</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<fieldname>flagfield</fieldname>
+<use_contains>N</use_contains>
+<case_value_type>String</case_value_type>
+<case_value_format/>
+<case_value_decimal/>
+<case_value_group/>
+<default_target_step/>
+<cases><case><value>new</value>
+<target_step>user_email_mapping output</target_step>
+</case><case><value>changed</value>
+<target_step>Update user_email_mapping</target_step>
+</case></cases>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>458</xloc>
+      <yloc>247</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>user_email_mapping output</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <schema/>
+    <table>user_email_mapping</table>
+    <commit>10000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>N</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>N</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>USER_EMAIL_MAPPING_ID</column_name>
+          <stream_name>USER_EMAIL_MAPPING_ID</stream_name>
+        </field>
+        <field>
+          <column_name>USER_ID</column_name>
+          <stream_name>USER_ID</stream_name>
+        </field>
+        <field>
+          <column_name>COMPANY_ID</column_name>
+          <stream_name>COMPANY_ID</stream_name>
+        </field>
+        <field>
+          <column_name>EMAIL_ID</column_name>
+          <stream_name>EMAIL_ID</stream_name>
+        </field>
+        <field>
+          <column_name>STATUS</column_name>
+          <stream_name>STATUS</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_ON</column_name>
+          <stream_name>CREATED_ON</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_BY</column_name>
+          <stream_name>CREATED_BY</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_ON</column_name>
+          <stream_name>MODIFIED_ON</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_BY</column_name>
+          <stream_name>MODIFIED_BY</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_ON_EST</column_name>
+          <stream_name>CREATED_ON_EST</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_ON_EST</column_name>
+          <stream_name>MODIFIED_ON_EST</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>458</xloc>
+      <yloc>353</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Update user_email_mapping</name>
+    <type>Update</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>5000</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>user_email_mapping</table>
+      <key>
+        <name>USER_EMAIL_MAPPING_ID</name>
+        <field>USER_EMAIL_MAPPING_ID</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>USER_ID</name>
+        <rename>USER_ID</rename>
+        </value>
+      <value>
+        <name>COMPANY_ID</name>
+        <rename>COMPANY_ID</rename>
+        </value>
+      <value>
+        <name>EMAIL_ID</name>
+        <rename>EMAIL_ID</rename>
+        </value>
+      <value>
+        <name>STATUS</name>
+        <rename>STATUS</rename>
+        </value>
+      <value>
+        <name>CREATED_ON</name>
+        <rename>CREATED_ON</rename>
+        </value>
+      <value>
+        <name>CREATED_BY</name>
+        <rename>CREATED_BY</rename>
+        </value>
+      <value>
+        <name>MODIFIED_ON</name>
+        <rename>MODIFIED_ON</rename>
+        </value>
+      <value>
+        <name>MODIFIED_BY</name>
+        <rename>MODIFIED_BY</rename>
+        </value>
+      <value>
+        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        </value>
+      <value>
+        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>638</xloc>
+      <yloc>247</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>638</xloc>
+      <yloc>353</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>Insert &#x2f; Update</source_step>
-        <target_step/>
+        <source_step>user_email_mapping output</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
         <is_enabled>Y</is_enabled>
-        <nr_valuename>&#x24;&#x7b;NUM_OF_ERROR&#x7d;</nr_valuename>
-        <descriptions_valuename>&#x24;&#x7b;ERROR_DESC&#x7d;</descriptions_valuename>
-        <fields_valuename>&#x24;&#x7b;ERROR_FIELDS&#x7d;</fields_valuename>
-        <codes_valuename>&#x24;&#x7b;ERROR_CODE&#x7d;</codes_valuename>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Update user_email_mapping</source_step>
+        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename/>
+        <fields_valuename/>
+        <codes_valuename/>
         <max_errors/>
         <max_pct_errors/>
         <min_pct_rows/>
