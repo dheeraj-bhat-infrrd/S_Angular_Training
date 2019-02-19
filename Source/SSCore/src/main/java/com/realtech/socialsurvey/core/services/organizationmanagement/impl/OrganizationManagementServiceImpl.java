@@ -11158,6 +11158,31 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Override
+    public boolean enableIncompleteSurveyDeleteToggle(long companyId, boolean incompleteSurveyDeleteFlag) throws InvalidInputException, NoRecordsFetchedException
+    {
+    	LOG.debug( "method enableIncompleteSurveyDeleteToggle() started for companyId : {}", companyId);
+
+    	if ( companyId <= 0 ) {
+    		LOG.warn( "companyId is invalid: {}", companyId);
+    		throw new InvalidInputException( "companyId is invalid" );
+    	}
+
+    	OrganizationUnitSettings unitSettings = getCompanySettings( companyId );
+
+    	if ( unitSettings == null ) {
+    		LOG.warn( "OrganizationSettings are not fournd for company id {}", companyId );
+    		throw new InvalidInputException( "OrganizationSettings are not fournd for company id " +companyId );
+    	}
+    	// update incomplete survey delete flag
+    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+    			MongoOrganizationUnitSettingDaoImpl.INCOMPLETE_SURVEY_DELETE_ENABLED, incompleteSurveyDeleteFlag, unitSettings,
+    			CommonConstants.COMPANY_SETTINGS_COLLECTION );
+
+    	LOG.debug( "method enableIncompleteSurveyDeleteToggle() finished." );
+    	return true;
+    }
+
     @Override public void updateCompanySettings( long companyId, String columnName, Object columnValue )
     {
         LOG.info( "Method to update company settings using companyId started." );

@@ -921,6 +921,8 @@ public class OrganizationManagementController
             // add isSocialMonitorEnabled flag
             model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
             
+            // add isIncompleteSurveyDeleteEnabled flag
+            model.addAttribute( "isIncompleteSurveyDeleteEnabled", unitSettings.isIncompleteSurveyDeleteEnabled());
             
             // add isEnableLoginButton flag
             model.addAttribute( "isEnableLogin", companySettings.getIsLoginEnableAllowed() );
@@ -4855,6 +4857,25 @@ public class OrganizationManagementController
                 .getMessage();
         }
 	
+
+	@RequestMapping ( value = "/enableincompletesurveydeletetoggle", method = RequestMethod.POST)
+	@ResponseBody
+	public String enableIncompleteSurveyDeleteToggle( HttpServletRequest request )
+	{
+		LOG.info( "Method enableIncompleteSurveyDeleteToggle started" );
+		HttpSession session = request.getSession();
+
+		long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+		try {
+			Response response = ssApiIntergrationBuilder.getIntegrationApi().enableIncompleteSurveyDeleteToggle( companyId,
+					Boolean.parseBoolean( request.getParameter( "isIncompleteSurveyDeleteEnabled" )));
+			return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+		} catch ( Exception error ) {
+			LOG.error( "Exception occured in enableIncompleteSurveyDeleteToggle() while updating incomplete survey delete flag. Nested exception is ",error );
+			return "false";
+		}
+	}
 
     @ResponseBody
     @RequestMapping ( value = "/disableencompassnotification", method = RequestMethod.PUT)

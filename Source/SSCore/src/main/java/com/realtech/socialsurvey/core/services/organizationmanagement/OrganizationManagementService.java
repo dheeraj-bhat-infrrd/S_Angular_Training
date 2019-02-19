@@ -1903,6 +1903,10 @@ public interface OrganizationManagementService
      */
     public void updateCompanySettings(OrganizationUnitSettings companySettings, String columnName, String columnValue);
 
+
+    public boolean enableIncompleteSurveyDeleteToggle(long companyId, boolean incompleteSurveyDeleteFlag) throws InvalidInputException, NoRecordsFetchedException;
+
+    
     void updateCompanySettings( long companyId, String columnName, Object columnValue );
     
 	/**
@@ -1915,5 +1919,6 @@ public interface OrganizationManagementService
 	 * @return
 	 */
 	public String getStateCodeByStateName(String stateName);
+
 
 }

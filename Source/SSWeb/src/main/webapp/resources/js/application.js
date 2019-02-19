@@ -6417,6 +6417,22 @@ function enableSocialMonitorToggleSetting(issocialmonitorenabled, disableEle) {
 	
 }
 
+function enableIncompleteSurveyDeleteToggleSetting(isincompletesurveydeleteenabled, disableEle) {
+	var payload = {
+		"isIncompleteSurveyDeleteEnabled" : isincompletesurveydeleteenabled
+	};
+	
+	callAjaxPostWithPayloadData("./enableincompletesurveydeletetoggle.do",function(data) {
+		if (data == "true") {
+			$('#overlay-toast').html("Incomplete Survey Delete toggle Updated Sucessfully.");
+		} else {
+			$('#overlay-toast').html("Unable to toggle Incomplete Survey Delete.");
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
 function updateVendastaAccessSetting(hasVendastaAcess, disableEle) {
 	var payload = {
 		"hasVendastaAcess" : hasVendastaAcess
@@ -12893,6 +12909,15 @@ $('body').on('click', '#soc-mon-access-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#incomplete-survey-delete-chk-box', function() {
+	if ($('#incomplete-survey-delete-chk-box').hasClass('bd-check-img-checked')) {
+		$('#incomplete-survey-delete-chk-box').removeClass('bd-check-img-checked');
+		enableIncompleteSurveyDeleteToggleSetting(true, '#incomplete-survey-delete-chk-box');
+	} else {
+		$('#incomplete-survey-delete-chk-box').addClass('bd-check-img-checked');
+		enableIncompleteSurveyDeleteToggleSetting(false, '#incomplete-survey-delete-chk-box');
+	}
+});
 
 $('body').on('blur', '#digest-recipients', function() {
 	

@@ -408,6 +408,8 @@ public class ReportingWebController
         }
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
         model.addAttribute( "vertical", profileSettings.getVertical().toLowerCase() );
+        model.addAttribute("isIncompleteSurveyDeleteEnabled",companySettings.isIncompleteSurveyDeleteEnabled());
+        model.addAttribute("isCompanyAdmin",user.isCompanyAdmin());
         return JspResolver.REPORTING_DASHBOARD;
     }
 
