@@ -1987,6 +1987,10 @@ public class ProfileManagementController
                 String imageFileName = request.getParameter( "imageFileName" );
                 String forProfileImageFix = request.getParameter( "forProfileImageFix" );
                 
+                if(forProfileImageFix == null || forProfileImageFix.isEmpty()) {
+                    throw new InvalidInputException( "parameter stating whether its image or url of image is null or empty" );
+                }
+                
                 if ( imageBase64 == null || imageBase64.isEmpty() ) {
                     throw new InvalidInputException( "image passed is null or empty" );
                 }
@@ -2001,7 +2005,7 @@ public class ProfileManagementController
                 String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR + CommonConstants.IMAGE_NAME;
                 
                 BufferedImage bufferedImage = null;
-                if ( forProfileImageFix == "false" ) {
+                if ( forProfileImageFix.equalsIgnoreCase( "false" ) ) {
                     BASE64Decoder decoder = new BASE64Decoder();
                     byte[] decodedBytes = decoder.decodeBuffer( imageBase64.split( "," )[1] );
                     ByteArrayInputStream bis = new ByteArrayInputStream( decodedBytes );
