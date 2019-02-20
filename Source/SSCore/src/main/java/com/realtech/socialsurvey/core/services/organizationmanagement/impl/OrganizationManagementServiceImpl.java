@@ -254,7 +254,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private String neutralTextComplete;
     @Value ( "${SAD_TEXT_COMPLETE}")
     private String sadTextComplete;
-
+    
     @Value ( "${PARAM_ORDER_TAKE_SURVEY}")
     String paramOrderTakeSurvey;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
@@ -5829,6 +5829,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveySettings.setHappyTextComplete( happyTextComplete );
         surveySettings.setNeutralTextComplete( neutralTextComplete );
         surveySettings.setSadTextComplete( sadTextComplete );
+       
         return surveySettings;
     }
 
@@ -5854,7 +5855,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else if ( mood.equalsIgnoreCase( "sadComplete" ) ) {
             surveySettings.setSadTextComplete( sadTextComplete );
             return sadTextComplete;
-        } else {
+        }  else {
             return "";
         }
     }

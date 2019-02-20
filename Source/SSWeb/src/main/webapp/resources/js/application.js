@@ -96,6 +96,9 @@ var sadText;
 var happyTextComplete;
 var neutralTexCompletet;
 var sadTextComplete;
+var happyUrl;
+var okUrl;
+var sadUrl;
 var rating = -1; // default value to be used to post on social survey in case of "ok" or "unpleasant" mood
 var reviewText;
 var reviewRating;
@@ -152,6 +155,19 @@ var sysCompTransGraphId = 'sys-sur-comp-graph';
 var sysInvSentGraphId = 'sys-invite-sent-graph';
 var sysRemSentGraphId = 'sys-rem-sent-graph';
 var sysUnproTransGraphId = 'sys-unpro-trans-graph';
+
+// URL redirect changes
+var suveySourceId;
+var participationType;
+var transactionType;
+var state;
+var city;
+var customeField1;
+var customeField2;
+var customeField3;
+var customeField4;
+var customeField5;
+
 
 var dangerGraphWrapper = '<div class="dash-stats-wrapper bord-bot-dc clearfix trans-monitor-wrapper">'
 						+'<div class="trans-monitor-sub-header-danger">'
@@ -6616,14 +6632,19 @@ function saveTextForMoodFlow(content, mood) {
 	}, payload, true);
 }
 
-function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete) {
+function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete,
+		happyUrl, okUrl, sadUrl) {
 	$('#happy-text').text(decodeURIComponent( escape( window.atob( happyText ) ) ));
 	$('#neutral-text').text(decodeURIComponent( escape( window.atob( neutralText ) ) ));
 	$('#sad-text').text(decodeURIComponent( escape( window.atob( sadText ) ) ));
-
+	console.log('HappyText'+happyText);
 	$('#happy-text-complete').text(decodeURIComponent( escape( window.atob( happyTextComplete ) ) ));
 	$('#neutral-text-complete').text(decodeURIComponent( escape( window.atob( neutralTextComplete ) ) ));
 	$('#sad-text-complete').text(decodeURIComponent( escape( window.atob( sadTextComplete ) ) ));
+	console.log('Happy URL'+happyUrl);
+	$('#happy-complete-url').text(decodeURIComponent( escape( window.atob( happyUrl) ) ));
+	$('#ok-complete-url').text(decodeURIComponent( escape( window.atob( okUrl) ) ));
+	$('#sad-complete-url').text(decodeURIComponent( escape( window.atob( sadUrl))));	
 }
 
 // User management
@@ -7887,6 +7908,9 @@ function paintSurveyPage(jsonData) {
 	happyTextComplete = jsonData.responseJSON.happyTextComplete;
 	neutralTextComplete = jsonData.responseJSON.neutralTextComplete;
 	sadTextComplete = jsonData.responseJSON.sadTextComplete;
+	happyUrl = jsonData.responseJSON.happyUrl;
+	okUrl = jsonData.responseJSON.okUrl;
+	sadUrl = jsonData.responseJSON.sadUrl;
 	autoPost = jsonData.responseJSON.autopostEnabled;
 	autoPostScore = jsonData.responseJSON.autopostScore;
 	yelpEnabled = Boolean(jsonData.responseJSON.yelpEnabled);
@@ -7904,6 +7928,19 @@ function paintSurveyPage(jsonData) {
 	subjectContentForZillowPost = jsonData.responseJSON.subjectContentForZillowPost;
 	isAutoFillReviewContentForZillowPost = jsonData.responseJSON.isAutoFillReviewContentForZillowPost;
 	reviewFooterContentForZillowPost = jsonData.responseJSON.reviewFooterContentForZillowPost;
+	console.log('Hogwarts! '+jsonData.responseJSON.branchName+' '+jsonData.responseJSON.regionName);
+	
+	// URL redirect changes
+	surveySourceId = jsonData.responseJSON.surveySourceId;
+	participationtype = jsonData.responseJSON.participationType;
+	transactionType = jsonData.responseJSON.transactionType;
+	city = jsonData.responseJSON.city;
+	state = jsonData.responseJSON.state;
+	customeField1 = jsonData.responseJSON.customField1;
+	customeField2 = jsonData.responseJSON.customField2;
+	customeField3 = jsonData.responseJSON.customField3;
+	customeField4 = jsonData.responseJSON.customField4;
+	customeField5 = jsonData.responseJSON.customField5;
 
 	// If social token availiable populate the links
 	// if (googleEnabled) {
@@ -8288,6 +8325,7 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 		},
 		complete : function(data) {
 			if (success) {
+				redirectPageUponSurveySubmit();				
 			}
 		},
 		error : function(e) {
@@ -8405,6 +8443,7 @@ function paintRangeScale() {
 }
 
 function showMasterQuestionPage() {
+	console.log('isSmileTypeQuestion'+isSmileTypeQuestion);
 	if (isSmileTypeQuestion) {
 		showFeedbackPage(mood);
 	} else {
@@ -8460,7 +8499,28 @@ function showMasterQuestionPage() {
 
 		// save survey response
 		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded, onlyPostToSocialSurvey);
-		$("div[data-ques-type]").hide();
+		
+	}
+	return;
+}
+
+function redirectPageUponSurveySubmit(){
+	
+	$("div[data-ques-type]").hide();
+	
+	if((mood == 'Great') && (happyUrl != null)){
+		happyUrl = updateRedirectUrlWithValues(happyUrl);
+		window.location = happyUrl;
+	}
+	else if((mood == 'OK') && (okUrl != null)){
+		okUrl = updateRedirectUrlWithValues(okUrl);
+		window.location = okUrl;
+	}
+	else if((mood == 'Unpleasant') && (sadUrl != null)){
+		sadUrl = updateRedirectUrlWithValues(sadUrl);
+		window.location = sadUrl;
+	}
+	else{	
 		$("div[data-ques-type='error']").show();
 		if(!hiddenSection){
 			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + "/" + surveyId + '" target="_blank">' + agentFullProfileLink + '</a>');
@@ -8477,7 +8537,7 @@ function showMasterQuestionPage() {
 		}
 		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink+ "/" + surveyId + "'");
 		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "/" + surveyId + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
-
+	
 		$('#content-head').html('Survey Completed');
 		if (mood == 'Great')
 			$('#content').html(happyTextComplete);
@@ -8489,12 +8549,36 @@ function showMasterQuestionPage() {
 		
 		// call method to post the review and update the review count
 		//postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
-
+	
 		//paint socialmedia icons on survey thank you page
 		paintSocialMediaIconsOnSurveyCompletion();
-		
 	}
-	return;
+}
+
+function updateRedirectUrlWithValues(redirectUrl){
+	var resultUrl = redirectUrl;
+	if(redirectUrl.indexOf('[SURVEY_SOURCE_ID]') != -1)
+		resultUrl = redirectUrl.replace('[SURVEY_SOURCE_ID]', surveySourceId);
+	if(redirectUrl.indexOf('[PARTICIPANT_TYPE]') != -1)
+		resultUrl = resultUrl.replace('[PARTICIPANT_TYPE]', participationtype);
+	if(redirectUrl.indexOf('[TRANSACTION_TYPE]') != -1)
+		resultUrl = resultUrl.replace('[TRANSACTION_TYPE]', transactionType);
+	if(redirectUrl.indexOf('[STATE]') != -1)
+		resultUrl = resultUrl.replace('[STATE]', state);
+	if(redirectUrl.indexOf('[CITY]') != -1)
+		resultUrl = resultUrl.replace('[CITY]', city);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_ONE]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_ONE]', customeField1);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_TWO]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_TWO]', customeField2);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_THREE]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_THREE]', customeField3);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_FOUR]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_FOUR]', customeField4);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_FIVE]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_FIVE]', customeField5);
+		return resultUrl;
+	
 }
 
 function postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded) {
@@ -12776,6 +12860,15 @@ $('body').on('blur', '#neutral-text-complete', function() {
 $('body').on('blur', '#sad-text-complete', function() {
 	saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
 });
+$('body').on('blur', '#happy-complete-url', function() {
+	saveTextForMoodFlow($("#happy-complete-url").val(), "happyUrl");
+});
+$('body').on('blur', '#ok-complete-url', function() {
+	saveTextForMoodFlow($("#ok-complete-url").val(), "okUrl");
+});
+$('body').on('blur', '#sad-complete-url', function() {
+	saveTextForMoodFlow($("#sad-complete-url").val(), "sadUrl");
+});
 $('body').on('blur', '#opt-out-text', function() {
 	storeOptOutText($("#opt-out-text").val(), "optOutText");
 });
@@ -12797,7 +12890,6 @@ $('body').on('click', '.reset-icon', function() {
 	} else if (resetId == 'sad-text-complete') {
 		resetTag = 'sadComplete';
 	}
-
 	showOverlay();
 	resetTextForMoodFlow(resetTag, resetId);
 });

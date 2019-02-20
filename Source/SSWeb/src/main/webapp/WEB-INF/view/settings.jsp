@@ -313,7 +313,7 @@
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container">
 				<div class="um-header  margin-top-25"><spring:message code="label.flow.text.key" /></div>
-				<div class="um-header-detail"><spring:message code="label.flow.desc.text.key" /></div>
+			<div class="um-header-detail"><spring:message code="label.flow.desc.text.key" /></div>
 				<div class="clearfix um-panel-content">
 					<div class="bd-mcq-row clearfix txtareaRow">
 						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.happy.label.text" /></div>
@@ -354,9 +354,98 @@
 							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
 						</div>
 					</div>
+</div>
+				
+						<!-- URL Redirection Upon Submit Changes -->
+
+				
+					<div class="um-header-detail"><spring:message code="label.complete.desc.url.key" /></div>
+							
+					<ul class="accordion" style="padding-left:0px;margin: 0 10px 10px 10px;width:75%">
+					<li class="col-lg-13 col-md-12 col-sm-6 col-xs-6 "><a href="#" class="email-category">Redirect URL Parameters</a>
+						<div class="email-content" style="">
+							<div class="col-lg-7 col-md-6 col-sm-12 col-xs-12 float-left legend-height" style="height:300px">
+								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 float-left">
+									<div class="legend-header">Field</div>
+									<div class="legend-wrapper">
+										<span class="legend">[SURVEY_SOURCE_ID] </span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[PARTICIPANT_TYPE] </span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[TRANSACTION_TYPE] </span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[STATE] </span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[CITY]</span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[CUSTOM_FIELD_ONE] </span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[CUSTOM_FIELD_TWO] </span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[CUSTOM_FIELD_THREE]</span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[CUSTOM_FIELD_FOUR]</span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[CUSTOM_FIELD_FIVE] </span>
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+									<div class="legend-header" >Description</div>
+									<div class="legend-wrapper" title="Survey Source ID">Survey Source ID</div>
+									<div class="legend-wrapper" title="Participant Type">Survey Participant Type</div>
+									<div class="legend-wrapper" title="Transaction Type">Type of transaction</div>
+									<div class="legend-wrapper" title="State">Customer State</div>
+									<div class="legend-wrapper" title="City">Customer City</div>
+									<div class="legend-wrapper" title="Custom Field One">Custom Field One</div>
+									<div class="legend-wrapper" title="Custom Field Two">Custom Field Two</div>
+									<div class="legend-wrapper" title="Custom Field Three">Custom Field Three</div>
+									<div class="legend-wrapper" title="Custom Field Four">Custom Field Four</div>
+									<div class="legend-wrapper" title="Custom Field five">Custom Field Five</div>
+								</div>
+							</div>				
+			</div></li></ul>
+			<br><br>
+			<div class="clearfix um-panel-content">
+					<div class="bd-mcq-row clearfix txtareaRow">
+						<div class="float-left cs-gq-lbl">
+							<spring:message code="label.complete.happy.url" />
+						</div>
+						<textarea id="happy-complete-url"
+							class="float-left textarea-bd-mcq-txt" style="" placeholder='<spring:message code="label.redirect.url.placeholder.key" />'></textarea>
+						
+					</div>
+					<div class="bd-mcq-row clearfix txtareaRow">
+						<div class="float-left cs-gq-lbl">
+							<spring:message code="label.complete.ok.url" />
+						</div>
+						<textarea id="ok-complete-url"
+							class="float-left textarea-bd-mcq-txt" style="" placeholder='<spring:message code="label.redirect.url.placeholder.key" />'></textarea>
+		
+					</div>
+					<div class="bd-mcq-row clearfix txtareaRow">
+						<div class="float-left cs-gq-lbl">
+							<spring:message code="label.complete.sad.url" />
+						</div>
+						<textarea id="sad-complete-url"
+							class="float-left textarea-bd-mcq-txt" style="" placeholder='<spring:message code="label.redirect.url.placeholder.key" />'></textarea>
+				
 				</div>
-			</div>
-		</c:if>
+				</div>
+				
+
+				
+				
+				</div>
+				</c:if>
 		
 		<!-- Starting code for configuring opt-out text -->
 		<!-- <c:if test="${profilemasterid == 1 || accountMasterId == 1}">
@@ -620,7 +709,11 @@ $(document).ready(function() {
 			sadTxtComplete = "${defaultSurveyProperties.sadTextComplete}";
 		}
 		
-		paintTextForMood(happyTxt, nuTxt,sadTxt,happyTxtComplete, nuTxtComplete,sadTxtComplete);		
+		var happyUrl="${surveysettings.happyUrl}";
+		var okUrl="${surveysettings.okUrl}";
+		var sadUrl="${surveysettings.sadUrl}";
+		
+		paintTextForMood(happyTxt, nuTxt,sadTxt,happyTxtComplete, nuTxtComplete,sadTxtComplete,happyUrl,okUrl,sadUrl);		
 	}
 	
 });

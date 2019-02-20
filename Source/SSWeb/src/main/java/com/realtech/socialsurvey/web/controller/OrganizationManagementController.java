@@ -213,6 +213,7 @@ public class OrganizationManagementController
 
     @Value ( "${SAD_TEXT_COMPLETE}")
     private String sadTextComplete;
+    
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
@@ -893,6 +894,7 @@ public class OrganizationManagementController
             //enocode before sending to UI
             encodeSurveySettings( unitSettings.getSurvey_settings() );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
+            LOG.info(unitSettings.getSurvey_settings().toString());
 
             //get default setting and store in model
             SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
@@ -2603,7 +2605,7 @@ public class OrganizationManagementController
 
             //decode text
             text = new String( DatatypeConverter.parseBase64Binary( text ) );
-
+            LOG.info("Testing!!!!"+text+" "+mood);
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
 
             SurveySettings surveySettings = companySettings.getSurvey_settings();
@@ -2619,6 +2621,12 @@ public class OrganizationManagementController
                 surveySettings.setNeutralTextComplete( text );
             else if ( mood.equalsIgnoreCase( "sadComplete" ) )
                 surveySettings.setSadTextComplete( text );
+            else if ( mood.equalsIgnoreCase( "happyUrl" ) )
+                surveySettings.setHappyUrl( text );
+            else if ( mood.equalsIgnoreCase( "okUrl" ) )
+                surveySettings.setOkUrl( text );
+            else if ( mood.equalsIgnoreCase( "sadUrl" ) )
+                surveySettings.setSadUrl( text );            
 
             organizationManagementService.updateSurveySettings( companySettings, surveySettings );
             status = CommonConstants.SUCCESS_ATTRIBUTE;
@@ -4397,6 +4405,16 @@ public class OrganizationManagementController
         if ( surveySettings.getNeutralTextComplete() != null )
             surveySettings.setNeutralTextComplete(
                 DatatypeConverter.printBase64Binary( surveySettings.getNeutralTextComplete().getBytes() ) );
+        // Redirect URL Changes
+        if ( surveySettings.getHappyUrl() != null )
+            surveySettings.setHappyUrl(
+                DatatypeConverter.printBase64Binary( surveySettings.getHappyUrl().getBytes() ) );
+        if ( surveySettings.getOkUrl() != null )
+            surveySettings.setOkUrl(
+                DatatypeConverter.printBase64Binary( surveySettings.getOkUrl().getBytes() ) );
+        if ( surveySettings.getSadUrl() != null )
+            surveySettings.setSadUrl(
+                DatatypeConverter.printBase64Binary( surveySettings.getSadUrl().getBytes() ) );
 
     }
     
