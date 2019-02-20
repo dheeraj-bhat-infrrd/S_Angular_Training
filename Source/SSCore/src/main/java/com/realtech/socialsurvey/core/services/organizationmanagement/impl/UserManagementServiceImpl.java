@@ -2739,6 +2739,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
         if(companySettings != null && companySettings.isAllowPartnerSurvey() ){
             agentSettings.setAllowPartnerSurvey(true);
+            if(companySettings.isHiddenSection()) {
+            	agentSettings.setHiddenSection(true);
+            }
         }
         
         MailIdSettings mail_ids = new MailIdSettings();
