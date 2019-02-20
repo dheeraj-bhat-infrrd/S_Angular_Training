@@ -57,6 +57,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyStats;
 import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.vo.AddressGeoLocationVO;
@@ -142,6 +143,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_FILTER_KEYWORDS = "filterKeywords";
     public static final String PROFILE_IMAGE_URL = "profileImageUrl";
     public static final String KEY_TRUSTED_SOURCES = "socialMonitorTrustedSources";
+    public static final String KEY_BRANCH_ADMIN_ALLOWED_TO_DELETE_USER = "branchAdminAllowedToDeleteUser";
+    public static final String KEY_REGION_ADMIN_ALLOWED_TO_DELETE_USER = "regionAdminAllowedToDeleteUser";
+    public static final String KEY_BRANCH_ADMIN_ALLOWED_TO_ADD_USER = "branchAdminAllowedToAddUser";
+    public static final String KEY_REGION_ADMIN_ALLOWED_TO_ADD_USER = "regionAdminAllowedToAddUser";
     
     public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
     public static final String KEY_IS_COPY_TO_CLIPBOARD = "isCopyToClipboard";
@@ -2543,5 +2548,30 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         	userIdList.add(setting.getIden());
         }
         return userIdList;
+    }
+    
+    @Override
+    public void updateOrganizationSettingsByQuery( Map<String, Object> queryMap, Map<String, Object> updateMap,
+        String collectionName ) throws Exception
+    {
+        LOG.debug( "updateOrganizationSettingsByQuery started" );
+        Query query = new Query();
+        Update update = new Update();
+        //iterate through the queryMap to add each query to criteria
+        for ( String key : queryMap.keySet() ) {
+            query.addCriteria( Criteria.where( key ).is( queryMap.get( key ) ) );
+        }
+        //iterate through the updateMap to set each update criteria
+        for ( String key : updateMap.keySet() ) {
+            update.set( key, updateMap.get( key ) );
+        }
+        try {
+            mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
+        } catch ( Exception exception ) {
+            LOG.error( "updateOrganizationSettingsByQuery failed to update in mongo due to", exception );
+            throw new DatabaseException( "updateOrganizationSettingsByQuery failed to update in mongo", exception );
+        }
+
+        LOG.debug( "updateOrganizationSettingsByQuery finished" );
     }
 }

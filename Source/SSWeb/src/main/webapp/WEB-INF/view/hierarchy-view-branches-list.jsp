@@ -46,7 +46,9 @@
 						title="<spring:message code="label.widget.key" />"
 						data-iden="${branch.branchId}" data-profile="branch">Widget</div>
 					<div class="float-left v-tbl-top-spacer"></div>
+					 <c:if test="${canDelete}">
 		            <div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-close branch-del-icn" data-branchid="${branch.branchId}">Delete</div>
+		            </c:if>
 		            <div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}">Edit</div>
 		        </div>
 		    </td>
@@ -156,7 +158,7 @@
 						</c:otherwise>
 					</c:choose> 
                    <c:choose>
-						<c:when test="${regionUser.canEdit && user.userId != regionUser.userId}">
+						<c:when test="${canDelete and user.userId != regionUser.userId}">
 						   <div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-close user-del-icn" data-userid="${regionUser.userId}">Delete</div>
 						</c:when>
 						<c:otherwise>

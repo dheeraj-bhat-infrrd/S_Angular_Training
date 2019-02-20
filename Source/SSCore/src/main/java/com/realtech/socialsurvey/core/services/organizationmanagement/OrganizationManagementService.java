@@ -1909,7 +1909,19 @@ public interface OrganizationManagementService
     
     void updateCompanySettings( long companyId, String columnName, Object columnValue );
     
-	/**
+    /**
+     * Update OrganizationSettings based on id and boolean value.
+     * The id will contain the IDEN value which is used to set the criteria.
+     * The boolean value will contain the data on which update is done.
+     * 
+     * @param iden
+     * @param value
+     * @param fieldToUpdate
+     * @param collection
+     */
+    public String updateOrganizationSettingsByIdAndBooleanValue(long id, boolean value, String fieldToUpdate, String collection);
+
+    /**
 	 * @return
 	 */
 	public Map<String, String> getStateCodeNameMap();

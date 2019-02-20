@@ -938,6 +938,10 @@ public class OrganizationManagementController
                 }
             }
             
+            model.addAttribute( "allowBranchAdminToAddUser", unitSettings.getBranchAdminAllowedToAddUser() ) ; 
+            model.addAttribute( "allowBranchAdminToDeleteUser", unitSettings.getBranchAdminAllowedToDeleteUser() );
+            model.addAttribute( "allowRegionAdminToAddUser", unitSettings.getRegionAdminAllowedToAddUser() );
+            model.addAttribute( "allowRegionAdminToDeleteUser", unitSettings.getRegionAdminAllowedToDeleteUser() );
             
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason : ", e );
@@ -4909,5 +4913,50 @@ public class OrganizationManagementController
         }
        
     }
+    
+    /**
+     * This controller is called to update Branch and Region admin access permission.
+     * 
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping (value = "/updateadminaccess", method = RequestMethod.POST)
+    public String updateAdminAccess( HttpServletRequest request )
+    {
+        LOG.info( "Method updateAdminAccess() started" );
+        HttpSession session = request.getSession();
+        boolean parameter = Boolean.parseBoolean( request.getParameter( "allowadminaddordeleteuser" ) );
+        String typeOfCheckBox = request.getParameter( "typeofcheckbox" );
+
+        long companyID = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+        try {
+            switch ( typeOfCheckBox ) {
+                case "branchAdminDeleteAccess":
+                    return organizationManagementService.updateOrganizationSettingsByIdAndBooleanValue( companyID, parameter,
+                        MongoOrganizationUnitSettingDaoImpl.KEY_BRANCH_ADMIN_ALLOWED_TO_DELETE_USER,
+                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                case "regionAdminDeleteAccess":
+                    return organizationManagementService.updateOrganizationSettingsByIdAndBooleanValue( companyID, parameter,
+                        MongoOrganizationUnitSettingDaoImpl.KEY_REGION_ADMIN_ALLOWED_TO_DELETE_USER,
+                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                case "branchAdminAddAccess":
+                    return organizationManagementService.updateOrganizationSettingsByIdAndBooleanValue( companyID, parameter,
+                        MongoOrganizationUnitSettingDaoImpl.KEY_BRANCH_ADMIN_ALLOWED_TO_ADD_USER,
+                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                case "regionAdminAddAccess":
+                    return organizationManagementService.updateOrganizationSettingsByIdAndBooleanValue( companyID, parameter,
+                        MongoOrganizationUnitSettingDaoImpl.KEY_REGION_ADMIN_ALLOWED_TO_ADD_USER,
+                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                default:
+                    return "false";
+            }
+        } catch ( Exception error ) {
+            LOG.error( "Exception occured in updateAdminAccess() . Nested exception is ", error );
+            return "false";
+        }
+    }
+
 }
 // JIRA: SS-24 BY RM02 EOC

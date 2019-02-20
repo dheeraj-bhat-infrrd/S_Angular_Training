@@ -192,6 +192,38 @@
 								</div>
 								</c:if>
 								
+								<c:if test="${ columnName == 'companyId' }">
+								<div class="ss-comp-settings" style="">
+									<div id="alw-br-admin-del-usr-chk-box" data-typeOfCheckBox="branchAdminDeleteAccess" class="float-left admin-access-chk-box bd-check-img clear-both"></div>
+									<input type="hidden" id="alw-br-admin-del-usr-cb" name="allowBranchAdminToDeleteUser" value="${allowBranchAdminToDeleteUser}">
+									<div class="float-left customized-settings-child cust-resp-txt"><spring:message code="label.companysettings.allowbranchadmin.deleteuser" /></div>
+								</div>
+								</c:if>
+
+								<c:if test="${ columnName == 'companyId' }">
+								<div class="ss-comp-settings" style="">
+									<div id="alw-rgn-admin-del-usr-chk-box" data-typeOfCheckBox="regionAdminDeleteAccess" class="float-left admin-access-chk-box bd-check-img clear-both"></div>
+									<input type="hidden" id="alw-rgn-admin-del-usr-cb" name="allowRegionAdminToDeleteUser" value="${allowRegionAdminToDeleteUser}">
+									<div class="float-left customized-settings-child cust-resp-txt"><spring:message code="label.companysettings.allowregionadmin.deleteuser" /></div>
+								</div>
+								</c:if>
+
+								<c:if test="${ columnName == 'companyId' }">
+								<div class="ss-comp-settings" style="">
+									<div id="alw-br-admin-add-usr-chk-box" data-typeOfCheckBox="branchAdminAddAccess" class="float-left admin-access-chk-box bd-check-img clear-both"></div>
+									<input type="hidden" id="alw-br-admin-add-usr-cb" name="allowBranchAdminToAddUser" value="${allowBranchAdminToAddUser}">
+									<div class="float-left customized-settings-child cust-resp-txt"><spring:message code="label.companysettings.allowbranchadmin.adduser" /></div>
+								</div>
+								</c:if>
+
+								<c:if test="${ columnName == 'companyId' }">
+								<div class="ss-comp-settings" style="">
+									<div id="alw-rgn-admin-add-usr-chk-box" data-typeOfCheckBox="regionAdminAddAccess" class="float-left admin-access-chk-box bd-check-img clear-both"></div>
+									<input type="hidden" id="alw-rgn-admin-add-usr-cb" name="allowBranchAdminToAddUser" value="${allowRegionAdminToAddUser}">
+									<div class="float-left customized-settings-child cust-resp-txt"><spring:message code="label.companysettings.allowregionadmin.adduser" /></div>
+								</div>
+								</c:if>
+								
 								<c:if test="${ columnName != 'agentId'}">
 								<div class="ss-comp-settings" style="">	
 									<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
@@ -491,6 +523,22 @@ $(document).ready(function() {
 	
 	if("${allowOverrideForSocialMedia}" == "false"){
 		$('#ovride-sm-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${allowBranchAdminToDeleteUser}" == "false"){
+		$('#alw-br-admin-del-usr-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${allowRegionAdminToDeleteUser}" == "false"){
+		$('#alw-rgn-admin-del-usr-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${allowBranchAdminToAddUser}" == "false"){
+		$('#alw-br-admin-add-usr-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${allowRegionAdminToAddUser}" == "false"){
+		$('#alw-rgn-admin-add-usr-chk-box').addClass('bd-check-img-checked');
 	}
 	
 	var accountMasterId = "${accountMasterId}";

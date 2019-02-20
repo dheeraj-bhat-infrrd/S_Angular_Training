@@ -6417,6 +6417,24 @@ function enableSocialMonitorToggleSetting(issocialmonitorenabled, disableEle) {
 	
 }
 
+//To update Branch and Region admin access permission.
+function updateAdminAccess(allowAdminAddOrDeleteUser,  typeOfCheckBox, disableEle) {
+	var payload = {
+			"allowadminaddordeleteuser" : allowAdminAddOrDeleteUser,
+			"typeofcheckbox" : typeOfCheckBox
+	};
+
+	callAjaxPostWithPayloadData("./updateadminaccess.do",function(data) {
+		if(data == "true") {
+			$('#overlay-toast').html(" Toggle Updated Sucessfully.");
+		} else {
+			$('#overlay-toast').html("Unable to update toggle");
+		}
+		showToast();
+	}, payload,true,disableEle);
+}
+
+
 function enableIncompleteSurveyDeleteToggleSetting(isincompletesurveydeleteenabled, disableEle) {
 	var payload = {
 		"isIncompleteSurveyDeleteEnabled" : isincompletesurveydeleteenabled
@@ -6980,9 +6998,14 @@ function paintUserDetailsForm(userId) {
  * Function paint the user list in user management page
  */
 function paintUserListInUserManagement(startIndex) {
+	
+	var entityId = $(this).attr('data-column-value');
+	var entityType = $(this).attr('data-column-type');
 	var payload = {
 		"startIndex" : startIndex,
-		"batchSize" : userBatchSize
+		"batchSize" : userBatchSize,
+		"entityId" : entityId,
+		"entityType" : entityType
 	};
 
 	$.ajax({
@@ -12909,6 +12932,26 @@ $('body').on('click', '#soc-mon-access-chk-box', function() {
 	}
 });
 
+$('body').on('click', '.admin-access-chk-box', function() {
+	var typeOfCheckBox = $(this).attr('data-typeOfCheckBox');
+	var id;
+	if(typeOfCheckBox == "branchAdminDeleteAccess")
+		id = '#alw-br-admin-del-usr-chk-box';
+	else if(typeOfCheckBox == "regionAdminDeleteAccess")
+		id = '#alw-rgn-admin-del-usr-chk-box';
+	else if(typeOfCheckBox == "branchAdminAddAccess")
+		id = '#alw-br-admin-add-usr-chk-box';
+	else if(typeOfCheckBox == "regionAdminAddAccess")
+		id = '#alw-rgn-admin-add-usr-chk-box';
+	if ($(id).hasClass('bd-check-img-checked')){
+		$(id).removeClass('bd-check-img-checked');
+		updateAdminAccess(true, typeOfCheckBox,id);
+	} else {
+		$(id).addClass('bd-check-img-checked');
+		updateAdminAccess(false, typeOfCheckBox, id);
+	}
+});
+		
 $('body').on('click', '#incomplete-survey-delete-chk-box', function() {
 	if ($('#incomplete-survey-delete-chk-box').hasClass('bd-check-img-checked')) {
 		$('#incomplete-survey-delete-chk-box').removeClass('bd-check-img-checked');

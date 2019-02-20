@@ -112,8 +112,6 @@ import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
 import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
-import org.springframework.web.bind.annotation.RequestBody;
-
 
 @DependsOn ( "generic")
 @Component
@@ -122,6 +120,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     private static final Logger LOG = LoggerFactory.getLogger( OrganizationManagementServiceImpl.class );
     private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
+    public static final String SUCCESS_MESSAGE = "Organization Settings updated Successfully";
 
     @Autowired
     private MessageUtils messageUtils;
@@ -11191,6 +11190,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method to update company settings using companyId finished" );
     }
 
+    @Override
+    public String updateOrganizationSettingsByIdAndBooleanValue(long id, boolean value, String fieldToUpdate, String collection)
+    {
+        LOG.info( "Method to update organization settings for boolean fields started." );
+        Map<String, Object> queryMap = new HashMap<>();
+        Map<String, Object> updateMap = new HashMap<>();
+        queryMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, id );
+        updateMap.put( fieldToUpdate, value );
+        try {
+            organizationUnitSettingsDao.updateOrganizationSettingsByQuery( queryMap, updateMap, collection );
+            LOG.info( SUCCESS_MESSAGE + " in updateOrganizationSettings()" );
+            return "true";
+        } catch ( Exception e ) {
+            LOG.error( "updateOrganizationSettingsByIdAndBooleanValue() failed to update mongo due to " + e );
+            return "false";
+        }
+    }
 
     @Override
 	public Map<String, String> getStateCodeNameMap() {
