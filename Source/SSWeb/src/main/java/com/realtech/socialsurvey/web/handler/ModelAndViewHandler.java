@@ -5,9 +5,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.realtech.socialsurvey.core.commons.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -76,12 +78,27 @@ public class ModelAndViewHandler
     @Autowired
     private ProfileManagementService profileManagementService;
 
+    @Value( "${AMAZON_ENV_PREFIX}" )
+    private String enviromment;
+
+    @Value( "${AMAZON_ENDPOINT}" )
+    private String amazonEndpoint;
+
+    @Value( "${AMAZON_BUCKET}" )
+    private String amazonBucket;
 
     public String handlePublicProfileModelAndView( Model model, PublicProfileAggregate profileAggregate, boolean isBotRequest )
         throws ProfileNotFoundException
     {
 
         LOG.debug( "method publicProfileModelAndViewHandler() started." );
+
+        if(enviromment.equalsIgnoreCase( "P" ) &&  profileAggregate.getProfile() != null &&
+            !StringUtils.isEmpty( profileAggregate.getProfile().getProfileImageUrlThumbnail() )){
+            profileAggregate.getProfile().setProfileImageUrlThumbnail(
+                Utils.convertCloudFrontUrlToS3Url(profileAggregate.getProfile().getProfileImageUrlThumbnail(), amazonEndpoint, amazonBucket));
+        }
+
         model.addAttribute( REVIEWS_COUNT, profileAggregate.getReviewCount() );
         model.addAttribute( PROFILE_JSON, profileAggregate.getProfileJson() );
         model.addAttribute( AVG_RATING, profileAggregate.getAverageRating() );
@@ -181,7 +198,7 @@ public class ModelAndViewHandler
         } else if ( error instanceof ProfileNotFoundException ) {
 
             LOG.error( "ProfileNotFoundException caught while fetching {} profile : {}", profileAggregate.getProfileLevel(),
-                error.getMessage(), error );
+                error.getMessage() );
             
             returnTemplate = JspResolver.SS_PAGE_NOT_FOUND;
            /* Map<String, String> nameMap = profileManagementService
