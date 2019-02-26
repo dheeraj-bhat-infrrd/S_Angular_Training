@@ -7846,8 +7846,7 @@ function initSurveyWithUrl(q) {
 			else {
 				$('.sq-ques-wrapper').addClass( 'sq-main-txt' );
 				$('.sq-ques-wrapper').empty();
-				$('.sq-ques-wrapper').html("<div class='error-main-wrapper container' style='min-height: 504px;'>  <div class='err-line-1 text-center'>SURVEY REQUEST EXPIRED</div>  <br>  <br>  <div class='err-line-2'>We're really excited to offer the opportunity for you to share your experience; however, the link you clicked has expired. If you feel this is an error, please call us at <a href='tel:+1-888-701-4512'>1-888-701-4512</a> or <a href='https://socialsurvey.zendesk.com/hc/en-us/requests/new'>send us a message</a>.</div>  <br>  <div class='err-line-3' style='border: 1px solid #ccc;    margin: 14px 0; padding: 21px;    box-shadow: 0px 2px #eee;'><strong style='font-family: 'Open Sans'; font-wieght: 600;'>NOTICE:</strong> Please accept our apology if you inadvertently received a request to take a survey on June 15th or 16th for a transaction you completed more than 30 days ago. This incident was trigged by human error while conducting maintenance on our system. <br>    <strong style='font-family: 'opensans'; font-wieght: 600;'>No data breach occurred and you do NOT need to take any further action.</strong></div>  <br>  <div class='err-page-btn'>Close</div></div>");
-			}
+				$('.sq-ques-wrapper').html("<div class='error-main-wrapper container' style='min-height: 504px;'>  <div class='err-line-1 text-center'>SURVEY REQUEST EXPIRED</div>  <br>  <br>  <div class='err-line-2'>We're really excited to offer the opportunity for you to share your experience; however, the link you clicked has expired. If you feel this is an error, please call us at <a href='tel:+1-888-701-4512'>1-888-701-4512</a> or <a href='https://socialsurvey.zendesk.com/hc/en-us/requests/new'>send us a message</a>.</div>  <br>  <div class='err-page-btn'>Close</div></div>");			}
 		},
 		error : function(e) {
 			if (e.status == 504) {
