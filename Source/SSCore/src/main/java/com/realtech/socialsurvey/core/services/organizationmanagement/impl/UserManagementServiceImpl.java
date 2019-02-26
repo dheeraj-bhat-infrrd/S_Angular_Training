@@ -2739,6 +2739,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
         if(companySettings != null && companySettings.isAllowPartnerSurvey() ){
             agentSettings.setAllowPartnerSurvey(true);
+            if(companySettings.isHiddenSection()) {
+            	agentSettings.setHiddenSection(true);
+            }
         }
         
         MailIdSettings mail_ids = new MailIdSettings();
@@ -5176,4 +5179,27 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		LOG.info("Batch one time run job updateSurveyDetails finished.");
 	}
+    
+    @Override
+    public boolean canAddAndDeleteUser(String entityType, long companyId, boolean addOrDeleteFlag) throws InvalidInputException
+    { 
+        LOG.debug( "Method canAddAndDeleteUser() started" );
+        if ( companyId <= 0l ) {
+            throw new InvalidInputException( "Invalid parameter passed : passed parameter company id invalid" );
+        }
+        OrganizationUnitSettings unitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );      
+        switch(entityType) {
+            case CommonConstants.COMPANY_ID_COLUMN :
+                return true;
+            case CommonConstants.REGION_ID_COLUMN :
+                return (addOrDeleteFlag ? unitSettings.getRegionAdminAllowedToAddUser():unitSettings.getRegionAdminAllowedToDeleteUser());
+            case CommonConstants.BRANCH_ID_COLUMN :
+                return (addOrDeleteFlag ? unitSettings.getBranchAdminAllowedToAddUser():unitSettings.getBranchAdminAllowedToDeleteUser());
+            case CommonConstants.AGENT_ID_COLUMN:
+                return false;
+            default : 
+                LOG.warn( "Invalid Entity Type passed to check canAddAndDeleteUser" );
+                throw new InvalidInputException( "Invalid Entity Type." );
+        }
+    }
 }

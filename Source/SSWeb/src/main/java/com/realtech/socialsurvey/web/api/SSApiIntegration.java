@@ -497,6 +497,9 @@ public interface SSApiIntegration
     @GET("/v1/users/{companyId}/owner")
     public Response getOwnerForCompany(@Path("companyId") Long companyId);
     
+    @POST("/v1/enableincompletesurveydeletetoggle/{companyId}/{isIncompleteSurveyDeleteEnabled}")
+    public Response enableIncompleteSurveyDeleteToggle (@Path ( "companyId") long companyId, @Path ("isIncompleteSurveyDeleteEnabled") boolean isIncompleteSurveyDeleteEnabled);
+    
     @PUT ( "/v1/disablenotification/{companyId}")
     public Response disableNotification (@Path ( "companyId") long companyId);
 

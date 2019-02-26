@@ -954,9 +954,12 @@ function paintReviews(result){
 }
 
 function stringEscape(str) {
-    if(str == undefined || str == null)
-        return "";
-    return str.replace( new RegExp("'", 'g'), "`" ).replace( new RegExp('"', 'g'), "`" );
+	
+    if(str == undefined || str == null){
+    	return "";
+    }
+    var textStr = str.toString();
+    return textStr.replace( new RegExp("'", 'g'), "`" ).replace( new RegExp('"', 'g'), "`" );
 }
 
 //invokes the google plus js that binds the click events to the popup

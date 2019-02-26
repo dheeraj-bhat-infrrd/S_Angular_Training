@@ -136,7 +136,27 @@ public class OrganizationUnitSettings implements Serializable
     
     private String optoutText;
     private Boolean isLoginEnableAllowed;
+    private boolean isIncompleteSurveyDeleteEnabled;
     
+    private boolean branchAdminAllowedToDeleteUser = true;//To Allow Branch Admin Delete User.
+
+    private boolean regionAdminAllowedToDeleteUser = true;//To Allow Region Admin Delete User
+
+    private boolean branchAdminAllowedToAddUser = true;//To Allow Branch Admin Add User
+
+    private boolean regionAdminAllowedToAddUser = true;//To Allow Region Admin Add User
+    
+    
+    public boolean isIncompleteSurveyDeleteEnabled() {
+    	return isIncompleteSurveyDeleteEnabled;
+    }
+
+
+    public void setIncompleteSurveyDeleteEnabled(boolean isIncompleteSurveyDeleteEnabled) {
+    	this.isIncompleteSurveyDeleteEnabled = isIncompleteSurveyDeleteEnabled;
+    }
+
+
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
 	}
@@ -1096,6 +1116,55 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.notification = notification;
     }
+    
+
+    public boolean getBranchAdminAllowedToDeleteUser()
+    {
+        return branchAdminAllowedToDeleteUser;
+    }
+
+
+    public void setBranchAdminAllowedToDeleteUser( boolean branchAdminAllowedToDeleteUser )
+    {
+        this.branchAdminAllowedToDeleteUser = branchAdminAllowedToDeleteUser;
+    }
+
+
+    public boolean getRegionAdminAllowedToDeleteUser()
+    {
+        return regionAdminAllowedToDeleteUser;
+    }
+
+
+    public void setRegionAdminAllowedToDeleteUser( boolean regionAdminAllowedToDeleteUser )
+    {
+        this.regionAdminAllowedToDeleteUser = regionAdminAllowedToDeleteUser;
+    }
+
+
+    public boolean getBranchAdminAllowedToAddUser()
+    {
+        return branchAdminAllowedToAddUser;
+    }
+
+
+    public void setBranchAdminAllowedToAddUser( boolean branchAdminAllowedToAddUser )
+    {
+        this.branchAdminAllowedToAddUser = branchAdminAllowedToAddUser;
+    }
+
+
+    public boolean getRegionAdminAllowedToAddUser()
+    {
+        return regionAdminAllowedToAddUser;
+    }
+
+
+    public void setRegionAdminAllowedToAddUser( boolean regionAdminAllowedToAddUser )
+    {
+        this.regionAdminAllowedToAddUser = regionAdminAllowedToAddUser;
+    }
+
 
     @Override
     public String toString()

@@ -12889,6 +12889,48 @@ b{
     line-height: 12px;
     color: #2f69aa;
 }
+
+.linkedin-api-v2-update-ribbon-outer {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    background-color: #e87c68;
+}
+
+.linkedin-api-v2-update-ribbon-body {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 50px;
+    width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    color: white;
+    text-align: center;
+}
+
+.margin-left-auto{
+	margin-left: auto;
+}
+
+.linkedin-api-v2-update-ribbon-close-btn {
+    width: 25px;
+    height: 25px;
+    margin: 0 auto;
+    margin-right: 0;
+    border: 4px solid white;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold !important;
+    line-height: 12px;
+    color: white;
+}
+
+.open-sans-bold{
+	font-family: OpenSansBold;
+}
 /*new 404 page*/
 body.ss-not-found-page {
     background-color: #fdfdfd;

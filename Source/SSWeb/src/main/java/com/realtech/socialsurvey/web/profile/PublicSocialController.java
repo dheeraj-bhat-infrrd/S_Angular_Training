@@ -74,7 +74,7 @@ public class PublicSocialController {
 	private String linkedinAccessUri;
 	@Value("${LINKED_IN_PROFILE_URI}")
 	private String linkedinProfileUri;
-	@Value("${LINKED_IN_SCOPE}")
+	@Value("${LINKED_IN_SCOPE_V2}")
 	private String linkedinScope;
 
 	// Google

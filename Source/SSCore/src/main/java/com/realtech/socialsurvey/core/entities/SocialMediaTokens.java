@@ -6,6 +6,7 @@ public class SocialMediaTokens
     private FacebookToken facebookToken;
     private GoogleToken googleToken;
     private LinkedInToken linkedInToken;
+    private LinkedInToken linkedInV2Token;
     private SocialProfileToken rssToken;
     private TwitterToken twitterToken;
     private YelpToken yelpToken;
@@ -15,6 +16,7 @@ public class SocialMediaTokens
     private GoogleBusinessToken googleBusinessToken;
     private FacebookPixelToken facebookPixelToken;
     private InstagramToken instagramToken;
+
 
     public GoogleBusinessToken getGoogleBusinessToken()
     {
@@ -147,29 +149,40 @@ public class SocialMediaTokens
         this.facebookPixelToken = facebookPixelToken;
     }
 
-    public InstagramToken getInstagramToken() {
+
+    public InstagramToken getInstagramToken()
+    {
         return instagramToken;
     }
 
-    public void setInstagramToken(InstagramToken instagramToken) {
+
+    public void setInstagramToken( InstagramToken instagramToken )
+    {
         this.instagramToken = instagramToken;
     }
+    
+    
+
+
+    public LinkedInToken getLinkedInV2Token()
+    {
+        return linkedInV2Token;
+    }
+
+
+    public void setLinkedInV2Token( LinkedInToken linkedInV2Token )
+    {
+        this.linkedInV2Token = linkedInV2Token;
+    }
+
 
     @Override
-    public String toString() {
-        return "SocialMediaTokens{" +
-                "facebookToken=" + facebookToken +
-                ", googleToken=" + googleToken +
-                ", linkedInToken=" + linkedInToken +
-                ", rssToken=" + rssToken +
-                ", twitterToken=" + twitterToken +
-                ", yelpToken=" + yelpToken +
-                ", zillowToken=" + zillowToken +
-                ", lendingTreeToken=" + lendingTreeToken +
-                ", realtorToken=" + realtorToken +
-                ", googleBusinessToken=" + googleBusinessToken +
-                ", facebookPixelToken=" + facebookPixelToken +
-                ", instagramToken=" + instagramToken +
-                '}';
+    public String toString()
+    {
+        return "SocialMediaTokens [facebookToken=" + facebookToken + ", googleToken=" + googleToken + ", linkedInToken="
+            + linkedInToken + ", linkedInV2Token=" + linkedInV2Token + ", rssToken=" + rssToken + ", twitterToken="
+            + twitterToken + ", yelpToken=" + yelpToken + ", zillowToken=" + zillowToken + ", lendingTreeToken="
+            + lendingTreeToken + ", realtorToken=" + realtorToken + ", googleBusinessToken=" + googleBusinessToken
+            + ", facebookPixelToken=" + facebookPixelToken + ", instagramToken=" + instagramToken + "]";
     }
 }

@@ -169,6 +169,8 @@ public class HierarchyManagementController
         LOG.info( "Method showViewHierarchyPage called" );
         User user = sessionHelper.getCurrentUser();
         String companyName = null;
+        HttpSession session = request.getSession( false );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         try {
             Company company = user.getCompany();
             if ( company == null ) {
@@ -177,6 +179,7 @@ public class HierarchyManagementController
             }
             companyName = company.getCompany();
             model.addAttribute( "companyName", companyName );
+            model.addAttribute( "canAdd", userManagementService.canAddAndDeleteUser(entityType,user.getCompany().getCompanyId(), true));
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException in showViewHierarchyPage. Reason:" + e.getMessage(), e );
             model.addAttribute( "message",
@@ -1693,7 +1696,10 @@ public class HierarchyManagementController
     public String fetchHierarchyViewBranches( Model model, HttpServletRequest request )
     {
         LOG.info( "Method fetchHierarchyViewBranches called in controller" );
+        HttpSession session = request.getSession( false );
         String strRegionId = request.getParameter( "regionId" );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        
         long regionId = 0l;
         List<Branch> branches = null;
         int start = 0;
@@ -1745,6 +1751,7 @@ public class HierarchyManagementController
             model.addAttribute( "branches", branches );
             model.addAttribute( "individuals", users );
             model.addAttribute( "regionId", regionId );
+            model.addAttribute( "canDelete", userManagementService.canAddAndDeleteUser( entityType, admin.getCompany().getCompanyId(), false ) );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching branches in a region . Reason : " + e.getMessage(), e );
             model.addAttribute( "message",
@@ -1767,8 +1774,11 @@ public class HierarchyManagementController
     public String fetchHierarchyViewUsersForBranch( Model model, HttpServletRequest request )
     {
         LOG.info( "Method fetchHierarchyViewUsersForBranch called in Hierarchy management controller" );
+        HttpSession session = request.getSession( false );
         String strBranchId = request.getParameter( "branchId" );
         String strRegionId = request.getParameter( "regionId" );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        
         long branchId = 0l;
         int start = 0;
         try {
@@ -1816,6 +1826,7 @@ public class HierarchyManagementController
             model.addAttribute( "users", usersList );
             model.addAttribute( "branchId", branchId );
             model.addAttribute( "regionId", strRegionId );
+            model.addAttribute( "canDelete", userManagementService.canAddAndDeleteUser( entityType, admin.getCompany().getCompanyId(), false ) );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching users in a branch . Reason : " + e.getMessage(), e );
             model.addAttribute( "message",
@@ -1843,6 +1854,7 @@ public class HierarchyManagementController
         LOG.info( "Method fetchHierarchyViewList called" );
         HttpSession session = request.getSession( false );
         User admin = sessionHelper.getCurrentUser();
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         Set<Long> regionIds = null;
         Set<Long> branchIds = null;
@@ -1914,6 +1926,7 @@ public class HierarchyManagementController
             model.addAttribute( "regions", regions );
             model.addAttribute( "branches", branches );
             model.addAttribute( "individuals", users );
+            model.addAttribute( "canDelete", userManagementService.canAddAndDeleteUser( entityType, admin.getCompany().getCompanyId(), false ) );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
             model.addAttribute( "message",

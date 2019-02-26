@@ -4580,6 +4580,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
     	boolean isUnsubscribed = false;
     	boolean isPartnerSurveyAllowed = true;
+    	boolean isIgnored = false;
         // null and syntax checks
         checkForSyntaxInSurveyPreInitiationData( survey );
 
@@ -4594,8 +4595,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         // check for ignored agent email mapping
         if ( isEmailIsIgnoredEmail( survey.getAgentEmailId(), survey.getCompanyId() ) ) {
             LOG.error( "no agent found with this email id and its an ignored record" );
-            throw new InvalidInputException(
-                "Can not process the record. The Service provider email id is set to be ignored" );
+            /*throw new InvalidInputException(
+                "Can not process the record. The Service provider email id is set to be ignored" );*/
+            survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD);
+            isIgnored = true;
         }
         
         if(unsubscribeService.isUnsubscribed( survey.getCustomerEmailId(), survey.getCompanyId() )) {
@@ -4637,7 +4640,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			//if borrower email is equal to coborrower email , we set the status of the survey to duplicate
 			//but status should change from STATUS_SURVEYPREINITIATION_NOT_PROCESSED to SURVEY_STATUS_PRE_INITIATED
 			//and not from STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD to SURVEY_STATUS_PRE_INITIATED
-			if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD && !isUnsubscribed && isPartnerSurveyAllowed) {
+			if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD && !isUnsubscribed && isPartnerSurveyAllowed && !isIgnored) {
 			  //update status
                 survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);  
 			}

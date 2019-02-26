@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +29,11 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserEmailMappingDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
@@ -1114,5 +1117,41 @@ public class UserManagementServiceImplTest
     public void testgetUsersAndEmailMappingForCompanyForInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
     {
         userManagementServiceImpl.getUsersAndEmailMappingForCompany( 0, 1, 10, -1 );
+    }
+    
+    @Test
+    public void testCanAddAndDeleteUserForTrue() throws InvalidInputException
+    {
+        OrganizationUnitSettings unitSettings = new OrganizationUnitSettings();
+        unitSettings.setBranchAdminAllowedToAddUser( true );
+        unitSettings.setRegionAdminAllowedToAddUser( true );
+        unitSettings.setBranchAdminAllowedToDeleteUser( true );
+        unitSettings.setRegionAdminAllowedToDeleteUser( true );
+        Mockito.when(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(16,"COMPANY_SETTINGS")).thenReturn( unitSettings );
+        assertTrue( userManagementServiceImpl.canAddAndDeleteUser( "regionId", 16, true )  == true);
+        assertTrue( userManagementServiceImpl.canAddAndDeleteUser( "branchId", 16, true )  == true);
+        assertTrue( userManagementServiceImpl.canAddAndDeleteUser( "regionId", 16, false ) == true);
+        assertTrue( userManagementServiceImpl.canAddAndDeleteUser( "branchId", 16, false ) == true);
+    }
+
+    @Test
+    public void testCanAddAndDeleteUserForFalse() throws InvalidInputException
+    {
+        OrganizationUnitSettings unitSettings =  new OrganizationUnitSettings();
+        unitSettings.setBranchAdminAllowedToAddUser( false );
+        unitSettings.setRegionAdminAllowedToAddUser( false );
+        unitSettings.setBranchAdminAllowedToDeleteUser( false );
+        unitSettings.setRegionAdminAllowedToDeleteUser( false );
+        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( 16, "COMPANY_SETTINGS" ) ).thenReturn( unitSettings );
+        assertTrue( userManagementServiceImpl.canAddAndDeleteUser( "regionId", 16, true ) == false );
+        assertTrue( userManagementServiceImpl.canAddAndDeleteUser( "branchId", 16, true )  == false);
+        assertTrue( userManagementServiceImpl.canAddAndDeleteUser( "regionId", 16, false ) == false);
+        assertTrue( userManagementServiceImpl.canAddAndDeleteUser( "branchId", 16, false ) == false);
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testcanAddAndDeleteUserForInvalidInput() throws InvalidInputException
+    {
+        userManagementServiceImpl.canAddAndDeleteUser( "companyId", 0l, true );
     }
 }
