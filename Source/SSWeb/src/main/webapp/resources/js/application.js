@@ -20878,6 +20878,14 @@ function closeSummitRibbon(){
 	$('#summit-ribbon-outer').hide();
 }
 
+function showLinkedinApiV2UpdateRibbon(){
+	$('#linkedin-api-v2-update-ribbon-outer').show();
+}
+
+function closeLinkedinApiV2UpdateRibbon(){
+	$('#linkedin-api-v2-update-ribbon-outer').hide();
+}
+
 
 $(document).on('click','#register-summit-btn',function(e){
 	e.stopImmediatePropagation();
@@ -20912,6 +20920,11 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 	}else{
 		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
 	}
+});
+
+$(document).on('click','#linkedin-api-v2-update-ribbon-close-btn',function(e){
+	e.stopPropagation();
+	closeLinkedinApiV2UpdateRibbon();
 });
 
 $(document).on('click','#summit-ribbon-close-btn',function(e){

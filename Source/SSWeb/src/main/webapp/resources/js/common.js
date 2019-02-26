@@ -725,8 +725,12 @@ function openAuthPage(event,socialNetwork, isAutoLogin, element) {
 	}
 	
 	var dataLink = $(element).attr('data-link');
+	var popupMessage = socialNetwork;
+	if(socialNetwork =='linkedinV2'){
+		popupMessage = "the new LinkedIn API";
+	}
 	
-	confirmSocialAuth(socialNetwork, function() {
+	confirmSocialAuth(popupMessage, function() {
 		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
 	}, dataLink);
 }

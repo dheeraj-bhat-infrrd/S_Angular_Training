@@ -126,6 +126,8 @@ public class AccountWebController
 
     @Value ( "${ENABLE_CAPTCHA}")
     private String enableCaptcha;
+    
+    private static final String V1 = "V2";
 
     @Autowired
     public AccountWebController( SSApiIntergrationBuilder apiBuilder, RequestUtils requestUtils, TokenHandler tokenHandler,
@@ -451,7 +453,7 @@ public class AccountWebController
                     SocialMediaTokens tokens = null;
                     if ( unit.equalsIgnoreCase( AGENT_UNIT ) ) {
                         tokens = organizationManagementService.getAgentSocialMediaTokens( Long.parseLong( sId ) );
-                        tokens = tokenHandler.updateLinkedInToken( accessToken, tokens, profileLink, expiresIn );
+                        tokens = tokenHandler.updateLinkedInToken( accessToken, tokens, profileLink, expiresIn, V1 );
                         // update tokens
                         tokens = socialManagementService.updateSocialMediaTokens( CommonConstants.AGENT_SETTINGS_COLLECTION,
                             Long.parseLong( sId ), tokens );

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -57,7 +55,6 @@ import com.realtech.socialsurvey.web.util.RequestUtils;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
 
 /**
  * 
@@ -131,6 +128,8 @@ public class SocialMediaTokenController
     @Autowired
     private URLGenerator urlGenerator;
     
+    private static final String V1 = "V1";
+    
     
     
     @RequestMapping ( value = "/socialauthfromemail", method = RequestMethod.GET)
@@ -170,7 +169,7 @@ public class SocialMediaTokenController
 
                     String redirectUri = socialManagementService.getLinkedinRedirectUrIForEmailRequest( columnName,
                         columnValue, serverBaseUrl );
-                    String linkedInAuth = socialManagementService.getLinkedinAuthUrl( redirectUri );
+                    String linkedInAuth = socialManagementService.getLinkedinAuthUrl( linkedinAuthUri, linkedInApiKey, redirectUri, linkedinScope );
 
                     model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuth );
 
@@ -258,7 +257,7 @@ public class SocialMediaTokenController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V1 );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
@@ -284,7 +283,7 @@ public class SocialMediaTokenController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V1);
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
@@ -310,7 +309,7 @@ public class SocialMediaTokenController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V1);
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
@@ -336,7 +335,7 @@ public class SocialMediaTokenController
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V1);
                 mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
 

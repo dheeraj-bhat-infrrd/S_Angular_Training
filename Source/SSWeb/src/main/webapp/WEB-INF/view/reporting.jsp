@@ -221,6 +221,13 @@
 	</div>
 </div> --%>
 
+<div id="linkedin-api-v2-update-ribbon-outer" class="linkedin-api-v2-update-ribbon-outer">
+	<div id="linkedin-api-v2-update-ribbon-body" class="linkedin-api-v2-update-ribbon-body  cursor-pointer">
+		<span class="margin-left-auto">Linkedin integration is changing and your existing connection will stop working starting March 1st. To continue using Linkedin with SocialSurvey, please <a href="#" onclick="openAuthPage(event,'linkedinV2', false, this);" data-link="${linkedinLink}">&nbsp;click here&nbsp;</a> and update your Linkedin connection</span>
+	   <div id="linkedin-api-v2-update-ribbon-close-btn" class="linkedin-api-v2-update-ribbon-close-btn cursor-pointer">x</div>
+	</div>
+</div>
+
 <c:if test='${vertical == "mortgage"}'>
 <!-- <div id="summit-ribbon-outer" class="summit-ribbon-outer">
 	<div id="summit-ribbon-body" class="summit-ribbon-body  cursor-pointer">
