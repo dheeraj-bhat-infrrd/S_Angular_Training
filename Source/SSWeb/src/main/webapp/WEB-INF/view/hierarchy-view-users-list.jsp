@@ -51,6 +51,15 @@
 						<c:set var="admincaneditclass" value="v-tbl-icn-disabled" />
 					</c:otherwise>
 				</c:choose>
+				
+				<c:choose>
+					<c:when test="${canDelete}">
+						<c:set var="admincandeleteclass" value="v-tbl-icn" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="admincandeleteclass" value="v-tbl-icn-disabled" />
+					</c:otherwise>
+				</c:choose>
 		<tr id="user-row-${branchUser.userId}" clicked="false" data-userid="${branchUser.userId}"
 			class="v-tbl-row v-tbl-row-sel v-tbl-row-ind sel-r${regionId}-b${branchId}-u${branchUser.userId} user-row-${branchId}">
 			<td class="v-tbl-line"><div class="v-line-ind"></div></td>
@@ -113,7 +122,7 @@
 						</c:otherwise>
 					</c:choose>  
 					<c:choose>
-						<c:when test="${branchUser.canEdit && user.userId != branchUser.userId}">
+						<c:when test="${canDelete && user.userId != branchUser.userId}">
 							<div class="float-left v-tbl-icn v-tbl-icn-sm v-icn-close user-del-icn" data-userid="${branchUser.userId}">Delete</div>
 						</c:when>
 						<c:otherwise>

@@ -75,7 +75,7 @@
 				</c:choose>
 
 				<c:choose>
-					<c:when test="${userfromsearch.canEdit && user.userId != userfromsearch.userId}">
+					<c:when test="${canDelete && user.userId != userfromsearch.userId}">
 						<c:set var="admincanremoveclass" value="v-tbl-icn" />
 					</c:when>
 					<c:otherwise>

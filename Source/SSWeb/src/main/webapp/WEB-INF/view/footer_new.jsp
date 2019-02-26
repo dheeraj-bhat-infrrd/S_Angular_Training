@@ -72,7 +72,7 @@
 			</div>
 		</div>
 		<div class="bottom">
-			<p>&copy; Copyright 2015. All Rights Reserved.</p>
+			<p>&copy; Copyright 2019 . All Rights Reserved.</p>
 			<p>
 				Created by BuyersRoad, Inc. in San Francisco &#149; <a
 					href="https://www.socialsurvey.com/survey/privacy-policy/" style="padding-left: 1px;">Privacy

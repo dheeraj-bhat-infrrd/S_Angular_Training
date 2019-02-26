@@ -503,7 +503,20 @@ public interface OrganizationUnitSettingsDao
 	List<Long> fetchActiveUserForCompany(long companyId);
 
 	/**
+	 * Method to update OrganizationSettings in MongoDataBase
+	 * queryMap contains the kEY as the attribute to be queried and VALUE as the value to be matched in the query
+	 * updateMap contains the kEY which is the column name in mongo and the VALUE which is the new update value.
+	 * collectionName will contain the name of collection in which the value is to be updated.
 	 * 
+	 * @param queryMap
+	 * @param updateMap
+	 * @param collectionName
+	 * @throws Exception 
+	 */
+	public void updateOrganizationSettingsByQuery( Map<String, Object> queryMap, Map<String, Object> updateMap,
+	    String collectionName ) throws Exception;
+
+	/** 
 	 * @param collectionName
 	 * @param vertical
 	 * @param locationType
@@ -511,7 +524,7 @@ public interface OrganizationUnitSettingsDao
 	 * @return
 	 */
 	List<SEOUrlEntity> fetchSEOUrlEntty(String collectionName, int count, int limit, String locationType,
-			List<Long> excludedEntityIds);
+	    List<Long> excludedEntityIds);
 
 	/**
 	 * @param collectionName

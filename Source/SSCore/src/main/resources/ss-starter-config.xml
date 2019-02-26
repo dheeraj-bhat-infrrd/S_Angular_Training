@@ -780,7 +780,7 @@
 	<bean id="dotloopcron"
 		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="dotloopjobdetail" />
-		<property name="cronExpression" value="0 01 7 * * ?" />
+   		<property name="cronExpression" value="0 01 7 * * ?" />
 	</bean>
 
 	<bean id="lonewolfcron"

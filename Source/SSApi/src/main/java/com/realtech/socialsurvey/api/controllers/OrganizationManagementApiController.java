@@ -499,6 +499,20 @@ public class OrganizationManagementApiController
         }
     }
 
+    @RequestMapping(value = "/enableincompletesurveydeletetoggle/{companyId}/{isIncompleteSurveyDeleteEnabled}", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> enableIncompleteSurveyDeleteToggle (@PathVariable long companyId, @PathVariable boolean isIncompleteSurveyDeleteEnabled) throws SSApiException
+    {
+    	LOGGER.info( "Method to enable incomplete survey delete toggle started");
+    	try {
+    		if ( companyId <= 0l ) {
+                throw new InvalidInputException( "Invalid comapanyId = " + companyId);
+            }
+    		return new ResponseEntity<>(organizationManagementService.enableIncompleteSurveyDeleteToggle( companyId, isIncompleteSurveyDeleteEnabled),HttpStatus.OK);
+    	}catch ( Exception e ) {
+            throw new SSApiException( e.getMessage());
+        }
+    }
+    
     @RequestMapping( value = "/branch/{id}", method = RequestMethod.GET)
     @ApiOperation( value = "Gets the branch details")
     public ResponseEntity<?> getBranchDetails(@PathVariable long id, @RequestHeader ( "authorizationHeader") String authorizationHeader)
