@@ -45,7 +45,7 @@
 				</div>
 
 				<div class="footer-copyright text-center">
-					<spring:message code="label.copyright.key" />&copy;
+					<spring:message code="label.copyright.key" />&copy; <span id="ss-cc-year"></span>
 					<spring:message code="label.footer.socialsurvey.key" /><span class="center-dot">.</span>
 					<spring:message code="label.allrightscopyright.key" />
 				</div>
@@ -60,7 +60,9 @@
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script> 
 <script>
  $(document).ready(function() {
-	
+	var curDate = new Date();
+	$('#ss-cc-year').html(curDate.getFullYear());
+		
 	var waitMessage = "${message}";
 	if (parseInt(waitMessage) == 1) {
 		var authUrl = "${authUrl}";

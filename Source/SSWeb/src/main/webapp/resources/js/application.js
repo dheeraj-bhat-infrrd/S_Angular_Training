@@ -9168,6 +9168,11 @@ $('#shr-post-chk-box').click(function() {
 
 // Edit profile functions
 $(document).ajaxStop(function() {
+	var hashString = document.baseURI.split('#')[1];
+	if(hashString != "showprofilepage"){
+		$('.footer-main-wrapper').show();
+		return;
+	}
 	adjustImage();
 });
 

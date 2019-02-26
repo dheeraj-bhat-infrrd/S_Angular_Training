@@ -43,7 +43,7 @@
 
         <div class="footer-main-wrapper">
             <div class="container text-center footer-text">
-                Copyright &copy; 2018 SocialSurvey<span class="center-dot">.</span> All Rights Reserved.
+                Copyright &copy; <span id="ss-cc-year"></span> SocialSurvey<span class="center-dot">.</span> All Rights Reserved.
             </div>
         </div>
     </div>
@@ -51,6 +51,9 @@
     
     <script>
         $(document).ready(function(){
+        	var curDate = new Date();
+    		$('#ss-cc-year').html(curDate.getFullYear());
+    		
             adjustMinHeight();
             $(window).resize(adjustMinHeight);
             function adjustMinHeight(){

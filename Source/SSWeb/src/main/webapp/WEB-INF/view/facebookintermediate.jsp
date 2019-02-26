@@ -38,7 +38,7 @@
 					<div style="font-size: 11px; text-align: center;"></div>
 				</div>
 				<div class="footer-copyright text-center">
-					<spring:message code="label.copyright.key" />&copy;
+					<spring:message code="label.copyright.key" />&copy; <span id="ss-cc-year"></span>
 					<spring:message code="label.footer.socialsurvey.key" /><span class="center-dot">.</span>
 					<spring:message code="label.allrightscopyright.key" />
 				</div>
@@ -54,6 +54,9 @@
 <script>
 var checkIfFacebookSet = false;
 $(document).ready(function() {
+	var curDate = new Date();
+	$('#ss-cc-year').html(curDate.getFullYear());
+	
 	//Get media tokens from model
 	/* var mediaTokens = $('#md-token').val(); */
 	var mediaTokens = '${mediaTokens}';
