@@ -1,12 +1,16 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.realtech.socialsurvey.core.entities.LoopDetails;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -475,7 +479,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
                             surveyPreInitiation.setCustomerLastName( null );
                             surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
                             surveyPreInitiation.setAgentEmailId( buyingAgentEmailId );
-                            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
+                            
                             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
                             surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
 	                        surveyPreInitiation.setCity( city );
@@ -483,11 +487,12 @@ public class DotloopReviewProcessor extends QuartzJobBean
                             // adding the loop view id in the source id for back tracking
                             surveyPreInitiation.setSurveySourceId( String.valueOf( loop.getLoopViewId() ) );
                             try {
+                                surveyPreInitiation.setEngagementClosedTime( getFormattedTime(loop.getLastUpdated()) );
                                 surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
                                 //update the flag
                                 newRecordFound = true;
                                 newRecordFoundCount++;
-                            } catch ( InvalidInputException e ) {
+                            } catch ( InvalidInputException | ParseException e ) {
                                 LOG.error( "Unable to insert this record ", e );
                             }
                         }
@@ -512,7 +517,6 @@ public class DotloopReviewProcessor extends QuartzJobBean
                             surveyPreInitiation.setCustomerLastName( null );
                             surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
                             surveyPreInitiation.setAgentEmailId( sellingAgentEmailId );
-                            surveyPreInitiation.setEngagementClosedTime( new Timestamp( System.currentTimeMillis() ) );
                             surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
                             surveyPreInitiation.setSurveySource( CommonConstants.CRM_SOURCE_DOTLOOP );
 	                        surveyPreInitiation.setCity( city );
@@ -520,11 +524,12 @@ public class DotloopReviewProcessor extends QuartzJobBean
                             // adding the loop view id in the source id for back tracking
                             surveyPreInitiation.setSurveySourceId( String.valueOf( loop.getLoopViewId() ) );
                             try {
+                                surveyPreInitiation.setEngagementClosedTime( getFormattedTime(loop.getLastUpdated()) );
                                 surveyHandler.saveSurveyPreInitiationObject( surveyPreInitiation );
                                 //update the flag
                                 newRecordFound = true;
                                 newRecordFoundCount++;
-                            } catch ( InvalidInputException e ) {
+                            } catch ( InvalidInputException | ParseException e ) {
                                 LOG.error( "Unable to insert this record ", e );
                             }
                         }
@@ -544,7 +549,23 @@ public class DotloopReviewProcessor extends QuartzJobBean
     }
 
 
-	/**
+	private Timestamp getFormattedTime( String dateVal ) throws ParseException
+    {
+	    String timeZoneDesc =  dateVal.substring( dateVal.lastIndexOf( '-' ) );
+        dateVal = dateVal.replace( 'T', ' ' );
+        dateVal = dateVal.substring( 0, dateVal.lastIndexOf( '-' ) );
+        
+        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+        Calendar cal = Calendar.getInstance();
+        cal.setTime( sdf.parse( dateVal ) );
+        cal.setTimeZone( TimeZone.getTimeZone( "GMT"+ timeZoneDesc ) );
+        
+        Timestamp ts = new Timestamp( cal.getTimeInMillis() );
+        return ts;
+    }
+
+
+    /**
 	 * Method to get city and state values for loop
 	 * @param loop
 	 * @param authorizationHeader
