@@ -8524,7 +8524,7 @@ function redirectPageUponSurveySubmit(){
 		if(!hiddenSection){
 			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + "/" + surveyId + '" target="_blank">' + agentFullProfileLink + '</a>');
 		}
-		
+		var feedback = $("#text-area").val();
 		var fmt_rating = Number(rating).toFixed(1);
 		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
