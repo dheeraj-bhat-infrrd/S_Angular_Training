@@ -509,7 +509,9 @@ public class UserManagementController
             "Method for Finding users under admin and redirecting to search page, findUsersUnderAdminAndRedirectToPage() started" );
         int startIndex = 0;
         int batchSize = 0;
-
+        HttpSession session = request.getSession( false );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+    
         try {
             //            String users = findUserByEmail( model, request );
 
@@ -559,6 +561,7 @@ public class UserManagementController
             } else {
                 LOG.warn( "No users found under the admin id : " + admin.getUserId() );
             }
+            model.addAttribute( "canDelete", userManagementService.canAddAndDeleteUser(entityType,admin.getCompany().getCompanyId(), false));
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException in findusers. Reason : ", e );
             model.addAttribute( "message",

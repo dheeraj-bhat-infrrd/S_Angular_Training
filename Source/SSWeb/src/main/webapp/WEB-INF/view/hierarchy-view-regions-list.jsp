@@ -57,9 +57,9 @@
 						data-iden="${branch.branchId}" data-profile="branch"
 						title="<spring:message code="label.widget.key" />">Widget</div>
 					<div class="float-left v-tbl-top-spacer"></div>
-					 <c:when test="${canDelete}">
+					 <c:if test="${canDelete}">
 					<div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}">Delete</div>
-					</c:when>
+					</c:if>
                    <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}">Edit</div>
               <div class="float-left v-tbl-top-spacer"></div>
                </div>

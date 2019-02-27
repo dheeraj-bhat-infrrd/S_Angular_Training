@@ -7181,10 +7181,12 @@ $(document).on('click', '#um-search-icn', function(e) {
 
 function searchUsersByNameEmailLoginId(searchKey) {
 	var url = "./findusersunderadmin.do";
+	var entityType = $(this).attr('data-column-type');
 	var payload = {
 		"searchKey" : searchKey,
 		"startIndex" : userStartIndex,
-		"batchSize" : userBatchSize
+		"batchSize" : userBatchSize,
+		"entityType" : entityType
 	};
 	callAjaxGetWithPayloadData(url, searchUsersByNameEmailLoginIdCallBack, payload, true);
 }
