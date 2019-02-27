@@ -183,7 +183,9 @@
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item" onclick="showMainContent('./showreportingpage.do')"><spring:message code="label.header.dashboard.key" /></div>
-				<div class="header-links-item" onclick="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.legacy.dashboard.key" /></div>
+				<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+					<div class="header-links-item" onclick="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.legacy.dashboard.key" /></div>
+				</c:if>
 				<div class="header-links-item" onclick="showMainContent('./showreportspage.do')"><spring:message code="label.reporting.key" /></div>
 				<c:if test="${(accountMasterId == 2 || accountMasterId == 3 || accountMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
 					<div class="header-links-item" onclick="showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></div>
@@ -221,13 +223,17 @@
 					<div id="vndsta-setting-one" class="header-links-item hide" onclick="showMainContent('./showlistingsmanagersettings.do')"><spring:message code="label.vendastaproductsettings.key" /></div>
 				</c:if>
 				<c:if test="${!hiddenSectionDashboard}">
-					<div class="header-links-item" onclick="showMainContent('./showwidget.do');"><spring:message code="label.showwidget.key" /></div>
+					<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+						<div class="header-links-item" onclick="showMainContent('./showwidget.do');"><spring:message code="label.showwidget.key" /></div>
+					</c:if>
 					<div class="header-links-item" onclick="showMainContent('./shownewwidget.do');"><spring:message code="label.shownewwidget.key" /></div>
 				</c:if>
 				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
-					<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
-						<spring:message code="label.showwidget.key" />
-					</div>
+					<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+						<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
+							<spring:message code="label.showwidget.key" />
+						</div>
+					</c:if>
 					<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./shownewwidget.do');">
 						<spring:message code="label.shownewwidget.key" />
 					</div>
@@ -287,9 +293,11 @@
 							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">
 								<spring:message code="label.header.dashboard.key" />
 							</div>
-							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./dashboard.do');">
-								<spring:message code="label.header.legacy.dashboard.key" />
-							</div>
+							<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./dashboard.do');">
+									<spring:message code="label.header.legacy.dashboard.key" />
+								</div>
+							</c:if>
 							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportspage.do');">
 								<spring:message code="label.reporting.key" />
 							</div>
@@ -326,9 +334,11 @@
 								</div>
 							</c:if>
 							<c:if test="true">
-								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
-									<spring:message code="label.showwidget.key" />
-								</div>
+								<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+									<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
+										<spring:message code="label.showwidget.key" />
+									</div>
+								</c:if>
 							</c:if>
 							<c:if test="true">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./shownewwidget.do');">
@@ -370,9 +380,11 @@
 								</div>
 							</c:if>
 							<c:if test="true">
-								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
-									<spring:message code="label.showwidget.key" />
-								</div>
+								<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+									<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
+										<spring:message code="label.showwidget.key" />
+									</div>
+								</c:if>
 							</c:if>
 							<c:if test="true">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./shownewwidget.do');">
