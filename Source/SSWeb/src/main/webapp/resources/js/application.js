@@ -6637,11 +6637,11 @@ function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, ne
 	$('#happy-text').text(decodeURIComponent( escape( window.atob( happyText ) ) ));
 	$('#neutral-text').text(decodeURIComponent( escape( window.atob( neutralText ) ) ));
 	$('#sad-text').text(decodeURIComponent( escape( window.atob( sadText ) ) ));
-	console.log('HappyText'+happyText);
+	
 	$('#happy-text-complete').text(decodeURIComponent( escape( window.atob( happyTextComplete ) ) ));
 	$('#neutral-text-complete').text(decodeURIComponent( escape( window.atob( neutralTextComplete ) ) ));
 	$('#sad-text-complete').text(decodeURIComponent( escape( window.atob( sadTextComplete ) ) ));
-	console.log('Happy URL'+happyUrl);
+	
 	$('#happy-complete-url').text(decodeURIComponent( escape( window.atob( happyUrl) ) ));
 	$('#ok-complete-url').text(decodeURIComponent( escape( window.atob( okUrl) ) ));
 	$('#sad-complete-url').text(decodeURIComponent( escape( window.atob( sadUrl))));	
@@ -7181,10 +7181,12 @@ $(document).on('click', '#um-search-icn', function(e) {
 
 function searchUsersByNameEmailLoginId(searchKey) {
 	var url = "./findusersunderadmin.do";
+	var entityType = $(this).attr('data-column-type');
 	var payload = {
 		"searchKey" : searchKey,
 		"startIndex" : userStartIndex,
-		"batchSize" : userBatchSize
+		"batchSize" : userBatchSize,
+		"entityType" : entityType
 	};
 	callAjaxGetWithPayloadData(url, searchUsersByNameEmailLoginIdCallBack, payload, true);
 }
@@ -7927,7 +7929,7 @@ function paintSurveyPage(jsonData) {
 	subjectContentForZillowPost = jsonData.responseJSON.subjectContentForZillowPost;
 	isAutoFillReviewContentForZillowPost = jsonData.responseJSON.isAutoFillReviewContentForZillowPost;
 	reviewFooterContentForZillowPost = jsonData.responseJSON.reviewFooterContentForZillowPost;
-	console.log('Hogwarts! '+jsonData.responseJSON.branchName+' '+jsonData.responseJSON.regionName);
+	
 	
 	// URL redirect changes
 	surveySourceId = jsonData.responseJSON.surveySourceId;
@@ -8442,7 +8444,6 @@ function paintRangeScale() {
 }
 
 function showMasterQuestionPage() {
-	console.log('isSmileTypeQuestion'+isSmileTypeQuestion);
 	if (isSmileTypeQuestion) {
 		showFeedbackPage(mood);
 	} else {
