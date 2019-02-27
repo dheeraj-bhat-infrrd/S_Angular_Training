@@ -23,6 +23,11 @@ import com.realtech.socialsurvey.core.entities.ApiRequestEntity;
 import com.realtech.socialsurvey.core.entities.ApiResponseEntity;
 
 
+/**
+ * Api transaction Intercepter to log all API request/response in mongoDB.
+ * @author manish
+ *
+ */
 @Component
 public class ApiTransactionInterceptor extends HandlerInterceptorAdapter
 {
@@ -43,7 +48,6 @@ public class ApiTransactionInterceptor extends HandlerInterceptorAdapter
 
     	LOG.debug("method postHandle started ");
     	
-    	 Gson gson = new Gson();
         String data = getRequestBody( request );
         
         ResponseEntity<Map<String, Object>> responseObj =  (ResponseEntity<Map<String, Object>>) request.getAttribute( "output" );
@@ -55,7 +59,7 @@ public class ApiTransactionInterceptor extends HandlerInterceptorAdapter
         		companyId = (long) request.getAttribute( "companyId" );
 
         }catch(Exception e){
-        	LOG.error("Error while getting companyId from the request : " + e.getMessage());
+        	LOG.error("Error while getting companyId from the request : {}", e.getMessage());
         }
         		
         
@@ -65,11 +69,18 @@ public class ApiTransactionInterceptor extends HandlerInterceptorAdapter
         apiRequestEntity.setRequestMethod(request.getMethod());
         
         ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
-        apiResponseEntity.setStatusCode(responseObj.getStatusCode().toString());
-        apiResponseEntity.setHeader(responseObj.getHeaders().toString());
         
-       
-        apiResponseEntity.setBody(gson.toJson(responseObj.getBody()));
+        if(responseObj.getStatusCode() != null) {
+            apiResponseEntity.setStatusCode(responseObj.getStatusCode().toString());
+        }
+        
+        if(responseObj.getHeaders()!= null) {
+            apiResponseEntity.setHeader(responseObj.getHeaders().toString());
+        }
+        
+        
+        // Not required to store response payload details.       
+        //apiResponseEntity.setBody(gson.toJson(responseObj.getBody()));
         
         ApiRequestDetails apiRequestDetails = new ApiRequestDetails();
         apiRequestDetails.setRequest(apiRequestEntity);
