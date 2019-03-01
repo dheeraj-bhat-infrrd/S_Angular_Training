@@ -8297,6 +8297,9 @@ function storeCustomerAnswer(customerResponse) {
 function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded, onlyPostToSocialSurvey) {
 	var success = false;
 
+	$('#survey-dash').show();
+	$('#next-textarea-smiley').attr('data-survey-submit-disabled',true);
+	
 	var payload = {
 		"mood" : mood,
 		"feedback" : feedback,
@@ -8334,6 +8337,7 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			$('#next-textarea-smiley').attr('data-survey-submit-disabled',false);
 		}
 	});
 }
@@ -8552,6 +8556,7 @@ function redirectPageUponSurveySubmit(){
 	
 		//paint socialmedia icons on survey thank you page
 		paintSocialMediaIconsOnSurveyCompletion();
+		$('#survey-dash').hide();
 	}
 }
 
@@ -8782,7 +8787,9 @@ $('.sq-np-item-next').click(function() {
 			if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
 				$('#overlay-toast').html('Please answer this question.');
 				showToast();
-			} else {
+			} else if($('#next-textarea-smiley').attr('data-survey-submit-disabled') == true || $('#next-textarea-smiley').attr('data-survey-submit-disabled') == 'true'){
+				return;
+			}else {
 				showMasterQuestionPage();
 			}
 			return;

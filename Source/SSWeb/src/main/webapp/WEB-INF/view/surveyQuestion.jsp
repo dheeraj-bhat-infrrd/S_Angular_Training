@@ -65,6 +65,7 @@
 	<div id="prof-container" data-q="${q}" data-agentid="${agentId}" data-agentName="${agentName}" data-agent-email="${agentEmail}"
 	data-last-name="${lastName}" data-first-name="${firstName}" data-copy-to-clipboard=""
 		 class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
+		 <div id="survey-dash" style="display:none"></div>
 		<div class="container">
 			<div class="sq-ques-wrapper" data-edited=false>
 				<div id="agnt-img" class="sq-top-img"></div>
@@ -328,7 +329,7 @@
 						</div>
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>
-							<div id="next-textarea-smiley" class="float-left sq-np-item sq-np-item-next btn-com"><spring:message code="label.nxt.btn.key"/></div>
+							<div id="next-textarea-smiley" class="float-left sq-np-item sq-np-item-next btn-com" data-survey-submit-disabled=false><spring:message code="label.nxt.btn.key"/></div>
 						</div>
 					</div>
 				</div>

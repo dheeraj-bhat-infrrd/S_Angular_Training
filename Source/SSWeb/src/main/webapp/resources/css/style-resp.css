@@ -1933,7 +1933,7 @@
 	.dash-size{
 	min-height:498px;
 	}
-	#top-dash{
+	#top-dash, #survey-dash{
 	min-height:498px;
 	}
 	.prof-details-header .social-item-icon {
@@ -2850,7 +2850,7 @@
 	.dash-size{
 	min-height:340px;
 	}
-	#top-dash{
+	#top-dash, #survey-dash{
 	min-height:340px;
 	}
 	.dash-btn-dl-br {
@@ -3209,9 +3209,10 @@
 	.dash-size{
 	min-height:480px;
 	}
-	#top-dash{
+	#top-dash, #survey-dash{
 	min-height:480px;
 	}
+	
 	.en-botttom-padding{
 	margin-bottom:30px;
 	}
