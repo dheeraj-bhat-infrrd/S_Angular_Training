@@ -228,17 +228,16 @@
 	</div>
 </div>
 
-<c:if test='${vertical == "mortgage"}'>
-<!-- <div id="summit-ribbon-outer" class="summit-ribbon-outer">
+<div id="summit-ribbon-outer" class="summit-ribbon-outer">
 	<div id="summit-ribbon-body" class="summit-ribbon-body  cursor-pointer">
 		<div id="summit-ribbon-close-btn" class="summit-ribbon-close-btn cursor-pointer">x</div>
 	</div>
-</div> -->
+</div>
 
 <div id="summit-popup-outer" class="summit-popup-outer hide">
 	<div id="summit-popup-body" class="summit-popup-body cursor-pointer">
 		<div class="summit-popup-close-cont">
-			<div id="summit-popup-close-btn" class="summit-popup-close-btn cursor-pointer"></div>
+			<div id="summit-popup-close-btn" class="summit-popup-close-btn cursor-pointer">x</div>
 		</div>
 		<div class="summit-checkbox-cont clearfix">
 			<div class="float-left wc-width summit-check-contain" id="">
@@ -248,7 +247,6 @@
 		</div>
 	</div>
 </div>
-</c:if>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
