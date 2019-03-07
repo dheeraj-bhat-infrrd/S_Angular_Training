@@ -20894,23 +20894,6 @@ function closeLinkedinApiV2UpdateRibbon(){
 	$('#linkedin-api-v2-update-ribbon-outer').hide();
 }
 
-
-$(document).on('click','#register-summit-btn',function(e){
-	e.stopImmediatePropagation();
-	e.preventDefault();
-	
-	closeSummitPopup( false );
-	
-	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
-	
-	if(profileMasterId == 1){
-		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
-	}else{
-		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
-	}
-	
-});
-
 $(document).on('click','#summit-popup-close-btn',function(e){
 	e.stopPropagation();
 	closeSummitPopup();
@@ -20923,11 +20906,7 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 
 	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
 	
-	if(profileMasterId == 1){
-		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
-	}else{
-		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
-	}
+	window.open('https://www.socialsurvey.com/top-performers-2018/', '_blank');
 });
 
 $(document).on('click','#linkedin-api-v2-update-ribbon-close-btn',function(e){
@@ -20950,11 +20929,7 @@ $(document).on('click','#summit-popup-body',function(e){
 	
 	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
 	
-	if(profileMasterId == 1){
-		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
-	}else{
-		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
-	}
+	window.open('https://www.socialsurvey.com/top-performers-2018/', '_blank');
 });
 
 function sendClickedEventInfo( event ){
