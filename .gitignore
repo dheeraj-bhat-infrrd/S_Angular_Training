@@ -5,6 +5,8 @@
 .project
 .springBeans
 .recommenders
+# Java annotation processor (APT)
+.factorypath
 Source/SSCore/.settings
 Source/SSWeb/.settings
 Source/SSBatch/.settings
