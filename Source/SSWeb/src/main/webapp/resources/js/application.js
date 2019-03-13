@@ -6637,11 +6637,11 @@ function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, ne
 	$('#happy-text').text(decodeURIComponent( escape( window.atob( happyText ) ) ));
 	$('#neutral-text').text(decodeURIComponent( escape( window.atob( neutralText ) ) ));
 	$('#sad-text').text(decodeURIComponent( escape( window.atob( sadText ) ) ));
-	console.log('HappyText'+happyText);
+	
 	$('#happy-text-complete').text(decodeURIComponent( escape( window.atob( happyTextComplete ) ) ));
 	$('#neutral-text-complete').text(decodeURIComponent( escape( window.atob( neutralTextComplete ) ) ));
 	$('#sad-text-complete').text(decodeURIComponent( escape( window.atob( sadTextComplete ) ) ));
-	console.log('Happy URL'+happyUrl);
+	
 	$('#happy-complete-url').text(decodeURIComponent( escape( window.atob( happyUrl) ) ));
 	$('#ok-complete-url').text(decodeURIComponent( escape( window.atob( okUrl) ) ));
 	$('#sad-complete-url').text(decodeURIComponent( escape( window.atob( sadUrl))));	
@@ -7181,10 +7181,12 @@ $(document).on('click', '#um-search-icn', function(e) {
 
 function searchUsersByNameEmailLoginId(searchKey) {
 	var url = "./findusersunderadmin.do";
+	var entityType = $(this).attr('data-column-type');
 	var payload = {
 		"searchKey" : searchKey,
 		"startIndex" : userStartIndex,
-		"batchSize" : userBatchSize
+		"batchSize" : userBatchSize,
+		"entityType" : entityType
 	};
 	callAjaxGetWithPayloadData(url, searchUsersByNameEmailLoginIdCallBack, payload, true);
 }
@@ -7927,7 +7929,7 @@ function paintSurveyPage(jsonData) {
 	subjectContentForZillowPost = jsonData.responseJSON.subjectContentForZillowPost;
 	isAutoFillReviewContentForZillowPost = jsonData.responseJSON.isAutoFillReviewContentForZillowPost;
 	reviewFooterContentForZillowPost = jsonData.responseJSON.reviewFooterContentForZillowPost;
-	console.log('Hogwarts! '+jsonData.responseJSON.branchName+' '+jsonData.responseJSON.regionName);
+	
 	
 	// URL redirect changes
 	surveySourceId = jsonData.responseJSON.surveySourceId;
@@ -8295,6 +8297,9 @@ function storeCustomerAnswer(customerResponse) {
 function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded, onlyPostToSocialSurvey) {
 	var success = false;
 
+	$('#survey-dash').show();
+	$('#next-textarea-smiley').attr('data-survey-submit-disabled',true);
+	
 	var payload = {
 		"mood" : mood,
 		"feedback" : feedback,
@@ -8332,6 +8337,7 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			$('#next-textarea-smiley').attr('data-survey-submit-disabled',false);
 		}
 	});
 }
@@ -8442,7 +8448,6 @@ function paintRangeScale() {
 }
 
 function showMasterQuestionPage() {
-	console.log('isSmileTypeQuestion'+isSmileTypeQuestion);
 	if (isSmileTypeQuestion) {
 		showFeedbackPage(mood);
 	} else {
@@ -8551,6 +8556,7 @@ function redirectPageUponSurveySubmit(){
 	
 		//paint socialmedia icons on survey thank you page
 		paintSocialMediaIconsOnSurveyCompletion();
+		$('#survey-dash').hide();
 	}
 }
 
@@ -8781,7 +8787,9 @@ $('.sq-np-item-next').click(function() {
 			if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
 				$('#overlay-toast').html('Please answer this question.');
 				showToast();
-			} else {
+			} else if($('#next-textarea-smiley').attr('data-survey-submit-disabled') == true || $('#next-textarea-smiley').attr('data-survey-submit-disabled') == 'true'){
+				return;
+			}else {
 				showMasterQuestionPage();
 			}
 			return;
@@ -20886,23 +20894,6 @@ function closeLinkedinApiV2UpdateRibbon(){
 	$('#linkedin-api-v2-update-ribbon-outer').hide();
 }
 
-
-$(document).on('click','#register-summit-btn',function(e){
-	e.stopImmediatePropagation();
-	e.preventDefault();
-	
-	closeSummitPopup( false );
-	
-	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
-	
-	if(profileMasterId == 1){
-		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
-	}else{
-		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
-	}
-	
-});
-
 $(document).on('click','#summit-popup-close-btn',function(e){
 	e.stopPropagation();
 	closeSummitPopup();
@@ -20915,11 +20906,7 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 
 	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
 	
-	if(profileMasterId == 1){
-		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
-	}else{
-		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
-	}
+	window.open('https://www.socialsurvey.com/top-performers-2018/', '_blank');
 });
 
 $(document).on('click','#linkedin-api-v2-update-ribbon-close-btn',function(e){
@@ -20942,11 +20929,7 @@ $(document).on('click','#summit-popup-body',function(e){
 	
 	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
 	
-	if(profileMasterId == 1){
-		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
-	}else{
-		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
-	}
+	window.open('https://www.socialsurvey.com/top-performers-2018/', '_blank');
 });
 
 function sendClickedEventInfo( event ){

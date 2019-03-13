@@ -136,7 +136,7 @@ public class OrganizationUnitSettings implements Serializable
     
     private String optoutText;
     private Boolean isLoginEnableAllowed;
-    private boolean isIncompleteSurveyDeleteEnabled;
+    private boolean isIncompleteSurveyDeleteEnabled = true;
     
     private boolean branchAdminAllowedToDeleteUser = true;//To Allow Branch Admin Delete User.
 
