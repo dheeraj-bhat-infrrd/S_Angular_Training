@@ -5,10 +5,11 @@
 .project
 .springBeans
 .recommenders
+# Java annotation processor (APT)
+.factorypath
 Source/SSCore/.settings
 Source/SSWeb/.settings
 Source/SSBatch/.settings
-.gitignore~
 Source/.settings/
 Source/.idea/
 Source/**/*.eml
@@ -20,7 +21,16 @@ Source/**/mvnw.cmd
 Source/standalone/
 /**/target/
 /.metadata/*
-.gitignore
 .DS_Store
-.*
+.idea
+
 target
+
+# Docker volume container
+tmp
+
+# docker-compose override. Usually a symlink to .dev.yml or .prod.yml
+docker-compose.override.yml
+
+# Environment variables
+.envrc

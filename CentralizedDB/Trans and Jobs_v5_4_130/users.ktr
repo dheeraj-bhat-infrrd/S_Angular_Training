@@ -66,10 +66,10 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;10&#x2f;12 12&#x3a;13&#x3a;23.725</created_date>
+  <created_date>2019&#x2f;03&#x2f;01 16&#x3a;09&#x3a;16.487</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;10&#x2f;12 12&#x3a;13&#x3a;23.725</modified_date>
-    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+  <modified_date>2019&#x2f;03&#x2f;01 16&#x3a;09&#x3a;16.487</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -131,8 +131,14 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Table input</from><to>Convert to EST</to><enabled>Y</enabled> </hop>
-  <hop> <from>Convert to EST</from><to>Update Users</to><enabled>Y</enabled> </hop>
+  <hop> <from>USERS input</from><to>Convert to EST</to><enabled>Y</enabled> </hop>
+  <hop> <from>Convert to EST</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows</from><to>Select values</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>users centralized input</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Switch &#x2f; Case</to><enabled>Y</enabled> </hop>
+  <hop> <from>Switch &#x2f; Case</from><to>users output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Switch &#x2f; Case</from><to>users update</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Convert to EST</name>
@@ -149,7 +155,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; sdf.format&#x28;CREATED_ON&#x29;&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; sdf.format&#x28;MODIFIED_ON&#x29;&#x3b;&#xd;&#xa;var LAST_LOGIN_EST &#x3d; sdf.format&#x28;LAST_LOGIN&#x29;&#x3b;&#xa;var ADOPTION_COMPLETED_DATE_EST &#x3d; &#x27;&#x27;&#x3b;&#xa;if&#x28;ADOPTION_COMPLETION_DATE &#x21;&#x3d; null&#x29; &#x7b;&#xa;	ADOPTION_COMPLETED_DATE_EST &#x3d; sdf.format&#x28;ADOPTION_COMPLETION_DATE&#x29;&#x3b;&#xa;&#x7d;&#xd;&#xa;var LAST_USER_LOGIN_EST &#x3d; &#x27;&#x27;&#x3b;&#xa;if&#x28;LAST_USER_LOGIN &#x21;&#x3d; null&#x29; &#x7b;&#xa;	LAST_USER_LOGIN_EST &#x3d; sdf.format&#x28;LAST_USER_LOGIN&#x29;&#x3b;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var SimpleDateFormat &#x3d; java.text.SimpleDateFormat&#x3b;&#xd;&#xa;var TimeZone &#x3d; java.util.TimeZone&#x3b;&#xd;&#xa;var sdf &#x3d; new SimpleDateFormat&#x28;&#x22;yyyy-MM-dd HH&#x3a;mm&#x3a;ss&#x22;&#x29;&#x3b;&#xd;&#xa;sdf.setTimeZone&#x28;TimeZone.getTimeZone&#x28;&#x22;EST5EDT&#x22;&#x29;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var CREATED_ON_EST &#x3d; sdf.format&#x28;CREATED_ON&#x29;&#x3b;&#xd;&#xa;var MODIFIED_ON_EST &#x3d; sdf.format&#x28;MODIFIED_ON&#x29;&#x3b;&#xd;&#xa;var LAST_LOGIN_EST &#x3d; sdf.format&#x28;LAST_LOGIN&#x29;&#x3b;&#xa;&#xa;var ADOPTION_COMPLETED_DATE_EST &#x3d; &#x27;&#x27;&#x3b;&#xa;if&#x28;ADOPTION_COMPLETION_DATE &#x21;&#x3d; null&#x29; &#x7b;&#xa;	ADOPTION_COMPLETED_DATE_EST &#x3d; sdf.format&#x28;ADOPTION_COMPLETION_DATE&#x29;&#x3b;&#xa;&#x7d;&#xa;var LAST_USER_LOGIN_EST &#x3d; &#x27;&#x27;&#x3b;&#xa;if&#x28;LAST_USER_LOGIN &#x21;&#x3d; null&#x29; &#x7b;&#xa;	LAST_USER_LOGIN_EST &#x3d; sdf.format&#x28;LAST_USER_LOGIN&#x29;&#x3b;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>CREATED_ON_EST</name>
         <rename>CREATED_ON_EST</rename>
         <type>String</type>
@@ -182,14 +188,14 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>268</xloc>
-      <yloc>127</yloc>
+      <xloc>213</xloc>
+      <yloc>82</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Table input</name>
+    <name>USERS input</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -200,7 +206,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xa;, ADOPTION_COMPLETION_DATE&#xa;, LAST_USER_LOGIN&#xd;&#xa;FROM USERS&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27; and MODIFIED_ON &#x3c; &#x27;&#x24;&#x7b;jobStartTime&#x7d;&#x27;&#x3b;</sql>
+    <sql>SELECT&#xa;  USER_ID&#xa;, COMPANY_ID&#xa;, LOGIN_NAME&#xa;, LOGIN_PASSWORD&#xa;, EMAIL_ID&#xa;, FIRST_NAME&#xa;, LAST_NAME&#xa;, SOURCE&#xa;, SOURCE_USER_ID&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xa;, IS_OWNER&#xa;, STATUS&#xa;, LAST_LOGIN&#xa;, LAST_USER_LOGIN&#xa;, NUM_OF_LOGINS&#xa;, SUPER_ADMIN&#xa;, IS_ZILLOW_CONNECTED&#xa;, ZILLOW_REVIEW_COUNT&#xa;, ZILLOW_AVERAGE_SCORE&#xa;, CREATED_ON&#xa;, CREATED_BY&#xa;, MODIFIED_ON&#xa;, MODIFIED_BY&#xa;, REGISTRATION_STAGE&#xa;, FORCE_PASSWORD&#xa;, ADOPTION_COMPLETION_DATE&#xa;FROM USERS&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27; and MODIFIED_ON &#x3c; &#x27;&#x24;&#x7b;jobStartTime&#x7d;&#x27;&#xa;order by USER_ID&#x3b;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -208,14 +214,810 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>115</xloc>
-      <yloc>127</yloc>
+      <xloc>91</xloc>
+      <yloc>82</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update Users</name>
+    <name>Sort rows</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>USER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>341</xloc>
+      <yloc>82</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>users centralized input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xa;  USER_ID&#xa;, COMPANY_ID&#xa;, LOGIN_NAME&#xa;, LOGIN_PASSWORD&#xa;, EMAIL_ID&#xa;, FIRST_NAME&#xa;, LAST_NAME&#xa;, SOURCE&#xa;, SOURCE_USER_ID&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xa;, IS_OWNER&#xa;, STATUS&#xa;, LAST_LOGIN&#xa;, LAST_USER_LOGIN&#xa;, NUM_OF_LOGINS&#xa;, SUPER_ADMIN&#xa;, IS_ZILLOW_CONNECTED&#xa;, ZILLOW_REVIEW_COUNT&#xa;, ZILLOW_AVERAGE_SCORE&#xa;, CREATED_ON&#xa;, CREATED_BY&#xa;, MODIFIED_ON&#xa;, MODIFIED_BY&#xa;, REGISTRATION_STAGE&#xa;, FORCE_PASSWORD&#xa;, ADOPTION_COMPLETED_DATE as ADOPTION_COMPLETION_DATE&#xa;, CREATED_ON_EST&#xa;, MODIFIED_ON_EST&#xa;, LAST_LOGIN_EST&#xa;, ADOPTION_COMPLETED_DATE_EST&#xa;, LAST_USER_LOGIN_EST&#xa;FROM users&#xa;order by USER_ID&#x3b;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>755</xloc>
+      <yloc>82</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>USER_ID</name>
+        <rename>USER_ID</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>COMPANY_ID</name>
+        <rename>COMPANY_ID</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LOGIN_NAME</name>
+        <rename>LOGIN_NAME</rename>
+        <type>None</type>
+        <length>100</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LOGIN_PASSWORD</name>
+        <rename>LOGIN_PASSWORD</rename>
+        <type>None</type>
+        <length>200</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>EMAIL_ID</name>
+        <rename>EMAIL_ID</rename>
+        <type>None</type>
+        <length>250</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>FIRST_NAME</name>
+        <rename>FIRST_NAME</rename>
+        <type>None</type>
+        <length>45</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LAST_NAME</name>
+        <rename>LAST_NAME</rename>
+        <type>None</type>
+        <length>45</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>SOURCE</name>
+        <rename>SOURCE</rename>
+        <type>None</type>
+        <length>2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>SOURCE_USER_ID</name>
+        <rename>SOURCE_USER_ID</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</name>
+        <rename>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>IS_OWNER</name>
+        <rename>IS_OWNER</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>STATUS</name>
+        <rename>STATUS</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LAST_LOGIN</name>
+        <rename>LAST_LOGIN</rename>
+        <type>None</type>
+        <length>0</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LAST_USER_LOGIN</name>
+        <rename>LAST_USER_LOGIN</rename>
+        <type>None</type>
+        <length>0</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>NUM_OF_LOGINS</name>
+        <rename>NUM_OF_LOGINS</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>SUPER_ADMIN</name>
+        <rename>SUPER_ADMIN</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>IS_ZILLOW_CONNECTED</name>
+        <rename>IS_ZILLOW_CONNECTED</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>ZILLOW_REVIEW_COUNT</name>
+        <rename>ZILLOW_REVIEW_COUNT</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>ZILLOW_AVERAGE_SCORE</name>
+        <rename>ZILLOW_AVERAGE_SCORE</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>CREATED_ON</name>
+        <rename>CREATED_ON</rename>
+        <type>None</type>
+        <length>0</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>CREATED_BY</name>
+        <rename>CREATED_BY</rename>
+        <type>None</type>
+        <length>45</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MODIFIED_ON</name>
+        <rename>MODIFIED_ON</rename>
+        <type>None</type>
+        <length>0</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MODIFIED_BY</name>
+        <rename>MODIFIED_BY</rename>
+        <type>None</type>
+        <length>45</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>REGISTRATION_STAGE</name>
+        <rename>REGISTRATION_STAGE</rename>
+        <type>None</type>
+        <length>45</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>FORCE_PASSWORD</name>
+        <rename>FORCE_PASSWORD</rename>
+        <type>None</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>ADOPTION_COMPLETION_DATE</name>
+        <rename>ADOPTION_COMPLETION_DATE</rename>
+        <type>None</type>
+        <length>0</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LAST_LOGIN_EST</name>
+        <rename>LAST_LOGIN_EST</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>ADOPTION_COMPLETED_DATE_EST</name>
+        <rename>ADOPTION_COMPLETED_DATE_EST</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LAST_USER_LOGIN_EST</name>
+        <rename>LAST_USER_LOGIN_EST</rename>
+        <type>None</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>466</xloc>
+      <yloc>82</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Rows &#x28;diff&#x29;</name>
+    <type>MergeRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <keys>
+      <key>USER_ID</key>
+    </keys>
+    <values>
+      <value>COMPANY_ID</value>
+      <value>LOGIN_NAME</value>
+      <value>LOGIN_PASSWORD</value>
+      <value>EMAIL_ID</value>
+      <value>FIRST_NAME</value>
+      <value>LAST_NAME</value>
+      <value>SOURCE</value>
+      <value>SOURCE_USER_ID</value>
+      <value>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</value>
+      <value>IS_OWNER</value>
+      <value>STATUS</value>
+      <value>LAST_LOGIN</value>
+      <value>LAST_USER_LOGIN</value>
+      <value>NUM_OF_LOGINS</value>
+      <value>SUPER_ADMIN</value>
+      <value>IS_ZILLOW_CONNECTED</value>
+      <value>ZILLOW_REVIEW_COUNT</value>
+      <value>ZILLOW_AVERAGE_SCORE</value>
+      <value>CREATED_ON</value>
+      <value>CREATED_BY</value>
+      <value>MODIFIED_ON</value>
+      <value>MODIFIED_BY</value>
+      <value>REGISTRATION_STAGE</value>
+      <value>FORCE_PASSWORD</value>
+      <value>ADOPTION_COMPLETION_DATE</value>
+      <value>CREATED_ON_EST</value>
+      <value>MODIFIED_ON_EST</value>
+      <value>LAST_LOGIN_EST</value>
+      <value>ADOPTION_COMPLETED_DATE_EST</value>
+      <value>LAST_USER_LOGIN_EST</value>
+    </values>
+<flag_field>flagfield</flag_field>
+<reference>users centralized input</reference>
+<compare>Select values</compare>
+    <compare>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>594</xloc>
+      <yloc>82</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Switch &#x2f; Case</name>
+    <type>SwitchCase</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<fieldname>flagfield</fieldname>
+<use_contains>N</use_contains>
+<case_value_type>String</case_value_type>
+<case_value_format/>
+<case_value_decimal/>
+<case_value_group/>
+<default_target_step/>
+<cases><case><value>new</value>
+<target_step>users output</target_step>
+</case><case><value>changed</value>
+<target_step>users update</target_step>
+</case></cases>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>594</xloc>
+      <yloc>187</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>users output</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <schema/>
+    <table>users</table>
+    <commit>10000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>USER_ID</column_name>
+          <stream_name>USER_ID</stream_name>
+        </field>
+        <field>
+          <column_name>COMPANY_ID</column_name>
+          <stream_name>COMPANY_ID</stream_name>
+        </field>
+        <field>
+          <column_name>LOGIN_NAME</column_name>
+          <stream_name>LOGIN_NAME</stream_name>
+        </field>
+        <field>
+          <column_name>LOGIN_PASSWORD</column_name>
+          <stream_name>LOGIN_PASSWORD</stream_name>
+        </field>
+        <field>
+          <column_name>EMAIL_ID</column_name>
+          <stream_name>EMAIL_ID</stream_name>
+        </field>
+        <field>
+          <column_name>FIRST_NAME</column_name>
+          <stream_name>FIRST_NAME</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_NAME</column_name>
+          <stream_name>LAST_NAME</stream_name>
+        </field>
+        <field>
+          <column_name>SOURCE</column_name>
+          <stream_name>SOURCE</stream_name>
+        </field>
+        <field>
+          <column_name>SOURCE_USER_ID</column_name>
+          <stream_name>SOURCE_USER_ID</stream_name>
+        </field>
+        <field>
+          <column_name>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</column_name>
+          <stream_name>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</stream_name>
+        </field>
+        <field>
+          <column_name>IS_OWNER</column_name>
+          <stream_name>IS_OWNER</stream_name>
+        </field>
+        <field>
+          <column_name>STATUS</column_name>
+          <stream_name>STATUS</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_LOGIN</column_name>
+          <stream_name>LAST_LOGIN</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_USER_LOGIN</column_name>
+          <stream_name>LAST_USER_LOGIN</stream_name>
+        </field>
+        <field>
+          <column_name>NUM_OF_LOGINS</column_name>
+          <stream_name>NUM_OF_LOGINS</stream_name>
+        </field>
+        <field>
+          <column_name>SUPER_ADMIN</column_name>
+          <stream_name>SUPER_ADMIN</stream_name>
+        </field>
+        <field>
+          <column_name>IS_ZILLOW_CONNECTED</column_name>
+          <stream_name>IS_ZILLOW_CONNECTED</stream_name>
+        </field>
+        <field>
+          <column_name>ZILLOW_REVIEW_COUNT</column_name>
+          <stream_name>ZILLOW_REVIEW_COUNT</stream_name>
+        </field>
+        <field>
+          <column_name>ZILLOW_AVERAGE_SCORE</column_name>
+          <stream_name>ZILLOW_AVERAGE_SCORE</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_ON</column_name>
+          <stream_name>CREATED_ON</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_BY</column_name>
+          <stream_name>CREATED_BY</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_ON</column_name>
+          <stream_name>MODIFIED_ON</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_BY</column_name>
+          <stream_name>MODIFIED_BY</stream_name>
+        </field>
+        <field>
+          <column_name>REGISTRATION_STAGE</column_name>
+          <stream_name>REGISTRATION_STAGE</stream_name>
+        </field>
+        <field>
+          <column_name>FORCE_PASSWORD</column_name>
+          <stream_name>FORCE_PASSWORD</stream_name>
+        </field>
+        <field>
+          <column_name>ADOPTION_COMPLETED_DATE</column_name>
+          <stream_name>ADOPTION_COMPLETION_DATE</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_ON_EST</column_name>
+          <stream_name>CREATED_ON_EST</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_ON_EST</column_name>
+          <stream_name>MODIFIED_ON_EST</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_LOGIN_EST</column_name>
+          <stream_name>LAST_LOGIN_EST</stream_name>
+        </field>
+        <field>
+          <column_name>ADOPTION_COMPLETED_DATE_EST</column_name>
+          <stream_name>ADOPTION_COMPLETED_DATE_EST</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_USER_LOGIN_EST</column_name>
+          <stream_name>LAST_USER_LOGIN_EST</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>594</xloc>
+      <yloc>316</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>users update</name>
     <type>Update</type>
     <description/>
     <distribute>Y</distribute>
@@ -227,9 +1029,9 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <skip_lookup>N</skip_lookup>
-    <commit>10000</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>Y</error_ignored>
+    <commit>5000</commit>
+    <use_batch>Y</use_batch>
+    <error_ignored>N</error_ignored>
     <ignore_flag_field/>
     <lookup>
       <schema/>
@@ -289,6 +1091,10 @@
         <rename>LAST_LOGIN</rename>
         </value>
       <value>
+        <name>LAST_USER_LOGIN</name>
+        <rename>LAST_USER_LOGIN</rename>
+        </value>
+      <value>
         <name>NUM_OF_LOGINS</name>
         <rename>NUM_OF_LOGINS</rename>
         </value>
@@ -333,6 +1139,10 @@
         <rename>FORCE_PASSWORD</rename>
         </value>
       <value>
+        <name>ADOPTION_COMPLETED_DATE</name>
+        <rename>ADOPTION_COMPLETION_DATE</rename>
+        </value>
+      <value>
         <name>CREATED_ON_EST</name>
         <rename>CREATED_ON_EST</rename>
         </value>
@@ -349,39 +1159,19 @@
         <rename>ADOPTION_COMPLETED_DATE_EST</rename>
         </value>
       <value>
-        <name>ADOPTION_COMPLETED_DATE</name>
-        <rename>ADOPTION_COMPLETION_DATE</rename>
-        </value>
-      <value>
-        <name>LAST_USER_LOGIN</name>
-        <rename>LAST_USER_LOGIN</rename>
-        </value>
-      <value>
         <name>LAST_USER_LOGIN_EST</name>
         <rename>LAST_USER_LOGIN_EST</rename>
         </value>
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>422</xloc>
-      <yloc>127</yloc>
+      <xloc>755</xloc>
+      <yloc>187</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
-      <error>
-        <source_step>Update Users</source_step>
-        <target_step/>
-        <is_enabled>N</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>
