@@ -11,7 +11,6 @@ import com.realtech.socialsurvey.core.enums.SocialFeedType;
 /**
  * @author manish
  *
- * @param <T>
  */
 public class SocialFeedResponse implements Serializable
 {
