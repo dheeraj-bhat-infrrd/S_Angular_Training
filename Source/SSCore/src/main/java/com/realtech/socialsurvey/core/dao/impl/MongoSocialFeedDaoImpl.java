@@ -204,7 +204,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
 
     @Override
-    public List<SocialResponseObject> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
+    public List<SocialFeedResponse> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
         Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText,
         boolean isCompanySet, boolean fromTrustedSource, boolean isSocMonOnLoad )
     {
@@ -253,7 +253,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         }
         
         //Stream, Alerts, Escalation, Resolved criteria
-        else if(!criterias.isEmpty() && criterias != null && isCompanySet){
+        else if(!criterias.isEmpty() && isCompanySet){
             criteria.orOperator( ( Criteria.where( STATUS ).is( status.toUpperCase() )
                 .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ) );
         } else {
@@ -279,7 +279,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         }
 
         LOG.info( "Mongo query to  getAllSocialFeeds : {}", query.toString() );
-        return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        return mongoTemplate.find( query, SocialFeedResponse.class, SOCIAL_FEED_COLLECTION );
     }
 
     @Override
