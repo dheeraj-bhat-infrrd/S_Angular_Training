@@ -26,4 +26,17 @@ public interface SitemapContentFecher {
 	 * @return
 	 */
 	public List<SiteMapEntry> nextBatch();
+	
+	/**
+	 * Gets the content for seo sitemap
+	 * @param locationType 
+	 * @return
+	 */
+	public List<SiteMapEntry> getInitialSEOContent(String locationType);
+	
+	/**
+	 * @param locatioType
+	 * @return
+	 */
+	public List<SiteMapEntry> nextSEOBatch(String locatioType);
 }

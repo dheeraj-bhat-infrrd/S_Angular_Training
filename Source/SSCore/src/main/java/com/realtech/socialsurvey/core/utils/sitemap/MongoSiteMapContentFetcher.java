@@ -3,7 +3,9 @@ package com.realtech.socialsurvey.core.utils.sitemap;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -18,7 +20,9 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SEOUrlEntity;
 import com.realtech.socialsurvey.core.entities.SiteMapEntry;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 
 
 @Component
@@ -32,6 +36,7 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 
     // needs to be removed
     private static final String HOURLY_FREQUENCY = "hourly";
+    private static final String DAILY_FREQUENCY = "daily";
 
     private static final float COMPANY_PRIORITY = 0.2f;
     private static final float REGION_PRIORITY = 0.4f;
@@ -51,7 +56,10 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
 
     @Autowired
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-
+    
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
+    
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationUrl;
 
@@ -207,4 +215,110 @@ public class MongoSiteMapContentFetcher implements SitemapContentFecher, Initial
     }
 
 
+	@Override
+	public List<SiteMapEntry> getInitialSEOContent(String locationType) {
+        LOG.info( "Getting initial SEO related content for collection" );
+        List<SiteMapEntry> entries = null;
+        
+        count = organizationUnitSettingsDao.fetchSEOUrlCount(collectionName, locationType, excludedEntityIds);
+        LOG.info("SEO URL conut - " + count);
+        if ( count <= limit ) {
+            areMoreRecordsPresent = false;
+        } else {
+            areMoreRecordsPresent = true;
+        }
+        if(count > 0) {
+	   		List<SEOUrlEntity> seoUrls = organizationUnitSettingsDao.fetchSEOUrlEntty(
+	   				collectionName, 0, limit, locationType, this.getExcludedEntityIds() );
+	   		if(seoUrls != null && !seoUrls.isEmpty()) {
+	   			entries = prepareSMEObjectsForSEO(seoUrls, locationType);
+	    	}
+	   		recordsFetched = limit;
+        }
+        
+        return entries;
+    }
+
+
+	@Override
+	public List<SiteMapEntry> nextSEOBatch(String locationType) {
+        LOG.info( "Getting next batch with limit " + limit + " from " + recordsFetched );
+        List<SiteMapEntry> entries = null;
+        if ( areMoreRecordsPresent ) {
+               List<SEOUrlEntity> seoUrls = organizationUnitSettingsDao.fetchSEOUrlEntty(
+                    collectionName, recordsFetched, limit, locationType, this.getExcludedEntityIds() );
+               entries = prepareSMEObjectsForSEO(seoUrls, locationType);
+            recordsFetched += limit;
+        }
+        if ( recordsFetched >= count ) {
+            areMoreRecordsPresent = false;
+        }
+        return entries;
+    }
+
+
+	private List<SiteMapEntry> prepareSMEObjectsForSEO(List<SEOUrlEntity> seoUrls, String locationType) {
+		LOG.info("prepareSMEObjectsForSEO started for collection " + collectionName);
+		
+		List<SiteMapEntry> siteMapUrlList = new ArrayList<SiteMapEntry>();
+		if(seoUrls != null) {
+			LOG.info("soURLs " + seoUrls.size());
+			Map<String,String> stateCodeNameMap = organizationManagementService.getStateCodeNameMap();
+			for(SEOUrlEntity seoEntity : seoUrls) {
+				LOG.debug("Result from DB with "+ locationType + " = " + seoEntity.getLocation() + " for vertical = " + seoEntity.getVertical() + " for entity = " + collectionName);
+				try {
+					//check zipcode-vertical is added to sitemap, if not add it.
+					if(seoEntity.getLocation() != null && !seoEntity.getLocation().isEmpty() && locationType.equalsIgnoreCase("zipcode")) {
+						SiteMapEntry entry = new SiteMapEntry();
+						entry.setChangeFrequency(DAILY_FREQUENCY);
+						entry.setLastModifiedDate(new Date().toString());
+						if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+			                entry.setPriority( COMPANY_PRIORITY );
+			                entry.setLocation(applicationUrl + "top/" + seoEntity.getVertical().replaceAll(" ", "-").replaceAll("&", "&amp;") +  "/Companies/" + seoEntity.getLocation());
+			            } else if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+			                entry.setPriority( BRANCH_PRIORITY );
+			                entry.setLocation(applicationUrl + "top/" + seoEntity.getVertical().replaceAll(" ", "-").replaceAll("&", "&amp;") + "/Loan-Offices/" + seoEntity.getLocation());
+			            } else if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+			                entry.setPriority( USERS_PRIORITY );
+			                entry.setLocation(applicationUrl + "top/" + seoEntity.getVertical().replaceAll(" ", "-").replaceAll("&", "&amp;") + "/Professionals/" + seoEntity.getLocation());
+			            }
+						siteMapUrlList.add(entry);
+					} else if(seoEntity.getLocation() != null && !seoEntity.getLocation().isEmpty() && locationType.equalsIgnoreCase("city") && seoEntity.getState() != null && stateCodeNameMap.get(seoEntity.getState()) != null) {
+						SiteMapEntry entry = new SiteMapEntry();
+						entry.setChangeFrequency(DAILY_FREQUENCY);
+						entry.setLastModifiedDate(new Date().toString());
+						if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+			                entry.setPriority( COMPANY_PRIORITY );
+			                entry.setLocation(applicationUrl + "top/" + seoEntity.getVertical().replaceAll(" ", "-").replaceAll("&", "&amp;") + "/Companies/" + seoEntity.getLocation().replaceAll(" ", "-") + "_" + seoEntity.getState());
+			            } else if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+			                entry.setPriority( BRANCH_PRIORITY );
+			                entry.setLocation(applicationUrl + "top/" + seoEntity.getVertical().replaceAll(" ", "-").replaceAll("&", "&amp;") + "/Loan-Offices/" + seoEntity.getLocation().replaceAll(" ", "-") + "_" + seoEntity.getState());
+			            } else if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+			                entry.setPriority( USERS_PRIORITY );
+			                entry.setLocation(applicationUrl + "top/" + seoEntity.getVertical().replaceAll(" ", "-").replaceAll("&", "&amp;") + "/Professionals/" + seoEntity.getLocation().replaceAll(" ", "-") + "_" + seoEntity.getState());
+			            }
+						siteMapUrlList.add(entry);
+					}else if(seoEntity.getLocation() != null && !seoEntity.getLocation().isEmpty() && locationType.equalsIgnoreCase("state") && stateCodeNameMap.get(seoEntity.getLocation()) != null) {
+						SiteMapEntry entry = new SiteMapEntry();
+						entry.setChangeFrequency(DAILY_FREQUENCY);
+						entry.setLastModifiedDate(new Date().toString());
+						if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
+			                entry.setPriority( COMPANY_PRIORITY );
+			                entry.setLocation(applicationUrl + "top/" + seoEntity.getVertical().replaceAll(" ", "-").replaceAll("&", "&amp;") + "/Companies/" + stateCodeNameMap.get(seoEntity.getLocation()).replaceAll(" ", "-"));
+			            } else if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
+			                entry.setPriority( BRANCH_PRIORITY );
+			                entry.setLocation(applicationUrl + "top/" + seoEntity.getVertical().replaceAll(" ", "-").replaceAll("&", "&amp;") + "/Loan-Offices/" + stateCodeNameMap.get(seoEntity.getLocation()).replaceAll(" ", "-"));
+			            } else if ( collectionName.equals( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
+			                entry.setPriority( USERS_PRIORITY );
+			                entry.setLocation(applicationUrl + "top/" + seoEntity.getVertical().replaceAll(" ", "-").replaceAll("&", "&amp;") + "/Professionals/" + stateCodeNameMap.get(seoEntity.getLocation()).replaceAll(" ", "-"));
+			            }
+						siteMapUrlList.add(entry);
+					}
+				} catch(Exception e) {
+					LOG.error("error while iterating siteMapEntry " , e);
+				}
+			}
+		}
+		return siteMapUrlList;
+	}
 }

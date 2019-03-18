@@ -103,7 +103,7 @@
 				</div>
 				<div class="footer-copyright text-center">
 					 <spring:message code="label.copyright.key"/> 
-					&copy; 
+					&copy; <span id="ss-cc-year"></span>
 					<spring:message code="label.footer.socialsurvey.key"/> 
 					<span class="center-dot">.</span> 
 					<spring:message code="label.allrightscopyright.key"/>
@@ -124,6 +124,9 @@
 		$(document)
 				.ready(
 						function() {
+							var curDate = new Date();
+							$('#ss-cc-year').html(curDate.getFullYear());
+							
 							adjustOnResize();
 							$(window).resize(adjustOnResize);
 							function adjustOnResize() {

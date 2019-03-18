@@ -257,6 +257,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR = "SurveyCsvUploadProcessor";
     public static final String BATCH_TYPE_TRANSACTION_ACTIVITY_MONITOR = "transactionActivityMonitor";
     public static final String BATCH_TYPE_FTP_FILE_UPLOADER = "FTPFileUploader";
+    public static final String BATCH_TYPE_SEO_SITE_MAP_GENERATOR = "SEOSiteMapGenerator";
 
     
     //batch name constant for batch tracker
@@ -288,6 +289,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR = "Survey CSV file Upload Processor";
     public static final String BATCH_NAME_TRANSACTION_ACTIVITY_MONITOR = "Transaction Activity Monitor";
     public static final String BATCH_NAME_FTP_FILE_UPLOADER = "FTP files uploader";
+    public static final String BATCH_NAME_SEO_SITE_MAP_GENERATOR = "SEO Site Map Generator Batch";
 
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";

@@ -112,8 +112,6 @@ import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
 import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
-import org.springframework.web.bind.annotation.RequestBody;
-
 
 @DependsOn ( "generic")
 @Component
@@ -122,6 +120,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     private static final Logger LOG = LoggerFactory.getLogger( OrganizationManagementServiceImpl.class );
     private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
+    public static final String SUCCESS_MESSAGE = "Organization Settings updated Successfully";
 
     @Autowired
     private MessageUtils messageUtils;
@@ -255,7 +254,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private String neutralTextComplete;
     @Value ( "${SAD_TEXT_COMPLETE}")
     private String sadTextComplete;
-
+    
     @Value ( "${PARAM_ORDER_TAKE_SURVEY}")
     String paramOrderTakeSurvey;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
@@ -5830,6 +5829,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         surveySettings.setHappyTextComplete( happyTextComplete );
         surveySettings.setNeutralTextComplete( neutralTextComplete );
         surveySettings.setSadTextComplete( sadTextComplete );
+       
         return surveySettings;
     }
 
@@ -5855,7 +5855,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else if ( mood.equalsIgnoreCase( "sadComplete" ) ) {
             surveySettings.setSadTextComplete( sadTextComplete );
             return sadTextComplete;
-        } else {
+        }  else {
             return "";
         }
     }
@@ -11158,6 +11158,31 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Override
+    public boolean enableIncompleteSurveyDeleteToggle(long companyId, boolean incompleteSurveyDeleteFlag) throws InvalidInputException, NoRecordsFetchedException
+    {
+    	LOG.debug( "method enableIncompleteSurveyDeleteToggle() started for companyId : {}", companyId);
+
+    	if ( companyId <= 0 ) {
+    		LOG.warn( "companyId is invalid: {}", companyId);
+    		throw new InvalidInputException( "companyId is invalid" );
+    	}
+
+    	OrganizationUnitSettings unitSettings = getCompanySettings( companyId );
+
+    	if ( unitSettings == null ) {
+    		LOG.warn( "OrganizationSettings are not fournd for company id {}", companyId );
+    		throw new InvalidInputException( "OrganizationSettings are not fournd for company id " +companyId );
+    	}
+    	// update incomplete survey delete flag
+    	organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+    			MongoOrganizationUnitSettingDaoImpl.INCOMPLETE_SURVEY_DELETE_ENABLED, incompleteSurveyDeleteFlag, unitSettings,
+    			CommonConstants.COMPANY_SETTINGS_COLLECTION );
+
+    	LOG.debug( "method enableIncompleteSurveyDeleteToggle() finished." );
+    	return true;
+    }
+
     @Override public void updateCompanySettings( long companyId, String columnName, Object columnValue )
     {
         LOG.info( "Method to update company settings using companyId started." );
@@ -11166,5 +11191,53 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method to update company settings using companyId finished" );
     }
 
+    @Override
+    public String updateOrganizationSettingsByIdAndBooleanValue(long id, boolean value, String fieldToUpdate, String collection)
+    {
+        LOG.info( "Method to update organization settings for boolean fields started." );
+        Map<String, Object> queryMap = new HashMap<>();
+        Map<String, Object> updateMap = new HashMap<>();
+        queryMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, id );
+        updateMap.put( fieldToUpdate, value );
+        try {
+            organizationUnitSettingsDao.updateOrganizationSettingsByQuery( queryMap, updateMap, collection );
+            LOG.info( SUCCESS_MESSAGE + " in updateOrganizationSettings()" );
+            return "true";
+        } catch ( Exception e ) {
+            LOG.error( "updateOrganizationSettingsByIdAndBooleanValue() failed to update mongo due to " + e );
+            return "false";
+        }
+    }
 
+    @Override
+	public Map<String, String> getStateCodeNameMap() {
+		LOG.info("getStateCodeNameMap start");
+		try {
+			List<StateLookup> stateLookupList = stateLookupDao.findAll(StateLookup.class);
+			if(stateLookupList != null && !stateLookupList.isEmpty()) {
+				LOG.info("Generating stateCOdeName map");
+				Map<String, String> stateCodeMap = new HashMap<String, String>();
+				for(StateLookup stateLookup : stateLookupList) {
+					stateCodeMap.put(stateLookup.getStatecode(), stateLookup.getStatename());
+				}
+				return stateCodeMap;
+			}
+		}catch(Exception e) {
+			LOG.error("Caught exception in getStateCodeNameMap " , e);
+		}
+		return null;
+	}
+	
+	public String getStateCodeByStateName(String stateName) {
+		LOG.info("getStateCodeByStateName start");
+		try {
+			List<StateLookup> statelookup = stateLookupDao.findByColumn(StateLookup.class, "statename", stateName);
+			if(statelookup != null && !statelookup.isEmpty()) {
+				return statelookup.get(0).getStatecode();
+			}
+		}catch(Exception e) {
+			LOG.error("Caught exception in getStateCodeByStateName " , e);
+		}
+		return null;
+	}
 }

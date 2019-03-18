@@ -624,6 +624,11 @@ $(document).ready(function() {
 	adjustImage();
 	$(window).resize(adjustImage);
 	$(document).ajaxStop(function() {
+		var hashString = document.baseURI.split('#')[1];
+		if(hashString != "showprofilepage"){
+			$('.footer-main-wrapper').show();
+			return;
+		}
 		adjustImage();
 	});
 	

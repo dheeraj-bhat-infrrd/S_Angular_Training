@@ -1798,6 +1798,7 @@ public class SurveyManagementController
 		if (companySettings != null && companySettings.getSurvey_settings() != null) {
 			LOG.info("Setting company specific values for surveyAndStage started");
 			SurveySettings surveySettings = companySettings.getSurvey_settings();
+		
 			if (StringUtils.isNotEmpty(surveySettings.getHappyText())) {
 			    //add Facebook pixel tag in happy text 
 			    String happyText = surveySettings.getHappyText() + facebookPixelTag;
@@ -1830,6 +1831,21 @@ public class SurveyManagementController
 						user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 				isSadTextCompleteSet = true;
 			}
+			if(StringUtils.isNotEmpty(surveySettings.getHappyUrl())) {
+				String happyUrl = surveySettings.getHappyUrl();
+				surveyAndStage.put("happyUrl", surveyHandler.replaceGatewayQuestionText(happyUrl, unitSettings, user,
+						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			}
+			if(StringUtils.isNotEmpty(surveySettings.getOkUrl())) {
+				String okUrl = surveySettings.getOkUrl();
+				surveyAndStage.put("okUrl", surveyHandler.replaceGatewayQuestionText(okUrl, unitSettings, user,
+						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			}
+			if(StringUtils.isNotEmpty(surveySettings.getSadUrl())) {
+				String sadUrl = surveySettings.getSadUrl();
+				surveyAndStage.put("sadUrl", surveyHandler.replaceGatewayQuestionText(sadUrl, unitSettings, user,
+						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			}	
 			LOG.info("Setting company specific values for surveyAndStage finished");
 		}
 
@@ -1881,7 +1897,18 @@ public class SurveyManagementController
 		catch (NullPointerException e) {
 			surveyAndStage.put("googleEnabled", false);
 		}
-
+		
+		// Changes for URL direction upon survey submission
+		surveyAndStage.put("participationType", surveyPreInitiation.getParticipantType());
+		surveyAndStage.put("transactionType", surveyPreInitiation.getTransactionType());
+		surveyAndStage.put("state", surveyPreInitiation.getState());
+		surveyAndStage.put("city", surveyPreInitiation.getCity());
+		surveyAndStage.put("surveySourceId", surveyPreInitiation.getSurveySourceId());
+		surveyAndStage.put("customField1", surveyPreInitiation.getCustomFieldOne());
+		surveyAndStage.put("customField2", surveyPreInitiation.getCustomFieldTwo());
+		surveyAndStage.put("customField3", surveyPreInitiation.getCustomFieldThree());
+		surveyAndStage.put("customField4", surveyPreInitiation.getCustomFieldFour());
+		surveyAndStage.put("customField5", surveyPreInitiation.getCustomFieldFive());
 		
 		// zillow
 		surveyHandler.updateSurveyStageForZillow(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage, survey);

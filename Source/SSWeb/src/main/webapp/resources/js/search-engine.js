@@ -64,7 +64,7 @@ $('#srch-eng-filter-container').on('click', '#srch-eng-srch-btn', function(e) {
 	e.preventDefault();
 
 	resetPageIndex();
-
+	
 	getLOSearchList();
 });
 
@@ -132,7 +132,7 @@ $('#srch-eng-cat-cont').on('click', '.srch-eng-less-cat', function(e) {
 
 function getLOSearchList() {
 
-	var url = './searchengine/searchresults.do';
+	var url = getLocationOrigin() + '/searchengine/searchresults.do';
 
 	var payload = getSearchFilters();
 
@@ -144,7 +144,8 @@ function getLOSearchList() {
 			Accept : "text/plain; charset=utf-8"
 		},
 		type : "POST",
-		data : payload,
+		data : {"payload" : JSON.stringify(payload)},
+		dataType: 'json',
 		beforeSend : function() {
 			if (lastLOSearchAjaxRequestToDelete != null) {
 				lastLOSearchAjaxRequestToDelete.abort();
@@ -171,6 +172,7 @@ function getLOSearchList() {
 			}
 
 			getLOSearchListCount();
+			
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -195,8 +197,10 @@ function getSearchFilters() {
 	var startIndex = parseInt($('#srch-eng-pag-data').attr('data-startIndex'));
 	var batchSize = parseInt($('#srch-eng-pag-data').attr('data-batchSize'));
 	var companyProfileName = $('#srchEngCompanyProfileName').val();
-
+	
 	if(!(lat == 0 && lng == 0)){
+		$('#cityName').val("");
+		$('#stateCode').val("");
 		if(distanceCriteria == 0){
 			if($('#srchEngLocFromBrowser').val() == 'false'){
 				distanceCriteria = 25;
@@ -205,6 +209,9 @@ function getSearchFilters() {
 			}
 		}
 	}	
+
+	var cityName = $('#cityName').val();
+	var stateCode = $('#stateCode').val();
 	
 	var filters = {
 		"startIndex" : startIndex,
@@ -218,7 +225,9 @@ function getSearchFilters() {
 		"findBasedOn" : findBasedOn,
 		"lat" : lat,
 		"lng" : lng,
-		"companyProfileName" : companyProfileName
+		"companyProfileName" : companyProfileName,
+		"cityName" : cityName,
+		"stateCode" : stateCode
 	}
 
 	return filters;
@@ -290,7 +299,7 @@ function getCategoryCriteria() {
 	/*
 	 * $('#srch-eng-cat-cont').find('[data-sel="true"]').each(function(){ categoryCriteria.push($(this).attr('data-filter')); });
 	 */
-	return $('#srch-eng-cat-list').val();
+	return categoryCriteria;
 }
 
 function getProfilesCriteria() {
@@ -299,7 +308,7 @@ function getProfilesCriteria() {
 
 function getSearchFiltersAppSettings() {
 
-	var url = './searchengine/applosetting.do';
+	var url = getLocationOrigin() + '/searchengine/applosetting.do';
 
 	$.ajax({
 		url : url,
@@ -324,7 +333,7 @@ function getSearchFiltersAppSettings() {
 
 function getNearMeSuggestions(searchString) {
 
-	var url = './searchengine/nearmesuggestions.do';
+	var url = getLocationOrigin() + '/searchengine/nearmesuggestions.do';
 
 	var startIndex = 0;
 	var batchSize = -1;
@@ -403,7 +412,7 @@ function showNearMeSuggestions(nearMe) {
 		$('#srch-eng-loc-dropdown').slideToggle();
 		
 		resetPageIndex();
-
+		
 		getLOSearchList();
 	});
 }
@@ -411,12 +420,12 @@ function showNearMeSuggestions(nearMe) {
 function drawSearchResults(searchResultsData) {
 	var searchResultCont = '<div id="srch-eng-result-item" class="container srch-eng-result-item"><input type="hidden" val="" class="srch-eng-pub-page-link-inp">' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 srch-eng-result-details">' + '<div class="srch-eng-result-img-cont srch-eng-pub-page-link">' + '<div class="srch-eng-result-rank-cont"></div><div class="srch-eng-result-rank"></div>' + '<div class="srch-eng-result-img"><img alt="SocialSurvey" src="" class="srch-eng-result-prof-img" onerror="$(this).parent().addClass(\'srch-eng-default-prof-img\');$(this).hide();"></div>' + '</div>' + '<div class="srch-eng-result-prof-details">' + '<div class="srch-eng-prof-details-cont col-lg-9 col-md-9 col-sm-7 col-xs-12">' + '<div class="srch-eng-result-name srch-eng-pub-page-link"></div>' + '<div class="srch-eng-result-title-nmls"></div>' + '<div class="srch-eng-result-company"></div>' + '<div class="srch-eng-result-rev-details">' + '<div class="srch-eng-result-rev-stars srch-eng-pub-page-link">' + '<div class="srch-eng-result-star srch-eng-star-1 srch-eng-nostar"></div>' + '<div class="srch-eng-result-star srch-eng-star-2 srch-eng-nostar"></div>' + '<div class="srch-eng-result-star srch-eng-star-3 srch-eng-nostar"></div>' + '<div class="srch-eng-result-star srch-eng-star-4 srch-eng-nostar"></div>' + '<div class="srch-eng-result-star srch-eng-star-5 srch-eng-nostar"></div>' + '</div>' + '<div class="srch-eng-result-rev-count-cont srch-eng-result-rat-txt srch-eng-pub-page-link">' + '<div class="srch-eng-result-rat srch-eng-result-rat-txt"></div> - ' + '<div class="srch-eng-result-rev-count srch-eng-result-rat-txt"></div>' + '<div class="srch-eng-result-rec-rev srch-eng-result-rat-txt"></div>' + '</div>' + '</div>' + '</div>' + '<div class="srch-eng-result-address col-lg-3 col-md-3 col-sm-5 col-xs-12">' + '<div class="srch-eng-result-distance"></div>' + '<div class="srch-eng-result-address1 srch-eng-addr-txt"></div>' + '<div class="srch-eng-result-address2 srch-eng-addr-txt"></div>' + '<div class="srch-eng-result-place srch-eng-addr-txt"></div>' + '<div class="srch-eng-result-contact srch-eng-addr-txt"></div>' + '</div>' + '</div>' + '</div>' + '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 srch-eng-result-review">' + '<div class="srch-eng-quote">❛</div>' + '<div class="srch-eng-quote">❛</div>' + '<div class="srch-eng-rev-text-cont">' + '<p class="srch-eng-rev-text" data-review=""></p>' + '<div class="srch-eng-read-more cursor-pointer">... read more</div>' + '</div>' + '</div>' + '</div>';
 
-	var searchResults = JSON.parse(searchResultsData);
+	var searchResults = searchResultsData;
 	var defaultProfileImage = 'resources/images/place-holder-individual.png';
 
 	$('.srch-eng-result-cont').html('');
 
-	if (searchResults.length == 0 || searchResults == undefined || searchResults == null) {
+	if (searchResults.length == 0 || searchResults == undefined || searchResults == null || searchResults == "null" || searchResults == "error") {
 
 		$('.srch-eng-result-cont').html('<div class="srch-eng-result-empty container">No Results found</div>');
 		return;
@@ -726,7 +735,7 @@ function drawAdvancedOptions(filtersList) {
 
 function getLOSearchListCount() {
 
-	var url = './searchengine/searchresults/count.do';
+	var url = getLocationOrigin() + '/searchengine/searchresults/count.do';
 
 	var payload = getSearchFilters();
 
@@ -736,7 +745,8 @@ function getLOSearchListCount() {
 			Accept : "text/plain; charset=utf-8"
 		},
 		type : "POST",
-		data : payload,
+		data : {"payload" : JSON.stringify(payload)},
+		dataType: 'json',
 		beforeSend : function() {
 			if (lastLOSearchCountAjaxRequestToDelete != null) {
 				lastLOSearchCountAjaxRequestToDelete.abort();
@@ -893,3 +903,12 @@ function searchFromPubPage(){
 		}
 	});*/
 }
+
+function findProfileOrder(profileName){
+		switch(profileName){
+		case "Professionals" : return 1;
+		case "Loan Offices" : return 2;
+		case "Companies" : return 3;
+		default : return 1;
+		}
+	}

@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.entities.LOSearchEngine;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SEOUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -500,4 +501,37 @@ public interface OrganizationUnitSettingsDao
 
 
 	List<Long> fetchActiveUserForCompany(long companyId);
+
+	/**
+	 * Method to update OrganizationSettings in MongoDataBase
+	 * queryMap contains the kEY as the attribute to be queried and VALUE as the value to be matched in the query
+	 * updateMap contains the kEY which is the column name in mongo and the VALUE which is the new update value.
+	 * collectionName will contain the name of collection in which the value is to be updated.
+	 * 
+	 * @param queryMap
+	 * @param updateMap
+	 * @param collectionName
+	 * @throws Exception 
+	 */
+	public void updateOrganizationSettingsByQuery( Map<String, Object> queryMap, Map<String, Object> updateMap,
+	    String collectionName ) throws Exception;
+
+	/** 
+	 * @param collectionName
+	 * @param vertical
+	 * @param locationType
+	 * @param excludedEntityIds
+	 * @return
+	 */
+	List<SEOUrlEntity> fetchSEOUrlEntty(String collectionName, int count, int limit, String locationType,
+	    List<Long> excludedEntityIds);
+
+	/**
+	 * @param collectionName
+	 * @param locationType
+	 * @param excludedEntityIds
+	 * @return
+	 */
+	public long fetchSEOUrlCount(String collectionName, String locationType, List<Long> excludedEntityIds);
+
 }

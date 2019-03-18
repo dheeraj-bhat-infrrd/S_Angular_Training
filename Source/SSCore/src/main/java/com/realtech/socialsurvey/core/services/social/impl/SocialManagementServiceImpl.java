@@ -259,6 +259,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     private String linkedinScope;
     @Value ("${LINKEN_IN_ACCESS_VALIDITY_URI}")
     private String  linkedInAccessValidityUri;
+    
+    // linkedin v2
+    @Value ( "${LINKED_IN_SCOPE_V2}")
+    private String linkedinScopeV2;
+    
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -3450,9 +3455,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @return
      */
     @Override
-    public String getLinkedinAuthUrl( String redirectUri )
+    public String getLinkedinAuthUrl(String linkedinAuthUri, String linkedInApiKey, String redirectUri, String linkedinScope)
     {
-
         LOG.info( "Method getLinkedinAuthUrl started" );
 
         StringBuilder linkedInAuth = new StringBuilder( linkedinAuthUri ).append( "?response_type=" ).append( "code" );

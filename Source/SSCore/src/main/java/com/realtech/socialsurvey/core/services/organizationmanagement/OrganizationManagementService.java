@@ -1903,5 +1903,34 @@ public interface OrganizationManagementService
      */
     public void updateCompanySettings(OrganizationUnitSettings companySettings, String columnName, String columnValue);
 
+
+    public boolean enableIncompleteSurveyDeleteToggle(long companyId, boolean incompleteSurveyDeleteFlag) throws InvalidInputException, NoRecordsFetchedException;
+
+    
     void updateCompanySettings( long companyId, String columnName, Object columnValue );
+    
+    /**
+     * Update OrganizationSettings based on id and boolean value.
+     * The id will contain the IDEN value which is used to set the criteria.
+     * The boolean value will contain the data on which update is done.
+     * 
+     * @param iden
+     * @param value
+     * @param fieldToUpdate
+     * @param collection
+     */
+    public String updateOrganizationSettingsByIdAndBooleanValue(long id, boolean value, String fieldToUpdate, String collection);
+
+    /**
+	 * @return
+	 */
+	public Map<String, String> getStateCodeNameMap();
+	
+	/**
+	 * @param stateName
+	 * @return
+	 */
+	public String getStateCodeByStateName(String stateName);
+
+
 }

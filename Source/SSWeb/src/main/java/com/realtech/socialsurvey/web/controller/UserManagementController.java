@@ -131,6 +131,7 @@ public class UserManagementController
         LOG.info( "User Management page started" );
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         try {
             if ( user == null ) {
@@ -151,11 +152,13 @@ public class UserManagementController
                 LOG.warn( "MalformedURLException while fetching users count. ", e );
                 throw new NonFatalException( "MalformedURLException while fetching users count", e );
             }
+            model.addAttribute( "canAdd", userManagementService.canAddAndDeleteUser(entityType,user.getCompany().getCompanyId(), true));
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException in while inviting new user", nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
+        
         return JspResolver.USER_MANAGEMENT;
     }
 
@@ -313,8 +316,10 @@ public class UserManagementController
     public String findUsersForCompany( Model model, HttpServletRequest request )
     {
         LOG.info( "Method to fetch user by company, findUsersForCompany() started." );
+        HttpSession session = request.getSession( false );
         int startIndex = 0;
         int batchSize = 0;
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         try {
             String startIndexStr = request.getParameter( "startIndex" );
@@ -373,6 +378,7 @@ public class UserManagementController
             }
             usersList = userManagementService.getUserSocialMediaList( usersList );
             model.addAttribute( "userslist", usersList );
+            model.addAttribute( "canDelete", userManagementService.canAddAndDeleteUser(entityType,admin.getCompany().getCompanyId(), false));
 
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while searching for user id. Reason : ", nonFatalException );
@@ -503,7 +509,9 @@ public class UserManagementController
             "Method for Finding users under admin and redirecting to search page, findUsersUnderAdminAndRedirectToPage() started" );
         int startIndex = 0;
         int batchSize = 0;
-
+        HttpSession session = request.getSession( false );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+    
         try {
             //            String users = findUserByEmail( model, request );
 
@@ -553,6 +561,7 @@ public class UserManagementController
             } else {
                 LOG.warn( "No users found under the admin id : " + admin.getUserId() );
             }
+            model.addAttribute( "canDelete", userManagementService.canAddAndDeleteUser(entityType,admin.getCompany().getCompanyId(), false));
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException in findusers. Reason : ", e );
             model.addAttribute( "message",
@@ -1251,6 +1260,9 @@ public class UserManagementController
             // updating session with aggregated user profiles, if not set
             sessionHelper.processAssignments( session, user );
 
+            //Update LastUserLogin
+            user.setLastUserLogin( new Timestamp( System.currentTimeMillis() ) );
+            
             // update the last login time and number of logins
             userManagementService.updateUserLoginTimeAndNum( user );
         } catch ( NonFatalException e ) {

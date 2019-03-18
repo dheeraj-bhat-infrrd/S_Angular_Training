@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -53,7 +55,9 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
     private static final Logger LOG = LoggerFactory.getLogger( ConvertToSurveyObject.class );
     private static final String[] MANDATORY_FIELDS = { "bor1Email", "bor1FirstName", "servicer", "serviceremail", "fileName" };
     private static final String UTF8_BOM = "\uFEFF";
-    private static final List<String> DATE_FORMATS = Arrays.asList( "MM-dd-yy HH:mm:ss.SSS", "MM-dd-yy" , "MM/dd/yy" , "MM/dd/yy HH:mm:ss.SSS", "MM-dd-yyyy HH:mm:ss.SSS", "MM-dd-yyyy" , "MM/dd/yyyy" , "MM/dd/yyyy HH:mm:ss.SSS" ); 
+	private static final List<String> DATE_FORMATS = Arrays.asList("MM-dd-yy HH:mm:ss.SSS", "MM-dd-yy", "MM/dd/yy",
+			"MM/dd/yy HH:mm:ss.SSS", "MM-dd-yyyy HH:mm:ss.SSS", "MM-dd-yyyy", "MM/dd/yyyy", "MM/dd/yyyy HH:mm:ss.SSS",
+			"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd" );
     
     private static final String SYSTEM_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private List<String> UNMATCHED_FILE_HEADERS  = null;
@@ -357,10 +361,10 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
         ServiceProviderInfo serviceProviderInfo = new ServiceProviderInfo();
         
         
-        transactionInfoPutVO.setCustomer1Email( entries.get(actualFileHeader.get( "bor1Email" )) );
+        transactionInfoPutVO.setCustomer1Email( getEmailFromString(entries.get(actualFileHeader.get( "bor1Email" ))) );
         transactionInfoPutVO.setCustomer1FirstName( entries.get(actualFileHeader.get( "bor1FirstName" )) );
         transactionInfoPutVO.setCustomer1LastName(actualFileHeader.containsKey( "bor1LastName" ) ? entries.get(actualFileHeader.get( "bor1LastName" )) : "" );
-        transactionInfoPutVO.setCustomer2Email( actualFileHeader.containsKey( "bor2Email" ) ? entries.get(actualFileHeader.get( "bor2Email" )) : "" );
+        transactionInfoPutVO.setCustomer2Email( actualFileHeader.containsKey( "bor2Email" ) ? getEmailFromString(entries.get(actualFileHeader.get( "bor2Email" ))) : "" );
         transactionInfoPutVO.setCustomer2FirstName( actualFileHeader.containsKey( "bor2FirstName" ) ?  entries.get(actualFileHeader.get( "bor2FirstName" )) : "" );
         transactionInfoPutVO.setCustomer2LastName(actualFileHeader.containsKey( "bor2LastName" ) ?  entries.get(actualFileHeader.get( "bor2LastName" )) : "");
         transactionInfoPutVO.setTransactionCity(actualFileHeader.containsKey( "subPropCity" ) ? entries.get(actualFileHeader.get( "subPropCity" )) : ""  );
@@ -370,15 +374,15 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
         transactionInfoPutVO.setTransactionType(actualFileHeader.containsKey( "loanPurpose" ) ?  entries.get(actualFileHeader.get( "loanPurpose" ))  : "" );
         transactionInfoPutVO.setTransactionType(actualFileHeader.containsKey( "propertyAddress" ) ?  entries.get(actualFileHeader.get( "propertyAddress" ))  : "" );
         //adding buyer and seller feilds
-        transactionInfoPutVO.setBuyerAgentEmail( actualFileHeader.containsKey( "buyerAgentEmail" ) ? entries.get(actualFileHeader.get( "buyerAgentEmail" )) : "" );
+        transactionInfoPutVO.setBuyerAgentEmail( actualFileHeader.containsKey( "buyerAgentEmail" ) ? getEmailFromString(entries.get(actualFileHeader.get( "buyerAgentEmail" ))) : "" );
         transactionInfoPutVO.setBuyerAgentFirstName( actualFileHeader.containsKey( "buyerAgentFirstName" ) ?  entries.get(actualFileHeader.get( "buyerAgentFirstName" )) : "" );
         transactionInfoPutVO.setBuyerAgentLastName(actualFileHeader.containsKey( "buyerAgentLastName" ) ?  entries.get(actualFileHeader.get( "buyerAgentLastName" )) : "");
-        transactionInfoPutVO.setSellerAgentEmail( actualFileHeader.containsKey( "sellerAgentEmail" ) ? entries.get(actualFileHeader.get( "sellerAgentEmail" )) : "" );
+        transactionInfoPutVO.setSellerAgentEmail( actualFileHeader.containsKey( "sellerAgentEmail" ) ? getEmailFromString(entries.get(actualFileHeader.get( "sellerAgentEmail" ))) : "" );
         transactionInfoPutVO.setSellerAgentFirstName( actualFileHeader.containsKey( "sellerAgentFirstName" ) ?  entries.get(actualFileHeader.get( "sellerAgentFirstName" )) : "" );
         transactionInfoPutVO.setSellerAgentLastName(actualFileHeader.containsKey( "sellerAgentLastName" ) ?  entries.get(actualFileHeader.get( "sellerAgentLastName" )) : "");
         //adding buyer and seller participants 
     
-        serviceProviderInfo.setServiceProviderEmail( entries.get(actualFileHeader.get( "serviceremail" ))  );
+        serviceProviderInfo.setServiceProviderEmail( getEmailFromString(entries.get(actualFileHeader.get( "serviceremail" )))  );
         serviceProviderInfo.setServiceProviderName(  entries.get(actualFileHeader.get( "servicer" ))   );
         
         
@@ -532,5 +536,15 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
         surveyVO.setServiceProviderInfo( null );
         surveyVO.setTransactionInfo( null );
         return surveyVO;
+    }
+    
+    private String getEmailFromString(String email) {
+    	Matcher m = Pattern.compile("[_A-Za-z0-9-\\+\\.]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})").matcher(email);
+    	if(m.find()) {
+			return m.group();
+		}else {
+			return email;
+		}
+    	
     }
 }

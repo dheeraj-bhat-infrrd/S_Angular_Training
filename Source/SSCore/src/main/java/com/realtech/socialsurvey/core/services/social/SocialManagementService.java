@@ -269,16 +269,12 @@ public interface SocialManagementService
     Facebook getFacebookInstanceByCallBackUrl( String callBackUrl );
 
 
-    String getFbRedirectUrIForEmailRequest( String columnName, String columnValue, String baseUrl )
+    public String getFbRedirectUrIForEmailRequest( String columnName, String columnValue, String baseUrl )
         throws InvalidInputException;
 
 
-    String getLinkedinRedirectUrIForEmailRequest( String columnName, String columnValue, String baseUrl )
+    public String getLinkedinRedirectUrIForEmailRequest( String columnName, String columnValue, String baseUrl )
         throws InvalidInputException;
-
-
-    String getLinkedinAuthUrl( String redirectUri );
-
 
     void askFaceBookToReScrapePage( String url ) throws InvalidInputException;
 
@@ -359,6 +355,8 @@ public interface SocialManagementService
 
 	void updateAgentIdOfSurveyPreinitiationRecordsForEmailForMismatch(User user, String emailAddress)
 			throws InvalidInputException;
+
+    public String getLinkedinAuthUrl( String linkedinAuthUri, String linkedInApiKey, String redirectUri, String linkedinScope );
 
 }
 // JIRA SS-34 BY RM02 BOC

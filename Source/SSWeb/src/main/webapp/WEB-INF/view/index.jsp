@@ -161,7 +161,7 @@
 			</div>
 			
 			<div id="footer-wrapper" class="footer-wrapper">
-				&copy; Copyright 2015. All Rights Reserved.<br/>
+				&copy; Copyright 2019. All Rights Reserved.<br/>
 				Created by BuyersRoad, Inc. in San Francisco 
 				<span class="footer-ul">
 					&bull; <a href="https://www.socialsurvey.com/privacy-policy/">Privacy Policy</a>

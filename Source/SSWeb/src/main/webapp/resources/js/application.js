@@ -96,6 +96,9 @@ var sadText;
 var happyTextComplete;
 var neutralTexCompletet;
 var sadTextComplete;
+var happyUrl;
+var okUrl;
+var sadUrl;
 var rating = -1; // default value to be used to post on social survey in case of "ok" or "unpleasant" mood
 var reviewText;
 var reviewRating;
@@ -152,6 +155,19 @@ var sysCompTransGraphId = 'sys-sur-comp-graph';
 var sysInvSentGraphId = 'sys-invite-sent-graph';
 var sysRemSentGraphId = 'sys-rem-sent-graph';
 var sysUnproTransGraphId = 'sys-unpro-trans-graph';
+
+// URL redirect changes
+var suveySourceId;
+var participationType;
+var transactionType;
+var state;
+var city;
+var customeField1;
+var customeField2;
+var customeField3;
+var customeField4;
+var customeField5;
+
 
 var dangerGraphWrapper = '<div class="dash-stats-wrapper bord-bot-dc clearfix trans-monitor-wrapper">'
 						+'<div class="trans-monitor-sub-header-danger">'
@@ -6417,6 +6433,40 @@ function enableSocialMonitorToggleSetting(issocialmonitorenabled, disableEle) {
 	
 }
 
+//To update Branch and Region admin access permission.
+function updateAdminAccess(allowAdminAddOrDeleteUser,  typeOfCheckBox, disableEle) {
+	var payload = {
+			"allowadminaddordeleteuser" : allowAdminAddOrDeleteUser,
+			"typeofcheckbox" : typeOfCheckBox
+	};
+
+	callAjaxPostWithPayloadData("./updateadminaccess.do",function(data) {
+		if(data == "true") {
+			$('#overlay-toast').html(" Toggle Updated Sucessfully.");
+		} else {
+			$('#overlay-toast').html("Unable to update toggle");
+		}
+		showToast();
+	}, payload,true,disableEle);
+}
+
+
+function enableIncompleteSurveyDeleteToggleSetting(isincompletesurveydeleteenabled, disableEle) {
+	var payload = {
+		"isIncompleteSurveyDeleteEnabled" : isincompletesurveydeleteenabled
+	};
+	
+	callAjaxPostWithPayloadData("./enableincompletesurveydeletetoggle.do",function(data) {
+		if (data == "true") {
+			$('#overlay-toast').html("Incomplete Survey Delete toggle Updated Sucessfully.");
+		} else {
+			$('#overlay-toast').html("Unable to toggle Incomplete Survey Delete.");
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
 function updateVendastaAccessSetting(hasVendastaAcess, disableEle) {
 	var payload = {
 		"hasVendastaAcess" : hasVendastaAcess
@@ -6582,14 +6632,19 @@ function saveTextForMoodFlow(content, mood) {
 	}, payload, true);
 }
 
-function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete) {
+function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete,
+		happyUrl, okUrl, sadUrl) {
 	$('#happy-text').text(decodeURIComponent( escape( window.atob( happyText ) ) ));
 	$('#neutral-text').text(decodeURIComponent( escape( window.atob( neutralText ) ) ));
 	$('#sad-text').text(decodeURIComponent( escape( window.atob( sadText ) ) ));
-
+	
 	$('#happy-text-complete').text(decodeURIComponent( escape( window.atob( happyTextComplete ) ) ));
 	$('#neutral-text-complete').text(decodeURIComponent( escape( window.atob( neutralTextComplete ) ) ));
 	$('#sad-text-complete').text(decodeURIComponent( escape( window.atob( sadTextComplete ) ) ));
+	
+	$('#happy-complete-url').text(decodeURIComponent( escape( window.atob( happyUrl) ) ));
+	$('#ok-complete-url').text(decodeURIComponent( escape( window.atob( okUrl) ) ));
+	$('#sad-complete-url').text(decodeURIComponent( escape( window.atob( sadUrl))));	
 }
 
 // User management
@@ -6964,9 +7019,14 @@ function paintUserDetailsForm(userId) {
  * Function paint the user list in user management page
  */
 function paintUserListInUserManagement(startIndex) {
+	
+	var entityId = $(this).attr('data-column-value');
+	var entityType = $(this).attr('data-column-type');
 	var payload = {
 		"startIndex" : startIndex,
-		"batchSize" : userBatchSize
+		"batchSize" : userBatchSize,
+		"entityId" : entityId,
+		"entityType" : entityType
 	};
 
 	$.ajax({
@@ -7121,10 +7181,12 @@ $(document).on('click', '#um-search-icn', function(e) {
 
 function searchUsersByNameEmailLoginId(searchKey) {
 	var url = "./findusersunderadmin.do";
+	var entityType = $(this).attr('data-column-type');
 	var payload = {
 		"searchKey" : searchKey,
 		"startIndex" : userStartIndex,
-		"batchSize" : userBatchSize
+		"batchSize" : userBatchSize,
+		"entityType" : entityType
 	};
 	callAjaxGetWithPayloadData(url, searchUsersByNameEmailLoginIdCallBack, payload, true);
 }
@@ -7786,8 +7848,7 @@ function initSurveyWithUrl(q) {
 			else {
 				$('.sq-ques-wrapper').addClass( 'sq-main-txt' );
 				$('.sq-ques-wrapper').empty();
-				$('.sq-ques-wrapper').html("<div class='error-main-wrapper container' style='min-height: 504px;'>  <div class='err-line-1 text-center'>SURVEY REQUEST EXPIRED</div>  <br>  <br>  <div class='err-line-2'>We're really excited to offer the opportunity for you to share your experience; however, the link you clicked has expired. If you feel this is an error, please call us at <a href='tel:+1-888-701-4512'>1-888-701-4512</a> or <a href='https://socialsurvey.zendesk.com/hc/en-us/requests/new'>send us a message</a>.</div>  <br>  <div class='err-line-3' style='border: 1px solid #ccc;    margin: 14px 0; padding: 21px;    box-shadow: 0px 2px #eee;'><strong style='font-family: 'Open Sans'; font-wieght: 600;'>NOTICE:</strong> Please accept our apology if you inadvertently received a request to take a survey on June 15th or 16th for a transaction you completed more than 30 days ago. This incident was trigged by human error while conducting maintenance on our system. <br>    <strong style='font-family: 'opensans'; font-wieght: 600;'>No data breach occurred and you do NOT need to take any further action.</strong></div>  <br>  <div class='err-page-btn'>Close</div></div>");
-			}
+				$('.sq-ques-wrapper').html("<div class='error-main-wrapper container' style='min-height: 504px;'>  <div class='err-line-1 text-center'>SURVEY REQUEST EXPIRED</div>  <br>  <br>  <div class='err-line-2'>We're really excited to offer the opportunity for you to share your experience; however, the link you clicked has expired. If you feel this is an error, please call us at <a href='tel:+1-888-701-4512'>1-888-701-4512</a> or <a href='https://socialsurvey.zendesk.com/hc/en-us/requests/new'>send us a message</a>.</div>  <br>  <div class='err-page-btn'>Close</div></div>");			}
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -7848,6 +7909,9 @@ function paintSurveyPage(jsonData) {
 	happyTextComplete = jsonData.responseJSON.happyTextComplete;
 	neutralTextComplete = jsonData.responseJSON.neutralTextComplete;
 	sadTextComplete = jsonData.responseJSON.sadTextComplete;
+	happyUrl = jsonData.responseJSON.happyUrl;
+	okUrl = jsonData.responseJSON.okUrl;
+	sadUrl = jsonData.responseJSON.sadUrl;
 	autoPost = jsonData.responseJSON.autopostEnabled;
 	autoPostScore = jsonData.responseJSON.autopostScore;
 	yelpEnabled = Boolean(jsonData.responseJSON.yelpEnabled);
@@ -7865,6 +7929,19 @@ function paintSurveyPage(jsonData) {
 	subjectContentForZillowPost = jsonData.responseJSON.subjectContentForZillowPost;
 	isAutoFillReviewContentForZillowPost = jsonData.responseJSON.isAutoFillReviewContentForZillowPost;
 	reviewFooterContentForZillowPost = jsonData.responseJSON.reviewFooterContentForZillowPost;
+	
+	
+	// URL redirect changes
+	surveySourceId = jsonData.responseJSON.surveySourceId;
+	participationtype = jsonData.responseJSON.participationType;
+	transactionType = jsonData.responseJSON.transactionType;
+	city = jsonData.responseJSON.city;
+	state = jsonData.responseJSON.state;
+	customeField1 = jsonData.responseJSON.customField1;
+	customeField2 = jsonData.responseJSON.customField2;
+	customeField3 = jsonData.responseJSON.customField3;
+	customeField4 = jsonData.responseJSON.customField4;
+	customeField5 = jsonData.responseJSON.customField5;
 
 	// If social token availiable populate the links
 	// if (googleEnabled) {
@@ -8220,6 +8297,9 @@ function storeCustomerAnswer(customerResponse) {
 function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded, onlyPostToSocialSurvey) {
 	var success = false;
 
+	$('#survey-dash').show();
+	$('#next-textarea-smiley').attr('data-survey-submit-disabled',true);
+	
 	var payload = {
 		"mood" : mood,
 		"feedback" : feedback,
@@ -8249,6 +8329,7 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 		},
 		complete : function(data) {
 			if (success) {
+				redirectPageUponSurveySubmit();				
 			}
 		},
 		error : function(e) {
@@ -8256,6 +8337,7 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			$('#next-textarea-smiley').attr('data-survey-submit-disabled',false);
 		}
 	});
 }
@@ -8421,12 +8503,33 @@ function showMasterQuestionPage() {
 
 		// save survey response
 		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded, onlyPostToSocialSurvey);
-		$("div[data-ques-type]").hide();
+		
+	}
+	return;
+}
+
+function redirectPageUponSurveySubmit(){
+	
+	$("div[data-ques-type]").hide();
+	
+	if((mood == 'Great') && (happyUrl != null)){
+		happyUrl = updateRedirectUrlWithValues(happyUrl);
+		window.location = happyUrl;
+	}
+	else if((mood == 'OK') && (okUrl != null)){
+		okUrl = updateRedirectUrlWithValues(okUrl);
+		window.location = okUrl;
+	}
+	else if((mood == 'Unpleasant') && (sadUrl != null)){
+		sadUrl = updateRedirectUrlWithValues(sadUrl);
+		window.location = sadUrl;
+	}
+	else{	
 		$("div[data-ques-type='error']").show();
 		if(!hiddenSection){
 			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + "/" + surveyId + '" target="_blank">' + agentFullProfileLink + '</a>');
 		}
-		
+		var feedback = $("#text-area").val();
 		var fmt_rating = Number(rating).toFixed(1);
 		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
@@ -8438,7 +8541,7 @@ function showMasterQuestionPage() {
 		}
 		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink+ "/" + surveyId + "'");
 		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "/" + surveyId + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
-
+	
 		$('#content-head').html('Survey Completed');
 		if (mood == 'Great')
 			$('#content').html(happyTextComplete);
@@ -8450,12 +8553,37 @@ function showMasterQuestionPage() {
 		
 		// call method to post the review and update the review count
 		//postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
-
+	
 		//paint socialmedia icons on survey thank you page
 		paintSocialMediaIconsOnSurveyCompletion();
-		
+		$('#survey-dash').hide();
 	}
-	return;
+}
+
+function updateRedirectUrlWithValues(redirectUrl){
+	var resultUrl = redirectUrl;
+	if(redirectUrl.indexOf('[SURVEY_SOURCE_ID]') != -1)
+		resultUrl = redirectUrl.replace('[SURVEY_SOURCE_ID]', surveySourceId);
+	if(redirectUrl.indexOf('[PARTICIPANT_TYPE]') != -1)
+		resultUrl = resultUrl.replace('[PARTICIPANT_TYPE]', participationtype);
+	if(redirectUrl.indexOf('[TRANSACTION_TYPE]') != -1)
+		resultUrl = resultUrl.replace('[TRANSACTION_TYPE]', transactionType);
+	if(redirectUrl.indexOf('[STATE]') != -1)
+		resultUrl = resultUrl.replace('[STATE]', state);
+	if(redirectUrl.indexOf('[CITY]') != -1)
+		resultUrl = resultUrl.replace('[CITY]', city);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_ONE]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_ONE]', customeField1);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_TWO]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_TWO]', customeField2);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_THREE]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_THREE]', customeField3);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_FOUR]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_FOUR]', customeField4);
+	if(redirectUrl.indexOf('[CUSTOM_FIELD_FIVE]') != -1)
+		resultUrl = resultUrl.replace('[CUSTOM_FIELD_FIVE]', customeField5);
+		return resultUrl;
+	
 }
 
 function postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded) {
@@ -8659,7 +8787,9 @@ $('.sq-np-item-next').click(function() {
 			if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
 				$('#overlay-toast').html('Please answer this question.');
 				showToast();
-			} else {
+			} else if($('#next-textarea-smiley').attr('data-survey-submit-disabled') == true || $('#next-textarea-smiley').attr('data-survey-submit-disabled') == 'true'){
+				return;
+			}else {
 				showMasterQuestionPage();
 			}
 			return;
@@ -9046,6 +9176,11 @@ $('#shr-post-chk-box').click(function() {
 
 // Edit profile functions
 $(document).ajaxStop(function() {
+	var hashString = document.baseURI.split('#')[1];
+	if(hashString != "showprofilepage"){
+		$('.footer-main-wrapper').show();
+		return;
+	}
 	adjustImage();
 });
 
@@ -12737,6 +12872,15 @@ $('body').on('blur', '#neutral-text-complete', function() {
 $('body').on('blur', '#sad-text-complete', function() {
 	saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
 });
+$('body').on('blur', '#happy-complete-url', function() {
+	saveTextForMoodFlow($("#happy-complete-url").val(), "happyUrl");
+});
+$('body').on('blur', '#ok-complete-url', function() {
+	saveTextForMoodFlow($("#ok-complete-url").val(), "okUrl");
+});
+$('body').on('blur', '#sad-complete-url', function() {
+	saveTextForMoodFlow($("#sad-complete-url").val(), "sadUrl");
+});
 $('body').on('blur', '#opt-out-text', function() {
 	storeOptOutText($("#opt-out-text").val(), "optOutText");
 });
@@ -12758,7 +12902,6 @@ $('body').on('click', '.reset-icon', function() {
 	} else if (resetId == 'sad-text-complete') {
 		resetTag = 'sadComplete';
 	}
-
 	showOverlay();
 	resetTextForMoodFlow(resetTag, resetId);
 });
@@ -12893,6 +13036,35 @@ $('body').on('click', '#soc-mon-access-chk-box', function() {
 	}
 });
 
+$('body').on('click', '.admin-access-chk-box', function() {
+	var typeOfCheckBox = $(this).attr('data-typeOfCheckBox');
+	var id;
+	if(typeOfCheckBox == "branchAdminDeleteAccess")
+		id = '#alw-br-admin-del-usr-chk-box';
+	else if(typeOfCheckBox == "regionAdminDeleteAccess")
+		id = '#alw-rgn-admin-del-usr-chk-box';
+	else if(typeOfCheckBox == "branchAdminAddAccess")
+		id = '#alw-br-admin-add-usr-chk-box';
+	else if(typeOfCheckBox == "regionAdminAddAccess")
+		id = '#alw-rgn-admin-add-usr-chk-box';
+	if ($(id).hasClass('bd-check-img-checked')){
+		$(id).removeClass('bd-check-img-checked');
+		updateAdminAccess(true, typeOfCheckBox,id);
+	} else {
+		$(id).addClass('bd-check-img-checked');
+		updateAdminAccess(false, typeOfCheckBox, id);
+	}
+});
+		
+$('body').on('click', '#incomplete-survey-delete-chk-box', function() {
+	if ($('#incomplete-survey-delete-chk-box').hasClass('bd-check-img-checked')) {
+		$('#incomplete-survey-delete-chk-box').removeClass('bd-check-img-checked');
+		enableIncompleteSurveyDeleteToggleSetting(true, '#incomplete-survey-delete-chk-box');
+	} else {
+		$('#incomplete-survey-delete-chk-box').addClass('bd-check-img-checked');
+		enableIncompleteSurveyDeleteToggleSetting(false, '#incomplete-survey-delete-chk-box');
+	}
+});
 
 $('body').on('blur', '#digest-recipients', function() {
 	
@@ -20714,22 +20886,13 @@ function closeSummitRibbon(){
 	$('#summit-ribbon-outer').hide();
 }
 
+function showLinkedinApiV2UpdateRibbon(){
+	$('#linkedin-api-v2-update-ribbon-outer').show();
+}
 
-$(document).on('click','#register-summit-btn',function(e){
-	e.stopImmediatePropagation();
-	e.preventDefault();
-	
-	closeSummitPopup( false );
-	
-	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
-	
-	if(profileMasterId == 1){
-		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
-	}else{
-		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
-	}
-	
-});
+function closeLinkedinApiV2UpdateRibbon(){
+	$('#linkedin-api-v2-update-ribbon-outer').hide();
+}
 
 $(document).on('click','#summit-popup-close-btn',function(e){
 	e.stopPropagation();
@@ -20743,11 +20906,12 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 
 	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
 	
-	if(profileMasterId == 1){
-		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
-	}else{
-		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
-	}
+	window.open('https://www.socialsurvey.com/top-performers-2018/', '_blank');
+});
+
+$(document).on('click','#linkedin-api-v2-update-ribbon-close-btn',function(e){
+	e.stopPropagation();
+	closeLinkedinApiV2UpdateRibbon();
 });
 
 $(document).on('click','#summit-ribbon-close-btn',function(e){
@@ -20765,11 +20929,7 @@ $(document).on('click','#summit-popup-body',function(e){
 	
 	var profileMasterId = parseInt($('#rep-prof-container').attr('data-profile-master-id'));
 	
-	if(profileMasterId == 1){
-		window.open('https://facebook.com/SocialSurveybusiness/videos/1164503300387327/', '_blank');
-	}else{
-		window.open('https://facebook.com/groups/1153852884788720/permalink/1186851441488864/', '_blank');
-	}
+	window.open('https://www.socialsurvey.com/top-performers-2018/', '_blank');
 });
 
 function sendClickedEventInfo( event ){

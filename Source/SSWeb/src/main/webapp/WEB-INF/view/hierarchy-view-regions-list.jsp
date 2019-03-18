@@ -24,7 +24,9 @@
                    		data-iden="${region.regionId}" data-profile="region"
                   	 	title="<spring:message code="label.widget.key" />">Widget</div> 
 	               <div class="float-left v-tbl-top-spacer"></div>  
+	               <c:if test="${canDelete}">
                    <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-close region-del-icn" data-regionid="${region.regionId}">Delete</div>
+                   </c:if>
                    <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-edit region-edit-icn" clicked="false" data-regionid="${region.regionId}">Edit</div>
                	   <div class="float-left v-tbl-top-spacer"></div>
                </div>
@@ -55,7 +57,9 @@
 						data-iden="${branch.branchId}" data-profile="branch"
 						title="<spring:message code="label.widget.key" />">Widget</div>
 					<div class="float-left v-tbl-top-spacer"></div>
+					 <c:if test="${canDelete}">
 					<div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}">Delete</div>
+					</c:if>
                    <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}">Edit</div>
               <div class="float-left v-tbl-top-spacer"></div>
                </div>
@@ -87,6 +91,15 @@
 					</c:when>
 					<c:otherwise>
 						<c:set var="admincaneditclass" value="v-tbl-icn-disabled" />
+					</c:otherwise>
+				</c:choose>
+				
+				<c:choose>
+				<c:when test="${canDelete}">
+						<c:set var="admincandeleteclass" value="v-tbl-icn" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="admincandeleteclass" value="v-tbl-icn-disabled" />
 					</c:otherwise>
 				</c:choose>
 	
@@ -141,7 +154,7 @@
 						</c:otherwise>
 					</c:choose>  
                    <c:choose>
-						<c:when test="${compUser.canEdit && user.userId != compUser.userId}">
+						<c:when test="${canDelete and user.userId != compUser.userId}">
 						   <div class="float-left v-tbl-icn-sm v-tbl-icn v-icn-close user-del-icn" data-userid="${compUser.userId}">Delete</div>
 						</c:when>
 						<c:otherwise>

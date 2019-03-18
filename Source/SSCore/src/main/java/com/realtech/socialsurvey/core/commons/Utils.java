@@ -474,4 +474,16 @@ public class Utils
         Matcher matcher = pattern.matcher( emailId.trim() );
         return matcher.matches();
     }
+
+    /**
+     * A utility method for converting a cloudfront image url to s3 image url
+     * @param cloudFrontUrl
+     * @param amazonEndpoint
+     * @param amazonBucket
+     */
+    public static String convertCloudFrontUrlToS3Url( String cloudFrontUrl, String amazonEndpoint, String amazonBucket )
+    {
+        String s3Prefix = amazonEndpoint+CommonConstants.FILE_SEPARATOR+amazonBucket;
+        return s3Prefix + cloudFrontUrl.substring( 36, cloudFrontUrl.length() ) ;
+    }
 }

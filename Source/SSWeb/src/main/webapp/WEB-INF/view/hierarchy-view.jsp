@@ -24,10 +24,12 @@
 				onclick="javascript:showMainContent('./showusermangementpage.do')">
 				<spring:message code="label.header.editteam.key" />
 			</div>
+			<c:if test="${canAdd}">
 			<div class="float-right hm-header-right text-center"
 				onclick="javascript:showMainContent('./showbuildhierarchypage.do')">
 				<spring:message code="label.header.buildhierarchy.key" />
 			</div>
+			</c:if>
 
 		</div>
 	</div>

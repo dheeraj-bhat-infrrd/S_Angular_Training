@@ -26,6 +26,9 @@ public class SurveySettings {
 	private String sadTextComplete;
 	private ComplaintResolutionSettings complaint_res_settings;
 	private AbusiveMailSettings abusive_mail_settings;
+	private String happyUrl;
+	private String okUrl;
+	private String sadUrl;
 	
     // threshold for sending survey completed mail to agents and admins
     private double surveyCompletedMailThreshold;
@@ -206,6 +209,32 @@ public class SurveySettings {
 	public void setAbusive_mail_settings(AbusiveMailSettings abusive_mail_settings) {
 		this.abusive_mail_settings = abusive_mail_settings;
 	}
+	
+	
+
+	public String getHappyUrl() {
+		return happyUrl;
+	}
+
+	public void setHappyUrl(String happyUrl) {
+		this.happyUrl = happyUrl;
+	}
+
+	public String getOkUrl() {
+		return okUrl;
+	}
+
+	public void setOkUrl(String okUrl) {
+		this.okUrl = okUrl;
+	}
+
+	public String getSadUrl() {
+		return sadUrl;
+	}
+
+	public void setSadUrl(String sadUrl) {
+		this.sadUrl = sadUrl;
+	}
 
 	@Override
 	public String toString() {
@@ -221,6 +250,6 @@ public class SurveySettings {
 				+ neutralTextComplete + ", sadTextComplete=" + sadTextComplete + ", complaint_res_settings="
 				+ complaint_res_settings + ", abusive_mail_settings=" + abusive_mail_settings
 				+ ", surveyCompletedMailThreshold=" + surveyCompletedMailThreshold + ", duplicateSurveyInterval="
-				+ duplicateSurveyInterval + "]";
+				+ duplicateSurveyInterval + ", happyUrl=" + happyUrl+", okUrl=" + okUrl +", sadUrl=" + sadUrl +"]";
 	}
 }

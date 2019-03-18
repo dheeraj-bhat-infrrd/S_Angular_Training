@@ -212,6 +212,7 @@ public interface JspResolver
     
     //Top LO search pages
     public static final String SEARCH_ENGINE = "searchengine";
+    public static final String SEARCH_ENGINE_NO_SCRIPT = "searchengine_noscript";
     
     //Page not found page
     public static final String SS_PAGE_NOT_FOUND = "ssPageNotFound";
