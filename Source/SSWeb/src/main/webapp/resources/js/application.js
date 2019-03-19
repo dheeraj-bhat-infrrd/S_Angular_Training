@@ -7346,9 +7346,9 @@ $(document).on('click', '#user-edit-btn', function(e) {
 	
 	$("#user-edit-save").off('click');
 	$("#user-edit-save").on('click', function(e) {
-		if (validateUserDetailsUserManagement()) {
+		var firstName = $('#um-user-first-name').val();
+		if (validateUserDetailsUserManagement(firstName)) {
 			saveUserDetailsByAdmin();
-
 			// refreshing right section after assignment
 			setTimeout(function() {
 				getUserAssignments($('#selected-userid-hidden').val());
@@ -7388,11 +7388,13 @@ $(document).on('click', '#user-assign-btn', function(e) {
 	});
 });
 
-function validateUserDetailsUserManagement() {
-
-	var isUserDetailsFormValid = true;
-
-	return isUserDetailsFormValid;
+function validateUserDetailsUserManagement(firstName) {
+	if (firstName == undefined || firstName == "") {
+		$('#overlay-toast').html('Please enter first name');
+		showToast();
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -7428,7 +7430,7 @@ function saveUserDetailsByAdmin() {
 
 		// user management page
 		$('td[data-user-id="' + userId + '"]').text(name).attr("data-first-name", firstName).attr("data-last-name", lastName);
-		$('td[data-user-id="' + userId + '"]').parent().find('.v-tbl-email').text(emailID);
+		$('td[data-user-id="' + userId + '"]').parent().find('.mng-tbl-email-div').text(emailID);
 
 		$('#overlay-toast').html(data);
 		showToast();
