@@ -141,9 +141,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
         SocialMonitorResponseData socialMonitorResponseData = new SocialMonitorResponseData();
         List<SocialMonitorFeedData> socialMonitorStreamDataList = new ArrayList<>();
-        List<SocialFeedResponse> socialFeedsResponse;
-
-        socialFeedsResponse = mongoSocialFeedDao.getAllSocialFeeds( socialFeedFilter.getStartIndex(),
+        List<SocialFeedResponse> socialFeedsResponse = mongoSocialFeedDao.getAllSocialFeeds( socialFeedFilter.getStartIndex(),
             socialFeedFilter.getLimit(), socialFeedFilter.getStatus(), socialFeedFilter.getFeedtype(),
             socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(), socialFeedFilter.getBranchIds(),
             socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(), socialFeedFilter.isCompanySet(),
