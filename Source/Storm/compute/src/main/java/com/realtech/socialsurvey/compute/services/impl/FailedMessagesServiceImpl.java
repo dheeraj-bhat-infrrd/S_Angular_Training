@@ -1,12 +1,20 @@
 package com.realtech.socialsurvey.compute.services.impl;
 
-import com.realtech.socialsurvey.compute.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.common.FailedMessageConstants;
 import com.realtech.socialsurvey.compute.dao.FailedMessagesDao;
 import com.realtech.socialsurvey.compute.dao.impl.FailedMessagesDaoImpl;
+import com.realtech.socialsurvey.compute.entities.EmailMessage;
+import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
+import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
+import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
+import com.realtech.socialsurvey.compute.entities.FailedSurveyProcessor;
+import com.realtech.socialsurvey.compute.entities.ReportRequest;
+import com.realtech.socialsurvey.compute.entities.SurveyData;
+import com.realtech.socialsurvey.compute.entities.UnsavedUserEvent;
+import com.realtech.socialsurvey.compute.entities.UserEvent;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.utils.ThrowableUtils;
