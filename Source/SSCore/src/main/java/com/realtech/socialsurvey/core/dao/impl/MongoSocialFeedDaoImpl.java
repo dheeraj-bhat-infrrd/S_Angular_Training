@@ -26,6 +26,28 @@ import java.util.regex.Pattern;
 public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingBean
 {
 
+    private static final String MEDIA_TYPE = "mediaType";
+
+    private static final String IS_RETRIED = "isRetried";
+
+    private static final String PROFILE_TYPE = "profileType";
+
+    private static final String AGENT_ID = "agentId";
+
+    private static final String BRANCH_ID = "branchId";
+
+    private static final String REGION_ID = "regionId";
+
+    private static final String OWNER_EMAIL = "ownerEmail";
+
+    private static final String OWNER_NAME = "ownerName";
+
+    private static final String POST_LINK = "postLink";
+
+    private static final String PAGE_LINK = "pageLink";
+
+    private static final String TEXT_HIGHLIGHTED = "textHighlighted";
+
     private static final Logger LOG = LoggerFactory.getLogger( MongoSocialFeedDaoImpl.class );
 
     @Autowired
@@ -60,6 +82,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     public static final String IS_DUPLICATE = "isDuplicate";
     public static final String BEGIN_REGEX = "^";
     public static final String END_REGEX = "$";
+
+    private static final String MEDIA_ENTITIES = "mediaEntities";
 
     @Override
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName )
@@ -204,7 +228,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
 
     @Override
-    public List<SocialResponseObject> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
+    public List<SocialFeedResponse> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
         Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText,
         boolean isCompanySet, boolean fromTrustedSource, boolean isSocMonOnLoad )
     {
@@ -253,7 +277,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         }
         
         //Stream, Alerts, Escalation, Resolved criteria
-        else if(!criterias.isEmpty() && criterias != null && isCompanySet){
+        else if(!criterias.isEmpty() && isCompanySet){
             criteria.orOperator( ( Criteria.where( STATUS ).is( status.toUpperCase() )
                 .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ) );
         } else {
@@ -277,9 +301,16 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         if ( limit > -1 ) {
             query.limit( limit );
         }
+        
+        query.fields().include( FEED_TYPE ).include( STATUS ).include( TEXT ).include( MEDIA_ENTITIES )
+            .include( TEXT_HIGHLIGHTED ).include( PAGE_LINK ).include( POST_LINK ).include( UPDATED_TIME )
+            .include( CREATED_TIME ).include( OWNER_NAME ).include( OWNER_EMAIL ).include( COMPANY_ID ).include( REGION_ID )
+            .include( BRANCH_ID ).include( AGENT_ID ).include( PROFILE_TYPE ).include( HASH ).include( DUPLICATE_COUNT )
+            .include( FOUND_KEYWORDS ).include( ACTION_HISTORY ).include( IS_RETRIED ).include( FROM_TRUSTED_SOURCE )
+            .include( POST_SOURCE ).include( IS_DUPLICATE ).include( MEDIA_TYPE ).include( POST_ID );
 
         LOG.info( "Mongo query to  getAllSocialFeeds : {}", query.toString() );
-        return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        return mongoTemplate.find( query, SocialFeedResponse.class, SOCIAL_FEED_COLLECTION );
     }
 
     @Override
@@ -343,6 +374,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             criteria.and( TEXT ).regex( Pattern.compile( searchText.trim(), Pattern.CASE_INSENSITIVE ) );
         }
 
+        query.fields().include( POST_ID );
         //Exclude duplicate posts
         query.addCriteria( criteria.and( IS_DUPLICATE ).is( false ) );
 

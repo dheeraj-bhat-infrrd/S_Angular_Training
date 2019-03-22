@@ -296,9 +296,6 @@ public interface SurveyDetailsDao
     public Long getFilteredSurveyCount( long companyId , String mood ,  Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds, boolean isRetaken );
 
 
-    void insertApiRequestDetails( ApiRequestDetails apiRequestDetails );
-
-
     public Map<Long, Long> getTotalReviewsCountForAllUsersOfCompany( long companyId );
 
 

@@ -1,14 +1,62 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.mongodb.BulkOperationException;
+import org.springframework.stereotype.Service;
+
 import com.mongodb.BulkWriteError;
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.MacrosComparator;
-import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.entities.integration.Agent;
-import com.realtech.socialsurvey.core.enums.*;
+import com.realtech.socialsurvey.core.entities.ActionHistory;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SegmentsEntity;
+import com.realtech.socialsurvey.core.entities.SegmentsVO;
+import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
+import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
+import com.realtech.socialsurvey.core.entities.SocialFeedResponse;
+import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
+import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
+import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.ActionHistoryType;
+import com.realtech.socialsurvey.core.enums.MessageType;
+import com.realtech.socialsurvey.core.enums.ProfileType;
+import com.realtech.socialsurvey.core.enums.SocialFeedActionType;
+import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
+import com.realtech.socialsurvey.core.enums.TextActionType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
@@ -20,19 +68,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.realtech.socialsurvey.core.utils.JsoupHtmlToTextUtils;
 import com.realtech.socialsurvey.core.vo.BulkWriteErrorVO;
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.mongodb.BulkOperationException;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.util.*;
 
 
 /**
@@ -40,7 +75,7 @@ import java.util.*;
  *
  */
 @DependsOn ( "generic")
-@Component
+@Service
 public class SocialFeedServiceImpl implements SocialFeedService
 {
     private static final String REPLIED_VIA_EMAIL_TEXT = "Replied via email by <b class='soc-mon-bold-text'> %s </b>";
@@ -99,7 +134,6 @@ public class SocialFeedServiceImpl implements SocialFeedService
     }
     
 
-    @SuppressWarnings ( "unchecked")
     @Override
     public SocialMonitorResponseData getAllSocialPosts( SocialFeedFilter socialFeedFilter ) throws InvalidInputException
     {
@@ -107,60 +141,42 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
         SocialMonitorResponseData socialMonitorResponseData = new SocialMonitorResponseData();
         List<SocialMonitorFeedData> socialMonitorStreamDataList = new ArrayList<>();
-        List<SocialResponseObject> socialResponseObjects;
-        OrganizationUnitSettings organizationUnitSettings;
-
-        socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds( socialFeedFilter.getStartIndex(),
+        List<SocialFeedResponse> socialFeedsResponse = mongoSocialFeedDao.getAllSocialFeeds( socialFeedFilter.getStartIndex(),
             socialFeedFilter.getLimit(), socialFeedFilter.getStatus(), socialFeedFilter.getFeedtype(),
             socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(), socialFeedFilter.getBranchIds(),
             socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(), socialFeedFilter.isCompanySet(),
             socialFeedFilter.isFromTrustedSource(), socialFeedFilter.isSocMonOnLoad() );
-        if ( socialResponseObjects != null && !socialResponseObjects.isEmpty() ) {
+        if ( socialFeedsResponse != null && !socialFeedsResponse.isEmpty() ) {
         	//fetch all profile url map
-        	Map<String, String> profileUrls = getAllProfileUrls(socialResponseObjects);
-            for ( SocialResponseObject socialResponseObject : socialResponseObjects ) {
+        	Map<String, String> profileUrls = getAllProfileUrls(socialFeedsResponse);
+            for ( SocialFeedResponse socialFeedResponse : socialFeedsResponse ) {
                 SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
-                /*if ( socialResponseObject.getProfileType().equals( ProfileType.COMPANY ) ) {
-                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getCompanyId(),
-                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
-                } else if ( socialResponseObject.getProfileType().equals( ProfileType.REGION ) ) {
-                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getRegionId(),
-                        CommonConstants.REGION_SETTINGS_COLLECTION );
-                } else if ( socialResponseObject.getProfileType().equals( ProfileType.BRANCH ) ) {
-                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getBranchId(),
-                        CommonConstants.BRANCH_SETTINGS_COLLECTION );
-                } else {
-                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getAgentId(),
-                        CommonConstants.AGENT_SETTINGS_COLLECTION );
-                }*/
-                socialMonitorFeedData.setType( socialResponseObject.getType() );
-                socialMonitorFeedData.setStatus( socialResponseObject.getStatus() );
-                socialMonitorFeedData.setText( socialResponseObject.getText() );
-                socialMonitorFeedData.setMediaEntities( socialResponseObject.getMediaEntities() );
-                socialMonitorFeedData.setOwnerName( socialResponseObject.getOwnerName() );
-                if ( profileUrls != null ) {
-                    socialMonitorFeedData.setOwnerProfileImage( profileUrls.get(createKeyForObj(socialResponseObject)) );
+                socialMonitorFeedData.setType( socialFeedResponse.getType() );
+                socialMonitorFeedData.setStatus( socialFeedResponse.getStatus() );
+                socialMonitorFeedData.setText( socialFeedResponse.getText() );
+                socialMonitorFeedData.setMediaEntities( socialFeedResponse.getMediaEntities() );
+                socialMonitorFeedData.setOwnerName( socialFeedResponse.getOwnerName() );
+                socialMonitorFeedData.setOwnerProfileImage( profileUrls.get(createKeyForObj(socialFeedResponse)) );
+                socialMonitorFeedData.setCompanyId( socialFeedResponse.getCompanyId() );
+                socialMonitorFeedData.setRegionId( socialFeedResponse.getRegionId() );
+                socialMonitorFeedData.setBranchId( socialFeedResponse.getBranchId() );
+                socialMonitorFeedData.setAgentId( socialFeedResponse.getAgentId() );
+                socialMonitorFeedData.setPostId( socialFeedResponse.getPostId() );
+                if ( socialFeedResponse.getActionHistory() != null ) {
+                    Collections.sort( socialFeedResponse.getActionHistory(), new ActionHistoryComparator() );
                 }
-                socialMonitorFeedData.setCompanyId( socialResponseObject.getCompanyId() );
-                socialMonitorFeedData.setRegionId( socialResponseObject.getRegionId() );
-                socialMonitorFeedData.setBranchId( socialResponseObject.getBranchId() );
-                socialMonitorFeedData.setAgentId( socialResponseObject.getAgentId() );
-                socialMonitorFeedData.setPostId( socialResponseObject.getPostId() );
-                if ( socialResponseObject.getActionHistory() != null ) {
-                    Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );
-                }
-                socialMonitorFeedData.setActionHistory( socialResponseObject.getActionHistory() );
-                socialMonitorFeedData.setUpdatedOn( socialResponseObject.getCreatedTime() );
-                socialMonitorFeedData.setFoundKeywords( socialResponseObject.getFoundKeywords() );
-                socialMonitorFeedData.setDuplicateCount( socialResponseObject.getDuplicateCount() );
-                socialMonitorFeedData.setPageLink( socialResponseObject.getPageLink() );
-                socialMonitorFeedData.setPostLink( socialResponseObject.getPostLink() );
-                socialMonitorFeedData.setFromTrustedSource(socialResponseObject.isFromTrustedSource());
-                socialMonitorFeedData.setPostSource(socialResponseObject.getPostSource());
-                if(StringUtils.isNotEmpty( socialResponseObject.getTextHighlighted() )){
-                    socialMonitorFeedData.setTextHighlighted( socialResponseObject.getTextHighlighted() );
+                socialMonitorFeedData.setActionHistory( socialFeedResponse.getActionHistory() );
+                socialMonitorFeedData.setUpdatedOn( socialFeedResponse.getCreatedTime() );
+                socialMonitorFeedData.setFoundKeywords( socialFeedResponse.getFoundKeywords() );
+                socialMonitorFeedData.setDuplicateCount( socialFeedResponse.getDuplicateCount() );
+                socialMonitorFeedData.setPageLink( socialFeedResponse.getPageLink() );
+                socialMonitorFeedData.setPostLink( socialFeedResponse.getPostLink() );
+                socialMonitorFeedData.setFromTrustedSource(socialFeedResponse.isFromTrustedSource());
+                socialMonitorFeedData.setPostSource(socialFeedResponse.getPostSource());
+                if(StringUtils.isNotEmpty( socialFeedResponse.getTextHighlighted() )){
+                    socialMonitorFeedData.setTextHighlighted( socialFeedResponse.getTextHighlighted() );
                 } else {
-                    socialMonitorFeedData.setTextHighlighted( socialResponseObject.getText() );
+                    socialMonitorFeedData.setTextHighlighted( socialFeedResponse.getText() );
                 }
                 socialMonitorStreamDataList.add( socialMonitorFeedData );
             }
@@ -187,7 +203,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	
     //this method is used to avoid the call made for each object in List<SocialResponseObject> to fetch the response
     //and reduced to 4 calls 
-    private Map<String, String> getAllProfileUrls(List<SocialResponseObject> socialResponseObjects){
+    private Map<String, String> getAllProfileUrls(List<SocialFeedResponse> socialResponseObjects){
     	LOG.info( "Fetching profile URLs for list of size {}", socialResponseObjects.size() );
     	Map<String, String> profileUrlMap = new HashMap<>();
     	Set<Long> companyIds = new HashSet<>();
@@ -195,7 +211,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
     	Set<Long> branchIds = new HashSet<>();
     	Set<Long> agentIds = new HashSet<>();
     	 List<OrganizationUnitSettings> organizationUnitSettings;
-    	for(SocialResponseObject socialResponseObject : socialResponseObjects) {
+    	for(SocialFeedResponse socialResponseObject : socialResponseObjects) {
     		if ( socialResponseObject.getProfileType().equals( ProfileType.COMPANY ) ) {
                 companyIds.add(socialResponseObject.getCompanyId());
             } else if ( socialResponseObject.getProfileType().equals( ProfileType.REGION ) ) {
@@ -244,7 +260,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
     	return key.toString();
     }
     
-    private String createKeyForObj(SocialResponseObject socialResponseObject) {
+    private String createKeyForObj(SocialFeedResponse socialResponseObject) {
     	switch (socialResponseObject.getProfileType()) {
 		case COMPANY:
 			return createKey(socialResponseObject.getProfileType(), socialResponseObject.getCompanyId());
@@ -1030,7 +1046,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
         try{
             mongoSocialFeedDao.insertSocialFeeds( socialFeeds, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
         } catch (  BulkOperationException bulkWriteException ) {
-            List<BulkWriteError> bulkWriteErrors = bulkWriteErrors = bulkWriteException.getErrors();
+            List<BulkWriteError> bulkWriteErrors = bulkWriteException.getErrors();
             for(BulkWriteError error: bulkWriteErrors){
                 errors.add( new BulkWriteErrorVO( error.getIndex(), error.getCode(), error.getMessage() ) );
             }
@@ -1042,8 +1058,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
     @Override public long updateDuplicateCount( int hash, long companyId, String id ) throws InvalidInputException
     {
-        LOG.debug("Executing updateDuplicateCount of post with id = {}"
-            + " and hash = {} ", id, hash);
+        LOG.debug("Executing updateDuplicateCount of post with id = {} and hash = {} ", id, hash);
         if( id == null || companyId <= 0){
             throw new InvalidInputException( "Id cannot be null or company id is invalid " );
         }

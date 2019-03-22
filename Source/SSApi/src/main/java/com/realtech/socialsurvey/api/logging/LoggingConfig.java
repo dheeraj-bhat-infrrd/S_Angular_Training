@@ -1,12 +1,10 @@
 package com.realtech.socialsurvey.api.logging;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
@@ -14,9 +12,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableWebMvc
 public class LoggingConfig extends WebMvcConfigurerAdapter
 {
-    
-    @Autowired
-    private ApiTransactionInterceptor apiTransactionInterceptor;
     
     @Bean (name = "loggingTaskExecutor")
     public ThreadPoolTaskExecutor loggingTaskExecutor() {
@@ -27,9 +22,4 @@ public class LoggingConfig extends WebMvcConfigurerAdapter
         return pool;
     }
     
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(apiTransactionInterceptor).addPathPatterns("/v2/*");
-    }
-
 }
