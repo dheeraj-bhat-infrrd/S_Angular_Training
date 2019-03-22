@@ -34,12 +34,12 @@ public class BulkSaveToMongo extends BaseComputeBoltWithAck
 
     /** The queue holding tuples in a batch. */
 
-    protected LinkedBlockingQueue<Tuple> queue = new LinkedBlockingQueue<Tuple>();
+    protected LinkedBlockingQueue<Tuple> queue = new LinkedBlockingQueue<>();
 
     /** The threshold after which the batch should be flushed out. */
 
 
-    int batchSize = 100;
+    int batchSize = 20;
 
     /**
      *
@@ -58,7 +58,6 @@ public class BulkSaveToMongo extends BaseComputeBoltWithAck
     @Override public void executeTuple( Tuple tuple )
     {
         LOG.info("Executing bulk save to mongo bolt ... ");
-        //boolean success = tuple.getBooleanByField("isSuccess");
 
         if ( TupleUtils.isTick(tuple)) {
             // If so, it is indication for batch flush. But don't flush if
@@ -66,23 +65,20 @@ public class BulkSaveToMongo extends BaseComputeBoltWithAck
             // threshold
             // was crossed or because of another tick tuple
             if (System.currentTimeMillis() / 1000 - lastBatchProcessTimeSeconds >= batchIntervalInSec
-                && queue.size() > 0) {
-                LOG.info("Current queue size is " + queue.size() + ". But received tick tuple so executing the batch");
+                && !queue.isEmpty()) {
+                LOG.info("Current queue size is {}. But received tick tuple so executing the batch", queue.size());
                 finishBatch();
-
             } else
                 LOG.info(
                     "Current queue size is {}. Received tick tuple but last batch was executed  {}  seconds back that is less than {}  so ignoring the tick tuple",
                     queue.size(), System.currentTimeMillis() / 1000 - lastBatchProcessTimeSeconds,
                     batchIntervalInSec);
-
             // acking tick tuple
-
         } else {
             // Add the tuple to queue.
             queue.add(tuple);
             final int queueSize = queue.size();
-            LOG.info("current queue size is " + queueSize);
+            LOG.info("current queue size is {}", queueSize);
 
             if (queueSize >= batchSize) {
                 LOG.debug("Current queue size is >= {} executing the batch", batchSize);
@@ -96,14 +92,13 @@ public class BulkSaveToMongo extends BaseComputeBoltWithAck
     private void finishBatch()
     {
         FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
-        LOG.info("Finishing batch of size " + queue.size());
+        LOG.info("Finishing batch of size {}", queue.size());
         lastBatchProcessTimeSeconds = System.currentTimeMillis() / 1000;
         final List<SocialResponseObject> socialPosts = new ArrayList<>(  );
         Optional<List<BulkWriteErrorVO>> bulkWriteErrors = Optional.empty();
         final List<Tuple> tuples = new ArrayList<>();
         queue.drainTo(tuples);
         for(Tuple tuple : tuples){
-            long companyId = tuple.getLongByField("companyId");
             SocialResponseObject<?> socialPost = (SocialResponseObject<?>) tuple.getValueByField( "post" );
             if(socialPost != null){
                 socialPosts.add( socialPost );
@@ -111,7 +106,6 @@ public class BulkSaveToMongo extends BaseComputeBoltWithAck
         }
         try {
             bulkWriteErrors =  bulkInsertToMongo(socialPosts);
-
         } catch ( IOException | APIIntegrationException e ) {
             LOG.error("Exception occurred", e);
             for(int i=0; i< tuples.size(); i++) {
@@ -139,7 +133,7 @@ public class BulkSaveToMongo extends BaseComputeBoltWithAck
                     }
                 }
                 else {
-                    LOG.error( "Unhandled Exception while performing bulk inserts to mongo", error.getMessage() );
+                    LOG.error( "Unhandled Exception while performing bulk inserts to mongo {}", error.getMessage() );
                     LOG.warn( " Exception needs to be handled immediately " );
                 }
             }
