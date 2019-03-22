@@ -307,7 +307,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             .include( CREATED_TIME ).include( OWNER_NAME ).include( OWNER_EMAIL ).include( COMPANY_ID ).include( REGION_ID )
             .include( BRANCH_ID ).include( AGENT_ID ).include( PROFILE_TYPE ).include( HASH ).include( DUPLICATE_COUNT )
             .include( FOUND_KEYWORDS ).include( ACTION_HISTORY ).include( IS_RETRIED ).include( FROM_TRUSTED_SOURCE )
-            .include( POST_SOURCE ).include( IS_DUPLICATE ).include( MEDIA_TYPE );
+            .include( POST_SOURCE ).include( IS_DUPLICATE ).include( MEDIA_TYPE ).include( POST_ID );
 
         LOG.info( "Mongo query to  getAllSocialFeeds : {}", query.toString() );
         return mongoTemplate.find( query, SocialFeedResponse.class, SOCIAL_FEED_COLLECTION );
