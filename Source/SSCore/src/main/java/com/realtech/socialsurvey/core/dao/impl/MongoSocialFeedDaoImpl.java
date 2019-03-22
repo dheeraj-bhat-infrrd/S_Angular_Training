@@ -131,7 +131,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         // updatedDocsCount+originalPostsDuplicateCount
         if(updatedDocs.getN() > 0) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(" Updating duplicate count of post having hash = {} and id = {} ", true, hash, id);
+                LOG.debug(" Updating duplicate count of post having hash = {} and id = {} ", hash, id);
             }
             Query updateQuery = new Query().addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).
                 and( KEY_IDENTIFIER ).is( originalPostId ));
