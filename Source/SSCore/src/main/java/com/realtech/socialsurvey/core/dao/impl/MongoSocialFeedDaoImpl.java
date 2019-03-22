@@ -245,13 +245,11 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         //Common criteria
         if( isSocMonOnLoad ){
             criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ) );
-            query.withHint( CommonConstants.COMPANY_ID_INDEX_NAME );
         } else {
             if ( companyId != null ) {
                 criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ).andOperator(
                     ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ) ),
                     ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-                query.withHint( CommonConstants.COMPANY_ID_INDEX_NAME );
             }
             if ( regionIds != null && !regionIds.isEmpty() ) {
                 criterias.add( ( Criteria.where( CommonConstants.REGION_ID ).in( regionIds ).andOperator(
