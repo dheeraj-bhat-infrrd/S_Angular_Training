@@ -26,7 +26,7 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
         </rollingPolicy>
  
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>25MB</MaxFileSize>
+            <MaxFileSize>100MB</MaxFileSize>
         </triggeringPolicy>
  
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -40,7 +40,7 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <FileNamePattern>../standalone/log/sqllogfile.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
-            <MaxIndex>10</MaxIndex>
+            <MaxIndex>30</MaxIndex>
         </rollingPolicy>
  
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
