@@ -295,7 +295,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         if( isSocMonOnLoad ){
             criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ) );
         } else {
-            criterias.add( Criteria.where( FEED_TYPE ).in( feedtype ) );
+            criteria.and(  FEED_TYPE ).in(feedtype);
             if ( companyId != null ) {
                 criterias.add( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ).and( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ));
             }
@@ -313,24 +313,24 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
         //NEW and TRUSTED-SOURCE tab criteria
         if ( status.equalsIgnoreCase( SocialFeedStatus.NEW.toString() ) ) {
-            criteria.andOperator( ( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ).and( STATUS ).is( SocialFeedStatus.NEW )
-                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ));
+            criteria.and(FROM_TRUSTED_SOURCE ).is( fromTrustedSource );
+            criteria.orOperator( criterias.toArray( new Criteria[criterias.size()] ) );
+        }
+        //Stream, Alerts, Escalation, Resolved criteria
+        else if(!criterias.isEmpty() && isCompanySet){
+            criteria.orOperator(criterias.toArray( new Criteria[criterias.size()]));
+        } else {
+            criteria.and( CommonConstants.COMPANY_ID ).is( companyId );
         }
         
-        //Stream, Alerts, Escalation, Resolved criteria
-        else if(!criterias.isEmpty() && criterias != null && isCompanySet){
-            criteria.orOperator( ( Criteria.where( STATUS ).is( status.toUpperCase() )
-                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ) );
-        } else {
-            criteria.and( CommonConstants.COMPANY_ID ).is( companyId ).and( STATUS ).is( status );
-        }
+        criteria.and(STATUS ).is( status.toUpperCase() );
+        criteria.and( IS_DUPLICATE ).is( false );
 
         //Text search
         if ( searchText != null && !searchText.isEmpty() ) {
             criteria.and( TEXT ).regex( Pattern.compile( searchText.trim(), Pattern.CASE_INSENSITIVE ) );
         }
-
-        criteria.and( IS_DUPLICATE ).is( false );
+        
         return criteria;
     }
 
