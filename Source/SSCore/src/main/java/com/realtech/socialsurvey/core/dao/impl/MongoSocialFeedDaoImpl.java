@@ -297,8 +297,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         } else {
             criterias.add( Criteria.where( FEED_TYPE ).in( feedtype ) );
             if ( companyId != null ) {
-                criterias.add( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ));
-                criterias.add( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ));
+                criterias.add( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ).and( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ));
             }
             if ( regionIds != null && !regionIds.isEmpty() ) {
                 criterias.add( Criteria.where( CommonConstants.REGION_ID ).in( regionIds ));
