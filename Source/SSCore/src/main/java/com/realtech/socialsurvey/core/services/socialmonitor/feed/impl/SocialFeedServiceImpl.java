@@ -31,13 +31,16 @@ import com.realtech.socialsurvey.core.commons.MacrosComparator;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
 import com.realtech.socialsurvey.core.entities.ActionHistory;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlEntity;
 import com.realtech.socialsurvey.core.entities.SegmentsEntity;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
@@ -63,7 +66,6 @@ import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.realtech.socialsurvey.core.utils.JsoupHtmlToTextUtils;
@@ -84,7 +86,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
     MongoSocialFeedDao mongoSocialFeedDao;
     
     @Autowired
-    OrganizationManagementService organizationManagementService;
+    OrganizationUnitSettingsDao organizationUnitSettingsDao;
     
     @Autowired
     CompanyDao companyDao;
@@ -210,7 +212,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
     	Set<Long> regionIds = new HashSet<>();
     	Set<Long> branchIds = new HashSet<>();
     	Set<Long> agentIds = new HashSet<>();
-    	 List<OrganizationUnitSettings> organizationUnitSettings;
+    	 List<ProfileImageUrlEntity> profileImageUrlEntities;
     	for(SocialFeedResponse socialResponseObject : socialResponseObjects) {
     		if ( socialResponseObject.getProfileType().equals( ProfileType.COMPANY ) ) {
                 companyIds.add(socialResponseObject.getCompanyId());
@@ -224,32 +226,32 @@ public class SocialFeedServiceImpl implements SocialFeedService
     	}
     	
     	if(!companyIds.isEmpty()) {
-    		organizationUnitSettings = mongoSocialFeedDao.getAllProfileImageUrl(companyIds,  CommonConstants.COMPANY_SETTINGS_COLLECTION );
-    		profileUrlMap.putAll(createMap(organizationUnitSettings,ProfileType.COMPANY));
+    		profileImageUrlEntities = organizationUnitSettingsDao.getAllProfileImageUrl(companyIds,  CommonConstants.COMPANY_SETTINGS_COLLECTION );
+    		profileUrlMap.putAll(createMap(profileImageUrlEntities,ProfileType.COMPANY));
     	}
     	if(!regionIds.isEmpty()) {
-    		organizationUnitSettings = mongoSocialFeedDao.getAllProfileImageUrl(regionIds, CommonConstants.REGION_SETTINGS_COLLECTION);
-    		profileUrlMap.putAll(createMap(organizationUnitSettings, ProfileType.REGION));
+    		profileImageUrlEntities = organizationUnitSettingsDao.getAllProfileImageUrl(regionIds, CommonConstants.REGION_SETTINGS_COLLECTION);
+    		profileUrlMap.putAll(createMap(profileImageUrlEntities, ProfileType.REGION));
     	}
     	if(!branchIds.isEmpty()) {
-    		organizationUnitSettings = mongoSocialFeedDao.getAllProfileImageUrl(branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION);
-    		profileUrlMap.putAll(createMap(organizationUnitSettings, ProfileType.BRANCH));
+    		profileImageUrlEntities = organizationUnitSettingsDao.getAllProfileImageUrl(branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION);
+    		profileUrlMap.putAll(createMap(profileImageUrlEntities, ProfileType.BRANCH));
     	}
     	if(!agentIds.isEmpty()) {
-    		organizationUnitSettings = mongoSocialFeedDao.getAllProfileImageUrl(agentIds, CommonConstants.AGENT_SETTINGS_COLLECTION);
-    		profileUrlMap.putAll(createMap(organizationUnitSettings, ProfileType.AGENT));
+    		profileImageUrlEntities = organizationUnitSettingsDao.getAllProfileImageUrl(agentIds, CommonConstants.AGENT_SETTINGS_COLLECTION);
+    		profileUrlMap.putAll(createMap(profileImageUrlEntities, ProfileType.AGENT));
     	}
     	LOG.debug( "Finished fetching profile url's" );
     	return profileUrlMap;
     	
     }
 
-    private Map<String, String> createMap(List<OrganizationUnitSettings> organizationUnitSettings, ProfileType appendString){
+    private Map<String, String> createMap(List<ProfileImageUrlEntity> profileImageUrlEntities, ProfileType appendString){
     	Map<String, String> profileUrlMap = new HashMap<>();
-    	if(organizationUnitSettings != null && !organizationUnitSettings.isEmpty()) {
-    		for(OrganizationUnitSettings unitSetting : organizationUnitSettings) {
-    			profileUrlMap.put(createKey(appendString, unitSetting.getIden()), unitSetting.getProfileImageUrl());
-    			LOG.debug("Created map for ProfileType:{} , iden:{} for profileImageUrl : {}",appendString, unitSetting.getIden(), unitSetting.getProfileImageUrl());
+    	if(profileImageUrlEntities != null && !profileImageUrlEntities.isEmpty()) {
+    		for(ProfileImageUrlEntity profileImageUrlEntity : profileImageUrlEntities) {
+    			profileUrlMap.put(createKey(appendString, profileImageUrlEntity.getIden()), profileImageUrlEntity.getProfileImageUrl());
+    			LOG.debug("Created map for ProfileType:{} , iden:{} for profileImageUrl : {}",appendString, profileImageUrlEntity.getIden(), profileImageUrlEntity.getProfileImageUrl());
     		}
     	}
     	return profileUrlMap;
