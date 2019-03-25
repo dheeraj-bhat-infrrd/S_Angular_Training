@@ -239,7 +239,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         Query query = new Query();
         
 
-        Criteria criteria = createAetAllSocialFeedsCriteria( status, feedtype, companyId, regionIds, branchIds, agentIds, searchText, isCompanySet, fromTrustedSource, isSocMonOnLoad );
+        Criteria criteria = createGetAllSocialFeedsCriteria( status, feedtype, companyId, regionIds, branchIds, agentIds, searchText, isCompanySet, fromTrustedSource, isSocMonOnLoad );
 
         query.addCriteria( criteria );
         
@@ -271,7 +271,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     {
         LOG.debug( "Fetching All Social Feeds count" );
         Query query = new Query();
-        Criteria criteria = createAetAllSocialFeedsCriteria( status, feedtype, companyId, regionIds, branchIds, agentIds, searchText, isCompanySet, fromTrustedSource, isSocMonOnLoad );
+        Criteria criteria = createGetAllSocialFeedsCriteria( status, feedtype, companyId, regionIds, branchIds, agentIds, searchText, isCompanySet, fromTrustedSource, isSocMonOnLoad );
 
         query.addCriteria( criteria );
         
@@ -280,13 +280,12 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         return mongoTemplate.count( query, SOCIAL_FEED_COLLECTION );
     }
     
-    private Criteria createAetAllSocialFeedsCriteria(String status, List<String> feedtype, Long companyId, List<Long> regionIds,
+    private Criteria createGetAllSocialFeedsCriteria(String status, List<String> feedtype, Long companyId, List<Long> regionIds,
         List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet, boolean fromTrustedSource,
         boolean isSocMonOnLoad) {
         List<Criteria> criterias = new ArrayList<>();
         Criteria criteria = new Criteria();
 
-        //NEW/ALERT/ESCALATIONS/RESOLVED tab criteria
         if ( status == null || status.isEmpty() ) {
             status = SocialFeedStatus.NEW.toString();
         }
