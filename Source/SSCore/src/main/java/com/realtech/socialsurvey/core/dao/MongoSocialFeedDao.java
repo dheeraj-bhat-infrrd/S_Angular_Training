@@ -20,7 +20,7 @@ public interface MongoSocialFeedDao
 	public void updateMacroList(List<SocialMonitorMacro> socialMonitorMacros, long companyId);
 	
 
-    public List<SocialResponseObject> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
+    public List<SocialFeedResponse> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
         Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet,
         boolean fromTrustedSource, boolean isSocMonOnLoad );
 
@@ -110,11 +110,4 @@ public interface MongoSocialFeedDao
 	 * @param socialFeedCollection
 	 */
 	void insertSocialFeeds( List<SocialResponseObject<?>> socialFeeds, String socialFeedCollection );
-
-	/**
-	 * @param entityIds
-	 * @param collectionName
-	 * @return
-	 */
-	List<OrganizationUnitSettings> getAllProfileImageUrl(Set<Long> entityIds, String collectionName);
 }
