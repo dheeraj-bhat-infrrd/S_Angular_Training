@@ -477,6 +477,7 @@ public interface CommonConstants
     public static final String INSTAGRAM_SOCIAL_SITE = "instagram";
     public static final String TWITTER_BASE_URL = "www.twitter.com/";
     public static final String COMPANY_ID = "companyId";
+    public static final String COMPANY_ID_INDEX_NAME = "companyId_1";
     public static final String REGION_ID = "regionId";
     public static final String BRANCH_ID = "branchId";
     public static final String AGENT_ID = "agentId";

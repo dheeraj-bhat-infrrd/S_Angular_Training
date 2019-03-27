@@ -246,7 +246,8 @@
 	</div>
 </div>
 
-<div id="summit-ribbon-outer" class="summit-ribbon-outer">
+<c:if test='${vertical == "mortgage"}'>
+<div id="summit-ribbon-outer" class="summit-ribbon-outer hide">
 	<div id="summit-ribbon-body" class="summit-ribbon-body  cursor-pointer">
 		<div id="summit-ribbon-close-btn" class="summit-ribbon-close-btn cursor-pointer">x</div>
 	</div>
@@ -265,6 +266,7 @@
 		</div>
 	</div>
 </div>
+</c:if>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
@@ -498,7 +500,7 @@
 
 		hideOverlay();
 		
-		showSummitRibbon();
+		/* showSummitRibbon();
 		
 		var isShowSummitPopup ="${isShowSummitPopup}";
 		var newSession = sessionStorage.getItem("newSession");
@@ -514,6 +516,6 @@
 			}
 		}
 		
-		sessionStorage.setItem("newSession",false);
+		sessionStorage.setItem("newSession",false); */
 	});
 </script>

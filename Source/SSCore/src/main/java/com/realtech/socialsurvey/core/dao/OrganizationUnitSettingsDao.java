@@ -534,4 +534,11 @@ public interface OrganizationUnitSettingsDao
 	 */
 	public long fetchSEOUrlCount(String collectionName, String locationType, List<Long> excludedEntityIds);
 
+    /**
+     * Method to return list of profile images object for list of ids.
+     * @param entityIds
+     * @param collectionName
+     * @return
+     */
+    public List<ProfileImageUrlEntity> getAllProfileImageUrl( Set<Long> entityIds, String collectionName );
 }

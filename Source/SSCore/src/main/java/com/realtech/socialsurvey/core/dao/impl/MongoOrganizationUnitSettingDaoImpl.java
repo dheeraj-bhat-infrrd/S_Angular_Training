@@ -70,7 +70,10 @@ import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
 @Repository
 public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSettingsDao, InitializingBean
 {
+    
+    private static final Logger LOG = LoggerFactory.getLogger( MongoOrganizationUnitSettingDaoImpl.class );
 
+    private static final String ID = "_id";
     public static final String COMPANY_SETTINGS_COLLECTION = "COMPANY_SETTINGS";
     public static final String REGION_SETTINGS_COLLECTION = "REGION_SETTINGS";
     public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
@@ -247,7 +250,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
 
-    private static final Logger LOG = LoggerFactory.getLogger( MongoOrganizationUnitSettingDaoImpl.class );
+    
 
 
     @Autowired
@@ -368,7 +371,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Updating unit setting in " + collectionName + " with " + unitSettings + " for key: " + keyToUpdate
             + " wtih value: " + updatedRecord );
         Query query = new Query();
-        query.addCriteria( Criteria.where( "_id" ).is( unitSettings.getId() ) );
+        query.addCriteria( Criteria.where( ID ).is( unitSettings.getId() ) );
         Update update = new Update();
         update.set( keyToUpdate, updatedRecord );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
@@ -400,7 +403,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Updating unit setting in AGENT_SETTINGS with " + agentSettings + " for key: " + keyToUpdate
             + " wtih value: " + updatedRecord );
         Query query = new Query();
-        query.addCriteria( Criteria.where( "_id" ).is( agentSettings.getId() ) );
+        query.addCriteria( Criteria.where( ID ).is( agentSettings.getId() ) );
         Update update = new Update().set( keyToUpdate, updatedRecord );
         LOG.debug( "Updating the unit settings" );
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
@@ -604,7 +607,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).nin( excludedEntityIds ) );
-        query.fields().include( KEY_PROFILE_URL ).include( KEY_MODIFIED_ON ).exclude( "_id" );
+        query.fields().include( KEY_PROFILE_URL ).include( KEY_MODIFIED_ON ).exclude( ID );
         query.with( new Sort( Sort.Direction.DESC, KEY_MODIFIED_ON ) );
         if ( skipCount > 0 ) {
             query.skip( skipCount );
@@ -656,7 +659,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         List<FeedIngestionEntity> tokens = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true ) );
-        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( ID );
         if ( skipCount > 0 ) {
             query.skip( skipCount );
         }
@@ -685,7 +688,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             .include( KEY_TWITTER_ACCESS_TOKEN_SECRET )
 
             .include( KEY_LINKEDIN_ID ).include( KEY_LINKEDIN_PAGE_LINK ).include( KEY_LINKEDIN_ACCESS_TOKEN )
-            .include( KEY_IDENTIFIER ).exclude( "_id" )
+            .include( KEY_IDENTIFIER ).exclude( ID )
             .include( PROFILE_IMAGE_URL );
         tokens = mongoTemplate.find( query, SocialMediaTokenResponse.class, collectionName );
         LOG.debug( "Fetched {} items with social media tokens from {}", ( tokens != null ? tokens.size() : "none" ),
@@ -750,7 +753,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     {
         LOG.debug( "Method removeKeyInOrganizationSettings() started." );
         Query query = new Query();
-        query.addCriteria( Criteria.where( "_id" ).is( unitSettings.getId() ) );
+        query.addCriteria( Criteria.where( ID ).is( unitSettings.getId() ) );
         Update update = new Update().unset( keyToUpdate );
         LOG.debug( "Updating the unit settings" );
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
@@ -770,7 +773,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_VERTICAL ).is( verticalName ) );
         query.fields().include( KEY_LOGO ).include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_NAME ).include( KEY_VERTICAL )
-            .exclude( "_id" );
+            .exclude( ID );
 
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
 
@@ -786,7 +789,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         List<OrganizationUnitSettings> unitSettings = null;
         Query query = new Query();
         query.fields().include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_NAME ).include( KEY_VERTICAL ).include( KEY_IDEN )
-            .exclude( "_id" );
+            .exclude( ID );
         query.with( new Sort( Sort.Direction.DESC, KEY_MODIFIED_ON ) );
 
         LOG.debug( "query: " + query.toString() );
@@ -809,7 +812,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( companyIds ) );
         query.fields().include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_NAME ).include( KEY_VERTICAL ).include( KEY_IDEN )
-            .include( KEY_PROFILE_IMAGE ).exclude( "_id" );
+            .include( KEY_PROFILE_IMAGE ).exclude( ID );
 
         query.with( new Sort( Direction.ASC, KEY_CONTACT_NAME ) );
         LOG.debug( "Query: " + query.toString() );
@@ -828,7 +831,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         Pattern pattern = Pattern.compile( searchKey + ".*" );
         query.addCriteria( Criteria.where( KEY_CONTACT_NAME ).regex( pattern ) );
-        query.fields().include( KEY_CONTACT_DETAILS ).include( KEY_VERTICAL ).include( KEY_IDEN ).exclude( "_id" );
+        query.fields().include( KEY_CONTACT_DETAILS ).include( KEY_VERTICAL ).include( KEY_IDEN ).exclude( ID );
         query.with( new Sort( Sort.Direction.DESC, KEY_MODIFIED_ON ) );
 
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
@@ -1214,7 +1217,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_ZILLOW_SOCIAL_MEDIA_TOKEN ).exists( true ) );
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( identifiers ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( KEY_SURVEY_SETTINGS )
-            .include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_URL ).exclude( "_id" );
+            .include( KEY_CONTACT_DETAILS ).include( KEY_PROFILE_URL ).exclude( ID );
         settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
         LOG.debug( "Fetched " + ( settings != null ? settings.size() : "none" ) + " items with social media tokens from "
             + collectionName );
@@ -1228,7 +1231,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Getting social media tokens for id: " + iden + " for collection " + collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
-        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).exclude( "_id" );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).exclude( ID );
         FeedIngestionEntity feedIngestionEntity = mongoTemplate.findOne( query, FeedIngestionEntity.class, collectionName );
         
         SocialMediaTokens socialMediaTokens = null;
@@ -1259,7 +1262,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( criteria );
 
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( KEY_CONTACT_DETAILS )
-            .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
+            .include( KEY_CONTACT_DETAILS ).exclude( ID );
 
         settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
         LOG.debug( "Fetched " + ( settings != null ? settings.size() : "none" )
@@ -1298,7 +1301,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER )
-            .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
+            .include( KEY_CONTACT_DETAILS ).exclude( ID );
 
         if ( skipCount > 0 ) {
             query.skip( skipCount );
@@ -1318,7 +1321,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true ) );
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
-        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( ID );
         return mongoTemplate.count( query, collectionName );
     }
     
@@ -1755,7 +1758,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.fields().include( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).include( KEY_IDENTIFIER ).include( KEY_CONTACT_DETAILS )
-            .include( KEY_FBREVIEW_LASTFETCHED ).exclude( "_id" );
+            .include( KEY_FBREVIEW_LASTFETCHED ).exclude( ID );
 
         if ( skipCount > 0 ) {
             query.skip( skipCount );
@@ -1783,7 +1786,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).exists( true ) );
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
-        query.fields().include( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).include( KEY_IDENTIFIER ).exclude( "_id" );
+        query.fields().include( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).include( KEY_IDENTIFIER ).exclude( ID );
         return mongoTemplate.count( query, collectionName );
     }
 
@@ -1794,7 +1797,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDEN  ).is( iden ));
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_LASTFETCHED ).exists( true )  );
-        query.fields().include( KEY_SOCIAL_MEDIA_LASTFETCHED ).exclude( "_id" );
+        query.fields().include( KEY_SOCIAL_MEDIA_LASTFETCHED ).exclude( ID );
         return mongoTemplate.findOne( query, OrganizationUnitSettings.class,collection );
 
     }
@@ -2394,13 +2397,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			if(locationType.equals("city")) {
 				obj.put("state", "$" + getLocationType("state"));
 				operations.add(new CustomAggregationOperation(new BasicDBObject( "$group",
-			            new BasicDBObject( "_id", obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
+			            new BasicDBObject( ID, obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
 			            .append("vertical", new BasicDBObject("$first" , "$" + KEY_VERTICAL))
 			            .append("state", new BasicDBObject("$first" , "$" + getLocationType("state")))
 			            .append( "count", new BasicDBObject( "$sum", 1 ) ) )));
 			} else {
 				operations.add(new CustomAggregationOperation(new BasicDBObject( "$group",
-			            new BasicDBObject( "_id", obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
+			            new BasicDBObject( ID, obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
 			            .append("vertical", new BasicDBObject("$first" , "$" + KEY_VERTICAL))
 			            .append( "count", new BasicDBObject( "$sum", 1 ) ) )));
 			}
@@ -2472,13 +2475,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			if(locationType.equals("city")) {
 				obj.put("state", "$" + getLocationType("state"));
 				operations.add(new CustomAggregationOperation(new BasicDBObject( "$group",
-			            new BasicDBObject( "_id", obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
+			            new BasicDBObject( ID, obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
 			            .append("vertical", new BasicDBObject("$first" , "$" + KEY_VERTICAL))
 			            .append("state", new BasicDBObject("$first" , "$" + getLocationType("state")))
 			            .append( "count", new BasicDBObject( "$sum", 1 ) ) )));
 			} else {
 				operations.add(new CustomAggregationOperation(new BasicDBObject( "$group",
-			            new BasicDBObject( "_id", obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
+			            new BasicDBObject( ID, obj).append("location", new BasicDBObject("$first","$" + getLocationType(locationType)))
 			            .append("vertical", new BasicDBObject("$first" , "$" + KEY_VERTICAL))
 			            .append( "count", new BasicDBObject( "$sum", 1 ) ) )));
 			}
@@ -2573,5 +2576,16 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         }
 
         LOG.debug( "updateOrganizationSettingsByQuery finished" );
+    }
+    
+    @Override
+    public List<ProfileImageUrlEntity> getAllProfileImageUrl( Set<Long> entityIds, String collectionName )
+    {
+        LOG.debug("Fetching profile image for id {} with profileType {}", entityIds, collectionName);
+        Query query = new  Query();
+        query.addCriteria(Criteria.where(KEY_IDEN).in(entityIds));
+        query.fields().exclude( ID ).include(PROFILE_IMAGE_URL).include(KEY_IDEN);
+        return mongoTemplate.find( query, ProfileImageUrlEntity.class, collectionName );
+
     }
 }

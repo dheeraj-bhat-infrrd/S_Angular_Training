@@ -1,11 +1,14 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import com.mongodb.WriteResult;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.enums.ProfileType;
-import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -18,14 +21,24 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import com.mongodb.WriteResult;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
+import com.realtech.socialsurvey.core.entities.ActionHistory;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialFeedResponse;
+import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
+import com.realtech.socialsurvey.core.enums.ProfileType;
+import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 
 
 @Repository
 public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingBean
 {
 
+   
     private static final Logger LOG = LoggerFactory.getLogger( MongoSocialFeedDaoImpl.class );
 
     @Autowired
@@ -60,6 +73,20 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     public static final String IS_DUPLICATE = "isDuplicate";
     public static final String BEGIN_REGEX = "^";
     public static final String END_REGEX = "$";
+    
+    private static final String MEDIA_TYPE = "mediaType";
+    private static final String IS_RETRIED = "isRetried";
+    private static final String PROFILE_TYPE = "profileType";
+    private static final String AGENT_ID = "agentId";
+    private static final String BRANCH_ID = "branchId";
+    private static final String REGION_ID = "regionId";
+    private static final String OWNER_EMAIL = "ownerEmail";
+    private static final String OWNER_NAME = "ownerName";
+    private static final String POST_LINK = "postLink";
+    private static final String PAGE_LINK = "pageLink";
+    private static final String TEXT_HIGHLIGHTED = "textHighlighted";
+
+    private static final String MEDIA_ENTITIES = "mediaEntities";
 
     @Override
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName )
@@ -107,7 +134,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         // updatedDocsCount+originalPostsDuplicateCount
         if(updatedDocs.getN() > 0) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(" Updating duplicate count of post having hash = {} and id = {} ", true, hash, id);
+                LOG.debug(" Updating duplicate count of post having hash = {} and id = {} ", hash, id);
             }
             Query updateQuery = new Query().addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).
                 and( KEY_IDENTIFIER ).is( originalPostId ));
@@ -204,70 +231,18 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
 
     @Override
-    public List<SocialResponseObject> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
+    public List<SocialFeedResponse> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
         Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText,
         boolean isCompanySet, boolean fromTrustedSource, boolean isSocMonOnLoad )
     {
         LOG.debug( "Fetching All Social Feeds" );
         Query query = new Query();
-        List<Criteria> criterias = new ArrayList<>();
-        Criteria criteria = new Criteria();
-
-        //NEW/ALERT/ESCALATIONS/RESOLVED tab criteria
-        if ( status == null || status.isEmpty() ) {
-            status = SocialFeedStatus.NEW.toString();
-        }
-
-        //Common criteria
-        if( isSocMonOnLoad ){
-            criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ) );
-        } else {
-            if ( companyId != null ) {
-                criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ).andOperator(
-                    ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ) ),
-                    ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-            }
-            if ( regionIds != null && !regionIds.isEmpty() ) {
-                criterias.add( ( Criteria.where( CommonConstants.REGION_ID ).in( regionIds ).andOperator(
-                    ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.REGION ) ),
-                    ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-            }
-            if ( branchIds != null && !branchIds.isEmpty() ) {
-                criterias.add( ( Criteria.where( CommonConstants.BRANCH_ID ).in( branchIds ).andOperator(
-                    ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.BRANCH ) ),
-                    ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-            }
-            if ( agentIds != null && !agentIds.isEmpty() ) {
-                criterias.add( ( Criteria.where( CommonConstants.AGENT_ID ).in( agentIds ).andOperator(
-                    ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.AGENT ) ),
-                    ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
-            }
-        }
-
-
-        //NEW and TRUSTED-SOURCE tab criteria
-        if ( status.equalsIgnoreCase( SocialFeedStatus.NEW.toString() ) ) {
-            //criterias.add( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
-            criteria.andOperator( ( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ).and( STATUS ).is( SocialFeedStatus.NEW )
-                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ));
-        }
         
-        //Stream, Alerts, Escalation, Resolved criteria
-        else if(!criterias.isEmpty() && criterias != null && isCompanySet){
-            criteria.orOperator( ( Criteria.where( STATUS ).is( status.toUpperCase() )
-                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ) );
-        } else {
-            criteria.and( CommonConstants.COMPANY_ID ).is( companyId ).and( STATUS ).is( status );
-        }
 
-        //Text search
-        if ( searchText != null && !searchText.isEmpty() ) {
-            criteria.and( TEXT ).regex( Pattern.compile( searchText.trim(), Pattern.CASE_INSENSITIVE ) );
-        }
+        Criteria criteria = createGetAllSocialFeedsCriteria( status, feedtype, companyId, regionIds, branchIds, agentIds, searchText, isCompanySet, fromTrustedSource, isSocMonOnLoad );
 
-        //Exclude duplicate posts
-        query.addCriteria( criteria.and( IS_DUPLICATE ).is( false ) );
-
+        query.addCriteria( criteria );
+        
         //Sort all posts
         query.with( new Sort( Sort.Direction.DESC, UPDATED_TIME ) );
 
@@ -277,9 +252,16 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         if ( limit > -1 ) {
             query.limit( limit );
         }
+        
+        query.fields().include( FEED_TYPE ).include( STATUS ).include( TEXT ).include( MEDIA_ENTITIES )
+            .include( TEXT_HIGHLIGHTED ).include( PAGE_LINK ).include( POST_LINK ).include( UPDATED_TIME )
+            .include( CREATED_TIME ).include( OWNER_NAME ).include( OWNER_EMAIL ).include( COMPANY_ID ).include( REGION_ID )
+            .include( BRANCH_ID ).include( AGENT_ID ).include( PROFILE_TYPE ).include( HASH ).include( DUPLICATE_COUNT )
+            .include( FOUND_KEYWORDS ).include( ACTION_HISTORY ).include( IS_RETRIED ).include( FROM_TRUSTED_SOURCE )
+            .include( POST_SOURCE ).include( IS_DUPLICATE ).include( MEDIA_TYPE ).include( POST_ID );
 
         LOG.info( "Mongo query to  getAllSocialFeeds : {}", query.toString() );
-        return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        return mongoTemplate.find( query, SocialFeedResponse.class, SOCIAL_FEED_COLLECTION );
     }
 
     @Override
@@ -289,10 +271,21 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     {
         LOG.debug( "Fetching All Social Feeds count" );
         Query query = new Query();
+        Criteria criteria = createGetAllSocialFeedsCriteria( status, feedtype, companyId, regionIds, branchIds, agentIds, searchText, isCompanySet, fromTrustedSource, isSocMonOnLoad );
+
+        query.addCriteria( criteria );
+        
+        query.fields().include( POST_ID );
+
+        return mongoTemplate.count( query, SOCIAL_FEED_COLLECTION );
+    }
+    
+    private Criteria createGetAllSocialFeedsCriteria(String status, List<String> feedtype, Long companyId, List<Long> regionIds,
+        List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet, boolean fromTrustedSource,
+        boolean isSocMonOnLoad) {
         List<Criteria> criterias = new ArrayList<>();
         Criteria criteria = new Criteria();
 
-        //NEW/ALERT/ESCALATIONS/RESOLVED tab criteria
         if ( status == null || status.isEmpty() ) {
             status = SocialFeedStatus.NEW.toString();
         }
@@ -301,52 +294,43 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         if( isSocMonOnLoad ){
             criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ) ) );
         } else {
+            criteria.and(  FEED_TYPE ).in(feedtype);
             if ( companyId != null ) {
-                criterias.add( ( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId )
-                    .andOperator( ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ) ),
-                        ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+                criterias.add( Criteria.where( CommonConstants.COMPANY_ID ).is( companyId ).and( CommonConstants.PROFILE_TYPE ).is( ProfileType.COMPANY ));
             }
             if ( regionIds != null && !regionIds.isEmpty() ) {
-                criterias.add( ( Criteria.where( CommonConstants.REGION_ID ).in( regionIds )
-                    .andOperator( ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.REGION ) ),
-                        ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+                criterias.add( Criteria.where( CommonConstants.REGION_ID ).in( regionIds ));
             }
             if ( branchIds != null && !branchIds.isEmpty() ) {
-                criterias.add( ( Criteria.where( CommonConstants.BRANCH_ID ).in( branchIds )
-                    .andOperator( ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.BRANCH ) ),
-                        ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+                criterias.add( Criteria.where( CommonConstants.BRANCH_ID ).in( branchIds ));
             }
             if ( agentIds != null && !agentIds.isEmpty() ) {
-                criterias.add( ( Criteria.where( CommonConstants.AGENT_ID ).in( agentIds )
-                    .andOperator( ( Criteria.where( CommonConstants.PROFILE_TYPE ).is( ProfileType.AGENT ) ),
-                        ( Criteria.where( FEED_TYPE ).in( feedtype ) ) ) ) );
+                criterias.add(Criteria.where( CommonConstants.AGENT_ID ).in( agentIds ));
             }
         }
 
+
         //NEW and TRUSTED-SOURCE tab criteria
         if ( status.equalsIgnoreCase( SocialFeedStatus.NEW.toString() ) ) {
-            //criterias.add( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
-            criteria.andOperator( ( Criteria.where( FROM_TRUSTED_SOURCE )
-                .is( fromTrustedSource ).and( STATUS ).is( SocialFeedStatus.NEW )
-                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ));
+            criteria.and(FROM_TRUSTED_SOURCE ).is( fromTrustedSource );
+            criteria.orOperator( criterias.toArray( new Criteria[criterias.size()] ) );
         }
         //Stream, Alerts, Escalation, Resolved criteria
-        else if(!criterias.isEmpty() && criterias != null && isCompanySet){
-            criteria.orOperator( ( Criteria.where( STATUS ).is( status.toUpperCase() )
-                .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) ) );
+        else if(!criterias.isEmpty() && isCompanySet){
+            criteria.orOperator(criterias.toArray( new Criteria[criterias.size()]));
         } else {
-            criteria.and( CommonConstants.COMPANY_ID ).is( companyId ).and( STATUS ).is( status );
+            criteria.and( CommonConstants.COMPANY_ID ).is( companyId );
         }
+        
+        criteria.and(STATUS ).is( status.toUpperCase() );
+        criteria.and( IS_DUPLICATE ).is( false );
 
         //Text search
         if ( searchText != null && !searchText.isEmpty() ) {
             criteria.and( TEXT ).regex( Pattern.compile( searchText.trim(), Pattern.CASE_INSENSITIVE ) );
         }
-
-        //Exclude duplicate posts
-        query.addCriteria( criteria.and( IS_DUPLICATE ).is( false ) );
-
-        return mongoTemplate.count( query, SOCIAL_FEED_COLLECTION );
+        
+        return criteria;
     }
 
     @Override
@@ -647,15 +631,6 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     }
 
 
-    @Override
-    public List<OrganizationUnitSettings> getAllProfileImageUrl( Set<Long> entityIds, String collectionName )
-    {
-        LOG.debug("Fetching profile image for id {} with profileType {}", entityIds, collectionName);
-        Query query = new  Query();
-        query.addCriteria(Criteria.where(IDEN).in(entityIds));
-        query.fields().exclude( KEY_IDENTIFIER ).include(PROFILE_IMAGE_URL).include(IDEN);
-        return mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
-
-    }
+    
 
 }

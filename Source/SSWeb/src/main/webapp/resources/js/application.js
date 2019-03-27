@@ -168,6 +168,8 @@ var customeField3;
 var customeField4;
 var customeField5;
 
+// Social Monitor setting
+var SOCIAL_MONITOR_PAGE_SIZE = 25;
 
 var dangerGraphWrapper = '<div class="dash-stats-wrapper bord-bot-dc clearfix trans-monitor-wrapper">'
 						+'<div class="trans-monitor-sub-header-danger">'
@@ -18104,7 +18106,7 @@ var dupContainer;
 var lastgetStreamPostRequestToDelete=null;
 function getStreamPosts(startIndex,status,text){
 	
-	var batchSize = 50;
+	var batchSize = SOCIAL_MONITOR_PAGE_SIZE;
 	showDashOverlay('#stream-dash');
 	if(status == undefined){
 		status = 'none';
@@ -18253,7 +18255,7 @@ function drawPaginationForSocialMonitor(count,startIndex,batchSize){
 		$('#stream-next-page-bottom').addClass('hide');
 	}
 	
-	if(startIndex < count-(count%50) && count > batchSize){
+	if(startIndex < count-(count%SOCIAL_MONITOR_PAGE_SIZE) && count > batchSize){
 		$('#stream-end-page-active').removeClass('hide');
 		$('#stream-end-page').addClass('hide');
 		$('#stream-end-page-active-bottom').removeClass('hide');
@@ -18292,8 +18294,8 @@ function drawPaginationForSocialMonitor(count,startIndex,batchSize){
 	
 	$('#stream-item-count').html(count);
 	$('#stream-item-count-bottom').html(count);
-	var pageCount = Math.ceil(count/50);
-	var pageNo = (startIndex/50)+1;
+	var pageCount = Math.ceil(count/SOCIAL_MONITOR_PAGE_SIZE);
+	var pageNo = (startIndex/SOCIAL_MONITOR_PAGE_SIZE)+1;
 	$('#stream-page-count').html(pageCount);
 	$('#stream-page-no').html(pageNo);
 	$('#stream-page-count-bottom').html(pageCount);
@@ -18324,7 +18326,7 @@ $(document).on('click','#stream-prev-page-active',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var startIndex = $('#stream-pagination').data('startIndex') - 50;
+	var startIndex = $('#stream-pagination').data('startIndex') - SOCIAL_MONITOR_PAGE_SIZE;
 	var text = $('#search-post').val();
 	
 	getStreamPosts(startIndex, status, text);
@@ -18338,7 +18340,7 @@ $(document).on('click','#stream-next-page-active',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var startIndex = $('#stream-pagination').data('startIndex') + 50;
+	var startIndex = $('#stream-pagination').data('startIndex') + SOCIAL_MONITOR_PAGE_SIZE;
 	var text = $('#search-post').val();
 	
 	getStreamPosts(startIndex, status, text);
@@ -18353,11 +18355,11 @@ $(document).on('click','#stream-end-page-active',function(e){
 	
 	var status = $('#stream-tabs').data('status');
 	var startIndex = $('#stream-pagination').data('startIndex');
-	var pageNo = (startIndex/50)+1;
+	var pageNo = (startIndex/SOCIAL_MONITOR_PAGE_SIZE)+1;
 	var count = $('#stream-pagination').data('count');
-	startIndex = count-(count%50);
-	if(count%50 == 0){
-		startIndex-=50;
+	startIndex = count-(count%SOCIAL_MONITOR_PAGE_SIZE);
+	if(count%SOCIAL_MONITOR_PAGE_SIZE == 0){
+		startIndex-=SOCIAL_MONITOR_PAGE_SIZE;
 	}
 	var text = $('#search-post').val();
 	
@@ -18386,7 +18388,7 @@ $(document).on('click','#stream-prev-page-active-bottom',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var startIndex = $('#stream-pagination').data('startIndex') - 50;
+	var startIndex = $('#stream-pagination').data('startIndex') - SOCIAL_MONITOR_PAGE_SIZE;
 	var text = $('#search-post').val();
 	
 	getStreamPosts(startIndex, status, text);
@@ -18401,7 +18403,7 @@ $(document).on('click','#stream-next-page-active-bottom',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var startIndex = $('#stream-pagination').data('startIndex') + 50;
+	var startIndex = $('#stream-pagination').data('startIndex') + SOCIAL_MONITOR_PAGE_SIZE;
 	var text = $('#search-post').val();
 	
 	getStreamPosts(startIndex, status, text);
@@ -18416,11 +18418,11 @@ $(document).on('click','#stream-end-page-active-bottom',function(e){
 	
 	var status = $('#stream-tabs').data('status');
 	var startIndex = $('#stream-pagination').data('startIndex');
-	var pageNo = (startIndex/50)+1;
+	var pageNo = (startIndex/SOCIAL_MONITOR_PAGE_SIZE)+1;
 	var count = $('#stream-pagination').data('count');
-	startIndex = count-(count%50);
-	if(count%50 == 0){
-		startIndex-=50;
+	startIndex = count-(count%SOCIAL_MONITOR_PAGE_SIZE);
+	if(count%SOCIAL_MONITOR_PAGE_SIZE == 0){
+		startIndex-=SOCIAL_MONITOR_PAGE_SIZE;
 	}
 	var text = $('#search-post').val();
 	
@@ -21584,10 +21586,10 @@ function drawDuplicatePopupDetails(postDetails,mainPostId){
 function paginateSocialMonitor() {
 	var pageNo = parseInt($('#sel-page-soc-mon').val());
 	var startIndex = 0;
-	var batchSize = 50;
+	var batchSize = SOCIAL_MONITOR_PAGE_SIZE;
 	startIndex = parseInt(pageNo - 1) * batchSize;
 	var totalCount = parseInt($('#stream-pagination').data('count'));
-	var pageCount = Math.ceil(totalCount/50);
+	var pageCount = Math.ceil(totalCount/SOCIAL_MONITOR_PAGE_SIZE);
 	//Set bottom count to the same value
 	$('#sel-page-soc-mon-bottom').val(pageNo);
 	
@@ -21609,10 +21611,10 @@ function paginateSocialMonitor() {
 function paginateSocialMonitorBottom() {
 	var pageNo = parseInt($('#sel-page-soc-mon-bottom').val());
 	var startIndex = 0;
-	var batchSize = 50;
+	var batchSize = SOCIAL_MONITOR_PAGE_SIZE;
 	startIndex = parseInt(pageNo - 1) * batchSize;
 	var totalCount = parseInt($('#stream-pagination-bottom').data('count'));
-	var pageCount = Math.ceil(totalCount/50);
+	var pageCount = Math.ceil(totalCount/SOCIAL_MONITOR_PAGE_SIZE);
 	//Set top count to the same value
 	$('#sel-page-soc-mon').val(pageNo);
 	

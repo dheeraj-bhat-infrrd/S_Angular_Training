@@ -32,7 +32,6 @@ import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.ApiRequestDetails;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -3289,14 +3288,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.debug( "Method to avg score of surveys, getFilteredSurveyAvgScore() finished." );
         return avgScore;
 
-    }
-
-    @Override
-    public void insertApiRequestDetails( ApiRequestDetails apiRequestDetails )
-    {
-        LOG.debug( "Method started insertApiRequestDetails started." );
-        mongoTemplate.insert( apiRequestDetails, API_REQUEST_DETAILS );
-        LOG.debug( "Method started insertApiRequestDetails finished." );
     }
 
 
