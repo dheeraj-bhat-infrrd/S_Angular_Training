@@ -2588,5 +2588,4 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         return mongoTemplate.find( query, ProfileImageUrlEntity.class, collectionName );
 
     }
-    
 }

@@ -171,7 +171,6 @@ var customeField5;
 // Social Monitor setting
 var SOCIAL_MONITOR_PAGE_SIZE = 25;
 
-
 var dangerGraphWrapper = '<div class="dash-stats-wrapper bord-bot-dc clearfix trans-monitor-wrapper">'
 						+'<div class="trans-monitor-sub-header-danger">'
 						+'<div class="trans-monitor-sub-header-box-danger"></div>'
@@ -22486,3 +22485,40 @@ $('body').on('blur', '#enc-alert-mail-recipients', function() {
 	}, payload, true);
 	
 });
+
+function checkImgForProfile(ele){
+	var realWidth = 0;
+	var realHeight = 0;
+	var profiImg = document.querySelector('#prof-image-edit');
+	
+	if (Modernizr.canvas) {
+		realWidth = profiImg.naturalWidth;
+		realHeight = profiImg.naturalHeight;
+	} else {
+		realWidth = $(ele).width;
+		realHeight = $(ele).height;
+	}
+	
+	if(realWidth != realHeight){
+		$('.ss-prof-img-fix-popup').show();
+		initiatePopupForImgFix();
+		
+		$(document).on('click','.ss-prof-img-fix-popup-close-btn',function(e){
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			e.stopPropagation();
+			
+			$('.ss-prof-img-fix-popup').hide();
+			$('.ss-prof-img-popup-cropper').html('');
+		});
+
+		$(document).on('click','.ss-prof-img-popup-cancel',function(e){
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			e.stopPropagation();
+			
+			$('.ss-prof-img-fix-popup').hide();
+			$('.ss-prof-img-popup-cropper').html('');
+		});
+	}
+}

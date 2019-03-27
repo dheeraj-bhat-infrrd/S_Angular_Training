@@ -62,7 +62,7 @@
 <input type="hidden"  id="reporting-data-div" data-profile-master-id="${profilemasterid}" data-user-id="${userId}" data-column-name="${columnName}" data-column-value="${columnValue}">
 <div id="rep-prof-container" data-profile-master-id="${profilemasterid}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
-			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
+			data-column-value="${columnValue}" data-prof-name="${profileSettings.profileName}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
 			<div id="top-dash" class="hide" ></div>
 </div>
 <div>
@@ -221,6 +221,24 @@
 	</div>
 </div> --%>
 
+<div class="ss-prof-img-fix-popup" style="display:none">
+	<div class="ss-prof-img-fix-popup-body">
+		<div class="ss-prof-img-popup-close-cont">
+			<div class="ss-prof-img-fix-popup-close-btn cursor-pointer">x</div>
+		</div>
+		<div class="ss-prof-img-popup-note">
+			The profile image uploaded on your profile is of the wrong size. This may affect few of the design in the website. Please crop the image to avoid this issue
+		</div>
+		<div class="ss-prof-img-popup-cropper">
+		
+		</div>
+		<div class="ss-prof-img-popup-btn-cont">
+			<div class="ss-prof-img-popup-confirm ss-prof-img-popup-btn">Confirm</div>
+			<div class="ss-prof-img-popup-cancel ss-prof-img-popup-btn">Cancel</div>
+		</div>
+	</div>
+</div>
+
 <div id="linkedin-api-v2-update-ribbon-outer" class="linkedin-api-v2-update-ribbon-outer">
 	<div id="linkedin-api-v2-update-ribbon-body" class="linkedin-api-v2-update-ribbon-body  cursor-pointer">
 		<span class="margin-left-auto">Linkedin integration is changing and your existing connection will stop working starting March 1st. To continue using Linkedin with SocialSurvey, please <a onclick="openAuthPage(event,'linkedinV2', false, this);" data-link="${linkedinLink}">&nbsp;click here&nbsp;</a> and update your Linkedin connection</span>
@@ -228,26 +246,29 @@
 	</div>
 </div>
 
-<c:if test='${vertical == "mortgage"}'>
-<div id="summit-ribbon-outer" class="summit-ribbon-outer">
-	<div id="summit-ribbon-body" class="summit-ribbon-body  cursor-pointer">
-		<div id="summit-ribbon-close-btn" class="summit-ribbon-close-btn cursor-pointer">x</div>
-	</div>
-</div>
-
-<div id="summit-popup-outer" class="summit-popup-outer hide">
-	<div id="summit-popup-body" class="summit-popup-body cursor-pointer">
-		<div class="summit-popup-close-cont">
-			<div id="summit-popup-close-btn" class="summit-popup-close-btn cursor-pointer">x</div>
-		</div>
-		<div class="summit-checkbox-cont clearfix">
-			<div class="float-left wc-width summit-check-contain" id="">
-				<div id="summit-do-not-show" class="float-left summit-check" data-checked=false></div>
-	     		<div class="float-left wc-dashboard-text summit-check-text">Do not show this again</div>
+<c:set var="hideBannerAndPopup" value="true"/>
+<c:if test="${hideBannerAndPopup == 'false' or hideBannerAndPopup == false }">
+	<c:if test='${vertical == "mortgage"}'>
+		<div id="summit-ribbon-outer" class="summit-ribbon-outer hide">
+			<div id="summit-ribbon-body" class="summit-ribbon-body  cursor-pointer">
+				<div id="summit-ribbon-close-btn" class="summit-ribbon-close-btn cursor-pointer">x</div>
 			</div>
 		</div>
-	</div>
-</div>
+		
+		<div id="summit-popup-outer" class="summit-popup-outer hide">
+			<div id="summit-popup-body" class="summit-popup-body cursor-pointer">
+				<div class="summit-popup-close-cont">
+					<div id="summit-popup-close-btn" class="summit-popup-close-btn cursor-pointer">x</div>
+				</div>
+				<div class="summit-checkbox-cont clearfix">
+					<div class="float-left wc-width summit-check-contain" id="">
+						<div id="summit-do-not-show" class="float-left summit-check" data-checked=false></div>
+			     		<div class="float-left wc-dashboard-text summit-check-text">Do not show this again</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</c:if>
 </c:if>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
@@ -482,7 +503,7 @@
 
 		hideOverlay();
 		
-		showSummitRibbon();
+		/* showSummitRibbon();
 		
 		var isShowSummitPopup ="${isShowSummitPopup}";
 		var newSession = sessionStorage.getItem("newSession");
@@ -498,6 +519,6 @@
 			}
 		}
 		
-		sessionStorage.setItem("newSession",false);
+		sessionStorage.setItem("newSession",false); */
 	});
 </script>
