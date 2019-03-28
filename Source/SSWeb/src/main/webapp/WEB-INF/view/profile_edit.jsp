@@ -33,8 +33,9 @@
 	<c:if test="${not empty socialMediaTokens.twitterToken && not empty socialMediaTokens.twitterToken.twitterPageLink}">
 		<c:set value="${socialMediaTokens.twitterToken.twitterPageLink}" var="twtLink"></c:set>
 	</c:if>
-	<c:if test="${not empty socialMediaTokens.linkedInToken && not empty socialMediaTokens.linkedInToken.linkedInPageLink}">
-		<c:set value="${socialMediaTokens.linkedInToken.linkedInPageLink}" var="lnLink"></c:set>
+	<c:if test="${not empty socialMediaTokens.linkedInV2Token && not empty socialMediaTokens.linkedInV2Token.linkedInAccessToken}">
+		<c:set value="${socialMediaTokens.linkedInV2Token.linkedInPageLink}" var="lnLink"></c:set>
+		<c:set value="true" var="linkedinConnected"></c:set>
 	</c:if>
 	<c:if test="${not empty socialMediaTokens.googleToken && not empty socialMediaTokens.googleToken.profileLink}">
 		<c:set value="${socialMediaTokens.googleToken.profileLink}" var="googleLink"></c:set>

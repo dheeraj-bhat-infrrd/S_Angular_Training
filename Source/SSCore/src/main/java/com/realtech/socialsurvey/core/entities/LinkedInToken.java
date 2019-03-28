@@ -9,7 +9,6 @@ public class LinkedInToken
     private String linkedInId;
     private String linkedInPageLink;
     private String linkedInAccessToken;
-    // private String linkedInAccessTokenSecret;
     private long linkedInAccessTokenCreatedOn;
     private long linkedInAccessTokenExpiresIn;
 
@@ -55,15 +54,6 @@ public class LinkedInToken
     {
         this.linkedInPageLink = linkedInPageLink;
     }
-
-
-    /*public String getLinkedInAccessTokenSecret() {
-    	return linkedInAccessTokenSecret;
-    }
-    
-    public void setLinkedInAccessTokenSecret(String linkedInAccessTokenSecret) {
-    	this.linkedInAccessTokenSecret = linkedInAccessTokenSecret;
-    }*/
 
     public long getLinkedInAccessTokenCreatedOn()
     {

@@ -7330,7 +7330,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Twitter is not set" );
             }
-            if ( unitSettings.getSocialMediaTokens().getLinkedInToken() != null ) {
+            if ( unitSettings.getSocialMediaTokens().getLinkedInV2Token() != null ) {
                 LOG.debug( "Linkedin is set" );
                 setterValue = setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf(factor) ) );
 
@@ -7812,7 +7812,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Twitter is not set" );
             }
-            if ( regionSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
+            if ( regionSetting.getSocialMediaTokens().getLinkedInV2Token() != null ) {
                 LOG.debug( "Linkedin is set" );
                 setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
 
@@ -7955,7 +7955,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Twitter is not set" );
             }
-            if ( regionSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
+            if ( regionSetting.getSocialMediaTokens().getLinkedInV2Token() != null ) {
                 LOG.debug( "Linkedin is set" );
                 setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
 
@@ -8084,7 +8084,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Twitter is not set" );
             }
-            if ( branchSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
+            if ( branchSetting.getSocialMediaTokens().getLinkedInV2Token() != null ) {
                 LOG.debug( "Linkedin is set" );
                 setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
 
@@ -8219,7 +8219,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Twitter is not set" );
             }
-            if ( companySetting.getSocialMediaTokens().getLinkedInToken() != null ) {
+            if ( companySetting.getSocialMediaTokens().getLinkedInV2Token() != null ) {
                 LOG.debug( "Linkedin is set" );
                 setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
 
@@ -8672,12 +8672,32 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     }
                 }
             }
-            if(socialManagementService.checkForFacebookTokenRefresh( settings.getSocialMediaTokens() ))
+            if ( socialManagementService.checkForFacebookTokenRefresh( settings.getSocialMediaTokens() ) )
                 tokenRefreshList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
         }
 
-        //linkedin token
+        //linkedin v2 token
         if ( settings != null && settings.getSocialMediaTokens() != null
+            && settings.getSocialMediaTokens().getLinkedInV2Token() != null ) {
+            if ( socialManagementService.checkLinkedInV2TokenExpiry( settings, collection ) ) {
+                LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInV2Token();
+                if ( !linkedInToken.isTokenExpiryAlertSent() ) {
+                    //send alert mail to entity 
+                    String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( settings,
+                        collection, CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    //update alert mail detail in linkedin token
+                    if ( emailId != null ) {
+                        linkedInToken.setTokenExpiryAlertEmail( emailId );
+                        linkedInToken.setTokenExpiryAlertSent( true );
+                        linkedInToken.setTokenExpiryAlertTime( new Date() );
+                        socialManagementService.updateLinkedinV2Token( collection, settings.getIden(), linkedInToken );
+                    }
+                }
+            }
+            if ( socialManagementService.checkForLinkedInV2TokenRefresh( settings.getSocialMediaTokens() ) )
+                tokenRefreshList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+        } //linkedin token
+        else if ( settings != null && settings.getSocialMediaTokens() != null
             && settings.getSocialMediaTokens().getLinkedInToken() != null ) {
             if ( socialManagementService.checkLinkedInTokenExpiry( settings, collection ) ) {
                 LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
@@ -8694,7 +8714,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     }
                 }
             }
-            if(socialManagementService.checkForLinkedInTokenRefresh( settings.getSocialMediaTokens() ))
+            if ( socialManagementService.checkForLinkedInTokenRefresh( settings.getSocialMediaTokens() ) )
                 tokenRefreshList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
         }
         return tokenRefreshList;
@@ -8709,42 +8729,43 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "method getExpiredSocailMedia started" );
-        Set<String> socialMedias = new HashSet<String>();
+        Set<String> socialMedias = new HashSet<>();
         OrganizationUnitSettings settings = null;
-        String collection = null;
         if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
             settings = getCompanySettings( columnValue );
-            collection = COMPANY_SETTINGS_COLLECTION;
         } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
             settings = getRegionSettings( columnValue );
-            collection = REGION_SETTINGS_COLLECTION;
         } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
             settings = getBranchSettingsDefault( columnValue );
-            collection = BRANCH_SETTINGS_COLLECTION;
         } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
             settings = userManagementService.getUserSettings( columnValue );
-            collection = AGENT_SETTINGS_COLLECTION;
+        }
+
+        if ( settings == null || settings.getSocialMediaTokens() == null ) {
+            LOG.debug( "method getExpiredSocailMedia ended" );
+            return new ArrayList<>( socialMedias );
         }
 
         //facebook token
-        if ( settings != null && settings.getSocialMediaTokens() != null
-            && settings.getSocialMediaTokens().getFacebookToken() != null ) {
+        if ( settings.getSocialMediaTokens().getFacebookToken() != null ) {
             if ( settings.getSocialMediaTokens().getFacebookToken().isTokenExpiryAlertSent() ) {
                 //check if token is still expired
                 socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
             }
         }
 
-        //linkedin token
-        if ( settings != null && settings.getSocialMediaTokens() != null
-            && settings.getSocialMediaTokens().getLinkedInToken() != null ) {
+        //linkedin V2 token
+        if ( settings.getSocialMediaTokens().getLinkedInV2Token() != null ) {
+            if ( settings.getSocialMediaTokens().getLinkedInV2Token().isTokenExpiryAlertSent() ) {
+                socialMedias.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+            }
+        } else if ( settings.getSocialMediaTokens().getLinkedInToken() != null ) {
             if ( settings.getSocialMediaTokens().getLinkedInToken().isTokenExpiryAlertSent() ) {
                 socialMedias.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
             }
         }
-
         LOG.debug( "method getExpiredSocailMedia ended" );
-        return new ArrayList<String>( socialMedias );
+        return new ArrayList<>( socialMedias );
     }
 
 
@@ -11546,4 +11567,58 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		return null;
 	}
+
+	@Override
+    public String saveLinkedInProfileUrl( String entityType, long entityId, String linkedInprofileUrl ) throws InvalidInputException
+    {
+        LOG.info( "saveLinkedInProfileUrl start" );
+
+        String collectionName = null;
+        OrganizationUnitSettings unitSettings = null;
+        switch ( entityType ) {
+            case CommonConstants.COMPANY_ID_COLUMN:
+                collectionName = COMPANY_SETTINGS_COLLECTION;
+                unitSettings = getCompanySettings( entityId );
+                break;
+            case CommonConstants.REGION_ID_COLUMN:
+                collectionName = REGION_SETTINGS_COLLECTION;
+                unitSettings = getRegionSettings( entityId );
+                break;
+            case CommonConstants.BRANCH_ID_COLUMN:
+                collectionName = BRANCH_SETTINGS_COLLECTION;
+                try {
+                    unitSettings = getBranchSettingsDefault( entityId );
+                } catch ( NoRecordsFetchedException e1 ) {
+                    LOG.warn( "No branch found for branch id {}", entityId );
+                }
+                break;
+            case CommonConstants.AGENT_ID_COLUMN:
+                collectionName = AGENT_SETTINGS_COLLECTION;
+                unitSettings = userManagementService.getUserSettings( entityId );
+                break;
+            default:
+                LOG.error( "Invalid entityType {}", entityType );
+                throw new InvalidInputException( "Invalid entityType {}", entityType );
+        }
+        
+        if(unitSettings == null){
+            throw new InvalidInputException( "UnitSettings not found for  " + entityType+ " and " +entityId  ) ;
+        }
+        
+        try {
+            if(unitSettings.getSocialMediaTokens() != null && unitSettings.getSocialMediaTokens().getLinkedInV2Token() != null) {
+                unitSettings.getSocialMediaTokens().setLinkedInProfileUrl( linkedInprofileUrl );
+                unitSettings.getSocialMediaTokens().getLinkedInV2Token().setLinkedInPageLink( linkedInprofileUrl );
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                    KEY_SOCIAL_MEDIA_TOKENS, unitSettings.getSocialMediaTokens(), unitSettings, collectionName );
+            } else {
+                LOG.warn( "Linkedin token not persent for settings type {} and entity id {}" ,entityType,  entityId);
+            }
+            
+        } catch ( Exception e ) {
+            LOG.error( "Caught exception in saveLinkedInProfileUrl {}", e);
+        }
+        LOG.info( "saveLinkedInProfileUrl end" );
+        return linkedInprofileUrl;
+    }
 }

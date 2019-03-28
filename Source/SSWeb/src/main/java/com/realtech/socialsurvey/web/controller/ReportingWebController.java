@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.NotificationType;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -392,6 +393,33 @@ public class ReportingWebController
 
         model.addAttribute( CommonConstants.HAS_BRANCH, hasBranch );
         model.addAttribute( CommonConstants.HAS_REGION, hasRegion );
+        
+        // Added for LinkedIn v2 changes
+        
+        String linkedUpdateClass= "";
+        String linkedV2TokenClass= "";
+        String linkedProfileUrlClass= "";
+        
+        // logic to show/hide LinkedIn v2 migration banner.
+        if(profileSettings != null && profileSettings.getSocialMediaTokens() != null && profileSettings.getSocialMediaTokens().getLinkedInV2Token() != null ) {
+            if(StringUtils.isNotEmpty(profileSettings.getSocialMediaTokens().getLinkedInV2Token().getLinkedInPageLink())) {
+                // For hiding whole banner
+                linkedUpdateClass = "hide";
+            } else {
+                // For hiding migration v2 message
+                linkedV2TokenClass = "hide";
+            }
+        }
+        else {
+            // For hiding profile URL empty message
+            linkedProfileUrlClass = "hide";
+        }
+
+        model.addAttribute( "linkedProfileUrlClass", linkedProfileUrlClass );
+        model.addAttribute( "linkedV2TokenClass", linkedV2TokenClass );
+        model.addAttribute( "linkedUpdateClass", linkedUpdateClass );        
+        
+        // EOM LinkedIn V2 changes
 
         Notification notification = companySettings.getNotification();
         String notificationMessage = null ;

@@ -49,7 +49,6 @@ import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -72,7 +71,6 @@ import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
-import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
@@ -154,9 +152,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     
     @Autowired
     private FileUploadService fileUploadService;
-
-    @Autowired
-    private SettingsSetterDao settingsSetterDao;
 
     @Autowired
     private EncryptionHelper encryptionHelper;
@@ -3566,16 +3561,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public List<SettingsDetails> getSettingScoresById( long companyId, long regionId, long branchId )
-    {
-        LOG.debug(
-            "Inside method getSettingScoresById for company " + companyId + " region " + regionId + " branch " + branchId );
-        return settingsSetterDao.getScoresById( companyId, regionId, branchId );
-    }
-
-
-    @Override
-    @Transactional
     public Company getCompanyById( long id )
     {
         Company company = companyDao.findById( Company.class, id );
@@ -5178,8 +5163,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
                 //linkedin
                 socialMediaVO = new SocialMediaVO( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                if ( socialMediaTokens!= null && socialMediaTokens.getLinkedInToken() != null ) {
-                    if ( socialMediaTokens.getLinkedInToken().isTokenExpiryAlertSent() )
+                if ( socialMediaTokens!= null && socialMediaTokens.getLinkedInV2Token() != null ) {
+                    if ( socialMediaTokens.getLinkedInV2Token().isTokenExpiryAlertSent() )
                         socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
                     else
                         socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );

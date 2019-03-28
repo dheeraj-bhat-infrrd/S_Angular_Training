@@ -13270,3 +13270,91 @@ body.ss-not-found-page {
 	background-size: 50px 50px;
 	background-color: rgba(255, 255, 255, 0.7);
 }
+
+.linked-in-popup-inp {
+    width: 95%;
+    margin-top: 20px;
+    padding: 0px 10px;
+    height: 40px;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+}
+
+/*facebook recommendations*/
+.fb-recommendation-cont {
+    border-radius: 3px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    padding-bottom: 2px;
+}
+
+.fb-recommendation-cont-pos {
+   	width: 110px;
+}
+
+.fb-recommendation-cont-neg {
+    width: 160px;
+}
+
+.fb-recom {
+    margin: 0 auto;
+    color: #666;
+    font-weight: bold !important;
+    height: 18px;
+    margin-left: 5px;
+    font-size: 14px;
+    line-height: 15px;
+}
+
+.fb-recommendation-icn-neg{
+	background: url(../images/facebook_recomendation_no_icon.png) no-repeat
+}
+
+.fb-recommendation-icn-pos{
+	background: url(../images/facebook_recomendation_yes_icon.png) no-repeat
+}
+
+.fb-recommendation-icn {
+    width: 18px;
+    height: 18px;
+    align-self: flex-end;
+    margin-right: 0;
+}
+
+/*Linked in copy to clipboard profile page popup*/
+.linked-in-cc-popup-txt-hdr {
+    font-weight: bold !important;
+    font-size: 15px;
+}
+
+.linked-in-cc-popup-txt {
+    font-weight: bold !important;
+    font-size: 12px;
+    margin: 15px 0 20px;
+}
+
+.linked-in-cc-popup-btn-cont {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.linked-in-cc-btn-cont {
+    margin: 0 auto;
+    width: 150px;
+}
+
+.linked-in-cc-btn {
+    width: 100%;
+    font-weight: bold !important;
+    cursor: pointer;
+    margin: 0 auto;
+    border-radius: 3px;
+    color: #fff;
+    background-color: #5CC8EF;
+    font-size: 13px;
+    line-height: 36px;
+    text-align: center;
+    height: 36px;
+}

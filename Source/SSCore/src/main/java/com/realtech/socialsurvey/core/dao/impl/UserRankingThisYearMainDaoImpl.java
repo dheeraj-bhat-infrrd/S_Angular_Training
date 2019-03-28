@@ -96,9 +96,13 @@ public class UserRankingThisYearMainDaoImpl extends GenericReportingDaoImpl<User
         LOG.info( "method to fetch user ranking Main Rank for this year, fetchUserRankingRankForThisYearMain() started" );
         Query query = getSession().createSQLQuery( "SELECT rank FROM user_ranking_this_year_main WHERE user_id = :userId " );
         query.setParameter( "userId", userId  );
-        int UserRank = (int) query.uniqueResult();
+        Object result = query.uniqueResult();
+        int userRank = 0;
+        if(result != null) {
+            userRank = (int) query.uniqueResult();
+        }
         LOG.info( "method to fetch user ranking Main Rank for this year, fetchUserRankingRankForThisYearMain() finished." );
-        return UserRank;
+        return userRank;
     }
 	
 	@Override

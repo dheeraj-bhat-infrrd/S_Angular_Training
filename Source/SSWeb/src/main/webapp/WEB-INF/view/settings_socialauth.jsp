@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!-- Check if auto login -->
 <c:choose>
@@ -45,7 +46,7 @@
 </div>
 <div class="soc-nw-icns-cont clearfix">
 	<c:choose>
-		<c:when test="${not empty linkedinLink}">
+		<c:when test="${linkedinConnected}">
 			<div class="social-media-disconnect float-left ${socialDisabled}"
 				onclick="disconnectSocialMedia(event,'linkedin', ${isAutoLogin})" title="Disconnect"></div>
 		</c:when>
@@ -56,8 +57,20 @@
 	<div
 		class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj ${socialDisabled}"
 		onclick="openAuthPage(event,'linkedin', ${isAutoLogin}, this);" data-link="${linkedinLink}"></div>
-	<div id="edt-prof-linkedin-lnk" class="float-left soc-nw-icn-link"
-		data-social='linkedin'>${linkedinLink}</div>
+		
+	
+	<c:choose>
+		<c:when test="${linkedinLinkNotFound}">
+			<div id="edt-prof-linkedin-lnk" class="float-left soc-nw-icn-link"
+				data-social='linkedin'><spring:message code="label.linkedin.profileurl.notfound" /></div>
+		</c:when>
+		<c:otherwise>
+			<div id="edt-prof-linkedin-lnk" class="float-left soc-nw-icn-link"
+				data-social='linkedin'>${linkedinLink}</div>
+		</c:otherwise>
+	</c:choose>	
+
+	
 </div>
 <div class="soc-nw-icns-cont clearfix">
 	<c:choose>

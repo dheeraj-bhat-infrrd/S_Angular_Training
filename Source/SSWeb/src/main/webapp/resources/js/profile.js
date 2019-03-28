@@ -2111,33 +2111,25 @@ $('#prof-review-item').on('click', '.ppl-share-icns', function(e) {
 	var title = $(this).attr('title');
 	
 	if(title == 'LinkedIn'){
-		$('#overlay-header').html("");
-		$('#overlay-header').css("z-index", "99999")
-		$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
-		$('#overlay-continue').html("Ok");
-		$('#overlay-cancel').html("Cancel");
-		
 		var copyText = $(this).parent().find('.linkedInSummary').val();
 		var decodedText = decodeURIComponent(copyText);
 		copyToClipboard( decodedText );
 
-		$('#overlay-continue').off();
-		$('#overlay-continue').click(function() {
-			overlayRevert();
+		$('#linked-in-cc-popup-continue').off();
+		$('#linked-in-cc-popup-continue').click(function() {
+			
+			$('#linked-in-cc-popup').hide();
+			$('#linked-in-cc-popup-continue').unbind('click');
+			enableBodyScroll();
+			
 			if (link == undefined || link == "") {
 				return false;
 			}
 			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 		});
 		
-		$('#overlay-cancel').click(function() {
-			$('#overlay-continue').unbind('click');
-			$('#overlay-cancel').unbind('click');
-			overlayRevert();
-
-		});
-		
-		$('#overlay-main').show();
+		$('#linked-in-cc-popup').show();
+		disableBodyScroll();
 		
 	}else{
 		if (link == undefined || link == "") {
@@ -2176,36 +2168,29 @@ $('.sr-share-wrapper').on('click', '.ppl-share-icns', function(e) {
 	
 
 	if(title == 'LinkedIn'){
-		$('#overlay-header').html("");
-		$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
-		$('#overlay-continue').html("Ok");
-		$('#overlay-cancel').html("Cancel");
-		
 		var copyText = $(this).parent().find('.linkedInSummary').val();
 		var decodedText = decodeURIComponent(copyText);
 		copyToClipboard( decodedText );
 
-		$('#overlay-continue').off();
-		$('#overlay-continue').click(function() {
-			overlayRevert();
+		$('#linked-in-cc-popup-continue').off();
+		$('#linked-in-cc-popup-continue').click(function() {
+			
+			$('#linked-in-cc-popup').hide();
+			$('#linked-in-cc-popup-continue').unbind('click');
+			enableBodyScroll();
+			
 			if (link == undefined || link == "") {
 				return false;
 			}
 			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 		});
 		
-		$('#overlay-cancel').click(function() {
-			$('#overlay-continue').unbind('click');
-			$('#overlay-cancel').unbind('click');
-			overlayRevert();
-
-		});
-		
-		$('#overlay-main').css('z-index',99999);
+		$('#linked-in-cc-popup').css('z-index',99999);
 		if(window.innerWidth < 768){
-			$('#overlay-main').css('top',70);
+			$('#linked-in-cc-popup').css('top',70);
 		}
-		$('#overlay-main').show();
+		$('#linked-in-cc-popup').show();
+		disableBodyScroll();
 		
 	}else{
 		if (link == undefined || link == "") {

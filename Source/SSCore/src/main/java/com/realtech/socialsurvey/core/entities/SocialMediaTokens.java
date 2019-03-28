@@ -16,7 +16,7 @@ public class SocialMediaTokens
     private GoogleBusinessToken googleBusinessToken;
     private FacebookPixelToken facebookPixelToken;
     private InstagramToken instagramToken;
-
+    private String linkedInProfileUrl;
 
     public GoogleBusinessToken getGoogleBusinessToken()
     {
@@ -173,6 +173,19 @@ public class SocialMediaTokens
     public void setLinkedInV2Token( LinkedInToken linkedInV2Token )
     {
         this.linkedInV2Token = linkedInV2Token;
+    }
+
+
+
+    public String getLinkedInProfileUrl()
+    {
+        return linkedInProfileUrl;
+    }
+
+
+    public void setLinkedInProfileUrl( String linkedInProfileUrl )
+    {
+        this.linkedInProfileUrl = linkedInProfileUrl;
     }
 
 

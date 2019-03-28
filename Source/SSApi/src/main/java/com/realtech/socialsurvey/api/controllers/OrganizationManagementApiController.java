@@ -633,6 +633,21 @@ public class OrganizationManagementApiController
     }
 
 
+    @RequestMapping ( value = "/linkedinprofileurl", method = RequestMethod.POST)
+    @ApiOperation ( value = "Save the linkedIn profile url fileds in socialMediaToken")
+    public ResponseEntity<?> saveLinkedInProfileUrl( String entityType, long entityId, String linkedInProfileUrl )
+        throws SSApiException
+    {
+        LOGGER.info( "Method to save linkedin profile url args: {},{} and {}",entityType, entityId, linkedInProfileUrl);
+        try {
+            String linkedInProfileurl = organizationManagementService.saveLinkedInProfileUrl( entityType, entityId,
+                linkedInProfileUrl );
+            return new ResponseEntity<>( linkedInProfileurl, HttpStatus.CREATED );
+        } catch ( NonFatalException e ) {
+            LOGGER.error( "An exception occured while saving linkedInProfileurl error details {} ", e.getMessage() );
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
+    }
     /**
      * Api for fetching relevant company statistics required to show on admin dashboard
      * Calls {@link OrganizationManagementService#fetchCompanyStatistics(long)}} to get the

@@ -1835,6 +1835,12 @@ public interface CommonConstants
     public static final String ZIPCODE_COL = "zipcode";
     public static final String STATE_NAME = "state";
     public static final String CITY_STATE_NAME = "citystate";
+    
+    public static final String X_RESTLI_PROTOCOL_VERSION = "X-Restli-Protocol-Version";
+    public static final String X_RESTLI_PROTOCOL_VERSION_VALUE = "2.0.0";
+    
+    // Http media type constants
+    public final static String APPLICATION_JSON_VALUE = "application/json";
 
     //constant for encompass alert emails
     String ENCOMPASS_ALERT_EMAILS = "alertEmails";

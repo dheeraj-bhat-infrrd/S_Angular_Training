@@ -7,9 +7,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -19,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +37,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.vo.IdInfoVO;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
@@ -60,22 +64,25 @@ public class PublicSocialController {
 	private String twitterRedirectUriInSession;
 
 	// LinkedIn
-	@Value("${LINKED_IN_REST_API_URI}")
+	@Value("${LINKED_IN_SHARE_V2}")
 	private String linkedInRestApiUri;
-	@Value("${LINKED_IN_API_KEY}")
-	private String linkedInApiKey;
-	@Value("${LINKED_IN_API_SECRET}")
-	private String linkedInApiSecret;
 	@Value("${LINKED_IN_REDIRECT_URI_SESSION}")
 	private String linkedinRedirectUriInSession;
-	@Value("${LINKED_IN_AUTH_URI}")
-	private String linkedinAuthUri;
-	@Value("${LINKED_IN_ACCESS_URI}")
-	private String linkedinAccessUri;
-	@Value("${LINKED_IN_PROFILE_URI}")
-	private String linkedinProfileUri;
-	@Value("${LINKED_IN_SCOPE_V2}")
-	private String linkedinScope;
+	
+    // Linkedin V2
+    @Value ( "${LINKED_IN_API_KEY_V2}")
+    private String linkedInApiKeyV2;
+    @Value ( "${LINKED_IN_API_SECRET_V2}")
+    private String linkedInApiSecretV2;
+    @Value ( "${LINKED_IN_AUTH_URI_V2}")
+    private String linkedinAuthUriV2;
+    @Value ( "${LINKED_IN_ACCESS_URI_V2}")
+    private String linkedinAccessUriV2;
+    @Value ( "${LINKED_IN_PROFILE_URI_V2}")
+    private String linkedinProfileUriV2;
+    @Value ( "${LINKED_IN_SCOPE_V2}")
+    private String linkedinScopeV2;
+
 
 	// Google
 	@Value("${GOOGLE_API_KEY}")
@@ -165,11 +172,11 @@ public class PublicSocialController {
 					session.setAttribute(CommonConstants.SOCIAL_FLOW, socialFlow);
 				}
 
-				StringBuilder linkedInAuth = new StringBuilder(linkedinAuthUri).append("?response_type=").append("code");
-				linkedInAuth.append("&client_id=").append(linkedInApiKey);
+				StringBuilder linkedInAuth = new StringBuilder(linkedinAuthUriV2).append("?response_type=").append("code");
+				linkedInAuth.append("&client_id=").append(linkedInApiKeyV2);
 				linkedInAuth.append("&redirect_uri=").append(requestUtils.getRequestServerName(request)).append(linkedinRedirectUriInSession);
 				linkedInAuth.append("&state=").append("SOCIALSURVEY");
-				linkedInAuth.append("&scope=").append(linkedinScope);
+				linkedInAuth.append("&scope=").append(linkedinScopeV2);
 
 				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, linkedInAuth.toString());
 
@@ -328,6 +335,8 @@ public class PublicSocialController {
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
+	
+
 	/**
 	 * The url that LinkedIn send request to with the oauth verification code
 	 * 
@@ -336,7 +345,7 @@ public class PublicSocialController {
 	 * @return
 	 */
 	@RequestMapping(value = "/linkedinauthinsession", method = RequestMethod.GET)
-	public String authenticateLinkedInAccess(Model model, HttpServletRequest request) {
+	public String authenticateLinkedInV2Access(Model model, HttpServletRequest request) {
 		LOG.info("Method authenticateLinkedInAccess() called from SocialManagementController");
 		HttpSession session = request.getSession(false);
 
@@ -355,12 +364,12 @@ public class PublicSocialController {
 			params.add(new BasicNameValuePair("grant_type", "authorization_code"));
 			params.add(new BasicNameValuePair("code", oauthCode));
 			params.add(new BasicNameValuePair("redirect_uri", requestUtils.getRequestServerName(request)+linkedinRedirectUriInSession));
-			params.add(new BasicNameValuePair("client_id", linkedInApiKey));
-			params.add(new BasicNameValuePair("client_secret", linkedInApiSecret));
+			params.add(new BasicNameValuePair("client_id", linkedInApiKeyV2));
+			params.add(new BasicNameValuePair("client_secret", linkedInApiSecretV2));
 
 			// fetching access token
 			HttpClient httpclient = HttpClientBuilder.create().build();
-			HttpPost httpPost = new HttpPost(linkedinAccessUri);
+			HttpPost httpPost = new HttpPost(linkedinAccessUriV2);
 			httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 			String accessTokenStr = httpclient.execute(httpPost, new BasicResponseHandler());
 			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
@@ -368,6 +377,12 @@ public class PublicSocialController {
 
 			String ratingStr = (String) session.getAttribute( "rating" );
 			double rating = Double.parseDouble( ratingStr );
+			
+            HttpGet httpGet = new HttpGet( linkedinProfileUriV2 );
+            httpGet.setHeader(HttpHeaders.AUTHORIZATION,"Bearer " + accessToken);
+            httpGet.setHeader(" X-Restli-Protocol-Version",CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE );
+            String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
+            IdInfoVO idInfoVO = new Gson().fromJson( basicProfileStr, IdInfoVO.class );
             
 			// Post on linkedin
 			String message = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
@@ -375,16 +390,18 @@ public class PublicSocialController {
 					+ " on SocialSurvey. Below is the feedback :\n " + session.getAttribute("review");
 			message = message.replaceAll("null", "");
 			String linkedInPost = new StringBuilder(linkedInRestApiUri).substring(0, linkedInRestApiUri.length() - 1);
-			linkedInPost += "/shares?oauth2_access_token=" + accessToken;
-			linkedInPost += "&format=json";
 
 			HttpClient client = HttpClientBuilder.create().build();
 			HttpPost post = new HttpPost(linkedInPost);
 
 			// add header
-			post.setHeader("Content-Type", "application/json");
+			post.setHeader(HttpHeaders.CONTENT_TYPE, CommonConstants.APPLICATION_JSON_VALUE);
+			
+			post.setHeader( HttpHeaders.AUTHORIZATION, "Bearer "+ accessToken);
+			post.setHeader(CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE);
 
-			StringEntity entity = new StringEntity("{\"comment\": \"" + message + "\",\"visibility\": {\"code\": \"anyone\"}}");
+			StringEntity entity = new StringEntity("{\"text:{\"text\": \"" + message + "\"},\"distribution\":{\"linkedInDistributionTarget\":{"
+			    + "\"visibleToGuest\":true}},\"owner\":\"urn:li:person:"+idInfoVO.getId()+"\"}");
 
 			post.setEntity(entity);
 			try {

@@ -487,6 +487,9 @@ public interface SSApiIntegration
 
     @POST( "/v1/updateencompassalertemailids" )
     Response updateEncompassAlertEmailIds(@Body EncompassAlertMailsVO encompassAlertMailsVO);
+    
+    @POST ( "/v1/linkedinprofileurl" )
+    Response saveLinkedInProfileUrl(@Query ( "entityType" ) String entityType,@Query ( "entityId") long entityId, @Query ( "linkedInProfileUrl") String linkedInProfileUrl);
 
     @GET( "/v1/fetchcompanystatistics/{companyId}" )
     CompanyStatistics fetchCompanyStatistics( @Path ("companyId") long companyId,

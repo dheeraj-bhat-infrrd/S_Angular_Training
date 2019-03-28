@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -85,8 +86,14 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.ContentEntity;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.DistributionTarget;
 import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInContent;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInDistributionTarget;
 import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInRequest;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInRequestV2;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInText;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInV2Content;
 import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInVisibility;
 import com.realtech.socialsurvey.core.enums.HierarchyType;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
@@ -247,18 +254,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     // Linkedin
     @Value ( "${LINKED_IN_REST_API_URI}")
     private String linkedInRestApiUri;
-    @Value ( "${LINKED_IN_API_KEY}")
-    private String linkedInApiKey;
-    @Value ( "${LINKED_IN_API_SECRET}")
-    private String linkedInApiSecret;
-    @Value ( "${LINKED_IN_REDIRECT_URI}")
-    private String linkedinRedirectUri;
-    @Value ( "${LINKED_IN_AUTH_URI}")
-    private String linkedinAuthUri;
-    @Value ( "${LINKED_IN_SCOPE}")
-    private String linkedinScope;
+    @Value ( "${LINKED_IN_SHARE_V2}")
+    private String linkedInRestApiVersion2Uri;    
     @Value ("${LINKEN_IN_ACCESS_VALIDITY_URI}")
     private String  linkedInAccessValidityUri;
+    @Value ("${LINKED_IN_PROFILE_URI_V2}")
+    private String linkedinProfileUriV2;
     
     // linkedin v2
     @Value ( "${LINKED_IN_SCOPE_V2}")
@@ -308,6 +309,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     private final int batchSize = 50;
 
     private static final String STYLE_ATTR = "align=\"center\"style=\"display:block; width: 150px; height: 40px; line-height: 40px;float: left; margin: 5px ;text-decoration:none;background: #009FE3; border-bottom: 2px solid #077faf; color: #fff; text-align: center; border-radius: 3px; font-size: 15px;border: 0;\"";
+    
+    private static final String SOCIAL_SURVEY_ME = "SocialSurvey.me";
+
+    private static final String ZILLOW = "Zillow";
 
     @Value ( "${FB_CLIENT_ID}")
     private String fbAppId;
@@ -557,149 +562,277 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         String linkedinProfileUrl, String linkedinMessageFeedback, OrganizationUnitSettings companySettings, boolean isZillow,
         AgentSettings agentSettings, SocialMediaPostResponse linkedinPostResponse, String surveyId ) throws NonFatalException
     {
+        LOG.info( "updateLinkedin() started." );
         if ( settings == null ) {
             throw new InvalidInputException( "AgentSettings can not be null" );
         }
         boolean linkedinNotSetup = true;
-        LOG.info( "updateLinkedin() started." );
-        if ( settings != null ) {
-            if ( settings.getSocialMediaTokens() != null ) {
-                if ( settings.getSocialMediaTokens().getLinkedInToken() != null
-                    && settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() != null ) {
-                    linkedinNotSetup = false;
-                    String linkedInPost = new StringBuilder( linkedInRestApiUri ).substring( 0,
-                        linkedInRestApiUri.length() - 1 );
-                    linkedInPost += "/shares?oauth2_access_token="
-                        + settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
-                    linkedInPost += "&format=json";
-                    // SS-585 begin
-                    String reviewId = Integer.toHexString( String.valueOf( System.currentTimeMillis() ).hashCode() )
-                        + Integer.toHexString( String.valueOf( settings.getIden() ).hashCode() );
-                    linkedInPost += "&reviewid=" + reviewId;
-                    // SS-585 end
+        HttpPost post = null;
+        String accessToken = null;
+        
+        if ( settings.getSocialMediaTokens() != null ) {
+            if ( settings.getSocialMediaTokens().getLinkedInToken() != null
+                || settings.getSocialMediaTokens().getLinkedInV2Token() != null ) {
+
+                linkedinNotSetup = false;
+                try {
+                    if ( settings.getSocialMediaTokens().getLinkedInV2Token() != null
+                        && settings.getSocialMediaTokens().getLinkedInV2Token().getLinkedInAccessToken() != null ) {
+                        accessToken = settings.getSocialMediaTokens().getLinkedInV2Token().getLinkedInAccessToken();
+                        post = createLinkedInV2PostRequest( settings, message, companySettings, isZillow, agentSettings,
+                            surveyId, accessToken );
+                    } else if ( settings.getSocialMediaTokens().getLinkedInToken() != null
+                        && settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() != null ) {
+                        accessToken = settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
+                        post = createLinkedInV1PostRequest( settings, message, companySettings, isZillow, agentSettings,
+                            surveyId, accessToken );
+                    }
+
                     try {
                         HttpClient client = HttpClientBuilder.create().build();
-                        HttpPost post = new HttpPost( linkedInPost );
-                        
-                        // add header
-                        post.setHeader( "Content-Type", "application/json" );
-                        post.setHeader("Accept-Encoding", "UTF-8");
-                        // String a = "{\"comment\": \"\",\"content\": {" +
-                        // "\"title\": \"\"," + "\"description\": \"" + message
-                        // + "-" + linkedinMessageFeedback + "\"," +
-                        // "\"submitted-url\": \"" + linkedinProfileUrl + "\", "
-                        // + "\"submitted-image-url\": \"" +
-                        // applicationLogoUrlForLinkedin + "\"},"
-                        // + "\"visibility\": {\"code\": \"anyone\" }}";
-                        // StringEntity entity = new StringEntity( a );
+                        HttpResponse response = client.execute( post );
+                        String responseString = response.toString();
+                        LOG.info( "Server response while posting on linkedin for survey id {} is {}", surveyId,
+                            responseString );
+                        JSONObject entityUpdateResponseObj = new JSONObject( EntityUtils.toString( response.getEntity() ) );
 
-                        ContactDetailsSettings agentContactDetailsSettings = agentSettings.getContact_details();
-                        String agentTitle = agentContactDetailsSettings.getTitle();
-                        String companyName = companySettings.getContact_details().getName();
-                        String location = agentContactDetailsSettings.getLocation();
-                        String industry = agentSettings.getVertical();
-                        if ( industry == null || industry.isEmpty() || industry.equalsIgnoreCase("null")) {
-                            industry = companySettings.getVertical();
-                        }
-                        if( industry == null || industry.isEmpty() || industry.equalsIgnoreCase("null")) {
-                        	 industry = companySettings.getContact_details().getIndustry();
+                        int statusCode = 0;
+                        if ( response.getStatusLine() != null ) {
+                            statusCode = response.getStatusLine().getStatusCode();
                         }
 
-                        String title = WordUtils.capitalize( agentContactDetailsSettings.getName() ) + ", "
-                            + ( agentTitle != null && !agentTitle.isEmpty() ? agentTitle + ", " : "" ) + companyName + ", "
-                            + ( location != null && !location.isEmpty() ? location + ", " : "" ) + industry
-                            + " Professional Reviews | " + ( isZillow ? "Zillow" : "SocialSurvey.me" );
-
-                        title = title.replace("null", "");
-                        
-                        String description = "Reviews for " + agentContactDetailsSettings.getName() + ". "
-                            + agentContactDetailsSettings.getFirstName() + " is a  " + industry + " professional in "
-                            + ( location != null && !location.isEmpty() ? location : "" ) + ". "
-                            + agentContactDetailsSettings.getFirstName() + " is the "
-                            + ( agentTitle != null && !agentTitle.isEmpty() ? agentTitle : "" ) + " of " + companyName + ".";
-                        description = description.replace("null", "");
-                        
-
-                        String imageUrl = applicationLogoUrlForLinkedin;
-
-                        if ( agentSettings.getProfileImageUrlRectangularThumbnail()!= null && !agentSettings.getProfileImageUrlRectangularThumbnail().isEmpty() ) {
-                            imageUrl = agentSettings.getProfileImageUrlRectangularThumbnail();
-                        } else if ( agentSettings.getProfileImageUrlThumbnail() != null && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
-                            imageUrl = agentSettings.getProfileImageUrlThumbnail();
-                        } else if ( companySettings.getLogoThumbnail() != null && !companySettings.getLogoThumbnail().isEmpty() ) {
-                            imageUrl = companySettings.getLogoThumbnail();
-                        }
-                        String profileUrl = "";
-                        if ( surveyId != null && !surveyId.isEmpty() ) {
-                            profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                                + agentSettings.getProfileUrl() + "/" + surveyId;
+                        if ( statusCode == 201 ) {
+                            linkedinPostResponse.setResponseMessage( "Ok" );
+                        } else if ( statusCode == 409 ) {
+                            LOG.error( "LinkedIn share API has given a error response, Error code: 409" );
+                            // statusCode 409 is for duplicate post on LinkedIn.
+                            throw new NonFatalException( "Review is already posted on LinkedIn" );
                         } else {
-                            profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                                + agentSettings.getProfileUrl();
+                            linkedinPostResponse.setResponseMessage( (String) entityUpdateResponseObj.get( "message" ) );
                         }
-                        
-                        //setting and parsing data in json format using gson library.
-                       
-                        
-                        LinkedInRequest linkedInRequest = new LinkedInRequest();
-                        linkedInRequest.setComment(message);
-                        
-                        LinkedInContent content = new LinkedInContent();
-                        content.setDescription(description);
-                        content.setSubmittedImageUrl(imageUrl);
-                        content.setSubmittedUrl(profileUrl);
-                        content.setTitle(title);
-                        
-                        LinkedInVisibility visibility = new LinkedInVisibility();
-                        visibility.setCode("anyone");
-                        
-                        linkedInRequest.setContent(content);
-                        linkedInRequest.setVisibility(visibility);
-                        
-                        String linkedInPostson = new Gson().toJson(linkedInRequest);
-                        
-                        linkedInPostson = linkedInPostson.replace("\\n", " ");
-                        
-                        
-                        StringEntity entity = new StringEntity( linkedInPostson,  "UTF-8" );
-                        post.setEntity( entity );
-                        try {
-                            HttpResponse response = client.execute( post );
-                            String responseString = response.toString();
-                            LOG.info( "Server response while posting on linkedin : " + responseString );
-                            JSONObject entityUpdateResponseObj = new JSONObject( EntityUtils.toString( response.getEntity() ) );
 
-                            if ( response.getStatusLine() != null
-                                && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED ) {
+                        if ( settings.getSocialMediaTokens().getLinkedInV2Token() != null
+                            && settings.getSocialMediaTokens().getLinkedInV2Token().getLinkedInAccessToken() != null ) {
+                            if ( statusCode == HttpStatus.SC_UNAUTHORIZED ) {
+                                // call social media error handler for linkedin
+                                // exception
+                                socialMediaExceptionHandler.handleLinkedinV2Exception( settings, collectionName );
+                            }
+                            linkedinPostResponse.setAccessToken(
+                                settings.getSocialMediaTokens().getLinkedInV2Token().getLinkedInAccessToken() );
+                        } else if ( settings.getSocialMediaTokens().getLinkedInToken() != null
+                            && settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() != null ) {
+                            if ( statusCode == HttpStatus.SC_UNAUTHORIZED ) {
                                 // call social media error handler for linkedin
                                 // exception
                                 socialMediaExceptionHandler.handleLinkedinException( settings, collectionName );
                             }
-
-                            if ( responseString.contains( "201 Created" ) ) {
-                                String updateUrl = (String) entityUpdateResponseObj.get( "updateUrl" );
-                                linkedinPostResponse.setReferenceUrl( updateUrl );
-                                linkedinPostResponse.setResponseMessage( "Ok" );
-                            } else {
-                                linkedinPostResponse.setResponseMessage( (String) entityUpdateResponseObj.get( "message" ) );
-                            }
                             linkedinPostResponse
                                 .setAccessToken( settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
-                        } catch ( RuntimeException e ) {
-                            LOG.error(
-                                "Runtime exception caught while trying to add an update on linkedin. Nested exception is ", e );
                         }
-                    } catch ( IOException e ) {
-                        throw new NonFatalException( "IOException caught while posting on Linkedin. Nested exception is ", e );
+                    } catch ( RuntimeException e ) {
+                        LOG.error( "Runtime exception caught while trying to add an update on linkedin. Nested exception is ",
+                            e );
                     }
+                } catch ( IOException e ) {
+                    throw new NonFatalException( "IOException caught while posting on Linkedin. Nested exception is ", e );
                 }
             }
         }
+
         LOG.info( "updateLinkedin() finished" );
         return linkedinNotSetup;
     }
 
 
+	private HttpPost createLinkedInV1PostRequest(OrganizationUnitSettings settings, String message, OrganizationUnitSettings companySettings, boolean isZillow,
+            AgentSettings agentSettings, String surveyId, String accessToken ) throws IOException {
+    	LOG.info( "createLinkedInV1PostRequest" );
+		String linkedInPost = new StringBuilder(linkedInRestApiUri).substring(0, linkedInRestApiUri.length() - 1);
+		linkedInPost += "/shares?oauth2_access_token="
+				+ settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
+		linkedInPost += "&format=json";
+		
+		String reviewId = Integer.toHexString(String.valueOf(System.currentTimeMillis()).hashCode())
+				+ Integer.toHexString(String.valueOf(settings.getIden()).hashCode());
+		linkedInPost += "&reviewid=" + reviewId;
+		HttpPost post = new HttpPost(linkedInPost);
+
+		// add header
+		post.setHeader(HttpHeaders.CONTENT_TYPE, CommonConstants.APPLICATION_JSON_VALUE);
+		post.setHeader("Accept-Encoding", "UTF-8");
+
+		ContactDetailsSettings agentContactDetailsSettings = agentSettings.getContact_details();
+		String agentTitle = agentContactDetailsSettings.getTitle();
+		String companyName = companySettings.getContact_details().getName();
+		String location = agentContactDetailsSettings.getLocation();
+		String industry = agentSettings.getVertical();
+		if (industry == null || industry.isEmpty() || industry.equalsIgnoreCase("null")) {
+			industry = companySettings.getVertical();
+		}
+		if (industry == null || industry.isEmpty() || industry.equalsIgnoreCase("null")) {
+			industry = companySettings.getContact_details().getIndustry();
+		}
+
+		String title = WordUtils.capitalize(agentContactDetailsSettings.getName()) + ", "
+				+ (agentTitle != null && !agentTitle.isEmpty() ? agentTitle + ", " : "") + companyName + ", "
+				+ (location != null && !location.isEmpty() ? location + ", " : "") + industry
+				+ " Professional Reviews | " + (isZillow ? ZILLOW : SOCIAL_SURVEY_ME);
+
+		title = title.replace("null", "");
+
+		String description = "Reviews for " + agentContactDetailsSettings.getName() + ". "
+				+ agentContactDetailsSettings.getFirstName() + " is a  " + industry + " professional in "
+				+ (location != null && !location.isEmpty() ? location : "") + ". "
+				+ agentContactDetailsSettings.getFirstName() + " is the "
+				+ (agentTitle != null && !agentTitle.isEmpty() ? agentTitle : "") + " of " + companyName + ".";
+		description = description.replace("null", "");
+
+		String imageUrl = applicationLogoUrlForLinkedin;
+
+		if (agentSettings.getProfileImageUrlRectangularThumbnail() != null
+				&& !agentSettings.getProfileImageUrlRectangularThumbnail().isEmpty()) {
+			imageUrl = agentSettings.getProfileImageUrlRectangularThumbnail();
+		} else if (agentSettings.getProfileImageUrlThumbnail() != null
+				&& !agentSettings.getProfileImageUrlThumbnail().isEmpty()) {
+			imageUrl = agentSettings.getProfileImageUrlThumbnail();
+		} else if (companySettings.getLogoThumbnail() != null && !companySettings.getLogoThumbnail().isEmpty()) {
+			imageUrl = companySettings.getLogoThumbnail();
+		}
+		String profileUrl = "";
+		if (surveyId != null && !surveyId.isEmpty()) {
+			profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+					+ agentSettings.getProfileUrl() + "/" + surveyId;
+		} else {
+			profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+					+ agentSettings.getProfileUrl();
+		}
+
+		// setting and parsing data in json format using gson library.
+
+		LinkedInRequest linkedInRequest = new LinkedInRequest();
+		linkedInRequest.setComment(message);
+
+		LinkedInContent content = new LinkedInContent();
+		content.setDescription(description);
+		content.setSubmittedImageUrl(imageUrl);
+		content.setSubmittedUrl(profileUrl);
+		content.setTitle(title);
+
+		LinkedInVisibility visibility = new LinkedInVisibility();
+		visibility.setCode("anyone");
+
+		linkedInRequest.setContent(content);
+		linkedInRequest.setVisibility(visibility);
+
+		String linkedInPostson = new Gson().toJson(linkedInRequest);
+
+		linkedInPostson = linkedInPostson.replace("\\n", " ");
+
+		StringEntity entity = new StringEntity(linkedInPostson, "UTF-8");
+		post.setEntity(entity);
+
+		return post;
+    }
+    
+    private HttpPost createLinkedInV2PostRequest(OrganizationUnitSettings settings, String message, OrganizationUnitSettings companySettings, boolean isZillow,
+            AgentSettings agentSettings, String surveyId, String accessToken ) throws IOException {
+    	
+		String linkedInPost = linkedInRestApiVersion2Uri;
+
+		LOG.debug("Inside createLinkedInV2PostRequest() for surveyId: {}", surveyId);
+        
+        HttpPost post = new HttpPost( linkedInPost );
+        
+        post.addHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken);
+        // add header
+        post.setHeader( HttpHeaders.CONTENT_TYPE, CommonConstants.APPLICATION_JSON_VALUE );
+        post.setHeader(HttpHeaders.ACCEPT_ENCODING, "UTF-8");
+        post.setHeader(CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE);
+
+        ContactDetailsSettings agentContactDetailsSettings = agentSettings.getContact_details();
+        String agentTitle = agentContactDetailsSettings.getTitle();
+        String companyName = companySettings.getContact_details().getName();
+        String location = agentContactDetailsSettings.getLocation();
+        String industry = agentSettings.getVertical();
+        if ( industry == null || industry.isEmpty() || industry.equalsIgnoreCase("null")) {
+            industry = companySettings.getVertical();
+        }
+        if( industry == null || industry.isEmpty() || industry.equalsIgnoreCase("null")) {
+        	 industry = companySettings.getContact_details().getIndustry();
+        }
+
+        String title = WordUtils.capitalize( agentContactDetailsSettings.getName() ) + ", "
+            + ( agentTitle != null && !agentTitle.isEmpty() ? agentTitle + ", " : "" ) + companyName + ", "
+            + ( location != null && !location.isEmpty() ? location + ", " : "" ) + industry
+            + " Professional Reviews | " + ( isZillow ? ZILLOW : SOCIAL_SURVEY_ME );
+
+        title = title.replace("null", "");
+        
+        String description = "Reviews for " + agentContactDetailsSettings.getName() + ". "
+            + agentContactDetailsSettings.getFirstName() + " is a  " + industry + " professional in "
+            + ( location != null && !location.isEmpty() ? location : "" ) + ". "
+            + agentContactDetailsSettings.getFirstName() + " is the "
+            + ( agentTitle != null && !agentTitle.isEmpty() ? agentTitle : "" ) + " of " + companyName + ".";
+        description = description.replace("null", "");
+        
+
+        String imageUrl = applicationLogoUrlForLinkedin;
+
+        if ( agentSettings.getProfileImageUrlRectangularThumbnail()!= null && !agentSettings.getProfileImageUrlRectangularThumbnail().isEmpty() ) {
+            imageUrl = agentSettings.getProfileImageUrlRectangularThumbnail();
+        } else if ( agentSettings.getProfileImageUrlThumbnail() != null && !agentSettings.getProfileImageUrlThumbnail().isEmpty() ) {
+            imageUrl = agentSettings.getProfileImageUrlThumbnail();
+        } else if ( companySettings.getLogoThumbnail() != null && !companySettings.getLogoThumbnail().isEmpty() ) {
+            imageUrl = companySettings.getLogoThumbnail();
+        }
+        String profileUrl = "";
+        if ( surveyId != null && !surveyId.isEmpty() ) {
+            profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                + agentSettings.getProfileUrl() + "/" + surveyId;
+        } else {
+            profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                + agentSettings.getProfileUrl();
+        }
+        
+        //setting and parsing data in json format using gson library.       
+        
+        LinkedInRequestV2 linkedInRequest = new LinkedInRequestV2();
+        
+        LinkedInText text = new LinkedInText();
+        text.setText(message);
+        linkedInRequest.setText(text);
+        
+        LinkedInV2Content content = new LinkedInV2Content();
+        ContentEntity profileEntity = new ContentEntity();
+        ContentEntity imageEntity = new ContentEntity();
+        profileEntity.setEntityLocation(profileUrl);
+        imageEntity.setEntityLocation(imageUrl);
+        content.setDescription(description);
+        content.setTitle(title);
+        ContentEntity[] entities = new ContentEntity[2];
+        entities[0] = profileEntity;
+        entities[1] = imageEntity;
+        content.setContentEntities(entities);
+        linkedInRequest.setContent(content);
+       	linkedInRequest.setOwner("urn:li:person:"+settings.getSocialMediaTokens().getLinkedInV2Token().getLinkedInId());
+        
+        DistributionTarget target = new DistributionTarget();
+        target.setVisibleToGuest(true);
+        LinkedInDistributionTarget linkedInTarget = new LinkedInDistributionTarget();
+        linkedInTarget.setLinkedInDistributionTarget(target);
+        linkedInRequest.setDistribution(linkedInTarget);
+        
+        String linkedInPostson = new Gson().toJson(linkedInRequest);        
+        linkedInPostson = linkedInPostson.replace("\\n", " ");
+        LOG.info("Post Entity: {} and POST details: {}, {}", linkedInPostson, post.getMethod(), post.getURI().toString());    
+        StringEntity entity = new StringEntity( linkedInPostson,  "UTF-8" );
+        post.setEntity( entity );
+        
+        return post;
+    } 
+    
+    
     @Override
     @Transactional
     public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesAndRegionsInHierarchy( long agentId )
@@ -937,7 +1070,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             case CommonConstants.LINKEDIN_SOCIAL_SITE:
                 profileStage.setOrder( ProfileStages.LINKEDIN_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.LINKEDIN_PRF.name() );
-                keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN;
+                keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_V2_SOCIAL_MEDIA_TOKEN;
                 break;
 
             case CommonConstants.ZILLOW_SOCIAL_SITE:
@@ -1401,7 +1534,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         SocialMediaPostResponseDetails socialMediaPostResponseDetails, OrganizationUnitSettings companySettings,
         boolean isZillow, boolean isAgentsHidden, String surveyId ) throws InvalidInputException, NoRecordsFetchedException
     {
-        LOG.debug( "Method postToLinkedInForHierarchy() started" );
+        LOG.debug( "Method postToLinkedInForHierarchy() started" +rating);
         if ( socialMediaPostDetails == null ) {
             throw new InvalidInputException( "passed parameter socialMediaPostDetails is null" );
         }
@@ -1549,14 +1682,24 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         } catch ( Exception e ) {
             // update SocialMediaPostResponse object
             SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
-            linkedinPostResponse.setAccessToken( setting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
+            
+            String accessToken = "";
+            if(setting.getSocialMediaTokens() != null ) {
+                if(setting.getSocialMediaTokens().getLinkedInV2Token() != null) {
+                    accessToken = setting.getSocialMediaTokens().getLinkedInV2Token().getLinkedInAccessToken();
+                } else if(setting.getSocialMediaTokens().getLinkedInToken() != null) {
+                    accessToken = setting.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
+                }
+            }
+            
+            linkedinPostResponse.setAccessToken( accessToken );
             linkedinPostResponse.setPostDate( new Date( System.currentTimeMillis() ) );
             linkedinPostResponse.setResponseMessage( e.getMessage() );
             if ( mediaPostResponseDetails.getLinkedinPostResponseList() == null )
                 mediaPostResponseDetails.setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
             mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
             
-            LOG.error("Found error while posting to LinkedIn for a hierarchy", e);
+            LOG.error("Found error while posting to LinkedIn for a hierarchy, surveyId is "+surveyId,e);
             
             reportBug( "Linkedin", setting.getProfileName(), e );
             return e.getMessage();
@@ -1727,12 +1870,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         boolean onlyPostToSocialSurvey, boolean isZillow ) throws NonFatalException
     {
 
-        LOG.info( "Method to post feedback of customer to various pages of social networking sites started." );
+        LOG.info( "Method to post feedback of customer to various pages of social networking sites started.");
         boolean successfullyPosted = true;
-
+        
         // format rating
         rating = surveyHandler.getFormattedSurveyScore( rating );
-
+        
         if ( agentProfileLink == null || agentProfileLink.isEmpty() ) {
             throw new InvalidInputException(
                 "Invalid parameter passed : passed input parameter agentProfileLink is null or empty" );
@@ -2033,10 +2176,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 break;
 
             case CommonConstants.LINKEDIN_SOCIAL_SITE:
-                if ( ( mediaTokens.getLinkedInToken() != null )
-                    && ( mediaTokens.getLinkedInToken().getLinkedInPageLink() != null )
-                    && !( mediaTokens.getLinkedInToken().getLinkedInPageLink().isEmpty() ) )
-                    socialUpdateAction.setLink( mediaTokens.getLinkedInToken().getLinkedInPageLink() );
+                if ( ( mediaTokens.getLinkedInV2Token() != null )
+                    && ( mediaTokens.getLinkedInV2Token().getLinkedInPageLink() != null )
+                    && !( mediaTokens.getLinkedInV2Token().getLinkedInPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getLinkedInV2Token().getLinkedInPageLink() );
                 break;
 
             case CommonConstants.ZILLOW_SOCIAL_SITE:
@@ -2203,7 +2346,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
                     CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
             }
-            if ( mediaTokens.getLinkedInToken() != null ) {
+            if ( mediaTokens.getLinkedInV2Token() != null ) {
                 String socialMedia = CommonConstants.LINKEDIN_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.LINKED_IN;
                 // disconnect social network in mongo
@@ -2446,7 +2589,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         // + "-star review on" + ( isZillow ? " Zillow via" : " " ) +
         // "SocialSurvey saying : \"" + feedback
         // + "\".\nView this and more at " + linkUrl + "/";
-        String facebookMessage = rating + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" ) + " \u2014 " + feedback
+        String facebookMessage = rating + " Star Review on " + ( isZillow ? ZILLOW : "SocialSurvey" ) + " \u2014 " + feedback
             + " by " + customerDisplayName + " for " + agentName + "\n" + ( isZillow ? linkUrl : "" );
         return facebookMessage;
     }
@@ -2465,7 +2608,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         // + "-star review on" + ( isZillow ? " Zillow via " : " " ) +
         // "SocialSurvey saying : \"" + linkedInComment
         // + "\". View this and more at " + linkUrl;
-        String linkedinMessage = rating + " Star Review on " + ( isZillow ? "Zillow" : "SocialSurvey" ) + " \u2014 "
+        String linkedinMessage = rating + " Star Review on " + ( isZillow ? ZILLOW : "SocialSurvey" ) + " \u2014 "
             + linkedInComment + " by " + customerDisplayName + " for " + agentName + "\n" + ( isZillow ? linkUrl : "" );
         return linkedinMessage;
     }
@@ -3176,6 +3319,20 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN, linkedInToken, iden, collectionName );
         LOG.info( "Method updateLinkedinToken() ended" );
     }
+    
+    /**
+     * 
+     * @param collectionName
+     * @param iden
+     * @param linkedInToken
+     */
+    public void updateLinkedinV2Token( String collectionName, long iden, LinkedInToken linkedInToken )
+    {
+        LOG.info( "Method updateLinkedinToken() started" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
+            MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_V2_SOCIAL_MEDIA_TOKEN, linkedInToken, iden, collectionName );
+        LOG.info( "Method updateLinkedinToken() ended" );
+    }
 
 
     /**
@@ -3397,6 +3554,28 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             if ( mediaTokens.getLinkedInToken().isTokenExpiryAlertSent() )
                 return true;
             long tokenCreatedOn = mediaTokens.getLinkedInToken().getLinkedInAccessTokenCreatedOn();
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis( tokenCreatedOn );
+
+            // adding 1 month to created time
+            cal.add( Calendar.DATE, tokenRefreshInterval );
+            Date createdOnPlusRefreshInterval = cal.getTime();
+            if ( new Date( System.currentTimeMillis() ).after( createdOnPlusRefreshInterval ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean checkForLinkedInV2TokenRefresh( SocialMediaTokens mediaTokens )
+    {
+        LOG.debug( "Method checkForLinkedInV2TokenRefresh() called to check if token refresh is required" );
+        if ( mediaTokens != null && mediaTokens.getLinkedInV2Token() != null ) {
+            if ( mediaTokens.getLinkedInV2Token().isTokenExpiryAlertSent() )
+                return true;
+            long tokenCreatedOn = mediaTokens.getLinkedInV2Token().getLinkedInAccessTokenCreatedOn();
 
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis( tokenCreatedOn );
@@ -3742,6 +3921,55 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         return false;
     }
+    
+   /* (non-Javadoc)
+   * @see com.realtech.socialsurvey.core.services.social.SocialManagementService#checkLinkedInV2TokenExpiry(com.realtech.socialsurvey.core.entities.OrganizationUnitSettings, java.lang.String)
+   */
+    @Override
+   public boolean checkLinkedInV2TokenExpiry( OrganizationUnitSettings settings, String collection )
+   {
+
+       LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInV2Token();
+       long tokenCreatedOn = linkedInToken.getLinkedInAccessTokenCreatedOn();
+       long expirySeconds = linkedInToken.getLinkedInAccessTokenExpiresIn();
+
+       long expiryHours = expirySeconds / 3600;
+       Calendar cal = Calendar.getInstance();
+       cal.setTimeInMillis( tokenCreatedOn );
+       Date createdOn = cal.getTime();
+
+       Calendar curDateCal = Calendar.getInstance();
+       // adding 7 days to current time
+       curDateCal.add( Calendar.HOUR, 168 );
+       Date curDatePlusSeven = curDateCal.getTime();
+
+       Calendar cal2 = Calendar.getInstance();
+       cal2.setTimeInMillis( createdOn.getTime() );
+
+       cal2.add( Calendar.HOUR, (int) expiryHours );
+       Date expiresOn = cal2.getTime();
+
+       if ( curDatePlusSeven.after( expiresOn ) ) {
+           return true;
+       }
+       // validate token if linkedIn token is not validated
+       if ( linkedInToken.getLastTokenExpiryValidationTime() == 0L ) {
+           linkedInToken.setLastTokenExpiryValidationTime( System.currentTimeMillis() );
+           updateLinkedinV2Token( collection, settings.getIden(), linkedInToken );
+           return checkForLinkedInV2TokenExpiry( linkedInToken );
+       }
+       // validate token if it was validated 5 days ago
+       cal.setTimeInMillis( linkedInToken.getLastTokenExpiryValidationTime() );
+       cal.add( Calendar.DATE, 5 );
+       Date lastValidatedPlusFive = cal.getTime();
+       if ( new Date( System.currentTimeMillis() ).after( lastValidatedPlusFive ) ) {
+           linkedInToken.setLastTokenExpiryValidationTime( System.currentTimeMillis() );
+           updateLinkedinV2Token( collection, settings.getIden(), linkedInToken );
+           return checkForLinkedInV2TokenExpiry( linkedInToken );
+       }
+
+       return false;
+   }
 
 
     @Override
@@ -4103,6 +4331,39 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             HttpResponse response;
             try {
                 response = client.execute( get );
+
+                if ( response.getStatusLine() != null && response.getStatusLine().getStatusCode() != HttpStatus.SC_OK ) {
+                    return true;
+                }
+                return false;
+
+            } catch ( IOException e ) {
+                LOG.error( "Unable to connect to LinkedIn to get acces token.", e );
+                return false;
+            }
+        } else {
+            LOG.warn( "LinkedIn media tokens not found for token:{}", token );
+            return false;
+
+        }
+    }
+    
+    @Override
+    public boolean checkForLinkedInV2TokenExpiry( LinkedInToken token )
+    {
+        if ( !token.isTokenExpiryAlertSent() && token.getLinkedInAccessToken() != null
+            && !token.getLinkedInAccessToken().isEmpty() ) {
+
+            HttpClient client = HttpClientBuilder.create().build();
+            
+            
+            HttpGet httpGet = new HttpGet( linkedinProfileUriV2 );
+            httpGet.setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + token.getLinkedInAccessToken() );
+            httpGet.setHeader( CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE );
+            
+            HttpResponse response;
+            try {
+                response = client.execute( httpGet );
 
                 if ( response.getStatusLine() != null && response.getStatusLine().getStatusCode() != HttpStatus.SC_OK ) {
                     return true;

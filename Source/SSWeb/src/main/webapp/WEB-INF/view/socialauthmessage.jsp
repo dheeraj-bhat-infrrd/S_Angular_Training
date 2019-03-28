@@ -62,7 +62,7 @@
  $(document).ready(function() {
 	var curDate = new Date();
 	$('#ss-cc-year').html(curDate.getFullYear());
-		
+	
 	var waitMessage = "${message}";
 	if (parseInt(waitMessage) == 1) {
 		var authUrl = "${authUrl}";
@@ -101,6 +101,7 @@ $(window).on('unload', function(){
 	if (window.opener != null && !window.opener.closed) {
 		parentWindow = window.opener;
 	}
+	
 	var fromDashboard = "${fromDashboard}";
 	var restful = "${restful}";
 	var flow = "${socialFlow}";
@@ -108,39 +109,89 @@ $(window).on('unload', function(){
 	var waitMessage = "${message}";
 	var isManual = "${isManual}"
 	
-	if(fromDashboard == 1){
-		var columnName = "${columnName}";
-		var columnValue = "${columnValue}";
-		
-		if(isFixSocialMedia != undefined && isFixSocialMedia == 1 && parseInt(waitMessage) != 1 && isManual == "true"){
-			parentWindow.fixSocialMediaResponse(columnName, columnValue);
-		}
-		
-		parentWindow.showDashboardButtons(columnName, columnValue);
-	}
-	else if(restful != "1"){
-		if (flow == "registration") {
-			var payload = {
-				'socialNetwork' : "linkedin"
-			};
-			fetchSocialProfileUrl(payload, function(data) {
-				parentWindow.showLinkedInProfileUrl(data.responseText);
-				parentWindow.showProfileLink("linkedin", data.responseText);
-			});
-		}
-		else {
-			var payload = {
+	var payloadForLinkedInPopup;
+	if (flow == "registration") {
+		payloadForLinkedInPopup = {
+			'socialNetwork' : "linkedin"
+		};
+	}else{
+		payloadForLinkedInPopup = {
 				'socialNetwork' : "${socialNetwork}"
-			};
-			fetchSocialProfileUrl(payload, function(data) {
-				if(data.statusText == 'OK'){
-
-					parentWindow.loadSocialMediaUrlInPopup();
-					parentWindow.loadSocialMediaUrlInSettingsPage();
-
-					parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);
+		};
+	}
+	
+	if(payloadForLinkedInPopup.socialNetwork == 'linkedin'){
+		fetchSocialProfileUrl(payloadForLinkedInPopup,function(data){
+			if(data.statusText == 'OK'){
+				parentWindow.$('#linked-in-prof-url-popup').attr('data-fromDashboard',"${fromDashboard}");
+				parentWindow.$('#linked-in-prof-url-popup').attr('data-restful',"${restful}");
+				parentWindow.$('#linked-in-prof-url-popup').attr('data-socialFlow',"${socialFlow}");
+				parentWindow.$('#linked-in-prof-url-popup').attr('data-isFixSocialMedia',"${isFixSocialMedia}");
+				parentWindow.$('#linked-in-prof-url-popup').attr('data-message',"${message}");
+				parentWindow.$('#linked-in-prof-url-popup').attr('data-isManual',"${message}");
+				parentWindow.$('#linked-in-prof-url-popup').attr('data-columnName',"${fromDashboard}");
+				parentWindow.$('#linked-in-prof-url-popup').attr('data-columnValue',"${columnValue}");
+				
+				var profileUrlLink = data.responseText;
+				
+				parentWindow.$('#linked-in-prof-url-popup').attr('data-profileUrl');
+				
+				if(profileUrlLink == '' || profileUrlLink == null || profileUrlLink == undefined || profileUrlLink.length <=0){
+					parentWindow.$('#linked-in-popup-text').html('We are sorry we cannot find the Linkedin URL for your profile, please provide the url in the following format "https://www.linkedin.com/in/esanchezmtg/');
+				}else{
+					parentWindow.$('#linked-in-popup-text').html('Please confirm your LinkedIn Profile Url>');
+					parentWindow.$('#linked-in-popup-inp').val(profileUrlLink);
 				}
-			});
+				
+				parentWindow.$('#linked-in-prof-url-popup-main').show();
+			}
+		});
+	}else{
+		updateUIForSocialMedia();
+	}
+	
+	function updateUIForSocialMedia(){
+		var fromDashboard = "${fromDashboard}";
+		var restful = "${restful}";
+		var flow = "${socialFlow}";
+		var isFixSocialMedia ="${isFixSocialMedia}";
+		var waitMessage = "${message}";
+		var isManual = "${isManual}"
+		
+		if(fromDashboard == 1){
+			var columnName = "${columnName}";
+			var columnValue = "${columnValue}";
+			
+			if(isFixSocialMedia != undefined && isFixSocialMedia == 1 && parseInt(waitMessage) != 1 && isManual == "true"){
+				parentWindow.fixSocialMediaResponse(columnName, columnValue);
+			}
+			
+			parentWindow.showDashboardButtons(columnName, columnValue);
+		}
+		else if(restful != "1"){
+			if (flow == "registration") {
+				var payload = {
+					'socialNetwork' : "linkedin"
+				};
+				fetchSocialProfileUrl(payload, function(data) {
+					parentWindow.showLinkedInProfileUrl(data.responseText);
+					parentWindow.showProfileLink("linkedin", data.responseText);
+				});
+			}
+			else {
+				var payload = {
+					'socialNetwork' : "${socialNetwork}"
+				};
+				fetchSocialProfileUrl(payload, function(data) {
+					if(data.statusText == 'OK'){
+
+						parentWindow.loadSocialMediaUrlInPopup();
+						parentWindow.loadSocialMediaUrlInSettingsPage();
+
+						parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);
+					}
+				});
+			}
 		}
 	}
 });

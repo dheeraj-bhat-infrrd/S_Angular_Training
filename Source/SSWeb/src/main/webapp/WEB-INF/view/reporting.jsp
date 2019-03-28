@@ -239,9 +239,10 @@
 	</div>
 </div>
 
-<div id="linkedin-api-v2-update-ribbon-outer" class="linkedin-api-v2-update-ribbon-outer">
+<div id="linkedin-api-v2-update-ribbon-outer" class="linkedin-api-v2-update-ribbon-outer ${linkedUpdateClass}">
 	<div id="linkedin-api-v2-update-ribbon-body" class="linkedin-api-v2-update-ribbon-body  cursor-pointer">
-		<span class="margin-left-auto">Linkedin integration is changing and your existing connection will stop working starting March 1st. To continue using Linkedin with SocialSurvey, please <a onclick="openAuthPage(event,'linkedinV2', false, this);" data-link="${linkedinLink}">&nbsp;click here&nbsp;</a> and update your Linkedin connection</span>
+		<span class="margin-left-auto linkedProfileUrl ${linkedProfileUrlClass}">Sorry, we couldn't find LinkedIn profile link, please enter LinkedIn profile link while reconnecting to LinkedIn, please <a onclick="openAuthPage(event,'linkedin', false, this);" data-link="${linkedinLink}">&nbsp;click here&nbsp;</a> and update your LinkedIn connection with your profile link</span>
+		<span class="margin-left-auto linkedV2Token ${linkedV2TokenClass}">We have updated our LinkedIn integration. To continue using LinkedIn with SocialSurvey, please <a onclick="openAuthPage(event,'linkedin', false, this);" data-link="${linkedinLink}">&nbsp;click here&nbsp;</a> and update your LinkedIn connection</span>
 	   <div id="linkedin-api-v2-update-ribbon-close-btn" class="linkedin-api-v2-update-ribbon-close-btn cursor-pointer">x</div>
 	</div>
 </div>

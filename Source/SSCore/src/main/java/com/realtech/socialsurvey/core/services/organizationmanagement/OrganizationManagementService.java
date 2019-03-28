@@ -1916,5 +1916,13 @@ public interface OrganizationManagementService
 	 */
 	public String getStateCodeByStateName(String stateName);
 
+    /**
+     * @param entityType
+     * @param entityId
+     * @param linkedInprofileUrl
+     * @return
+     * @throws InvalidInputException 
+     */
+    public String saveLinkedInProfileUrl( String entityType, long entityId, String linkedInprofileUrl ) throws InvalidInputException;
 
 }

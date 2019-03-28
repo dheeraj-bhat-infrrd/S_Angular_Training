@@ -3059,10 +3059,10 @@ public class ProfileManagementController
             LOG.debug( "No social media token in profile added" );
             socialMediaTokens = new SocialMediaTokens();
         }
-        if ( socialMediaTokens.getLinkedInToken() == null ) {
-            socialMediaTokens.setLinkedInToken( new LinkedInToken() );
+        if ( socialMediaTokens.getLinkedInV2Token() == null ) {
+            socialMediaTokens.setLinkedInV2Token( new LinkedInToken() );
         }
-        LinkedInToken linkedIntoken = socialMediaTokens.getLinkedInToken();
+        LinkedInToken linkedIntoken = socialMediaTokens.getLinkedInV2Token();
         linkedIntoken.setLinkedInPageLink( linkedinLink );
         socialMediaTokens.setLinkedInToken( linkedIntoken );
         LOG.debug( "Method updateLinkedinToken() finished from ProfileManagementController" );

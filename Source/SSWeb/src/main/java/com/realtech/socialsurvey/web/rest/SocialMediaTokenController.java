@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -32,7 +33,6 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FacebookPage;
-import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -49,6 +49,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.vo.IdInfoVO;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.common.TokenHandler;
 import com.realtech.socialsurvey.web.util.RequestUtils;
@@ -84,22 +85,21 @@ public class SocialMediaTokenController
     private String facebookUri;
 
     // LinkedIn
-    @Value ( "${LINKED_IN_REST_API_URI}")
-    private String linkedInRestApiUri;
-    @Value ( "${LINKED_IN_API_KEY}")
-    private String linkedInApiKey;
-    @Value ( "${LINKED_IN_API_SECRET}")
-    private String linkedInApiSecret;
-    @Value ( "${LINKED_IN_REDIRECT_URI}")
-    private String linkedinRedirectUri;
-    @Value ( "${LINKED_IN_AUTH_URI}")
-    private String linkedinAuthUri;
-    @Value ( "${LINKED_IN_ACCESS_URI}")
-    private String linkedinAccessUri;
-    @Value ( "${LINKED_IN_PROFILE_URI}")
-    private String linkedinProfileUri;
-    @Value ( "${LINKED_IN_SCOPE}")
-    private String linkedinScope;
+    
+    // Linkedin V2
+    @Value ( "${LINKED_IN_API_KEY_V2}")
+    private String linkedInApiKeyV2;
+    @Value ( "${LINKED_IN_API_SECRET_V2}")
+    private String linkedInApiSecretV2;
+    @Value ( "${LINKED_IN_AUTH_URI_V2}")
+    private String linkedinAuthUriV2;
+    @Value ( "${LINKED_IN_ACCESS_URI_V2}")
+    private String linkedinAccessUriV2;
+    @Value ( "${LINKED_IN_PROFILE_URI_V2}")
+    private String linkedinProfileUriV2;
+
+    @Value ( "${LINKED_IN_SCOPE_V2}")
+    private String linkedinScopeV2;
     
     @Autowired
     private RequestUtils requestUtils;
@@ -128,9 +128,7 @@ public class SocialMediaTokenController
     @Autowired
     private URLGenerator urlGenerator;
     
-    private static final String V1 = "V1";
-    
-    
+    private static final String V2 = "V2";
     
     @RequestMapping ( value = "/socialauthfromemail", method = RequestMethod.GET)
     public String getSocialAuthPageFromEmail( Model model , HttpServletRequest request )
@@ -169,7 +167,8 @@ public class SocialMediaTokenController
 
                     String redirectUri = socialManagementService.getLinkedinRedirectUrIForEmailRequest( columnName,
                         columnValue, serverBaseUrl );
-                    String linkedInAuth = socialManagementService.getLinkedinAuthUrl( linkedinAuthUri, linkedInApiKey, redirectUri, linkedinScope );
+
+                    String linkedInAuth = socialManagementService.getLinkedinAuthUrl( linkedinAuthUriV2, linkedInApiKeyV2, redirectUri, linkedinScopeV2 );
 
                     model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuth );
 
@@ -229,12 +228,12 @@ public class SocialMediaTokenController
             String redirectUri = socialManagementService.getLinkedinRedirectUrIForEmailRequest( columnName, columnValue,
                 requestUtils.getRequestServerName( request ) );
             params.add( new BasicNameValuePair( "redirect_uri", redirectUri ) );
-            params.add( new BasicNameValuePair( "client_id", linkedInApiKey ) );
-            params.add( new BasicNameValuePair( "client_secret", linkedInApiSecret ) );
+            params.add( new BasicNameValuePair( "client_id", linkedInApiKeyV2 ) );
+            params.add( new BasicNameValuePair( "client_secret", linkedInApiSecretV2 ) );
 
             // fetching access token
             HttpClient httpclient = HttpClientBuilder.create().build();
-            HttpPost httpPost = new HttpPost( linkedinAccessUri );
+            HttpPost httpPost = new HttpPost( linkedinAccessUriV2 );
             httpPost.setEntity( new UrlEncodedFormEntity( params, "UTF-8" ) );
             String accessTokenStr = httpclient.execute( httpPost, new BasicResponseHandler() );
             Map<String, Object> map = new Gson().fromJson( accessTokenStr, new TypeToken<Map<String, String>>() {}.getType() );
@@ -244,20 +243,23 @@ public class SocialMediaTokenController
             if ( StringUtils.isNotBlank( expiresInStr ) )
                 expiresIn = Long.valueOf( expiresInStr ).longValue();
 
-            // fetching linkedin profile url
-            HttpGet httpGet = new HttpGet( linkedinProfileUri + accessToken );
+            HttpGet httpGet = new HttpGet( linkedinProfileUriV2 );
+            httpGet.setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + accessToken );
+            httpGet.setHeader( CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE );
             String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
-            LinkedinUserProfileResponse profileData = new Gson().fromJson( basicProfileStr, LinkedinUserProfileResponse.class );
-            String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
-
+            IdInfoVO idInfoVO = new Gson().fromJson( basicProfileStr, IdInfoVO.class );
+            
+            String profileLink = null;
             boolean updated = false;
+            
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( entityId );
                 if ( companySettings == null ) {
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V1 );
+
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V2, idInfoVO.getId() );
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
                 companySettings.setSocialMediaTokens( mediaTokens );
@@ -283,7 +285,7 @@ public class SocialMediaTokenController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V1);
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V2, idInfoVO.getId());
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
                 regionSettings.setSocialMediaTokens( mediaTokens );
@@ -309,7 +311,8 @@ public class SocialMediaTokenController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V1);
+
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V2, idInfoVO.getId());
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
                 branchSettings.setSocialMediaTokens( mediaTokens );
@@ -335,7 +338,8 @@ public class SocialMediaTokenController
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V1);
+
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, V2, idInfoVO.getId());
                 mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
 

@@ -5048,6 +5048,24 @@ public class OrganizationManagementController
             return "false";
         }
     }
+    
+    @ResponseBody
+    @RequestMapping (value = "/savelinkedinprofileurl", method = RequestMethod.POST)
+    public String saveLinkedInProfileUrl( HttpServletRequest request )
+    {
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        
+        String linkedInProfileUrl = request.getParameter( "linkedInProfileUrl" );
+        try {
+            Response response = ssApiIntergrationBuilder.getIntegrationApi().saveLinkedInProfileUrl( entityType, entityId, linkedInProfileUrl );
+            
+            return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        }catch(SSAPIException e) {
+            return "Unable to save profile url";
+        }
+    }
 
 }
 // JIRA: SS-24 BY RM02 EOC

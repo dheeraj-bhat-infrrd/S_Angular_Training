@@ -102,6 +102,29 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
         }
         LOG.debug( "Method handleLinkedinException ended" );
     }
+    
+    /**
+     * 
+     */
+    @Override
+    public void handleLinkedinV2Exception( OrganizationUnitSettings settings, String collectionName )
+    {
+        LOG.debug( "Method handleLinkedinException started" );
+        if ( settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getLinkedInV2Token() != null ) {
+            LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInV2Token();
+            if ( !linkedInToken.isTokenExpiryAlertSent() ) {
+                String emailId = generateAndSendSocialMedialTokenExpiryMail( settings , collectionName , CommonConstants.LINKEDIN_SOCIAL_SITE);
+                //update alert detail in token
+                if ( emailId != null ) {
+                    linkedInToken.setTokenExpiryAlertEmail( emailId );
+                    linkedInToken.setTokenExpiryAlertSent( true );
+                    linkedInToken.setTokenExpiryAlertTime( new Date() );
+                    socialManagementService.updateLinkedinV2Token( collectionName, settings.getIden(), linkedInToken );
+                }
+            }
+        }
+        LOG.debug( "Method handleLinkedinException ended" );
+    }
 
 
     /**

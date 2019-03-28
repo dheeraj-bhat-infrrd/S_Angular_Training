@@ -96,6 +96,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_TWITTER_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.twitterToken";
     public static final String KEY_GOOGLE_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleToken";
     public static final String KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.linkedInToken";
+    // linkedin v2 token
+    public static final String KEY_LINKEDIN_V2_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.linkedInV2Token";
     public static final String KEY_ZILLOW_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.zillowToken";
     public static final String KEY_YELP_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.yelpToken";
     public static final String KEY_LENDINGTREE_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.lendingTreeToken";
@@ -103,6 +105,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_GOOGLE_BUSINESS_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleBusinessToken";
     public static final String KEY_INSTAGRAM_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.instagramToken";
     public static final String KEY_FACEBOOK_PIXEL_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.facebookPixelToken";
+    public static final String KEY_LINKEDIN_PROFILE = "socialMediaTokens.linkedInProfileUrl";
     public static final String KEY_CONTACT_NAME = "contact_details.name";
     public static final String KEY_POSTIONS = "positions";
     public static final String KEY_STATUS = "status";
@@ -1253,6 +1256,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         cList.add( Criteria.where( KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN ).exists( true ) );
         //cList.add( Criteria.where( KEY_TWITTER_SOCIAL_MEDIA_TOKEN ).exists( true ) );
         cList.add( Criteria.where( KEY_LINKEDIN_SOCIAL_MEDIA_TOKEN ).exists( true ) );
+        cList.add( Criteria.where( KEY_LINKEDIN_V2_SOCIAL_MEDIA_TOKEN ).exists( true ) );
         //cList.add( Criteria.where( KEY_GOOGLE_SOCIAL_MEDIA_TOKEN ).exists( true ) );
 
         Criteria criteria = new Criteria().orOperator( cList.toArray( new Criteria[cList.size()] ) );

@@ -434,9 +434,6 @@ public interface UserManagementService
     public void updateCompany( Company company );
 
 
-    public List<SettingsDetails> getSettingScoresById( long companyId, long regionId, long branchId );
-
-
     public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
         throws InvalidInputException, ProfileNotFoundException;
 

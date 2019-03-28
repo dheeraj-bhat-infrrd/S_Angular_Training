@@ -7,8 +7,9 @@ public class LinkedInRequestV2 implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	private LinkedInText text;
-	private LinkedInContent content;
-	private LinkedInVisibility visibility;
+	private LinkedInV2Content content;
+	private LinkedInDistributionTarget distribution;
+	
 	private String owner;
 
 	public LinkedInText getText() {
@@ -22,30 +23,17 @@ public class LinkedInRequestV2 implements Serializable{
 	/**
 	 * @return the content
 	 */
-	public LinkedInContent getContent() {
+	public LinkedInV2Content getContent() {
 		return content;
 	}
 
 	/**
 	 * @param content the content to set
 	 */
-	public void setContent(LinkedInContent content) {
+	public void setContent(LinkedInV2Content content) {
 		this.content = content;
 	}
 
-	/**
-	 * @return the visibility
-	 */
-	public LinkedInVisibility getVisibility() {
-		return visibility;
-	}
-
-	/**
-	 * @param visibility the visibility to set
-	 */
-	public void setVisibility(LinkedInVisibility visibility) {
-		this.visibility = visibility;
-	}
 
 	public String getOwner() {
 		return owner;
@@ -53,6 +41,14 @@ public class LinkedInRequestV2 implements Serializable{
 
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+
+	public LinkedInDistributionTarget getDistribution() {
+		return distribution;
+	}
+
+	public void setDistribution(LinkedInDistributionTarget distribution) {
+		this.distribution = distribution;
 	}
 
 }

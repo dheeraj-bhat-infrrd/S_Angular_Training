@@ -102,6 +102,32 @@
 		</div>
 	</div>
 	
+	<div id="linked-in-prof-url-popup-main" class="overlay-main hide">
+		<div id="linked-in-prof-url-popup" class="overlay-disable-wrapper" data-profileUrl="" data-fromDashboard="" data-restful="" data-socialFlow="" data-isFixSocialMedia="" data-message="" data-isManual="" data-columnName="" data-columnValue="" data-socialNetwork="linkedin"> 
+			<div id="linked-in-prof-url-popup-header" class="ol-header">
+				LinkedIn Url Confirmation
+			</div>
+			<div class="ol-content">
+				<div id="linked-in-prof-url-popup-text" class="ol-txt">
+					<div style="font-family:OpenSansSemiBold;" id="linked-in-popup-text"></div>
+					<input id="linked-in-popup-inp" type="text" class="linked-in-popup-inp" value="">
+				</div>
+				<div class="clearfix">
+					<div class="float-left ol-btn-wrapper">
+						<div id="linked-in-prof-url-popup-cancel" class="ol-btn cursor-pointer">
+							Exit
+						</div>
+					</div>
+					<div class="float-left ol-btn-wrapper">
+						<div id="linked-in-prof-url-popup-continue" class="ol-btn cursor-pointer" data-btn-isDisabled=false>
+							Edit
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 	<div id="zillow-popup" class="overlay-main hide">
 		<div id="zillow-popup-body"  class="welcome-popup-wrapper zillow-popup-wrapper"> <!--  class="overlay-disable-wrapper overlay-disable-wrapper-zillow container login-container"> -->
 		</div>
