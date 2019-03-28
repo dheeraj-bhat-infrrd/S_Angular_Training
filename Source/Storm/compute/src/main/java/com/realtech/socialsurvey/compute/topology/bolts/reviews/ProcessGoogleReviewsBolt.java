@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -85,26 +86,18 @@ public class ProcessGoogleReviewsBolt extends BaseComputeBoltWithAck
             myBusiness = (MyBusiness) input.getValueByField( "myBusiness" );
             try {
                 List<Account> accounts = listAccounts();
-                /*String gmbAccount = LocalPropertyFileHandler.getInstance()
-                .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.GMB_ACCOUNT )
-                .orElse( backupGMBAccount );*/
                 for ( Account account : accounts ) {
                     List<Location> locations = listLocations( account.getName() );
                     for ( Location location : locations ) {
                         String placeId = location.getLocationKey().getPlaceId();
                         if ( placeId != null ) {
                             fetchReviewFlag = true;
-                            List<OrganizationUnitIds> ouIds = null;
-                            if ( placeId != null ) {
-                                ouIds = SSAPIOperations.getInstance().getDetailsFromPlaceId( placeId );
-                            }
-                            if ( ouIds != null ) {
-                                listSurveys( location.getName(), ouIds, placeId, input );
-                            }
+                            List<OrganizationUnitIds> ouIds = SSAPIOperations.getInstance().getDetailsFromPlaceId( placeId );
+                            listSurveys( location.getName(), ouIds, input );
                         }
                     }
                 }
-            } catch ( IOException | ParseException e ) {
+            } catch ( Exception e ) {
                 LOG.error( "Failed processing google reviews.", e );
             }
         }
@@ -114,20 +107,20 @@ public class ProcessGoogleReviewsBolt extends BaseComputeBoltWithAck
         MyBusiness.Accounts.List accountsList = myBusiness.accounts().list();
         ListAccountsResponse response = accountsList.execute();
         List<Account> accounts = response.getAccounts();
-
-        /*for (Account account : accounts) {
-          LOG.info(account.toPrettyString());
-        }*/
-        return accounts;
+        if(accounts != null && !accounts.isEmpty()) {
+            return accounts;
+        } else {
+            return new ArrayList<>();
+        }
       }
 
 
-    private void listSurveys( String name, List<OrganizationUnitIds> ouIds, String placeId, Tuple input )
+    private void listSurveys( String name, List<OrganizationUnitIds> ouIds, Tuple input )
         throws IOException, ParseException
     {
         while ( fetchReviewFlag ) {
             List<Review> reviews = listReviews( name );
-            if ( reviews != null && reviews.size() > 0 ) {
+            if ( reviews != null && !reviews.isEmpty() ) {
                 for ( OrganizationUnitIds ouId : ouIds ) {
                     long key = getKeyFromOUId( ouId );
                     long lastBatchTime = 0;
@@ -271,7 +264,12 @@ public class ProcessGoogleReviewsBolt extends BaseComputeBoltWithAck
     {
         MyBusiness.Accounts.Locations.List locationsList = myBusiness.accounts().locations().list( accountName );
         ListLocationsResponse response = locationsList.execute();
-        return response.getLocations();
+        List<Location> locations = response.getLocations();
+        if(locations != null && !locations.isEmpty()) {
+            return locations;
+        } else {
+            return new ArrayList<>();
+        }
     }
 
 
