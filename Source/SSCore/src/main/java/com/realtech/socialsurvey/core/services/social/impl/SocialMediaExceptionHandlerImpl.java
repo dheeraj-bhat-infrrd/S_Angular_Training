@@ -109,7 +109,8 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
     @Override
     public void handleLinkedinV2Exception( OrganizationUnitSettings settings, String collectionName )
     {
-        LOG.debug( "Method handleLinkedinException started" );
+        LOG.info( "Method handleLinkedinException started" );
+
         if ( settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getLinkedInV2Token() != null ) {
             LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInV2Token();
             if ( !linkedInToken.isTokenExpiryAlertSent() ) {
@@ -123,7 +124,7 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
                 }
             }
         }
-        LOG.debug( "Method handleLinkedinException ended" );
+        LOG.info( "Method handleLinkedinException ended" );
     }
 
 
@@ -141,7 +142,7 @@ public class SocialMediaExceptionHandlerImpl implements SocialMediaExceptionHand
                 && settings.getContact_details().getMail_ids().getWork() != null ) {
                 emailId = settings.getContact_details().getMail_ids().getWork();
                 name = settings.getContact_details().getName();
-                LOG.info( "Sending SocialMedialTokenExpiryMail to " + emailId );
+                LOG.info( "Sending SocialMedialTokenExpiryMail to {}", emailId );
                 try {
                     //TODO update the update connection url
                     String loginUrl = getApplicationLoginUrl();

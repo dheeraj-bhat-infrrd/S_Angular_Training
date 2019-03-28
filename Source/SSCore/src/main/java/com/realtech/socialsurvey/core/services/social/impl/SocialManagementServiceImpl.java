@@ -3328,7 +3328,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      */
     public void updateLinkedinV2Token( String collectionName, long iden, LinkedInToken linkedInToken )
     {
-        LOG.info( "Method updateLinkedinToken() started" );
+        LOG.info( "Method updateLinkedinToken() started for iden {} and collection name {}",iden, collectionName );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
             MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_V2_SOCIAL_MEDIA_TOKEN, linkedInToken, iden, collectionName );
         LOG.info( "Method updateLinkedinToken() ended" );
