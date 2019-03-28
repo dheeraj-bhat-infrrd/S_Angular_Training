@@ -2398,7 +2398,7 @@
       <value>
         <name>SOCIAL_MEDIA_TOKENS_ID</name>
         <rename>SOCIAL_MEDIA_TOKENS_ID</rename>
-        <update>N</update>
+        <update>Y</update>
       </value>
       <value>
         <name>CREATED_ON</name>

@@ -6,10 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Order;
@@ -432,6 +429,33 @@ public class GenericReportingDaoImpl<T, ID extends Serializable> implements Gene
             throw new DatabaseException( "HibernateException caught in findByKeyValue().", hibernateException );
         }
         return criteria.list();
+    }
+
+
+    /**
+     * Given a native query and the query parameters , this method executes the query and returns the
+     * data as T. Here T represents the VO which contains all the fields applied in the selected
+     * projection of the query.
+     * @param dataClass
+     * @param queries
+     * @param nativeQuery
+     * @return
+     */
+    @Override
+    @Transactional
+    public List<T> executeNativeQuery(Class<T> dataClass, Map<String, Object> queries, String nativeQuery){
+        Query sqlQuery = getSession().createSQLQuery( nativeQuery);
+        try {
+            for ( Entry<String, Object> query : queries.entrySet() ) {
+                sqlQuery.setParameter( query.getKey(), query.getValue() );
+            }
+            sqlQuery.setResultTransformer( Transformers.aliasToBean( dataClass ) );
+            LOG.debug( sqlQuery.getQueryString() );
+        } catch ( HibernateException hibernateException  ){
+            LOG.error( "HibernateException caught in executeNativeQuery().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in executeNativeQuery().", hibernateException );
+        }
+        return sqlQuery.list();
     }
 
 }

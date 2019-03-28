@@ -434,9 +434,6 @@ public interface UserManagementService
     public void updateCompany( Company company );
 
 
-    public List<SettingsDetails> getSettingScoresById( long companyId, long regionId, long branchId );
-
-
     public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
         throws InvalidInputException, ProfileNotFoundException;
 
@@ -531,7 +528,16 @@ public interface UserManagementService
     public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException;
 
 
-    public void restoreDeletedUser( long userId, boolean restoreSocial ) throws InvalidInputException, SolrException;
+	/**
+	 * Method to restore deleted user
+	 * @param userId
+	 * @param restoreSocial
+	 * @param branchId
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	public void restoreDeletedUser(long userId, boolean restoreSocial, long branchId)
+			throws InvalidInputException, SolrException;
 
 
     public User getUserByEmailAddress( String emailId ) throws InvalidInputException, NoRecordsFetchedException;
@@ -669,8 +675,18 @@ public interface UserManagementService
 
 	void updateAgentIdInSurveyPreinitiation(String emailId) throws InvalidInputException, NoRecordsFetchedException;
 	
+	
 	public void updateSurveyDetails();
 	
+	
+	/**
+	 * Method to get all active roles for userIds
+	 * @param userIds
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<UserFromSearch> getActiveUsersByUserIds( Set<Long> userIds ) throws InvalidInputException;
+
 	
 	/**
 	 * Method to check if  branch and region admins can Add or Delete User.
@@ -681,6 +697,7 @@ public interface UserManagementService
 	 * @throws InvalidInputException
 	 */
 	public boolean canAddAndDeleteUser(String entityType, long companyId, boolean addOrDeleteFlag) throws InvalidInputException;
+
 
 }
 // JIRA SS-34 BY RM02 BOC

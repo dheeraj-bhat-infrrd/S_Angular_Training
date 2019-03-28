@@ -30,7 +30,7 @@ public class SettingsSetterDaoImpl extends GenericDaoImpl<SettingsDetails, Long>
     @Override
     public List<SettingsDetails> getScoresById( long companyId, long regionId, long branchId )
     {
-        LOG.info( "Method getSettingsScoresByRegionId() started." );
+        LOG.info( "Method getScoresById started" );
 
         List<SettingsDetails> scoreListObject = new ArrayList<SettingsDetails>();
         List<Object[]> scoreList = new ArrayList<Object[]>();
@@ -87,10 +87,10 @@ public class SettingsSetterDaoImpl extends GenericDaoImpl<SettingsDetails, Long>
 
 
         } catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in getSettingsScoresByCompanyId() ", hibernateException );
-            throw new DatabaseException( "Exception caught in deleteBranchesByCompanyId() ", hibernateException );
+            LOG.error( "Exception caught in getScoresById() ", hibernateException );
+            throw new DatabaseException( "Exception caught in method getScoresById ", hibernateException );
         }
-        LOG.info( "Method to delete all the branches by company id, deleteBranchesByCompanyId() finished." );
+        LOG.info( "Method getScoresById finished." );
 
         return scoreListObject;
     }

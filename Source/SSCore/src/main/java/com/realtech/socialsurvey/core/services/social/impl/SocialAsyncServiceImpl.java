@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -34,6 +35,7 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.vo.IdInfoVO;
 
 
 @Component
@@ -51,8 +53,8 @@ public class SocialAsyncServiceImpl implements SocialAsyncService
     @Autowired
     private SocialManagementService socialManagementService;
 
-    @Value ( "${LINKED_IN_REST_API_URI}")
-    private String linkedInRestApiUri;
+    @Value ( "${LINKED_IN_REST_API_URI_V2}")
+    private String linkedInRestApiUriV2;
 
 
     @Async
@@ -74,20 +76,17 @@ public class SocialAsyncServiceImpl implements SocialAsyncService
     {
         LOG.info( "Method linkedInDataUpdate() called from SocialAsyncServiceImpl" );
 
-        StringBuilder linkedInFetch = new StringBuilder( linkedInRestApiUri )
-            .append( "(id,first-name,last-name,headline,picture-url,public-profile-url,industry,summary,specialties,location,picture-urls::(original),positions:(id,title,summary,start-date,end-date,is-current,company:(id,name,type,size,industry,ticker)),associations,interests,skills:(id,skill:(name)))" );
-        linkedInFetch.append( "?oauth2_access_token=" ).append( mediaTokens.getLinkedInToken().getLinkedInAccessToken() );
-        linkedInFetch.append( "&format=json" );
-        LOG.debug( "URL to be posted to linked in: " + linkedInFetch.toString() );
-
         LinkedInProfileData linkedInProfileData = null;
         try {
             HttpClient httpclient = HttpClientBuilder.create().build();
-            HttpGet httpget = new HttpGet( linkedInFetch.toString() );
-            String responseBody = httpclient.execute( httpget, new BasicResponseHandler() );
+            HttpGet httpGet = new HttpGet( linkedInRestApiUriV2 );
+            httpGet.setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + mediaTokens.getLinkedInV2Token().getLinkedInAccessToken() );
+            httpGet.setHeader( CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE );
+            String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
+            IdInfoVO idInfoVO = new Gson().fromJson( basicProfileStr, IdInfoVO.class );
 
-            LOG.debug( "Response from linkedin: " + responseBody );
-            linkedInProfileData = new Gson().fromJson( responseBody, LinkedInProfileData.class );
+            linkedInProfileData = new LinkedInProfileData();
+            linkedInProfileData.setId( idInfoVO.getId() );
         } catch ( Exception e ) {
             LOG.error( e.getMessage(), e );
         }
@@ -95,7 +94,8 @@ public class SocialAsyncServiceImpl implements SocialAsyncService
         if ( linkedInProfileData != null ) {
             LOG.debug( "Adding linkedin data into collection" );
             try {
-                mediaTokens.getLinkedInToken().setLinkedInPageLink( linkedInProfileData.getPublicProfileUrl() );
+                // Waiting for becoming LinkedIn partner.
+                //mediaTokens.setLinkedInProfileUrl( linkedInProfileData.getPublicProfileUrl() );
                 if ( collection.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
                     socialManagementService.updateAgentSocialMediaTokens( (AgentSettings) unitSettings, mediaTokens );
                 }

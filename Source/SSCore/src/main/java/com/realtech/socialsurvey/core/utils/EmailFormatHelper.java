@@ -291,8 +291,8 @@ public class EmailFormatHelper
                     facebook_link = socialMediaTokens.getFacebookToken().getFacebookPageLink();
                 if ( socialMediaTokens.getTwitterToken() != null )
                     twitter_link = socialMediaTokens.getTwitterToken().getTwitterPageLink();
-                if ( socialMediaTokens.getLinkedInToken() != null )
-                    linkedin_link = socialMediaTokens.getLinkedInToken().getLinkedInPageLink();
+                if ( socialMediaTokens.getLinkedInV2Token() != null )
+                    linkedin_link = socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink();
                 if ( socialMediaTokens.getGoogleToken() != null )
                     google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
@@ -314,8 +314,8 @@ public class EmailFormatHelper
                     company_facebook_link = socialMediaTokens.getFacebookToken().getFacebookPageLink();
                 if ( socialMediaTokens.getTwitterToken() != null )
                     company_twitter_link = socialMediaTokens.getTwitterToken().getTwitterPageLink();
-                if ( socialMediaTokens.getLinkedInToken() != null )
-                    company_linkedin_link = socialMediaTokens.getLinkedInToken().getLinkedInPageLink();
+                if ( socialMediaTokens.getLinkedInV2Token() != null )
+                    company_linkedin_link = socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink();
                 if ( socialMediaTokens.getGoogleToken() != null )
                     company_google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
@@ -454,8 +454,8 @@ public class EmailFormatHelper
                     facebook_link = socialMediaTokens.getFacebookToken().getFacebookPageLink();
                 if ( socialMediaTokens.getTwitterToken() != null )
                     twitter_link = socialMediaTokens.getTwitterToken().getTwitterPageLink();
-                if ( socialMediaTokens.getLinkedInToken() != null )
-                    linkedin_link = socialMediaTokens.getLinkedInToken().getLinkedInPageLink();
+                if ( socialMediaTokens.getLinkedInV2Token() != null )
+                    linkedin_link = socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink();
                 if ( socialMediaTokens.getGoogleToken() != null )
                     google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
@@ -477,8 +477,8 @@ public class EmailFormatHelper
                     company_facebook_link = socialMediaTokens.getFacebookToken().getFacebookPageLink();
                 if ( socialMediaTokens.getTwitterToken() != null )
                     company_twitter_link = socialMediaTokens.getTwitterToken().getTwitterPageLink();
-                if ( socialMediaTokens.getLinkedInToken() != null )
-                    company_linkedin_link = socialMediaTokens.getLinkedInToken().getLinkedInPageLink();
+                if ( socialMediaTokens.getLinkedInV2Token() != null )
+                    company_linkedin_link = socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink();
                 if ( socialMediaTokens.getGoogleToken() != null )
                     company_google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )

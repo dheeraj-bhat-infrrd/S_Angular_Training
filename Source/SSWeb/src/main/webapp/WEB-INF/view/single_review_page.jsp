@@ -84,8 +84,8 @@
 					<div class="sr-margin-bottom-50">
 						<span>Posted on </span> 
 						<c:choose>
-							<c:when test="${not empty singleReviewItem.surveyUpdatedDate and singleReviewItem.surveyUpdatedDate != singleReviewItem.surveyCompletedDate }">
-							 	<fmt:formatDate type="date" pattern="MMMM d, YYYY"value="${singleReviewItem.surveyUpdatedDate}" /> 
+							<c:when test="${not empty singleReviewItem.surveyUpdatedDate and singleReviewItem.surveyUpdatedDate != singleReviewItem.surveyCompletedDate}">
+							 	<fmt:formatDate type="date" pattern="MMMM d, YYYY" value="${singleReviewItem.surveyUpdatedDate}" /> 
 							</c:when>
 							<c:when test="${ not empty singleReviewItem.surveyCompletedDate}">
 							    <fmt:formatDate type="date" pattern="MMMM d, YYYY" value="${singleReviewItem.surveyCompletedDate}" />

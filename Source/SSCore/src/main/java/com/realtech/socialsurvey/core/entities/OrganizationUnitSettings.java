@@ -136,8 +136,40 @@ public class OrganizationUnitSettings implements Serializable
     
     private String optoutText;
     private Boolean isLoginEnableAllowed;
+
+    //customer success information
+    private String customerSuccessName;
+    private long customerSuccessId;
+    private String customerSuccessOwner;
+    private long closedDate;
+    private String rvp;
+    private String tmcClient;
+    private String surveyDataSource;
+    private String dbaForCompany;
+    private String potential;
+    private long gapAnalysisDate;
+    private String customerSettings;
+    private String servicesSold;
+    private String transferReviewPolicy;
+    private String tag;
+    private String realtorSurveys;
+    private String happyWorkflowSettings;
+
+    //customer success point of contact information
+    private String primaryPoc;
+    private String poc2;
+    private String email;
+    private String emailPoc2;
+    private String secondaryEmail;
+    private String phonePoc2;
+    private String phone;
+    private long lastConversationDate;
+
+    //ss-admin notes
+    List<Notes> notes;
+
     private boolean isIncompleteSurveyDeleteEnabled = true;
-    
+
     private boolean branchAdminAllowedToDeleteUser = true;//To Allow Branch Admin Delete User.
 
     private boolean regionAdminAllowedToDeleteUser = true;//To Allow Region Admin Delete User
@@ -1163,6 +1195,305 @@ public class OrganizationUnitSettings implements Serializable
     public void setRegionAdminAllowedToAddUser( boolean regionAdminAllowedToAddUser )
     {
         this.regionAdminAllowedToAddUser = regionAdminAllowedToAddUser;
+    }
+
+
+    public String getCustomerSuccessName()
+    {
+        return customerSuccessName;
+    }
+
+
+    public void setCustomerSuccessName( String customerSuccessName )
+    {
+        this.customerSuccessName = customerSuccessName;
+    }
+
+
+    public long getCustomerSuccessId()
+    {
+        return customerSuccessId;
+    }
+
+
+    public void setCustomerSuccessId( long customerSuccessId )
+    {
+        this.customerSuccessId = customerSuccessId;
+    }
+
+
+    public String getCustomerSuccessOwner()
+    {
+        return customerSuccessOwner;
+    }
+
+
+    public void setCustomerSuccessOwner( String customerSuccessOwner )
+    {
+        this.customerSuccessOwner = customerSuccessOwner;
+    }
+
+    public long getClosedDate()
+    {
+        return closedDate;
+    }
+
+
+    public void setClosedDate( long closedDate )
+    {
+        this.closedDate = closedDate;
+    }
+
+
+    public String getRvp()
+    {
+        return rvp;
+    }
+
+
+    public void setRvp( String rvp )
+    {
+        this.rvp = rvp;
+    }
+
+
+    public String getTmcClient()
+    {
+        return tmcClient;
+    }
+
+
+    public void setTmcClient( String tmcClient )
+    {
+        this.tmcClient = tmcClient;
+    }
+
+
+    public String getSurveyDataSource()
+    {
+        return surveyDataSource;
+    }
+
+
+    public void setSurveyDataSource( String surveyDataSource )
+    {
+        this.surveyDataSource = surveyDataSource;
+    }
+
+
+    public String getDbaForCompany()
+    {
+        return dbaForCompany;
+    }
+
+
+    public void setDbaForCompany( String dbaForCompany )
+    {
+        this.dbaForCompany = dbaForCompany;
+    }
+
+
+    public String getPotential()
+    {
+        return potential;
+    }
+
+
+    public void setPotential( String potential )
+    {
+        this.potential = potential;
+    }
+
+
+    public String getCustomerSettings()
+    {
+        return customerSettings;
+    }
+
+
+    public void setCustomerSettings( String customerSettings )
+    {
+        this.customerSettings = customerSettings;
+    }
+
+
+    public String getServicesSold()
+    {
+        return servicesSold;
+    }
+
+
+    public void setServicesSold( String servicesSold )
+    {
+        this.servicesSold = servicesSold;
+    }
+
+
+    public String getTransferReviewPolicy()
+    {
+        return transferReviewPolicy;
+    }
+
+
+    public void setTransferReviewPolicy( String transferReviewPolicy )
+    {
+        this.transferReviewPolicy = transferReviewPolicy;
+    }
+
+
+    public String getTag()
+    {
+        return tag;
+    }
+
+
+    public void setTag( String tag )
+    {
+        this.tag = tag;
+    }
+
+
+    public String getRealtorSurveys()
+    {
+        return realtorSurveys;
+    }
+
+
+    public void setRealtorSurveys( String realtorSurveys )
+    {
+        this.realtorSurveys = realtorSurveys;
+    }
+
+
+    public String getHappyWorkflowSettings()
+    {
+        return happyWorkflowSettings;
+    }
+
+
+    public void setHappyWorkflowSettings( String happyWorkflowSettings )
+    {
+        this.happyWorkflowSettings = happyWorkflowSettings;
+    }
+
+
+    public long getGapAnalysisDate()
+    {
+        return gapAnalysisDate;
+    }
+
+
+    public void setGapAnalysisDate( long gapAnalysisDate )
+    {
+        this.gapAnalysisDate = gapAnalysisDate;
+    }
+
+
+    public String getPrimaryPoc()
+    {
+        return primaryPoc;
+    }
+
+
+    public void setPrimaryPoc( String primaryPoc )
+    {
+        this.primaryPoc = primaryPoc;
+    }
+
+
+    public String getPoc2()
+    {
+        return poc2;
+    }
+
+
+    public void setPoc2( String poc2 )
+    {
+        this.poc2 = poc2;
+    }
+
+
+    public String getEmail()
+    {
+        return email;
+    }
+
+
+    public void setEmail( String email )
+    {
+        this.email = email;
+    }
+
+
+    public String getEmailPoc2()
+    {
+        return emailPoc2;
+    }
+
+
+    public void setEmailPoc2( String emailPoc2 )
+    {
+        this.emailPoc2 = emailPoc2;
+    }
+
+
+    public String getSecondaryEmail()
+    {
+        return secondaryEmail;
+    }
+
+
+    public void setSecondaryEmail( String secondaryEmail )
+    {
+        this.secondaryEmail = secondaryEmail;
+    }
+
+
+    public String getPhonePoc2()
+    {
+        return phonePoc2;
+    }
+
+
+    public void setPhonePoc2( String phonePoc2 )
+    {
+        this.phonePoc2 = phonePoc2;
+    }
+
+
+    public String getPhone()
+    {
+        return phone;
+    }
+
+
+    public void setPhone( String phone )
+    {
+        this.phone = phone;
+    }
+
+
+    public long getLastConversationDate()
+    {
+        return lastConversationDate;
+    }
+
+
+    public void setLastConversationDate( long lastConversationDate )
+    {
+        this.lastConversationDate = lastConversationDate;
+    }
+
+
+    public List<Notes> getNotes()
+    {
+        return notes;
+    }
+
+
+    public void setNotes( List<Notes> notes )
+    {
+        this.notes = notes;
     }
 
 

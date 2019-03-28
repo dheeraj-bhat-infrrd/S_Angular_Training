@@ -1,51 +1,22 @@
 package com.realtech.socialsurvey.web.controller;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.Utils;
-import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
-import com.realtech.socialsurvey.core.dao.RedisDao;
-import com.realtech.socialsurvey.core.dao.SocialPostDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.enums.AccountType;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.ProfileType;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.generator.URLGenerator;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
-import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.core.vo.IdInfoVO;
-import com.realtech.socialsurvey.web.common.ErrorResponse;
-import com.realtech.socialsurvey.web.common.JspResolver;
-import com.realtech.socialsurvey.web.common.TokenHandler;
-import com.realtech.socialsurvey.web.util.RequestUtils;
-import facebook4j.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.UnavailableException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -67,18 +38,77 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
+import com.realtech.socialsurvey.core.entities.FacebookPage;
+import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.InstagramToken;
+import com.realtech.socialsurvey.core.entities.LenderRef;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMonitorData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
+import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.TwitterToken;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.ZillowToken;
+import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.vo.IdInfoVO;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
+import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.common.TokenHandler;
+import com.realtech.socialsurvey.web.util.RequestUtils;
+
+import facebook4j.Account;
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
+import facebook4j.RawAPIResponse;
+import facebook4j.Reading;
+import facebook4j.ResponseList;
 import retrofit.mime.TypedByteArray;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
-
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.*;
 
 
 /**
@@ -126,9 +156,6 @@ public class SocialManagementController
     private EmailFormatHelper emailFormatHelper;
 
     @Autowired
-    private EmailServices emailServices;
-
-    @Autowired
     private TokenHandler tokenHandler;
 
     @Value ( "${APPLICATION_BASE_URL}")
@@ -153,35 +180,13 @@ public class SocialManagementController
     @Value ( "${IG_URI}")
     private String instagramUri;
 
-    // LinkedIn
-    
-    
-    // Linkedin V1
-    @Value ( "${LINKED_IN_REST_API_URI}")
-    private String linkedInRestApiUri;
-    @Value ( "${LINKED_IN_API_KEY}")
-    private String linkedInApiKey;
-    @Value ( "${LINKED_IN_API_SECRET}")
-    private String linkedInApiSecret;
+    // Linkedin V2
     @Value ( "${LINKED_IN_REDIRECT_URI}")
     private String linkedinRedirectUri;
-    @Value ( "${LINKED_IN_AUTH_URI}")
-    private String linkedinAuthUri;
-    @Value ( "${LINKED_IN_ACCESS_URI}")
-    private String linkedinAccessUri;
-    @Value ( "${LINKED_IN_PROFILE_URI}")
-    private String linkedinProfileUri;
-    @Value ( "${LINKED_IN_SCOPE}")
-    private String linkedinScope;
-    
-    
-    // Linkedin V2
     @Value ( "${LINKED_IN_API_KEY_V2}")
     private String linkedInApiKeyV2;
     @Value ( "${LINKED_IN_API_SECRET_V2}")
     private String linkedInApiSecretV2;
-    @Value ( "${LINKED_IN_REDIRECT_URI_V2}")
-    private String linkedinRedirectUriV2;
     @Value ( "${LINKED_IN_AUTH_URI_V2}")
     private String linkedinAuthUriV2;
     @Value ( "${LINKED_IN_ACCESS_URI_V2}")
@@ -190,10 +195,8 @@ public class SocialManagementController
     private String linkedinProfileUriV2;
     @Value ( "${LINKED_IN_SCOPE_V2}")
     private String linkedinScopeV2;
-    
-    private static final String V1 = "V1";    
+       
     private static final String V2 = "V2";
-
 
     // Google
     @Value ( "${GOOGLE_API_KEY}")
@@ -221,10 +224,6 @@ public class SocialManagementController
     @Autowired
     private SurveyHandler surveyHandler;
 
-    //TODO : DAO must not be used in controllers
-    @Autowired
-    private SocialPostDao socialPostDao;
-
     @Autowired
     private BatchTrackerService batchTrackerService;
 
@@ -240,14 +239,9 @@ public class SocialManagementController
 
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
-
-    @Autowired
-    private URLGenerator urlGenerator;
     
     @Value ( "${ZILLOW_PARTNER_ID}")
     private String zillowPartnerId;
-    
-    private static final String X_RESTLI_PROTOCOL_VERSION = "X-Restli-Protocol-Version";
     
     @Autowired
     private ZillowIntergrationApiBuilder zillowIntegrationApiBuilder;
@@ -327,29 +321,15 @@ public class SocialManagementController
 
                 LOG.info( "Returning the twitter authorizationurl : " + requestToken.getAuthorizationURL() );
                 break;
-
-            // Building linkedin authUrl
+                
+             // Building linkedin authUrl
             case "linkedin":
                 if ( socialFlow != null && !socialFlow.isEmpty() ) {
                     session.setAttribute( CommonConstants.SOCIAL_FLOW, socialFlow );
                 }
                 //String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
                 
-                String linkedInAuth = socialManagementService.getLinkedinAuthUrl( linkedinAuthUri, linkedInApiKey, serverBaseUrl + linkedinRedirectUri, linkedinScope );
-                
-                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuth );
-
-                LOG.info( "Returning the linkedin authorizationurl : {}", linkedInAuth );
-                break;
-                
-             // Building linkedin authUrl
-            case "linkedinV2":
-                if ( socialFlow != null && !socialFlow.isEmpty() ) {
-                    session.setAttribute( CommonConstants.SOCIAL_FLOW, socialFlow );
-                }
-                //String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
-                
-                String linkedInAuthV2 = socialManagementService.getLinkedinAuthUrl( linkedinAuthUriV2, linkedInApiKeyV2, serverBaseUrl + linkedinRedirectUriV2, linkedinScopeV2 );
+                String linkedInAuthV2 = socialManagementService.getLinkedinAuthUrl( linkedinAuthUriV2, linkedInApiKeyV2, serverBaseUrl + linkedinRedirectUri, linkedinScopeV2 );
                 
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuthV2 );
 
@@ -1220,22 +1200,6 @@ public class SocialManagementController
         return mediaTokens;
     }
 
-    
-    /**
-     * The url that LinkedIn send request to with the oauth verification code - Linkedin V1
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
-    @RequestMapping ( value = "/linkedinauth", method = RequestMethod.GET)
-    public String authenticateLinkedInAccessV1( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method authenticateLinkedInAccessV1() called from SocialManagementController" );
-        return authenticateLinkedInAccess( model, request, V1, linkedInApiKey, linkedInApiSecret, linkedinAccessUri,
-            linkedinRedirectUri );
-    }
-
 
     /**
      * The url that LinkedIn send request to with the oauth verification code - Linkedin V2
@@ -1244,12 +1208,12 @@ public class SocialManagementController
      * @param request
      * @return
      */
-    @RequestMapping ( value = "/linkedinauthV2", method = RequestMethod.GET)
+    @RequestMapping ( value = "/linkedinauth", method = RequestMethod.GET)
     public String authenticateLinkedInAccessV2( Model model, HttpServletRequest request )
     {
         LOG.info( "Method authenticateLinkedInAccessV2() called from SocialManagementController" );
         return authenticateLinkedInAccess( model, request, V2, linkedInApiKeyV2, linkedInApiSecretV2, linkedinAccessUriV2,
-            linkedinRedirectUriV2 );
+            linkedinRedirectUri );
     }
 
     public String authenticateLinkedInAccess( Model model, HttpServletRequest request, String version, String linkedInApiKey, String linkedInApiSecret, String linkedinAccessUri, String linkedinRedirectUri )
@@ -1311,25 +1275,14 @@ public class SocialManagementController
             if(StringUtils.isNotBlank( expiresInStr ))
                 expiresIn = Long.valueOf( expiresInStr ).longValue();
 
-            String profileLink = null;
-            LinkedinUserProfileResponse profileData = null;
-            if(version.equals( V1 )) {
-             // fetching linkedin profile url
-                HttpGet httpGet = new HttpGet( linkedinProfileUri + accessToken );
-                String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
-                profileData = new Gson().fromJson( basicProfileStr, LinkedinUserProfileResponse.class );
-                profileLink = profileData.getPublicProfileUrl();
-            } else {
-                HttpGet httpGet = new HttpGet( linkedinProfileUriV2 );
-                httpGet.setHeader("Authorization","Bearer " + accessToken);
-                httpGet.setHeader( X_RESTLI_PROTOCOL_VERSION,"2.0.0" );
-                String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
-                IdInfoVO idInfoVO = new Gson().fromJson( basicProfileStr, IdInfoVO.class );
-                profileData = new LinkedinUserProfileResponse();
-                profileData.setId(idInfoVO.getId());
-            }
-            
+            HttpGet httpGet = new HttpGet( linkedinProfileUriV2 );
+            httpGet.setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + accessToken );
+            httpGet.setHeader( CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE );
+            String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
+            IdInfoVO idInfoVO = new Gson().fromJson( basicProfileStr, IdInfoVO.class );
 
+            String profileLink = null;
+            
             boolean updated = false;
             int accountMasterId = accountType.getValue();
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -1341,7 +1294,7 @@ public class SocialManagementController
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
                 
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, version, profileData.getId() );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, version, idInfoVO.getId() );
                 
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );
@@ -1371,7 +1324,7 @@ public class SocialManagementController
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
                 
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, version, profileData.getId() );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, version, idInfoVO.getId() );
                 
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
@@ -1401,7 +1354,7 @@ public class SocialManagementController
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
                 
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, version, profileData.getId() );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, version, idInfoVO.getId() );
                 
                 mediaTokens = socialManagementService.updateSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
@@ -1432,7 +1385,7 @@ public class SocialManagementController
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
                 
-                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, version, profileData.getId() );
+                mediaTokens = tokenHandler.updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, version, idInfoVO.getId() );
                 
                 mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
@@ -1481,7 +1434,9 @@ public class SocialManagementController
 
         // Updating attributes
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        
         model.addAttribute( "socialNetwork", "linkedin" );
+        
         LOG.info( "Method authenticateLinkedInAccess() finished from SocialManagementController" );
         return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
@@ -1973,9 +1928,9 @@ public class SocialManagementController
         if ( usersettings != null && usersettings.getAgentSettings() != null
             && usersettings.getAgentSettings().getSocialMediaTokens() != null ) {
       
-            if ( usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null ) {
-                linkedinProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken()
+            if ( usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInV2Token() != null
+                && usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInV2Token().getLinkedInPageLink() != null ) {
+                linkedinProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInV2Token()
                     .getLinkedInPageLink();
             }
         }
@@ -2804,49 +2759,68 @@ public class SocialManagementController
         String socialNetwork = request.getParameter( "socialNetwork" );
         HttpSession session = request.getSession( false );
         UserSettings usersettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-
+        
         String profileUrl = "";
+        if ( usersettings == null) {
+            return profileUrl;
+        }
+        
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        
+        OrganizationUnitSettings unitSettings = null;
+        
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            unitSettings = usersettings.getCompanySettings();
+            
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            if(usersettings.getRegionSettings() != null) {
+                unitSettings = usersettings.getRegionSettings().get( entityId);
+            }
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            if(usersettings.getBranchSettings() != null) {
+                unitSettings = usersettings.getBranchSettings().get( entityId);
+            }
+        }
+        if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            unitSettings = usersettings.getAgentSettings();
+        }
+        
+        if(unitSettings == null || unitSettings.getSocialMediaTokens() == null) {
+            return profileUrl;
+        }
+
+        SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
+        
         if ( socialNetwork.equalsIgnoreCase( "facebook" ) ) {
-            if ( usersettings != null && usersettings.getAgentSettings() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink() != null ) {
+            if ( socialMediaTokens.getFacebookToken() != null
+                && socialMediaTokens.getFacebookToken().getFacebookPageLink() != null ) {
                 profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink();
             }
         } else if ( socialNetwork.equalsIgnoreCase( "twitter" ) ) {
-            if ( usersettings != null && usersettings.getAgentSettings() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink() != null ) {
-                profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink();
+            if (  socialMediaTokens.getTwitterToken().getTwitterPageLink() != null ) {
+                profileUrl = socialMediaTokens.getTwitterToken().getTwitterPageLink();
             }
         } else if ( socialNetwork.equals( "linkedin" ) ) {
-            if ( usersettings != null && usersettings.getAgentSettings() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null ) {
-                profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink();
+            if (  socialMediaTokens.getLinkedInV2Token() != null) {
+                profileUrl = socialMediaTokens.getLinkedInProfileUrl();
             }
         } else if ( socialNetwork.equalsIgnoreCase( "google" ) ) {
-            if ( usersettings != null && usersettings.getAgentSettings() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink() != null ) {
-                profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink();
+            if ( socialMediaTokens.getGoogleToken() != null
+                && socialMediaTokens.getGoogleToken().getProfileLink() != null ) {
+                profileUrl = socialMediaTokens.getGoogleToken().getProfileLink();
             }
         } else if ( socialNetwork.equalsIgnoreCase( "zillow" ) ) {
-            if ( usersettings != null && usersettings.getAgentSettings() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens() != null
-                && usersettings.getAgentSettings().getSocialMediaTokens().getZillowToken() != null ) {
-                if ( usersettings.getAgentSettings().getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
-                    profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getZillowToken().getZillowProfileLink();
+            if (socialMediaTokens.getZillowToken() != null ) {
+                if ( socialMediaTokens.getZillowToken().getZillowProfileLink() != null ) {
+                    profileUrl = socialMediaTokens.getZillowToken().getZillowProfileLink();
                 }
             }
         } else if ( socialNetwork.equalsIgnoreCase( "instagram" ) ) {
-            if ( usersettings != null && usersettings.getAgentSettings() != null
-                    && usersettings.getAgentSettings().getSocialMediaTokens() != null
-                    && usersettings.getAgentSettings().getSocialMediaTokens().getInstagramToken() != null ) {
-                if ( usersettings.getAgentSettings().getSocialMediaTokens().getInstagramToken().getPageLink() != null ) {
-                    profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getInstagramToken().getPageLink();
+            if (  socialMediaTokens != null
+                    && socialMediaTokens.getInstagramToken() != null ) {
+                if ( socialMediaTokens.getInstagramToken().getPageLink() != null ) {
+                    profileUrl = socialMediaTokens.getInstagramToken().getPageLink();
                 }
             }
         }
@@ -3242,8 +3216,17 @@ public class SocialManagementController
                 if ( tokens.getTwitterToken() != null && tokens.getTwitterToken().getTwitterPageLink() != null ) {
                     model.addAttribute( "twitterLink", tokens.getTwitterToken().getTwitterPageLink() );
                 }
-                if ( tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null ) {
-                    model.addAttribute( "linkedinLink", tokens.getLinkedInToken().getLinkedInPageLink() );
+                if ( tokens.getLinkedInV2Token() != null && tokens.getLinkedInV2Token().getLinkedInAccessToken() != null ) {
+                    model.addAttribute( "linkedinLink", tokens.getLinkedInV2Token().getLinkedInPageLink() );
+                    if(StringUtils.isEmpty( tokens.getLinkedInV2Token().getLinkedInPageLink() )) {
+                        model.addAttribute( "linkedinLinkNotFound",true);
+                    } else {
+                        model.addAttribute( "linkedinLinkNotFound",false);
+                    }
+                    model.addAttribute( "linkedinConnected", true );
+                    
+                } else {
+                    model.addAttribute( "linkedinConnected", false );
                 }
                 if ( tokens.getZillowToken() != null && tokens.getZillowToken().getZillowProfileLink() != null ) {
                     model.addAttribute( "zillowLink", tokens.getZillowToken().getZillowProfileLink() );

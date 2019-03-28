@@ -490,5 +490,30 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
         }
         return (long) criteria.setProjection( Projections.rowCount() ).uniqueResult();
     }
+
+    /**
+     * Given a native query and the query parameters , this method executes the query and returns the
+     * data as T. Here T represents the VO which contains all the fields applied in the selected
+     * projection of the query.
+     * @param dataClass
+     * @param queries
+     * @param nativeQuery
+     * @return
+     */
+    @Override
+    public List<T> executeNativeQuery(Class<T> dataClass, Map<String, Object> queries, String nativeQuery){
+        Query sqlQuery = getSession().createSQLQuery( nativeQuery);
+        try {
+            for ( Entry<String, Object> query : queries.entrySet() ) {
+                sqlQuery.setParameter( query.getKey(), query.getValue() );
+            }
+            sqlQuery.setResultTransformer( Transformers.aliasToBean( dataClass ) );
+            LOG.debug( sqlQuery.getQueryString() );
+        } catch ( HibernateException hibernateException  ){
+            LOG.error( "HibernateException caught in executeNativeQuery().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in executeNativeQuery().", hibernateException );
+        }
+        return sqlQuery.list();
+    }
 }
 // JIRA: SS-8: By RM05: EOC

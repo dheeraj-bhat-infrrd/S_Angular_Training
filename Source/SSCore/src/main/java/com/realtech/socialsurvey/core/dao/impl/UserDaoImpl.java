@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
@@ -24,11 +25,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.SqlQueries;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -46,6 +49,21 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
     @Autowired
     private CompanyDao companyDao;
 
+    /**
+     * Method to get name of the user
+     * @param userId
+     * @return
+     */
+    @Override
+    public String getUserName( long userId )
+    {
+        LOG.debug( "Method getUserName started for userId : {}" , userId );
+        Query query = getSession().createSQLQuery( SqlQueries.USER_NAME );
+
+        query.setParameter( 0, userId );
+        
+        return (String) query.uniqueResult();
+    }
 
     /*
      * Method to return all the users that match email id passed.
@@ -714,6 +732,22 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         Long userId = (Long) criteria.setProjection(Projections.property(CommonConstants.USER_ID)).uniqueResult();      
         return userId;
     }
-    
+
+    public List<Object[]> getSocialSurveyAdmins() throws HibernateException {
+
+        LOG.debug("Method to get the all social survey admins, getSocialSurveyAdmins() started.");
+
+        try {
+            Query query = getSession().createSQLQuery( "select USER_ID, FIRST_NAME, LAST_NAME from USERS "
+                + "where USER_ID in (select USER_ID from USER_PROFILE where PROFILES_MASTER_ID = 5 and STATUS = 1)" );
+
+            LOG.debug("Method to get the all social survey admins, getSocialSurveyAdmins() finished.");
+
+            return query.list();
+        } catch (HibernateException hibernateException) {
+
+            throw new DatabaseException("Exception caught in getSocialSurveyAdmins() ", hibernateException);
+        }
+    }
 }
 // JIRA SS-42 By RM-05 EOC

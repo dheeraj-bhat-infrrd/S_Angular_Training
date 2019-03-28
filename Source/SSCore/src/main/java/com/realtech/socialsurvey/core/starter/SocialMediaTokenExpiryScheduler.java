@@ -95,43 +95,66 @@ public class SocialMediaTokenExpiryScheduler extends QuartzJobBean
         for ( OrganizationUnitSettings orgUnit : orgUnitList ) {
             SocialMediaTokens smTokens = orgUnit.getSocialMediaTokens();
 
-            if ( smTokens != null && smTokens.getLinkedInToken() != null
-                && smTokens.getLinkedInToken().getLinkedInAccessTokenExpiresIn() != 0L ) {
-                if ( socialManagementService.checkLinkedInTokenExpiry( orgUnit, collectionName ) ) {
-                    LinkedInToken linkedInToken = smTokens.getLinkedInToken();
-                    if ( !linkedInToken.isTokenExpiryAlertSent() ) {
-                        //send alert mail to entity 
-                        String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit , collectionName , CommonConstants.LINKEDIN_SOCIAL_SITE );
-                        //update alert mail detail in linkedin token
-                        if ( emailId != null ) {
-                            linkedInToken.setTokenExpiryAlertEmail( emailId );
-                            linkedInToken.setTokenExpiryAlertSent( true );
-                            linkedInToken.setTokenExpiryAlertTime( new Date() );
-                            socialManagementService.updateLinkedinToken( collectionName, orgUnit.getIden(), linkedInToken );
+            if ( smTokens != null ) {
+                
+                if ( smTokens.getLinkedInV2Token() != null
+                    && smTokens.getLinkedInV2Token().getLinkedInAccessTokenExpiresIn() != 0L ) {
+                    if ( socialManagementService.checkLinkedInV2TokenExpiry( orgUnit, collectionName ) ) {
+                        LinkedInToken linkedInToken = smTokens.getLinkedInV2Token();
+                        if ( !linkedInToken.isTokenExpiryAlertSent() ) {
+                            //send alert mail to entity 
+                            String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit,
+                                collectionName, CommonConstants.LINKEDIN_SOCIAL_SITE );
+                            //update alert mail detail in linkedin token
+                            if ( emailId != null ) {
+                                linkedInToken.setTokenExpiryAlertEmail( emailId );
+                                linkedInToken.setTokenExpiryAlertSent( true );
+                                linkedInToken.setTokenExpiryAlertTime( new Date() );
+                                socialManagementService.updateLinkedinV2Token( collectionName, orgUnit.getIden(), linkedInToken );
+                            }
                         }
                     }
+                } else if ( smTokens.getLinkedInToken() != null
+                    && smTokens.getLinkedInToken().getLinkedInAccessTokenExpiresIn() != 0L ) {
+                    if ( socialManagementService.checkLinkedInTokenExpiry( orgUnit, collectionName ) ) {
+                        LinkedInToken linkedInToken = smTokens.getLinkedInToken();
+                        if ( !linkedInToken.isTokenExpiryAlertSent() ) {
+                            //send alert mail to entity 
+                            String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit,
+                                collectionName, CommonConstants.LINKEDIN_SOCIAL_SITE );
+                            //update alert mail detail in linkedin token
+                            if ( emailId != null ) {
+                                linkedInToken.setTokenExpiryAlertEmail( emailId );
+                                linkedInToken.setTokenExpiryAlertSent( true );
+                                linkedInToken.setTokenExpiryAlertTime( new Date() );
+                                socialManagementService.updateLinkedinToken( collectionName, orgUnit.getIden(), linkedInToken );
+                            }
+                        }
 
+                    }
                 }
 
-            }
-            if ( smTokens != null && smTokens.getFacebookToken() != null ) {
-                if ( socialManagementService.checkFacebookTokenExpiry( orgUnit, collectionName )  ){
-                    FacebookToken facebookToken = smTokens.getFacebookToken();
-                    if ( ! facebookToken.isTokenExpiryAlertSent() ) {
-                        LOG.debug( "Alert Mail hasn't send to sending alert mail for entity" );
-                        String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit , collectionName,  CommonConstants.FACEBOOK_SOCIAL_SITE );
-                        //update alert detail in token
-                        if ( emailId != null ) {
-                            facebookToken.setTokenExpiryAlertEmail( emailId );
-                            facebookToken.setTokenExpiryAlertSent( true );
-                            facebookToken.setTokenExpiryAlertTime( new Date() );
-                            socialManagementService.updateFacebookToken( collectionName, orgUnit.getIden(), facebookToken );
+                if ( smTokens.getFacebookToken() != null ) {
+                    if ( socialManagementService.checkFacebookTokenExpiry( orgUnit, collectionName ) ) {
+                        FacebookToken facebookToken = smTokens.getFacebookToken();
+                        if ( !facebookToken.isTokenExpiryAlertSent() ) {
+                            LOG.debug( "Alert Mail hasn't send to sending alert mail for entity" );
+                            String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( orgUnit,
+                                collectionName, CommonConstants.FACEBOOK_SOCIAL_SITE );
+                            //update alert detail in token
+                            if ( emailId != null ) {
+                                facebookToken.setTokenExpiryAlertEmail( emailId );
+                                facebookToken.setTokenExpiryAlertSent( true );
+                                facebookToken.setTokenExpiryAlertTime( new Date() );
+                                socialManagementService.updateFacebookToken( collectionName, orgUnit.getIden(), facebookToken );
+                            }
                         }
                     }
                 }
+
             }
         }
-        
+
         LOG.debug( "Inside method startProcessingForCollection finished." );
 
     }

@@ -105,7 +105,7 @@ public class UserController
         String data = String.format( "grant_type=password&username=%s&password=%s", loginRequest.getEmail(),
             loginRequest.getPassword() );
         HttpHeaders headers = new HttpHeaders();
-        headers.add( "Authorization", "Basic " + authData );
+        headers.add( HttpHeaders.AUTHORIZATION, "Basic " + authData );
         headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         HttpEntity<String> httpEntity = new HttpEntity<String>( data, headers );
         try {

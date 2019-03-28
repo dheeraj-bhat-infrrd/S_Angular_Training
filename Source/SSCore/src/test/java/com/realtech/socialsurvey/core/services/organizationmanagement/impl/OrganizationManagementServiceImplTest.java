@@ -28,44 +28,31 @@ import org.mockito.Spy;
 
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.BranchDao;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
-import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
-import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.dao.RegionDao;
-import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
-import com.realtech.socialsurvey.core.dao.UserDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.entities.AccountsMaster;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.DisabledAccount;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RetriedTransaction;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.*;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.utils.CommonUtils;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.vo.CompanyStatistics;
+import com.realtech.socialsurvey.core.vo.CustomerSuccessInformation;
+import com.realtech.socialsurvey.core.vo.UserVo;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.junit.*;
+import org.mockito.*;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 
+import java.util.*;
+
+import static org.junit.Assert.*;
 import junit.framework.Assert;
 
 
@@ -122,7 +109,24 @@ public class OrganizationManagementServiceImplTest
     
     @Mock
     private SurveyDetailsDao surveyDetailsDao;
+    
+    @Mock
+    private List<String> keyList = null;
+    
+    @Mock
+    private UtilityService utilityService;
+    
+    @Mock
+    private CommonUtils commonUtils;
 
+    @Mock
+    private GenericReportingDao<CompanyStatistics, Long> genericReportingDao;
+
+    @Mock
+    private GenericDao<UserVo, Long> genericDao;
+
+    @Mock
+    private DashboardService dashboardService;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
@@ -144,7 +148,6 @@ public class OrganizationManagementServiceImplTest
     @After
     public void tearDown() throws Exception
     {}
-
 
     @Test ( expected = InvalidInputException.class)
     public void testAddAccountTypeForCompanyWithNullStrAccountType() throws InvalidInputException, SolrException
@@ -2370,7 +2373,211 @@ public class OrganizationManagementServiceImplTest
     @Test
     public void testUpdateCompanySettings() {
         
-        organizationManagementServiceImpl.updateCompanySettings( new OrganizationUnitSettings(), "optoutText", "Your Login is currently disabled by your company admin" );
+        organizationManagementServiceImpl.updateCompanySettings( new OrganizationUnitSettings(), "optoutText",
+            "Your Login is currently disabled by your company admin" );
+    }
+
+    @Test
+    public void testUpdateCustomerInformation() throws Exception {
+        
+        long companyId = 995l; 
+        String keyToBeUpdated = "closedDate"; 
+        Object value = 39069l;
+        long modifiedBy = 39069l;
+        
+        Map<Integer, VerticalsMaster> verticalsMap = new HashMap<>();
+        Mockito.when( utilityService.populateVerticalMastersMap() ).thenReturn( verticalsMap );
+        
+        organizationManagementServiceImpl.afterPropertiesSet();
+        
+        assertEquals( organizationManagementServiceImpl.updateCustomerInformation( companyId, keyToBeUpdated, value, modifiedBy ),
+            "Successfully updated settings" );
+    }
+    
+    @Test
+    public void testInvalidKeyUpdateCustomerInformation() throws Exception {
+        
+        long companyId = 995l; 
+        String keyToBeUpdated = "accountDisabled"; 
+        Object value = new String("ACTIVE");
+        long modifiedBy = 39069l;
+        
+        Map<Integer, VerticalsMaster> verticalsMap = new HashMap<>();
+        Mockito.when( utilityService.populateVerticalMastersMap() ).thenReturn( verticalsMap );
+        
+        organizationManagementServiceImpl.afterPropertiesSet();
+        
+        assertEquals( organizationManagementServiceImpl.updateCustomerInformation( companyId, keyToBeUpdated, value, modifiedBy ),
+            "Some problem occurred while updating customer success information. Please try again later" );
+    }
+    
+    @Test
+    public void testNullValueUpdateCustomerInformation() throws Exception {
+        
+        long companyId = 995l; 
+        String keyToBeUpdated = "closedDate"; 
+        Object value = null;
+        long modifiedBy = 39069l;
+        
+        Map<Integer, VerticalsMaster> verticalsMap = new HashMap<>();
+        Mockito.when( utilityService.populateVerticalMastersMap() ).thenReturn( verticalsMap );
+        
+        organizationManagementServiceImpl.afterPropertiesSet();
+        
+        assertEquals( organizationManagementServiceImpl.updateCustomerInformation( companyId, keyToBeUpdated, value, modifiedBy ),
+            "Some problem occurred while updating customer success information. Please try again later" );
+    }
+    
+    @Test
+    public void testInvalidDateValueUpdateCustomerInformation() throws Exception {
+        
+        long companyId = 995l; 
+        String keyToBeUpdated = "closedDate"; 
+        Object value = "06-02-2019 10:10:30";
+        long modifiedBy = 39069l;
+        
+        Map<Integer, VerticalsMaster> verticalsMap = new HashMap<>();
+        Mockito.when( utilityService.populateVerticalMastersMap() ).thenReturn( verticalsMap );
+        
+        organizationManagementServiceImpl.afterPropertiesSet();
+        
+        assertEquals( organizationManagementServiceImpl.updateCustomerInformation( companyId, keyToBeUpdated, value, modifiedBy ),
+            "Some problem occurred while updating customer success information. Please try again later" );
+    }
+    
+    @Test
+    public void testCustomerSuccessValueUpdateCustomerInformation() throws Exception {
+        
+        long companyId = 995l; 
+        String keyToBeUpdated = "customerSuccessId"; 
+        Object value = "06-02-2019 10:10:30";
+        long modifiedBy = 39069l;
+        
+        Map<Integer, VerticalsMaster> verticalsMap = new HashMap<>();
+        Mockito.when( utilityService.populateVerticalMastersMap() ).thenReturn( verticalsMap );
+        
+        organizationManagementServiceImpl.afterPropertiesSet();
+        
+        assertEquals( organizationManagementServiceImpl.updateCustomerInformation( companyId, keyToBeUpdated, value, modifiedBy ),
+            "Some problem occurred while updating customer success information. Please try again later" );
+    }
+    
+    @Test
+    public void testCustomerSuccessIdNameValueUpdateCustomerInformation() throws Exception {
+        
+        long companyId = 995l; 
+        String keyToBeUpdated = "customerSuccessId"; 
+        Object value = "id,name";
+        long modifiedBy = 39069l;
+        
+        Map<Integer, VerticalsMaster> verticalsMap = new HashMap<>();
+        Mockito.when( utilityService.populateVerticalMastersMap() ).thenReturn( verticalsMap );
+        
+        organizationManagementServiceImpl.afterPropertiesSet();
+        
+        assertEquals( organizationManagementServiceImpl.updateCustomerInformation( companyId, keyToBeUpdated, value, modifiedBy ),
+            "Some problem occurred while updating customer success information. Please try again later" );
+    }
+    
+    @Test
+    public void testGetSocialSurveyAdmins() throws Exception {
+
+        List<UserVo> ssAdmins = null;
+
+        List<UserVo> list = new ArrayList<>();
+
+        UserVo object = new UserVo();
+        object.setUserId( 1001 );
+        object.setEmailId( "abc@xyz.co" );
+        list.add( object );
+
+        Mockito.when( genericDao.executeNativeQuery(Matchers.<Class<UserVo>>any(), Mockito.anyMap(),Mockito.anyString()) ).thenReturn( list );
+
+        assertTrue( organizationManagementServiceImpl.getSocialSurveyAdmins().size() > 0 );
+    }
+    
+    @Test
+    public void testNullGetSocialSurveyAdmins() throws Exception {
+
+        Mockito.when( genericDao.executeNativeQuery(Matchers.<Class<UserVo>>any(), Mockito.anyMap(),Mockito.anyString()) ).thenReturn( null );
+
+        assertNull( organizationManagementServiceImpl.getSocialSurveyAdmins() );
+    }
+
+    /*@Test
+    public void testEmptyGetSocialSurveyAdmins() throws Exception {
+
+        List<UserVo> list = new ArrayList<>();
+
+        Mockito.when( genericDao.executeNativeQuery(Matchers.<Class<UserVo>>any(), Mockito.anyMap(),Mockito.anyString()) ).thenReturn( list );
+
+        assertNull( organizationManagementServiceImpl.getSocialSurveyAdmins() );
+    }*/
+
+    @Test (expected = NoRecordsFetchedException.class)
+    public void testFetchCompanyStatisticsForUnknownCompanyId() throws Exception
+    {
+        organizationManagementServiceImpl.fetchCompanyStatistics(988l );
+    }
+
+    @Test (expected = InvalidInputException.class)
+    public void testFetchCompanyStatisticsForInvalidCompanyId() throws Exception
+    {
+        organizationManagementServiceImpl.fetchCompanyStatistics(-1 );
+    }
+
+    @Test
+    public void testFetchCompanyStatistics() throws Exception
+    {
+        CompanyStatistics companyStatistics = new CompanyStatistics();
+        companyStatistics.setUserCount( 100 );
+
+        List<CompanyStatistics> companyStatisticsList = new ArrayList<>(  );
+        companyStatisticsList.add( companyStatistics );
+
+        Mockito.when( genericReportingDao.executeNativeQuery(Matchers.<Class<CompanyStatistics>>any(), Mockito.anyMap(),Mockito.anyString()) )
+            .thenReturn(companyStatisticsList );
+        assertEquals( organizationManagementServiceImpl.fetchCompanyStatistics(90).getUserCount() ,100);
+    }
+
+    @Test(expected = InvalidInputException.class)
+    public void testFetchCustomerSuccessinfoForInvalidCompanyId() throws Exception
+    {
+         organizationManagementServiceImpl.fetchCustomerSuccessInformation(0);
+    }
+
+    @Test(expected = NoRecordsFetchedException.class)
+    public void testFetchCustomerSuccessinfoForUnknownCompanyId() throws Exception
+    {
+         organizationManagementServiceImpl.fetchCustomerSuccessInformation(100);
+    }
+
+
+    @Test
+    public void testFetchCustomerSuccessinfo() throws Exception
+    {
+        ContactDetailsSettings contactDetailsSettings = new ContactDetailsSettings();
+        contactDetailsSettings.setName( "TestCompany" );
+        OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+        companySettings.setContact_details( contactDetailsSettings );
+        companySettings.setCreatedBy( "123" );
+        companySettings.setModifiedBy( "321" );
+
+        Mockito.when( userDao.getUserName( Mockito.anyLong() ) ).thenReturn( "123" );
+        
+        int profilePercent = 1;
+
+        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(Mockito.anyLong(),Mockito.anyString(),Mockito.anyList() ))
+            .thenReturn( companySettings );
+
+        CustomerSuccessInformation customerSuccessInfo =  PowerMockito.mock( CustomerSuccessInformation.class );
+        PowerMockito.whenNew(  CustomerSuccessInformation.class).withAnyArguments().thenReturn( customerSuccessInfo );
+
+        Mockito.when( dashboardService.getProfileCompletionPercentage(Mockito.any( User.class ),Mockito.anyString(),Mockito.anyLong(),
+            Mockito.any(OrganizationUnitSettings.class)) ).thenReturn( profilePercent );
+        customerSuccessInfo.setPrimaryPoc( "BobbyWexiler" );
+
+        assert( organizationManagementServiceImpl.fetchCustomerSuccessInformation(90) != null) ;
     }
     
     @Test ( expected = InvalidInputException.class )

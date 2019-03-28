@@ -358,5 +358,17 @@ public interface SocialManagementService
 
     public String getLinkedinAuthUrl( String linkedinAuthUri, String linkedInApiKey, String redirectUri, String linkedinScope );
 
+
+    public boolean checkForLinkedInV2TokenRefresh( SocialMediaTokens mediaTokens );
+
+
+    public boolean checkLinkedInV2TokenExpiry( OrganizationUnitSettings settings, String collection );
+
+
+    public boolean checkForLinkedInV2TokenExpiry( LinkedInToken token );
+
+
+    public void updateLinkedinV2Token( String collectionName, long iden, LinkedInToken linkedInToken );
+
 }
 // JIRA SS-34 BY RM02 BOC

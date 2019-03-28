@@ -232,6 +232,25 @@
 			</div>
 		</div>
 	</div>
+	
+	<div id="linked-in-cc-popup" class="overlay-main" style="display: none;">
+		<div id="linked-in-cc-popup-body" class="overlay-disable-wrapper">
+			<div class="ol-content">
+				<div id="linked-in-cc-popup-txt-cont" class="ol-txt">
+					<div class="linked-in-cc-popup-txt-body">
+					    <div class="linked-in-cc-popup-txt-hdr">Review copied to clipboard</div>
+					    <div class="linked-in-cc-popup-txt">You can paste and post the review in the next step.</div>
+					</div>
+				</div>
+				<div class="linked-in-cc-popup-btn-cont">
+					<div class="linked-in-cc-btn-cont">
+						<div id="linked-in-cc-popup-continue" class="linked-in-cc-btn">Got it!</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 	<div id="toast-container" class="toast-container">
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>
@@ -579,9 +598,9 @@
 										title="Twitter"></div>
 								</c:if>
 								<c:if
-									test="${not empty profile.socialMediaTokens.linkedInToken && not empty profile.socialMediaTokens.linkedInToken.linkedInPageLink}">
+									test="${not empty profile.socialMediaTokens.linkedInV2Token && not empty profile.socialMediaTokens.linkedInV2Token.linkedInPageLink}">
 									<div id="icn-lin" class="float-left social-item-icon icn-lin"
-										data-link="${profile.socialMediaTokens.linkedInToken.linkedInPageLink}"
+										data-link="${profile.socialMediaTokens.linkedInV2Token.linkedInPageLink}"
 										title="LinkedIn"></div>
 								</c:if>
 								<c:if

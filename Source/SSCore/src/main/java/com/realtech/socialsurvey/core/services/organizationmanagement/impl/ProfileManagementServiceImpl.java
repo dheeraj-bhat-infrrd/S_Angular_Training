@@ -1524,7 +1524,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             companyId = region.getCompany().getCompanyId();
         }
 
-        LOG.debug( "Fetching company settings for companyId: " + companyId );
+        LOG.debug( "Fetching company settings for companyId: {}", companyId );
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
@@ -1552,11 +1552,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 && !companyTokens.getGoogleToken().getProfileLink().equals( "" ) ) {
                 entityTokens.getGoogleToken().setProfileLink( companyTokens.getGoogleToken().getProfileLink() );
             }
-            if ( ( entityTokens.getLinkedInToken().getLinkedInPageLink() == null
-                || entityTokens.getLinkedInToken().getLinkedInPageLink().equals( "" ) )
-                && companyTokens.getLinkedInToken().getLinkedInPageLink() != null
-                && !companyTokens.getLinkedInToken().getLinkedInPageLink().equals( "" ) ) {
-                entityTokens.getLinkedInToken().setLinkedInPageLink( companyTokens.getLinkedInToken().getLinkedInPageLink() );
+            if ( ( entityTokens.getLinkedInV2Token().getLinkedInPageLink() == null
+                || entityTokens.getLinkedInV2Token().getLinkedInPageLink().equals( "" ) )
+                && companyTokens.getLinkedInV2Token().getLinkedInPageLink() != null
+                && !companyTokens.getLinkedInV2Token().getLinkedInPageLink().equals( "" ) ) {
+                entityTokens.getLinkedInV2Token().setLinkedInPageLink( companyTokens.getLinkedInV2Token().getLinkedInPageLink() );
             }
             if ( ( entityTokens.getRssToken().getProfileLink() == null
                 || entityTokens.getRssToken().getProfileLink().equals( "" ) )
@@ -1624,9 +1624,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( mediaTokens.getGoogleToken() == null ) {
             mediaTokens.setGoogleToken( new GoogleToken() );
         }
-        if ( mediaTokens.getLinkedInToken() == null ) {
-            mediaTokens.setLinkedInToken( new LinkedInToken() );
+        
+        if ( mediaTokens.getLinkedInV2Token() == null ) {
+            mediaTokens.setLinkedInV2Token( new LinkedInToken() );
         }
+        
         if ( mediaTokens.getRssToken() == null ) {
             mediaTokens.setRssToken( new SocialProfileToken() );
         }
@@ -3940,7 +3942,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     }
                 }
                 if ( unitSettings.getSocialMediaTokens() != null ) {
-                    if ( unitSettings.getSocialMediaTokens().getLinkedInToken() != null ) {
+                    if ( unitSettings.getSocialMediaTokens().getLinkedInV2Token() != null ) {
                         closestSettings.put( SettingsForApplication.LINKED_IN, OrganizationUnit.AGENT );
                     }
                 }
@@ -4404,16 +4406,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 //get twitter token from upper hierarchy in case of public profile page.
                 if ( isFetchRequiredDataFromHierarchy ) {
                     if ( entry.getValue() == OrganizationUnit.COMPANY && companyUnitSettings.getSocialMediaTokens() != null ) {
-                        socialMediaTokens.setLinkedInToken( companyUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                        socialMediaTokens.setLinkedInToken( companyUnitSettings.getSocialMediaTokens().getLinkedInV2Token() );
                     } else if ( entry.getValue() == OrganizationUnit.REGION
                         && regionUnitSettings.getSocialMediaTokens() != null ) {
-                        socialMediaTokens.setLinkedInToken( regionUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                        socialMediaTokens.setLinkedInToken( regionUnitSettings.getSocialMediaTokens().getLinkedInV2Token() );
                     } else if ( entry.getValue() == OrganizationUnit.BRANCH
                         && branchUnitSettings.getSocialMediaTokens() != null ) {
-                        socialMediaTokens.setLinkedInToken( branchUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                        socialMediaTokens.setLinkedInToken( branchUnitSettings.getSocialMediaTokens().getLinkedInV2Token() );
                     } else if ( entry.getValue() == OrganizationUnit.AGENT
                         && agentUnitSettings.getSocialMediaTokens() != null ) {
-                        socialMediaTokens.setLinkedInToken( agentUnitSettings.getSocialMediaTokens().getLinkedInToken() );
+                        socialMediaTokens.setLinkedInToken( agentUnitSettings.getSocialMediaTokens().getLinkedInV2Token() );
                     }
                 }
                 userProfile.setSocialMediaTokens( socialMediaTokens );
@@ -5530,8 +5532,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         socialMediaTokens.getFacebookToken().setFacebookAccessTokenToPost( null );
                         socialMediaTokens.getFacebookToken().setFacebookPages( null );
                     }
-                    if ( socialMediaTokens.getLinkedInToken() != null ) {
-                        socialMediaTokens.getLinkedInToken().setLinkedInAccessToken( null );
+                    if ( socialMediaTokens.getLinkedInV2Token() != null ) {
+                        socialMediaTokens.getLinkedInV2Token().setLinkedInAccessToken( null );
                     }
                     if ( socialMediaTokens.getTwitterToken() != null ) {
                         socialMediaTokens.getTwitterToken().setTwitterAccessToken( null );

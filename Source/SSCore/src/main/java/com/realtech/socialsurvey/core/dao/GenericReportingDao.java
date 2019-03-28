@@ -61,4 +61,5 @@ public interface GenericReportingDao<T, ID extends Serializable>{
 	
 	List<T> findByKeyValueInBatch(Class<T> dataClass, Map<String, Object> queries, int startIndex, int batchSize);
 
+    List<T> executeNativeQuery(Class<T> dataClass, Map<String, Object> queries, String nativeQuery);
 }

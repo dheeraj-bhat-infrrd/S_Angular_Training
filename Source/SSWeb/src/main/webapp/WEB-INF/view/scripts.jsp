@@ -30,4 +30,5 @@
 <script src="${initParam.resourcesPath}/resources/js/jquery.prettify.js"></script>
 <script src="${initParam.widgetResourcesPath}/widget/js/widget-framework.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/widgetPageLoader.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/admin-dashboard.js"></script>
 

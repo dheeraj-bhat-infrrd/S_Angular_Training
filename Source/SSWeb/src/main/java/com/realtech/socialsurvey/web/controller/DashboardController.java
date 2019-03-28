@@ -2073,8 +2073,8 @@ public class DashboardController
             if ( tokens.getTwitterToken() != null && tokens.getTwitterToken().getTwitterPageLink() != null ) {
                 model.addAttribute( "twitterProfileUrl", tokens.getTwitterToken().getTwitterPageLink() );
             }
-            if ( tokens.getLinkedInToken() != null && tokens.getLinkedInToken().getLinkedInPageLink() != null ) {
-                model.addAttribute( "linkedinProfileUrl", tokens.getLinkedInToken().getLinkedInPageLink() );
+            if ( tokens.getLinkedInV2Token() != null && tokens.getLinkedInV2Token().getLinkedInPageLink() != null ) {
+                model.addAttribute( "linkedinProfileUrl", tokens.getLinkedInV2Token().getLinkedInPageLink() );
             }
             if ( tokens.getZillowToken() != null && tokens.getZillowToken().getZillowProfileLink() != null ) {
                 model.addAttribute( "zillowProfileUrl", tokens.getZillowToken().getZillowProfileLink() );

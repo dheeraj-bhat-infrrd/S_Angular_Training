@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
@@ -497,10 +498,25 @@ public interface OrganizationUnitSettingsDao
 			LOSearchEngine loSearchEngine, long companyIdFilter, String pattern);
 
 
+    OrganizationUnitSettings fetchOrganizationUnitSettingsById( long companyId, String companySettingsCollection, List<String> projections);
+
 	List<Long> fetchCompaniesWithHiddenSection();
 
-
 	List<Long> fetchActiveUserForCompany(long companyId);
+	
+	/**
+	 * Method will update particular COMPANY_SETTING based on the iden
+	 * 
+	 * @param keyToUpdate
+	 * @param updatedRecord
+	 * @param iden
+	 * @param modifiedBy
+	 * @throws InvalidInputException
+	 */
+	public void updateParticularKeyCompanySettingsByIden( String keyToUpdate, Object updatedRecord, long iden, long modifiedBy ) throws InvalidInputException;
+
+    void updateParticularKeyArrayOrganizationUnitSettingsByIden( String keyToUpdate, Object value, long companyId,
+        String collectionName ) throws NonFatalException;
 
 	/**
 	 * Method to update OrganizationSettings in MongoDataBase
@@ -534,6 +550,8 @@ public interface OrganizationUnitSettingsDao
 	 */
 	public long fetchSEOUrlCount(String collectionName, String locationType, List<Long> excludedEntityIds);
 
+    int removeKeyInOrganizationSettings( long companyId, String keyToUpdate, String collectionName,
+        long modifiedBy );
 
     /**
      * Method to return list of profile images object for list of ids.
@@ -542,5 +560,4 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public List<ProfileImageUrlEntity> getAllProfileImageUrl( Set<Long> entityIds, String collectionName );
-
 }

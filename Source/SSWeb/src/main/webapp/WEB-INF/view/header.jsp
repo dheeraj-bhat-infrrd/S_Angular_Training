@@ -102,6 +102,32 @@
 		</div>
 	</div>
 	
+	<div id="linked-in-prof-url-popup-main" class="overlay-main hide">
+		<div id="linked-in-prof-url-popup" class="overlay-disable-wrapper" data-profileUrl="" data-fromDashboard="" data-restful="" data-socialFlow="" data-isFixSocialMedia="" data-message="" data-isManual="" data-columnName="" data-columnValue="" data-socialNetwork="linkedin"> 
+			<div id="linked-in-prof-url-popup-header" class="ol-header">
+				LinkedIn Url Confirmation
+			</div>
+			<div class="ol-content">
+				<div id="linked-in-prof-url-popup-text" class="ol-txt">
+					<div style="font-family:OpenSansSemiBold;" id="linked-in-popup-text"></div>
+					<input id="linked-in-popup-inp" type="text" class="linked-in-popup-inp" value="">
+				</div>
+				<div class="clearfix">
+					<div class="float-left ol-btn-wrapper">
+						<div id="linked-in-prof-url-popup-cancel" class="ol-btn cursor-pointer">
+							Exit
+						</div>
+					</div>
+					<div class="float-left ol-btn-wrapper">
+						<div id="linked-in-prof-url-popup-continue" class="ol-btn cursor-pointer" data-btn-isDisabled=false>
+							Edit
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 	<div id="zillow-popup" class="overlay-main hide">
 		<div id="zillow-popup-body"  class="welcome-popup-wrapper zillow-popup-wrapper"> <!--  class="overlay-disable-wrapper overlay-disable-wrapper-zillow container login-container"> -->
 		</div>
@@ -184,6 +210,9 @@
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item" onclick="showMainContent('./showreportingpage.do')"><spring:message code="label.header.dashboard.key" /></div>
 				<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+					<c:if test="${highestrole == 1}">
+						<div class="header-links-item" onclick="showMainContent('./showadmindashboard.do')"><spring:message code="label.header.admin.dashboard.key" /></div>
+					</c:if>
 					<div class="header-links-item" onclick="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.legacy.dashboard.key" /></div>
 				</c:if>
 				<div class="header-links-item" onclick="showMainContent('./showreportspage.do')"><spring:message code="label.reporting.key" /></div>
@@ -293,7 +322,13 @@
 							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">
 								<spring:message code="label.header.dashboard.key" />
 							</div>
+							
 							<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+								<c:if test="${highestrole == 1}">
+									<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showadmindashboard.do');">
+										<spring:message code="label.header.admin.dashboard.key" />
+									</div>
+								</c:if>
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./dashboard.do');">
 									<spring:message code="label.header.legacy.dashboard.key" />
 								</div>

@@ -553,7 +553,7 @@ public class UserManagementController
                 startIndex, batchSize );
             if ( userIdList != null && userIdList.size() != 0 ) {
                 Set<Long> userIds = solrSearchService.getUserIdsFromSolrDocumentList( userIdList );
-                List<UserFromSearch> usersList = userManagementService.getUsersByUserIds( userIds );
+                List<UserFromSearch> usersList = userManagementService.getActiveUsersByUserIds( userIds );
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
                 model.addAttribute( "numFound", userIdList.getNumFound() );
                 usersList = userManagementService.getUserSocialMediaList( usersList );

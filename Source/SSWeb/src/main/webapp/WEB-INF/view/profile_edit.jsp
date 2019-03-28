@@ -33,8 +33,9 @@
 	<c:if test="${not empty socialMediaTokens.twitterToken && not empty socialMediaTokens.twitterToken.twitterPageLink}">
 		<c:set value="${socialMediaTokens.twitterToken.twitterPageLink}" var="twtLink"></c:set>
 	</c:if>
-	<c:if test="${not empty socialMediaTokens.linkedInToken && not empty socialMediaTokens.linkedInToken.linkedInPageLink}">
-		<c:set value="${socialMediaTokens.linkedInToken.linkedInPageLink}" var="lnLink"></c:set>
+	<c:if test="${not empty socialMediaTokens.linkedInV2Token && not empty socialMediaTokens.linkedInV2Token.linkedInAccessToken}">
+		<c:set value="${socialMediaTokens.linkedInV2Token.linkedInPageLink}" var="lnLink"></c:set>
+		<c:set value="true" var="linkedinConnected"></c:set>
 	</c:if>
 	<c:if test="${not empty socialMediaTokens.googleToken && not empty socialMediaTokens.googleToken.profileLink}">
 		<c:set value="${socialMediaTokens.googleToken.profileLink}" var="googleLink"></c:set>
@@ -195,6 +196,24 @@
 		<div class="clearfix gmb-wc-btn-row">
 			<div id="gmb-add-link" class="gmb-wc-sub-send-btn wc-final-submit">Add Link</div>
 			<div id="gmb-disconnect-link" class="gmb-wc-sub-send-btn wc-final-submit">Disconnect</div>
+		</div>
+	</div>
+</div>
+
+<div class="ss-prof-img-fix-popup" style="display:none">
+	<div class="ss-prof-img-fix-popup-body">
+		<div class="ss-prof-img-popup-close-cont">
+			<div class="ss-prof-img-fix-popup-close-btn cursor-pointer">x</div>
+		</div>
+		<div class="ss-prof-img-popup-note">
+			The profile image uploaded on your profile is of the wrong size. This may affect few of the design in the website. Please crop the image to avoid this issue
+		</div>
+		<div class="ss-prof-img-popup-cropper">
+		
+		</div>
+		<div class="ss-prof-img-popup-btn-cont">
+			<div class="ss-prof-img-popup-confirm ss-prof-img-popup-btn">Confirm</div>
+			<div class="ss-prof-img-popup-cancel ss-prof-img-popup-btn">Cancel</div>
 		</div>
 	</div>
 </div>

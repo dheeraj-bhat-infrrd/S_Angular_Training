@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.common;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,20 +19,6 @@ public class TokenHandler
     private static final Logger LOG = LoggerFactory.getLogger( TokenHandler.class );
     
     /**
-     * Method to update LinkedIn token in SocialMediaTokens without linkedinId
-     * @param accessToken - accessToken
-     * @param mediaTokens - Unit setting mediaTokens
-     * @param profileLink - LinkedIn user profile link
-     * @param expiresIn - token expiry time.
-     * @param version - LinkedIn API version
-     * @return
-     */
-    public SocialMediaTokens updateLinkedInToken( String accessToken, SocialMediaTokens mediaTokens, String profileLink,
-        long expiresIn, String version) {
-        return updateLinkedInToken( accessToken, mediaTokens, profileLink, expiresIn, version, null );
-    }
-    
-    /**
      * Method to update LinkedIn token in SocialMediaTokens 
      * @param accessToken - accessToken
      * @param mediaTokens - Unit setting mediaTokens
@@ -43,20 +30,14 @@ public class TokenHandler
     public SocialMediaTokens updateLinkedInToken( String accessToken, SocialMediaTokens mediaTokens, String profileLink,
         long expiresIn, String version, String linkedinId )
     {
-        LOG.info( "Method updateLinkedInToken() called for API version {}",  version);
+        LOG.info( "Method updateLinkedInToken() called for API version {}", version );
         if ( mediaTokens == null ) {
             LOG.debug( "Media tokens do not exist. Creating them and adding the LinkedIn access token" );
             mediaTokens = new SocialMediaTokens();
         }
-        
-        LinkedInToken linkedInToken = null;
-        
-        if(version.equals( "V2" )) {
-            linkedInToken = mediaTokens.getLinkedInV2Token();
-        } else {
-            linkedInToken = mediaTokens.getLinkedInToken();
-        }
-        
+
+        LinkedInToken linkedInToken = mediaTokens.getLinkedInV2Token();
+
         if ( linkedInToken == null ) {
             linkedInToken = new LinkedInToken();
         }
@@ -74,17 +55,17 @@ public class TokenHandler
             profileLink = profileLink.split( "&" )[0];
             linkedInToken.setLinkedInPageLink( profileLink );
         }
-        
-        if(version.equals( "V2" )) {
-            if(mediaTokens.getLinkedInToken() != null) {
-                linkedInToken.setLinkedInPageLink(  mediaTokens.getLinkedInToken().getLinkedInPageLink() );
-            }
-            mediaTokens.setLinkedInV2Token( linkedInToken ); 
-        } else {
-            mediaTokens.setLinkedInToken( linkedInToken );
+
+        if ( mediaTokens.getLinkedInToken() != null ) {
+            linkedInToken.setLinkedInPageLink( mediaTokens.getLinkedInToken().getLinkedInPageLink() );
         }
         
-        LOG.info( "Method updateLinkedInToken() finished for API version {}",  version );
+        if ( StringUtils.isNotEmpty( mediaTokens.getLinkedInProfileUrl()) ) {
+            linkedInToken.setLinkedInPageLink( mediaTokens.getLinkedInProfileUrl() );
+        }
+        
+        mediaTokens.setLinkedInV2Token( linkedInToken );
+        LOG.info( "Method updateLinkedInToken() finished for API version {}", version );
         return mediaTokens;
     }
 }

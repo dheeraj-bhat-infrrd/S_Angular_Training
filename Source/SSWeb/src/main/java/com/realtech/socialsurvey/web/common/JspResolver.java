@@ -216,4 +216,5 @@ public interface JspResolver
     
     //Page not found page
     public static final String SS_PAGE_NOT_FOUND = "ssPageNotFound";
+    public static final String SHOW_ADMIN_DASHBOARD = "adminDashboard";
 }

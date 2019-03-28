@@ -43,6 +43,7 @@ var minScore = 0;
 var attrName = null;
 var attrVal = null;
 var webAddressRegEx = /((http(s?):\/\/)?)(www.)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w.?=&_]+)?/;
+const WEBSITE_CHECK_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
 var timer = 0;
 var profileId;
 var proPostBatchSize = 10;
@@ -170,7 +171,6 @@ var customeField5;
 
 // Social Monitor setting
 var SOCIAL_MONITOR_PAGE_SIZE = 25;
-
 
 var dangerGraphWrapper = '<div class="dash-stats-wrapper bord-bot-dc clearfix trans-monitor-wrapper">'
 						+'<div class="trans-monitor-sub-header-danger">'
@@ -438,6 +438,10 @@ $(document).on('click', function(e) {
 		$('#add-macro-action-options').toggle();
 		$('#macro-action-chevron-down').toggle();
 		$('#macro-action-chevron-up').toggle();
+	}
+	
+	if ($('#ad-customer-success-name-dropdown').is(':visible')) {
+		$('#ad-customer-success-name-dropdown').slideToggle(200);
 	}
 	
 });
@@ -1712,8 +1716,13 @@ function updateEventOnDashboardPageForReviews() {
 				type : "POST",
 				data : payload,
 				success : function(data) {
-					var response = JSON.parse(data);
-					linkedInShare(response,link,title);
+					try{
+						var response = JSON.parse(data);
+						linkedInShare(response,link,title);
+					} catch(e){
+						$('#overlay-toast').html(data);
+						showToast();
+					}
 				},
 				error : function(e) {
 					if (e.status == 504) {
@@ -7349,9 +7358,9 @@ $(document).on('click', '#user-edit-btn', function(e) {
 	
 	$("#user-edit-save").off('click');
 	$("#user-edit-save").on('click', function(e) {
-		if (validateUserDetailsUserManagement()) {
+		var firstName = $('#um-user-first-name').val();
+		if (validateUserDetailsUserManagement(firstName)) {
 			saveUserDetailsByAdmin();
-
 			// refreshing right section after assignment
 			setTimeout(function() {
 				getUserAssignments($('#selected-userid-hidden').val());
@@ -7391,11 +7400,13 @@ $(document).on('click', '#user-assign-btn', function(e) {
 	});
 });
 
-function validateUserDetailsUserManagement() {
-
-	var isUserDetailsFormValid = true;
-
-	return isUserDetailsFormValid;
+function validateUserDetailsUserManagement(firstName) {
+	if (firstName == undefined || firstName == "") {
+		$('#overlay-toast').html('Please enter first name');
+		showToast();
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -7431,7 +7442,7 @@ function saveUserDetailsByAdmin() {
 
 		// user management page
 		$('td[data-user-id="' + userId + '"]').text(name).attr("data-first-name", firstName).attr("data-last-name", lastName);
-		$('td[data-user-id="' + userId + '"]').parent().find('.v-tbl-email').text(emailID);
+		$('td[data-user-id="' + userId + '"]').parent().find('.mng-tbl-email-div').text(emailID);
 
 		$('#overlay-toast').html(data);
 		showToast();
@@ -22484,3 +22495,196 @@ $('body').on('blur', '#enc-alert-mail-recipients', function() {
 	}, payload, true);
 	
 });
+
+function saveLinkedInProfileUrl(linkedInProfileUrl,completeCallBack){
+	
+	// Regex pattern to check valid URL
+	var pattern = new RegExp(WEBSITE_CHECK_REGEX);
+	if(!pattern.test(linkedInProfileUrl)){
+		$('#overlay-toast').html("Please provide a valid linkedin profile url.");
+		showToast();
+		return;
+	}
+	
+	var url= "./savelinkedinprofileurl.do";
+	var payload = {
+		"linkedInProfileUrl" : linkedInProfileUrl	
+	}
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		data : payload,
+		async : false,
+		complete: completeCallBack,
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			
+			$('#overlay-toast').html("Failed to save LinkedIn profile URL");
+			showToast();
+			$('#overlay-continue').attr('btn-isDisbaled',false);
+		}
+	});
+	
+}
+
+$('#linked-in-prof-url-popup-continue').click(function() {
+	var linkedInProfileUrl = $('#linked-in-popup-inp').val();
+	var btnIsDisabled = $('#linked-in-prof-url-popup-continue').attr('btn-isDisabled');
+	
+	if(linkedInProfileUrl == null || linkedInProfileUrl == undefined || linkedInProfileUrl == ''){
+		$('#overlay-toast').html("Cannot Edit! LinkedIn Profile URL cannot be empty.");
+		showToast();
+		return;
+	}
+	if(btnIsDisabled == true || btnIsDisabled == 'true'){
+		return;
+	}
+	
+	$('#linked-in-prof-url-popup-continue').attr('btn-isDisbaled',true);
+	
+	saveLinkedInProfileUrl(linkedInProfileUrl, function(data){
+		if(data.responseText != null && data.responseText != undefined && data.responseText != '' && data.responseText.length > 0){
+				$('#overlay-toast').html("Successfully Saved LinkedIn profile URL");
+				showToast();
+				linkedInUrlPopupRevert();
+				
+				updateUIForSocialMedia();
+		}else{
+			$('#overlay-toast').html("Failed to save LinkedIn profile URL");
+			showToast();
+		}
+		$('#linked-in-prof-url-popup-continue').attr('btn-isDisbaled',false);
+	});
+});
+
+$('#linked-in-prof-url-popup-cancel').click(function() {
+	
+	var linkedInProfileUrl = $('#linked-in-popup-inp').val();
+	
+	if(linkedInProfileUrl == null || linkedInProfileUrl == undefined || linkedInProfileUrl == ''){
+
+		var updateBanner = $("#linkedin-api-v2-update-ribbon-outer");
+		if(updateBanner) {
+				$(updateBanner).find(".linkedProfileUrl").removeClass("hide");
+				$(updateBanner).find(".linkedV2Token").addClass("hide");
+		}
+	}
+	
+	linkedInUrlPopupRevert();
+
+	updateUIForSocialMedia();
+});
+
+function updateUIForSocialMedia(){
+	var fromDashboard = $('#linked-in-prof-url-popup').attr('data-fromDashboard');
+	var restful = $('#linked-in-prof-url-popup').attr('data-restful');
+	var flow = $('#linked-in-prof-url-popup').attr('data-socialFlow');
+	var isFixSocialMedia =$('#linked-in-prof-url-popup').attr('data-isFixSocialMedia');
+	var waitMessage = $('#linked-in-prof-url-popup').attr('data-message');
+	var isManual = $('#linked-in-prof-url-popup').attr('data-isManual');
+	
+	if(fromDashboard == 1){
+		var columnName = $('#linked-in-prof-url-popup').attr('data-columnName');
+		var columnValue = $('#linked-in-prof-url-popup').attr('data-columnValue');
+		
+		if(isFixSocialMedia != undefined && isFixSocialMedia == 1 && parseInt(waitMessage) != 1 && isManual == "true"){
+			fixSocialMediaResponse(columnName, columnValue);
+		}
+		
+		showDashboardButtons(columnName, columnValue);
+	}
+	else if(restful != "1"){
+		if (flow == "registration") {
+			var payload = {
+				'socialNetwork' : "linkedin"
+			};
+			fetchSocialProfileUrl(payload, function(data) {
+				showLinkedInProfileUrl(data.responseText);
+				showProfileLink("linkedin", data.responseText);
+			});
+		}
+		else {
+			var payload = {
+				'socialNetwork' : $('#linked-in-prof-url-popup').attr('data-socialNetwork')
+			};
+			fetchSocialProfileUrl(payload, function(data) {
+				if(data.statusText == 'OK'){
+
+					loadSocialMediaUrlInPopup();
+					loadSocialMediaUrlInSettingsPage();
+
+					showProfileLinkInEditProfilePage($('#linked-in-prof-url-popup').attr('data-socialNetwork'), data.responseText);
+				}
+			});
+		}
+	}
+}
+
+function fetchSocialProfileUrl(payload, callBackFunction){
+	$.ajax({
+		url : './profileUrl.do',
+		type : "GET",
+		cache : false,
+		data : payload,
+		async : false,
+		complete : callBackFunction,
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
+	});
+}
+
+function linkedInUrlPopupRevert() {
+	$('#linked-in-prof-url-popup-main').hide();
+	if ($('#linked-in-prof-url-popup-continue').attr("data-btn-isDisabled") == "true" || $('#linked-in-prof-url-popup-continue').attr("data-btn-isDisabled") == true) {
+		$('#linked-in-prof-url-popup-continue').attr("data-btn-isDisabled",false);
+	}
+	$('#linked-in-popup-inp').val('');
+	
+	enableBodyScroll();
+}
+
+function checkImgForProfile(ele){
+	var realWidth = 0;
+	var realHeight = 0;
+	var profiImg = document.querySelector('#prof-image-edit');
+	
+	if (Modernizr.canvas) {
+		realWidth = profiImg.naturalWidth;
+		realHeight = profiImg.naturalHeight;
+	} else {
+		realWidth = $(ele).width;
+		realHeight = $(ele).height;
+	}
+	
+	if(realWidth != realHeight){
+		$('.ss-prof-img-fix-popup').show();
+		initiatePopupForImgFix();
+		
+		$(document).on('click','.ss-prof-img-fix-popup-close-btn',function(e){
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			e.stopPropagation();
+			
+			$('.ss-prof-img-fix-popup').hide();
+			$('.ss-prof-img-popup-cropper').html('');
+		});
+
+		$(document).on('click','.ss-prof-img-popup-cancel',function(e){
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			e.stopPropagation();
+			
+			$('.ss-prof-img-fix-popup').hide();
+			$('.ss-prof-img-popup-cropper').html('');
+		});
+	}
+}

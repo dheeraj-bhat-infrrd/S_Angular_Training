@@ -1,20 +1,9 @@
 package com.realtech.socialsurvey.web.api;
 
 
-import java.util.List;
-
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.Keyword;
-import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
-import com.realtech.socialsurvey.core.entities.PostToSocialMedia;
-import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
-import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
-import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
-import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
-import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
-import com.realtech.socialsurvey.core.vo.EncompassAlertMailsVO;
+import com.realtech.socialsurvey.core.vo.*;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.FtpCreateRequest;
@@ -22,17 +11,10 @@ import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.Payment;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
-
-import org.springframework.web.bind.annotation.PathVariable;
 import retrofit.client.Response;
-import retrofit.http.Body;
-import retrofit.http.DELETE;
-import retrofit.http.GET;
-import retrofit.http.Header;
-import retrofit.http.POST;
-import retrofit.http.PUT;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit.http.*;
+
+import java.util.List;
 
 
 public interface SSApiIntegration
@@ -505,4 +487,25 @@ public interface SSApiIntegration
 
     @POST( "/v1/updateencompassalertemailids" )
     Response updateEncompassAlertEmailIds(@Body EncompassAlertMailsVO encompassAlertMailsVO);
+    
+    @POST ( "/v1/linkedinprofileurl" )
+    Response saveLinkedInProfileUrl(@Query ( "entityType" ) String entityType,@Query ( "entityId") long entityId, @Query ( "linkedInProfileUrl") String linkedInProfileUrl);
+
+    @GET( "/v1/fetchcompanystatistics/{companyId}" )
+    CompanyStatistics fetchCompanyStatistics( @Path ("companyId") long companyId,
+        @Header( "authorizationHeader" ) String authorizationHeader );
+    
+    @GET( "/v1/getsocialsurveyadmins" )
+    List<UserVo> getSocialSurveyAdmins(@Header( "authorizationHeader" ) String authorizationHeader );
+    
+    @PUT( "/v1/updatecustomerinformation/{companyId}" )
+    String updateCustomerInformation( @Header ( "authorizationHeader") String authorizationHeader,
+        @Path("companyId") long companyId, @Query("key") String key, @Query("value") Object value, @Query("modifiedBy") long modifiedBy );
+
+    @GET( "/v1/fetchcustomersuccessinfo/{companyId}" )
+    CustomerSuccessInformation fetchCustomerSuccessInfo( @Path("companyId") long companyId, @Header( "authorizationHeader" ) String authorizationHeader );
+
+    @GET( "/v1/fetchnotes/{companyId}/startIndex/{startIndex}/limit/{limit}" )
+    List<Notes> fetchSSAdminNotes( @Path("companyId") long companyId, @Path( "startIndex" ) long startIndex,
+        @Path( "limit" ) long limit, @Header( "authorizationHeader" ) String authorizationHeader );
 }
