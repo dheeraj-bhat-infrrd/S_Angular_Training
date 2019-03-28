@@ -2,10 +2,10 @@ package com.realtech.socialsurvey.core.services.hierarchylocationmanagement.impl
 
 
 import java.sql.Timestamp;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +14,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -58,6 +60,9 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
     
     @Autowired
     private SearchEngineManagementServices searchEngineManagement;
+    
+    @Autowired
+    private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 
     /* method to relocate region to another company 
@@ -169,6 +174,8 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
         long curentBranchId = 0l;
         long curentRegionId = 0l;
         long curentCompanyId = 0l;
+        boolean user = false;
+        List<UserProfile> userProfilesToDelete = new ArrayList<UserProfile>();
         
         
         //check if user is assigned to valid company
@@ -198,14 +205,7 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
         		}
         		
         }else {
-        		Set<Long> existingBranchAssignments = new HashSet<Long>();
             for ( UserProfile userProfile : userProfiles ) {
-                if(existingBranchAssignments.contains( userProfile.getBranchId() )){
-                    throw new InvalidInputException("User " + userToBeRelocated.getUserId()  + " has assignments in different branches");
-                }else{
-                    existingBranchAssignments.add(  userProfile.getBranchId()  );
-                }
-                
                 if(userProfile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE){
                     curentBranchId = userProfile.getBranchId();
                     curentRegionId = userProfile.getRegionId();
@@ -221,11 +221,33 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
 
         switch ( targetLocation.getHierarchyType() ) {
             case USER: {
-                for ( UserProfile userProfile : userProfiles ) {
-                    userProfile.setBranchId( targetLocation.getTargetBranch().getBranchId() );
-                    userProfile.setRegionId( targetLocation.getTargetRegion().getRegionId() );
-                    userProfile.setCompany( targetLocation.getTargetCompany() );
-                    userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+            	Iterator<UserProfile> iterator = userProfiles.iterator();
+                while(iterator.hasNext()) {
+                	UserProfile userProfile = (UserProfile) iterator.next();
+                	if(!user && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID)
+                	{
+                		user=true;
+                		userProfile.setBranchId( targetLocation.getTargetBranch().getBranchId() );
+                		userProfile.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                		userProfile.setCompany( targetLocation.getTargetCompany() );
+                		userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+                	}
+                	else
+                	{
+                		userProfilesToDelete.add(userProfile);
+                		iterator.remove();
+                	}
+                }
+                if(userProfiles.size()==0)
+                {
+                	UserProfile userProfile = userProfilesToDelete.remove(CommonConstants.INITIAL_INDEX);
+                	userProfile.setBranchId( targetLocation.getTargetBranch().getBranchId() );
+                	userProfile.setRegionId( targetLocation.getTargetRegion().getRegionId() );
+                	userProfile.setCompany( targetLocation.getTargetCompany() );
+                	userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+                	userProfile.setProfilesMaster(
+                			profilesMasterDao.findById( ProfilesMaster.class, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+                	userProfiles.add(userProfile);
                 }
                 break;
             }
@@ -280,6 +302,11 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
         userToBeRelocated.setUserProfiles( userProfiles );
         for ( UserProfile userProfile : userProfiles ) {
             userManagementService.updateUserProfileObject( userProfile );
+        }
+        
+        //delete remaining user profiles
+        for (UserProfile userProfile : userProfilesToDelete) {
+        	userManagementService.removeUserProfile(userProfile.getUserProfileId());
         }
 
         //update Other user details in MySQL
@@ -600,6 +627,10 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
         if ( targetBranch == null ) {
             LOG.error( "Target branch does'nt exist" );
             throw new InvalidInputException( "generateEntitiesAndStartRelocationForUser: Target branch does'nt exist" );
+        }
+        if (targetBranch.getStatus() != CommonConstants.STATUS_ACTIVE) {
+            LOG.error( "Invalid target branch" );
+            throw new InvalidInputException( "generateEntitiesAndStartRelocationForUser: Target branch is not active" );
         }
 
         Region targetRegion = targetBranch.getRegion();

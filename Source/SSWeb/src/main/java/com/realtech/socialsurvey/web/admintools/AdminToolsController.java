@@ -155,7 +155,7 @@ public class AdminToolsController
     @ResponseBody
     @RequestMapping ( value = "/user/restore/{userId}")
     public Response restoreUser( @PathVariable long userId, @QueryParam ( value = "fullRestore") boolean fullRestore,
-        HttpServletRequest request )
+    		@RequestParam(value = "branchId", required = false, defaultValue = "0") long branchId, HttpServletRequest request )
     {
         LOG.info( "Method restoreUser started for userId : " + userId );
         Response response = null;
@@ -163,11 +163,10 @@ public class AdminToolsController
             try {
                 String authorizationHeader = request.getHeader( "Authorization" );
                 validateAuthHeader( authorizationHeader );
-                userManagementService.restoreDeletedUser( userId, fullRestore );
+                userManagementService.restoreDeletedUser( userId, fullRestore, branchId );
                 response = Response.ok( "UserId " + userId + " was successfully restored." ).build();
             } catch ( Exception e ) {
-                LOG.error( "Exception occured while restoring user having userId : " + userId + ". Reason : "
-                    + e.getStackTrace() , e );
+                LOG.error( "Exception occured while restoring user having userId : " + userId + ". Reason : " , e );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while restoring the user" ), e.getMessage(), e );
             }

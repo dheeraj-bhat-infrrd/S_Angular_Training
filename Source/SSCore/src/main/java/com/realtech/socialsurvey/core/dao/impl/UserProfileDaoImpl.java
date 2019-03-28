@@ -455,6 +455,20 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         LOG.debug( "Method call ended for getUserFromSearchByUserIds for user ids" );
         return userList;
     }
+    
+    public List<UserFromSearch> getActiveUserFromSearchByUserIds( Set<Long> userIds )
+    {
+        LOG.debug( "Method call started for getActiveUserFromSearchByUserIds for user ids : " + userIds );
+        String queryStr = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM USER_PROFILE UP JOIN USERS US ON US.USER_ID = UP.USER_ID WHERE UP.USER_ID IN ( :userIds ) AND UP.STATUS NOT IN ( :status ) GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME";
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameterList( "userIds", userIds );
+        query.setParameter("status", CommonConstants.STATUS_INACTIVE);
+        List<Object[]> rows = (List<Object[]>) query.list();
+
+        List<UserFromSearch>  userList = buildUserFromSearch( rows );
+        LOG.debug( "Method call ended for getActiveUserFromSearchByUserIds for user ids : " + userIds );
+        return userList;
+    }
 
 
     private String getCustomerDisplayName( String firstName, String lastName )

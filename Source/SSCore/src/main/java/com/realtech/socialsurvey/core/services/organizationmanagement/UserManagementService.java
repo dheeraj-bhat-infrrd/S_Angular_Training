@@ -531,7 +531,16 @@ public interface UserManagementService
     public UserProfile getAgentUserProfileForUserId( long userId ) throws InvalidInputException;
 
 
-    public void restoreDeletedUser( long userId, boolean restoreSocial ) throws InvalidInputException, SolrException;
+	/**
+	 * Method to restore deleted user
+	 * @param userId
+	 * @param restoreSocial
+	 * @param branchId
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	public void restoreDeletedUser(long userId, boolean restoreSocial, long branchId)
+			throws InvalidInputException, SolrException;
 
 
     public User getUserByEmailAddress( String emailId ) throws InvalidInputException, NoRecordsFetchedException;
@@ -669,7 +678,17 @@ public interface UserManagementService
 
 	void updateAgentIdInSurveyPreinitiation(String emailId) throws InvalidInputException, NoRecordsFetchedException;
 	
+	
 	public void updateSurveyDetails();
+	
+	
+	/**
+	 * Method to get all active roles for userIds
+	 * @param userIds
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<UserFromSearch> getActiveUsersByUserIds( Set<Long> userIds ) throws InvalidInputException;
 
 	
 	/**

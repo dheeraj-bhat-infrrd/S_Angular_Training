@@ -129,4 +129,11 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 	 * @return
 	 */
 	public List<Long> findPrimaryUserProfile(String entityType, long entityId) ;
+	
+	/**
+	 * Method to get all the active roles for userIds
+	 * @param userIds
+	 * @return
+	 */
+	public List<UserFromSearch> getActiveUserFromSearchByUserIds( Set<Long> userIds );
 }

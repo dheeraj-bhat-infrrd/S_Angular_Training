@@ -63,6 +63,7 @@ import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.DeleteDataTracker;
 import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
@@ -263,6 +264,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     
     @Autowired
     private EmailUnsubscribeService unsubscribeService;
+    
+    @Autowired
+    private GenericDao<DeleteDataTracker, Long> deleteDataTrackerDao;
 
 
     /**
@@ -725,7 +729,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      */
     @Transactional
     @Override
-    public void restoreDeletedUser( long userId, boolean restoreSocial ) throws InvalidInputException, SolrException
+    public void restoreDeletedUser( long userId, boolean restoreSocial, long branchId ) throws InvalidInputException, SolrException
     {
         if ( userId <= 0l ) {
             throw new InvalidInputException( "User id is invalid in restoreDeletedUser" );
@@ -753,7 +757,72 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         } catch ( NoRecordsFetchedException e1 ) {
             LOG.debug( "No existing user found. Restoring." );
         }
+        
+        List<UserProfile> userProfiles=userProfileDao.getUserProfiles(userId);
+        boolean updated = false;
+        if(branchId <= 0l)
+        {
+            List<UserProfile> userProfilesToDelete = new ArrayList<UserProfile>();
+            for (UserProfile userProfile : userProfiles)
+            {
+                Branch branch = branchDao.findById(Branch.class, userProfile.getBranchId());
+                Region region = regionDao.findById(Region.class, branch.getRegion().getRegionId());
+                if(branch.getStatus()==CommonConstants.STATUS_ACTIVE && region.getStatus()==CommonConstants.STATUS_ACTIVE)
+                {
+                    userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+                    userProfile.setModifiedBy(String.valueOf( CommonConstants.REALTECH_ADMIN_ID ));
+                    userProfile.setModifiedOn(new Timestamp( System.currentTimeMillis()));
+                    if(userProfile.getRegionId() != region.getRegionId())
+                        userProfile.setRegionId(region.getRegionId());
+                    userProfileDao.update(userProfile);
+                    updated=true;
+                }
+                else
+                    userProfilesToDelete.add(userProfile);
+            }
+            if(!updated)
+            {
+                LOG.warn("User does not have an assignment in any active branch");
+                throw new InvalidInputException("User does not have an assignment in any active branch");
+            }
+            for (UserProfile userProfile : userProfilesToDelete)
+                removeUserProfile(userProfile.getUserProfileId());
+        }
+        else
+        {
+            List<UserProfile> userProfilesToDelete = new ArrayList<UserProfile>();
+            Branch branch = branchDao.findById(Branch.class, branchId);
+            Region region = regionDao.findById(Region.class, branch.getRegion().getRegionId());
+            if(branch.getStatus()!=CommonConstants.STATUS_ACTIVE || region.getStatus()!=CommonConstants.STATUS_ACTIVE)
+            {
+                LOG.warn("Deleted branch_id {} passed",branchId);
+                throw new InvalidInputException("Deleted branch_id passed");
+            }
 
+            for (UserProfile userProfile : userProfiles)
+            {
+                if(userProfile.getBranchId() == branchId)
+                {
+                    userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+                    userProfile.setModifiedBy(String.valueOf( CommonConstants.REALTECH_ADMIN_ID ));
+                    userProfile.setModifiedOn(new Timestamp( System.currentTimeMillis()));
+                    userProfile.setRegionId(region.getRegionId());
+                    userProfileDao.update(userProfile);
+                    updated=true;
+                }
+                else
+                    userProfilesToDelete.add(userProfile);
+            }
+            if(!updated)
+            {
+                LOG.warn("User does not have an assignment in the specified branch");
+                throw new InvalidInputException("User does not have an assignment in the specified branch");
+            }
+
+            for (UserProfile userProfile : userProfilesToDelete)
+                removeUserProfile(userProfile.getUserProfileId());
+        }
+         
         //Start restoring the user
         //Set status = 1 if password field is present, 2 otherwise, and loginId = emailId
         boolean isVerified = true;
@@ -765,9 +834,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         user.setLoginName( user.getEmailId() );
         updateUser( user );
-
-        //Set the status of all user profiles for that user as 1
-        userProfileDao.activateAllUserProfilesForUser( user );
 
         //update the mismatched record for  restored user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
@@ -1288,7 +1354,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<User> getUsersForCompany( User user ) throws InvalidInputException, NoRecordsFetchedException
     {
         if ( user == null || user.getCompany() == null ) {
-            LOG.error( "User cannote be null." );
+            LOG.error( "User cannot be null." );
             throw new InvalidInputException( "Null value found  user found for userId specified in getUsersForCompany()" );
         }
         LOG.debug( "Method getUsersForCompany() started for " + user.getUserId() );
@@ -1686,10 +1752,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userProfile == null ) {
             throw new InvalidInputException( "No user profile present for the specified profileId" );
         }
-
-        userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        userProfile.setStatus( CommonConstants.STATUS_INACTIVE );
-        userProfileDao.update( userProfile );
+        DeleteDataTracker tracker = new DeleteDataTracker();
+        tracker.setEntityId( String.valueOf(profileIdToDelete) );
+        tracker.setEntityType( "USER_PROFILE" );
+        tracker.setIsDeleted( 0 );
+        tracker.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        tracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        deleteDataTrackerDao.save(tracker);
+        
+        userProfileDao.delete( userProfile );
         LOG.debug( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
 
@@ -3779,6 +3850,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         LOG.debug( "Method to find users on the basis of user ids ended for user ids : " + userIds );
         return userList;
+    }
+    
+    public List<UserFromSearch> getActiveUsersByUserIds( Set<Long> userIds ) throws InvalidInputException
+    {
+    	LOG.debug( "Method to find active users on the basis of user ids started for user ids : " + userIds );
+    	if ( userIds == null || userIds.size() <= 0 ) {
+    		LOG.warn("Invalid input parameter : Null or empty User Id List passed ");
+    		throw new InvalidInputException( "Invalid input parameter : Null or empty User Id List passed " );
+    	}
+    	List<UserFromSearch> userList = userProfileDao.getActiveUserFromSearchByUserIds( userIds );
+    	if ( userList == null ) {
+    		LOG.warn("User not found for userId: {}", userIds );
+    		throw new InvalidInputException( "User not found for userId:" + userIds );
+    	}
+    	LOG.debug( "Method to find active users on the basis of user ids ended for user ids : " + userIds );
+    	return userList;
     }
 
 

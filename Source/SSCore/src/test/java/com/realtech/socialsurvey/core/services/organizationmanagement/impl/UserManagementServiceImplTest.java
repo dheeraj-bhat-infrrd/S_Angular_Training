@@ -23,16 +23,20 @@ import org.mockito.Spy;
 
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserEmailMappingDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
@@ -45,6 +49,8 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+
+import ch.qos.logback.core.boolex.Matcher;
 
 
 public class UserManagementServiceImplTest
@@ -68,6 +74,12 @@ public class UserManagementServiceImplTest
 
     @Mock
     private CompanyDao companyDao;
+    
+    @Mock
+    private RegionDao regionDao;
+    
+    @Mock
+    private BranchDao branchDao;
 
     @Mock
     private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -949,7 +961,7 @@ public class UserManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testRestoreDeletedUserForInvalidUserId() throws InvalidInputException, SolrException
     {
-        userManagementServiceImpl.restoreDeletedUser( 0l, false );
+        userManagementServiceImpl.restoreDeletedUser( 0l, false, 0l );
     }
 
 
@@ -957,7 +969,7 @@ public class UserManagementServiceImplTest
     public void testRestoreDeletedUserForUserDoesntExist() throws InvalidInputException, SolrException
     {
         Mockito.doReturn( null ).when( userManagementServiceImpl ).getUserByUserId( Matchers.anyLong() );
-        userManagementServiceImpl.restoreDeletedUser( 50l, false );
+        userManagementServiceImpl.restoreDeletedUser( 50l, false, 0l );
     }
 
 
@@ -967,7 +979,7 @@ public class UserManagementServiceImplTest
         User user = new User();
         user.setStatus( CommonConstants.STATUS_ACTIVE );
         Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByUserId( Matchers.anyLong() );
-        userManagementServiceImpl.restoreDeletedUser( 50l, false );
+        userManagementServiceImpl.restoreDeletedUser( 50l, false, 0l );
     }
 
 
@@ -981,14 +993,90 @@ public class UserManagementServiceImplTest
         user.setStatus( CommonConstants.STATUS_INACTIVE );
         Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByUserId( Matchers.anyLong() );
 
-        List<User> userList = new ArrayList<User>();
         User user2 = new User();
 
         user2.setUserId( 2l );
         user2.setEmailId( email );
-        userList.add( user2 );
         Mockito.doReturn( user2 ).when( userManagementServiceImpl ).getUserByEmailAddress( email );
-        userManagementServiceImpl.restoreDeletedUser( 50l, false );
+        userManagementServiceImpl.restoreDeletedUser( 50l, false, 0l );
+    }
+    
+    @Test ( expected = InvalidInputException.class)
+    public void testRestoreDeletedUserForNoActiveBranchAssignment() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+    	User user = new User();
+        String email = "abc@xyz.com";
+        user.setEmailId( email );
+        user.setUserId( 50l );
+        user.setStatus( CommonConstants.STATUS_INACTIVE );
+        UserProfile userProfile = new UserProfile();
+        userProfile.setBranchId(55l);
+        List<UserProfile> userProfiles = new ArrayList<UserProfile>();
+        userProfiles.add(userProfile);
+        Branch branch = new Branch();
+        branch.setStatus(CommonConstants.STATUS_INACTIVE);
+        Region region = new Region();
+        region.setRegionId(56l);
+        region.setStatus(CommonConstants.STATUS_INACTIVE);
+        branch.setRegion(region);
+        Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByUserId( Matchers.anyLong() );
+        Mockito.doThrow(new NoRecordsFetchedException()).when(userManagementServiceImpl).getUserByEmailAddress(Matchers.anyString());
+        Mockito.when(userProfileDao.getUserProfiles(Matchers.anyLong())).thenReturn(userProfiles);
+        Mockito.when(branchDao.findById(Mockito.eq( Branch.class ),Matchers.anyLong())).thenReturn(branch);
+        Mockito.when(regionDao.findById(Mockito.eq( Region.class ),Matchers.anyLong())).thenReturn(region);
+        userManagementServiceImpl.restoreDeletedUser( 50l, false, 0l );
+    }
+    
+    @Test (expected = InvalidInputException.class)
+    public void testRestoreDeletedUserForDeletedBranch() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+    	User user = new User();
+        String email = "abc@xyz.com";
+        user.setEmailId( email );
+        user.setUserId( 50l );
+        user.setStatus( CommonConstants.STATUS_INACTIVE );
+        UserProfile userProfile = new UserProfile();
+        userProfile.setBranchId(55l);
+        List<UserProfile> userProfiles = new ArrayList<UserProfile>();
+        userProfiles.add(userProfile);
+        Branch branch = new Branch();
+        branch.setStatus(CommonConstants.STATUS_INACTIVE);
+        Region region = new Region();
+        region.setRegionId(56l);
+        region.setStatus(CommonConstants.STATUS_INACTIVE);
+        branch.setRegion(region);
+        Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByUserId( Matchers.anyLong() );
+        Mockito.doThrow(new NoRecordsFetchedException()).when(userManagementServiceImpl).getUserByEmailAddress(Matchers.anyString());
+        Mockito.when(userProfileDao.getUserProfiles(Matchers.anyLong())).thenReturn(userProfiles);
+        Mockito.when(branchDao.findById(Mockito.eq( Branch.class ),Matchers.anyLong())).thenReturn(branch);
+        Mockito.when(regionDao.findById(Mockito.eq( Region.class ),Matchers.anyLong())).thenReturn(region);
+        userManagementServiceImpl.restoreDeletedUser( 50l, false, 55l );
+    }
+    
+    @Test (expected=InvalidInputException.class)
+    public void testRestoreDeletedUserForInvalidBranchId() throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+    	User user = new User();
+        String email = "abc@xyz.com";
+        user.setEmailId( email );
+        user.setUserId( 50l );
+        user.setStatus( CommonConstants.STATUS_INACTIVE );
+        UserProfile userProfile = new UserProfile();
+        userProfile.setBranchId(55l);
+        List<UserProfile> userProfiles = new ArrayList<UserProfile>();
+        userProfiles.add(userProfile);
+        Branch branch = new Branch();
+        branch.setStatus(CommonConstants.STATUS_ACTIVE);
+        Region region = new Region();
+        region.setRegionId(56l);
+        region.setStatus(CommonConstants.STATUS_ACTIVE);
+        branch.setRegion(region);
+        Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByUserId( Matchers.anyLong() );
+        Mockito.doThrow(new NoRecordsFetchedException()).when(userManagementServiceImpl).getUserByEmailAddress(Matchers.anyString());
+        Mockito.when(userProfileDao.getUserProfiles(Matchers.anyLong())).thenReturn(userProfiles);
+        Mockito.when(branchDao.findById(Mockito.eq( Branch.class ),Matchers.anyLong())).thenReturn(branch);
+        Mockito.when(regionDao.findById(Mockito.eq( Region.class ),Matchers.anyLong())).thenReturn(region);
+        userManagementServiceImpl.restoreDeletedUser( 50l, false, 56l );
     }
 
 
