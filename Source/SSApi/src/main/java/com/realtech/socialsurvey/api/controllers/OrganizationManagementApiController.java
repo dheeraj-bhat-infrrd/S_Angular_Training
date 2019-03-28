@@ -14,20 +14,15 @@ import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 
-import org.json.JSONObject;
+import com.realtech.socialsurvey.core.vo.*;
+import com.realtech.socialsurvey.core.vo.NotesVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -50,9 +45,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.vo.EncompassAlertMailsVO;
-import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
-import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -637,6 +629,170 @@ public class OrganizationManagementApiController
 
         }catch ( Exception e ) {
             throw new SSApiException( e.getMessage(), e );
+        }
+    }
+
+
+    /**
+     * Api for fetching relevant company statistics required to show on admin dashboard
+     * Calls {@link OrganizationManagementService#fetchCompanyStatistics(long)}} to get the
+     * statistics from reporting DB
+     * @param authorizationHeader
+     * @param companyId
+     * @return
+     * @throws SSApiException
+     */
+    @GetMapping(value = "/fetchcompanystatistics/{companyId}")
+    public ResponseEntity<?> fetchCompanyStatistics(@RequestHeader ( "authorizationHeader") String authorizationHeader,
+        @PathVariable("companyId") long companyId )
+    {
+        try {
+            LOGGER.debug("Authorization Header : {}", authorizationHeader);
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            
+            //get all the necessary data from reporting db
+            CompanyStatistics companyStatistics = organizationManagementService.fetchCompanyStatistics( companyId );
+
+            return new ResponseEntity<>( companyStatistics, HttpStatus.OK );
+        }
+        catch ( AuthorizationException authException){
+            return new ResponseEntity<>( CommonConstants.AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        } catch ( NoRecordsFetchedException noRecordsFetchedException ){
+            return new ResponseEntity<>( noRecordsFetchedException.getMessage(), HttpStatus.BAD_REQUEST );
+        }
+        catch ( Exception ex ){
+            LOGGER.error("Exception while fetching company statistics for company {} with exception {}", companyId, ex);
+            return new ResponseEntity<>( ex.getMessage(),  HttpStatus.INTERNAL_SERVER_ERROR );
+        }
+    }
+    
+    @PutMapping(value = "/updatecustomerinformation/{companyId}")
+    public ResponseEntity<?> updateCustomerInformation( @RequestHeader ( "authorizationHeader") String authorizationHeader,
+        @PathVariable("companyId") long companyId, @RequestParam("key") String key,
+        @RequestParam(value = "value", required = false) Object value,
+        @RequestParam("modifiedBy") long modifiedBy )
+    {
+        LOGGER.debug( "Method updateCustomerInformation() started." );
+        try {
+            
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            String message = organizationManagementService.updateCustomerInformation( companyId, key, value, modifiedBy );
+
+            LOGGER.debug( "Method updateCustomerInformation() finished." );
+
+            return new ResponseEntity<>( message, HttpStatus.OK );
+        }
+        catch ( AuthorizationException authException ) {
+            
+            LOGGER.error("Exception while authenticating put request ", companyId, authException);
+            return new ResponseEntity<>( CommonConstants.AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+        catch ( Exception ex ) {
+            
+            LOGGER.error("Exception while fetching company statistics for company {} with exception {}", companyId, ex);
+            return new ResponseEntity<>( ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
+        }
+    }
+
+    /**
+     * Api for fetching customer success information required to show on admin dashboard
+     * calls {@link OrganizationManagementService#fetchCustomerSuccessInformation(long)} to get the
+     * data from mongo
+     * @param authorizationHeader
+     * @param companyId
+     * @return
+     * @throws SSApiException
+     */
+    @GetMapping(value = "/fetchcustomersuccessinfo/{companyId}")
+    public ResponseEntity<?> fetchCustomerSuccessInfo(@RequestHeader ( "authorizationHeader") String authorizationHeader,
+        @PathVariable("companyId") long companyId )
+    {
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+
+            CustomerSuccessInformation customerSuccessInfo = organizationManagementService.fetchCustomerSuccessInformation( companyId );
+
+            return new ResponseEntity<>( customerSuccessInfo, HttpStatus.OK );
+        } catch ( AuthorizationException authException ) {
+            return new ResponseEntity<>( CommonConstants.AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        } catch ( NoRecordsFetchedException noRecordsFetchedException ) {
+            return new ResponseEntity<>( noRecordsFetchedException.getMessage(), HttpStatus.BAD_REQUEST );
+        } catch ( Exception e ) {
+            LOGGER.error( "Exception while fetching customer success information for company {} with exception {}", companyId, e );
+            return new ResponseEntity<>( e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
+        }
+    }
+
+
+    /**
+     * API for fetching all the SS Admins. Calls {@link OrganizationManagementService#getSocialSurveyAdmins()}
+     * @param authorizationHeader
+     * @return
+     * @throws SSApiException
+     */
+    @GetMapping(value = "/getsocialsurveyadmins")
+    public ResponseEntity<?> getSocialSurveyAdmins(@RequestHeader ( "authorizationHeader") String authorizationHeader )
+    {
+        LOGGER.debug( "Method getSocialSurveyAdmins() started." );
+        try {
+            
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            
+            return new ResponseEntity<>( organizationManagementService.getSocialSurveyAdmins(), HttpStatus.OK );
+        }
+        catch ( AuthorizationException authException) {
+            
+            return new ResponseEntity<>( CommonConstants.AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+        catch ( Exception ex ) {
+            
+            return new ResponseEntity<>( ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR );
+        }
+    }
+
+
+    /**
+     * Fetches the ss admin notes for the given companyId.
+     * @param authorizationHeader
+     * @param companyId
+     * @param startIndex represents from which record the notes needs to be fetched
+     * @param limit represents the the max records
+     * @return
+     */
+    @GetMapping(value = "/fetchnotes/{companyId}/startIndex/{startIndex}/limit/{limit}")
+    public ResponseEntity<?> getSSAdminNotes(@RequestHeader("authorizationHeader") String authorizationHeader,
+        @PathVariable("companyId") long companyId, @PathVariable("startIndex") long startIndex, @PathVariable("limit") long limit  )
+        throws SSApiException
+    {
+        LOGGER.debug( "Method to fetch ss admin notes for companyId {} started", companyId );
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            return new ResponseEntity<>( organizationManagementService.fetchNotes(companyId, startIndex, limit), HttpStatus.OK );
+        } catch ( AuthorizationException e ) {
+            return new ResponseEntity<>( CommonConstants.AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        } catch ( InvalidInputException e ) {
+            LOGGER.error( "Invalid details provided for fetching ssadmin notes ", e.getMessage() );
+            return new ResponseEntity<>( e.getMessage(), HttpStatus.BAD_REQUEST );
+        }catch ( Exception ex ) {
+            throw new SSApiException( ex.getMessage() );
+        }
+    }
+
+    @PostMapping(value = "/updateNotes")
+    public ResponseEntity<?> updateNotes(@RequestHeader("authorizationHeader")String authorizationHeader,@RequestBody NotesVo notes)
+        throws SSApiException
+    {
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+
+            organizationManagementService.updateSSAdminNotes( notes );
+            return null;
+
+        } catch ( AuthorizationException e ) {
+            return new ResponseEntity<>( CommonConstants.AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        } catch ( NonFatalException e ) {
+            LOGGER.error( "UpdatingNotes for companyId {} failed with exception {}", notes.getCompanyId(), e.getMessage() );
+            throw new SSApiException( e.getMessage() );
         }
     }
 }

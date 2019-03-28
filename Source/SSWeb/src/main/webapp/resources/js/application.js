@@ -439,6 +439,10 @@ $(document).on('click', function(e) {
 		$('#macro-action-chevron-up').toggle();
 	}
 	
+	if ($('#ad-customer-success-name-dropdown').is(':visible')) {
+		$('#ad-customer-success-name-dropdown').slideToggle(200);
+	}
+	
 });
 
 function checkSocMonDropdowns(e){

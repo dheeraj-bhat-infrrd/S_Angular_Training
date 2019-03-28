@@ -27,7 +27,6 @@ public class MongoOrganizationUnitSettingsDaoImplTest
     @Mock
     private MongoTemplate mongoTemplate;
 
-
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
     {}
@@ -190,5 +189,11 @@ public class MongoOrganizationUnitSettingsDaoImplTest
     public void updateAgentSettingsForUserRestorationTestAgentSettingsNull() throws InvalidInputException
     {
         mongoOrganizationUnitSettingDaoImpl.updateAgentSettingsForUserRestoration( null, null, false, true );
+    }
+    
+    @Test(expected = InvalidInputException.class)
+    public void testUpdateParticularKeyCompanySettingsByIden() throws InvalidInputException {
+        
+        mongoOrganizationUnitSettingDaoImpl.updateParticularKeyCompanySettingsByIden( "rvp", "testValue", 995l, 30369l );
     }
 }

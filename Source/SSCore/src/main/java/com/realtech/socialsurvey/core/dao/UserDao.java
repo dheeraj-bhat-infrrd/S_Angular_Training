@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.HibernateException;
+
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
@@ -17,6 +19,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
  */
 public interface UserDao extends GenericDao<User, Long>
 {
+    public String getUserName( long userId );
 
     public List<User> fetchUsersBySimilarEmailId( User user, String emailId );
 
@@ -88,7 +91,7 @@ public interface UserDao extends GenericDao<User, Long>
      * @return adminId
      */    
     public Long getOwnerForCompany(Long companyId);
-    
+
 	/**
 	 * @param searchString
 	 * @param startIndex
@@ -117,5 +120,12 @@ public interface UserDao extends GenericDao<User, Long>
 	 * @return
 	 */
 	List<ZipCodeLookup> getZipcodeSuggestion(String zipcode, int startIndex, int batchSize, boolean onlyUsFilter);
+	
+	/**
+	 * Method will return all the SocialSurvey Admins
+	 * @return list
+	 * @throws HibernateException
+	 */
+	public List getSocialSurveyAdmins() throws HibernateException;
 
 }

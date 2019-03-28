@@ -670,7 +670,7 @@ public interface UserManagementService
 	void updateAgentIdInSurveyPreinitiation(String emailId) throws InvalidInputException, NoRecordsFetchedException;
 	
 	public void updateSurveyDetails();
-	
+
 	
 	/**
 	 * Method to check if  branch and region admins can Add or Delete User.
@@ -681,6 +681,7 @@ public interface UserManagementService
 	 * @throws InvalidInputException
 	 */
 	public boolean canAddAndDeleteUser(String entityType, long companyId, boolean addOrDeleteFlag) throws InvalidInputException;
+
 
 }
 // JIRA SS-34 BY RM02 BOC

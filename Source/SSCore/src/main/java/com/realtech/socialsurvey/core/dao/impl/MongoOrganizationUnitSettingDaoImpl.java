@@ -1,17 +1,18 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.vo.AddressGeoLocationVO;
+import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -30,39 +31,11 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.index.Index;
-import org.springframework.data.mongodb.core.query.BasicQuery;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.NearQuery;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Repository;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-
-import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.LOSearchEngine;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
-import com.realtech.socialsurvey.core.entities.SEOUrlEntity;
-import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SurveyStats;
-import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
-import com.realtech.socialsurvey.core.exception.DatabaseException;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.vo.AddressGeoLocationVO;
-import com.realtech.socialsurvey.core.vo.AdvancedSearchVO;
-
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Mongo implementation of settings
@@ -246,6 +219,32 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String NOTIFICATION_ISDISABLED = "notification.isDisabled";
 
     public static final String KEY_ALERT_EMAIL = "crm_info.alertEmail";
+    
+    public static final String KEY_CUSTOMER_SUCCESS_ID = "customerSuccessId";
+    public static final String KEY_CUSTOMER_SUCCESS_NAME = "customerSuccessName";
+    public static final String KEY_CUSTOMER_SUCCESS_OWNER = "customerSuccessOwner";
+    public static final String KEY_CLOSED_DATE = "closedDate";
+    public static final String KEY_RVP = "rvp";
+    public static final String KEY_TMC_CLIENT = "tmcClient";
+    public static final String KEY_SURVEY_DATA_SOURCE = "surveyDataSource";
+    public static final String KEY_DBA_FOR_COMPANY = "dbaForCompany";
+    public static final String KEY_POTENTIAL = "potential";
+    public static final String KEY_GAP_ANALYSIS_DATE = "gapAnalysisDate";
+    public static final String KEY_CUSTOMER_SETTINGS = "customerSettings";
+    public static final String KEY_SERVICES_SOLD = "servicesSold";
+    public static final String KEY_TRANSFER_REVIEW_POLICY = "transferReviewPolicy";
+    public static final String KEY_TAG = "tag";
+    public static final String KEY_REALTOR_SURVEYS = "realtorSurveys";
+    public static final String KEY_HAPPY_WORKFLOW_SETTINGS = "happyWorkflowSettings";
+    public static final String KEY_PRIMARY_POC = "primaryPoc";
+    public static final String KEY_POC2 = "poc2";
+    public static final String KEY_EMAIL = "email";
+    public static final String KEY_EMAIL_POC2 = "emailPoc2";
+    public static final String KEY_SECONDARY_EMAIL = "secondaryEmail";
+    public static final String KEY_PHONE_POC2 = "phonePoc2";
+    public static final String KEY_PHONE = "phone";
+    public static final String KEY_LAST_CONVERSATION_DATE = "lastConversationDate";
+    public static final String KEY_NOTES = "notes";
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -2361,6 +2360,24 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 	}
 
+    /**
+     * Fetches the organisationSettings for given companyId and collectionName applying the given projections
+     * @param companyId
+     * @param collectionName
+     * @param projections
+     * @return
+     */
+    @Override public OrganizationUnitSettings fetchOrganizationUnitSettingsById( long companyId, String collectionName,
+        List<String> projections)
+    {
+        LOG.debug( "Fetch organization unit settings from {} for id: {}", collectionName, companyId );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( companyId ) );
+        for(String proj : projections){
+            query.fields().include( proj );
+        }
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
+    }
 
 	@Override
 	public List<SEOUrlEntity> fetchSEOUrlEntty(String collectionName, int count, int limit, String locationType , List<Long> excludedEntityIds) {
@@ -2499,7 +2516,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		}
 		
 	}
-    
+
     @Override
     public List<Long> fetchCompaniesWithHiddenSection()
     {
@@ -2554,6 +2571,46 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     }
     
     @Override
+    public void updateParticularKeyCompanySettingsByIden( String keyToUpdate, Object updatedRecord, long iden, long modifiedBy ) throws InvalidInputException
+    {
+        LOG.debug( "User {} updating company setting with identifier {} for key: {} with value: {}" ,
+            modifiedBy, iden , keyToUpdate, updatedRecord );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
+        Update update = new Update();
+        update.set( keyToUpdate, updatedRecord );
+        update.set( KEY_MODIFIED_ON, System.currentTimeMillis() );
+        update.set( KEY_MODIFIED_BY, modifiedBy );
+        WriteResult result = mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        if(result == null || result.getN() != 1) {
+            
+            throw new InvalidInputException( "company setting not found for compannyId : " + iden );
+        }
+        LOG.debug( "Updated the company setting" );
+    }
+
+
+    @Override public void updateParticularKeyArrayOrganizationUnitSettingsByIden( String keyToUpdate, Object value,
+        long companyId, String collectionName ) throws NonFatalException
+    {
+        if(LOG.isDebugEnabled())
+            LOG.debug("Updating company setting with identifier {} for key: {} with value: {} ", companyId , keyToUpdate , value);
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        Update update = new Update();
+        update.push( keyToUpdate, value );
+        update.set( KEY_MODIFIED_ON, System.currentTimeMillis() );
+        WriteResult result = mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
+        if(result == null || result.getN() != 1) {
+            throw new NonFatalException("Unable to update the key " + keyToUpdate + " with value " + value.toString() +
+                " for companyId "  + companyId );
+        }
+
+        if(LOG.isDebugEnabled())
+            LOG.debug( "Updated the company setting" );
+    }
+    
+    @Override
     public void updateOrganizationSettingsByQuery( Map<String, Object> queryMap, Map<String, Object> updateMap,
         String collectionName ) throws Exception
     {
@@ -2575,9 +2632,30 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             throw new DatabaseException( "updateOrganizationSettingsByQuery failed to update in mongo", exception );
         }
 
+
         LOG.debug( "updateOrganizationSettingsByQuery finished" );
     }
-    
+
+    /**
+     * Unsets a key in the unit organisation settings and also updates the modifiedBy and modifiedBy
+     * @param companyId
+     * @param keyToUpdate
+     * @param collectionName
+     * @param modifiedBy
+     */
+    @Override
+    public int removeKeyInOrganizationSettings( long companyId, String keyToUpdate,
+        String collectionName, long modifiedBy )
+    {
+        LOG.debug( "Method removeKeyInOrganizationSettings() started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        Update update = new Update().unset( keyToUpdate );
+        LOG.debug( "Updating the unit settings" );
+        WriteResult updateResult = mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
+        return updateResult.getN();
+    }
+
     @Override
     public List<ProfileImageUrlEntity> getAllProfileImageUrl( Set<Long> entityIds, String collectionName )
     {

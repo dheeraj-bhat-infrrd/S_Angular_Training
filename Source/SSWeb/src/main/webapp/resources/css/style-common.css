@@ -13087,7 +13087,7 @@ body.ss-not-found-page {
     padding: 10px 0;
 }
 
- /* ss-Admin only visible setting  style*/   
+ /* ss-Admin only visible setting  style*/
 .ss-admin-comp-settings {
     margin-top: 15px;
     margin-bottom: 15px;
@@ -13116,6 +13116,148 @@ body.ss-not-found-page {
     color: #585757;
     font-weight: bold !important;
     font-size: 11px;
+}
+
+/*New Admin dashboard styles*/
+.cust-suc-info {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.cust-suc-info-hdr {
+    text-align: right;
+    color: black;
+    font-size: 12px;
+    word-break: break-word;
+}
+
+.cust-suc-info-val {
+    text-align: left;
+    min-height: 35px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    color: #737373;
+    line-height: 18px;
+    font-size: 12px;
+    font-weight: bold !important;
+    word-break: break-all;
+    background-color: #f9f9fb;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.cust-suc-info-val-fixed {
+    background-color: transparent;
+    cursor: default;
+    border: none;
+}
+
+.cust-suc-info-val-editable {
+    background-color: #f9f9fb;
+}	
+
+.cust-suc-info-inp {
+    border: 0;
+    height: 100%;
+    width: 100%;
+    font-size: 12px;
+    font-weight: bold !important;
+    background: inherit;
+}
+
+.cust-suc-notes {
+    border-bottom: 1px solid #dcdcdc;
+    padding: 0;
+    padding-bottom: 15px;
+    margin-bottom: 10px;
+}
+
+.cust-suc-notes-hdr {
+    font-weight: bold !important;
+    font-size: 12px;
+}
+
+.cust-suc-notes-body {
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.cust-suc-notes-info {
+    font-size: 11px;
+    font-weight: bold !important;
+    margin-top: 10px;
+    margin-left: -6px;
+}
+
+.cust-suc-notes-pagination {
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+}
+
+.cust-suc-notes-prev-notes {
+    font-size: 12px;
+    color: #2a4bcf;
+}
+
+.cust-suc-notes-count {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.cust-suc-notes-cur-count,  .cust-suc-notes-count-of{
+	margin-right: 5px;
+}
+
+.cust-suc-dropdown-head{
+	padding: 5px 15px;
+}
+
+.cust-suc-info-val-dropdown {
+    background: white;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+}
+
+.ad-customer-success-name-dropdown {
+    border: 1px solid #a5a3a3;
+    border-top: 0;
+    border-radius: 3px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    position: absolute;
+    z-index: 111111;
+    background: #f9f9fb;
+    width: 100%;
+    padding: 5px 0;
+    min-height: 35px;
+}
+
+.ad-customer-success-name-item {
+    padding: 5px 15px;
+}
+
+.ad-customer-success-name-item:hover {
+    background: #a7c5e2;
+}
+
+#cust-suc-loader, #ss-data-loader, #poc-loader, #serv-det-loader, #zoho-crm-loader, #notes-loader, #cust-succ-drop-loader {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 9999999;
+    background: url(../images/dashloader.gif) no-repeat center;
+    background-size: 50px 50px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.ad-container{
+	position: relative;
 }
 
 #survey-dash{

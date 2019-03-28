@@ -184,6 +184,9 @@
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item" onclick="showMainContent('./showreportingpage.do')"><spring:message code="label.header.dashboard.key" /></div>
 				<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+					<c:if test="${highestrole == 1}">
+						<div class="header-links-item" onclick="showMainContent('./showadmindashboard.do')"><spring:message code="label.header.admin.dashboard.key" /></div>
+					</c:if>
 					<div class="header-links-item" onclick="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.legacy.dashboard.key" /></div>
 				</c:if>
 				<div class="header-links-item" onclick="showMainContent('./showreportspage.do')"><spring:message code="label.reporting.key" /></div>
@@ -293,7 +296,13 @@
 							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">
 								<spring:message code="label.header.dashboard.key" />
 							</div>
+							
 							<c:if test="${isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true'}">
+								<c:if test="${highestrole == 1}">
+									<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showadmindashboard.do');">
+										<spring:message code="label.header.admin.dashboard.key" />
+									</div>
+								</c:if>
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./dashboard.do');">
 									<spring:message code="label.header.legacy.dashboard.key" />
 								</div>

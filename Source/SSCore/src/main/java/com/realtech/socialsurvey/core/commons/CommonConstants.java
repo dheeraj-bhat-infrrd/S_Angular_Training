@@ -1838,4 +1838,14 @@ public interface CommonConstants
 
     //constant for encompass alert emails
     String ENCOMPASS_ALERT_EMAILS = "alertEmails";
+
+    //constant for authheader
+    String BASIC = "Basic " ;
+    String AUTH_FAILED = "AUTHORIZATION FAILED";
+    
+    String ACTIVE = "ACTIVE";
+    String INACTIVE = "INACTIVE";
+    String ACCOUNT_STATUS = "accountStatus";
+    String PROFILE_MASTER_ID_COLUMN = "PROFILE_MASTER_ID_COLUMN";
 }
+

@@ -9,48 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.realtech.socialsurvey.core.vo.BranchVO;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.vo.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
-import com.realtech.socialsurvey.core.entities.CRMInfo;
-import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
-import com.realtech.socialsurvey.core.entities.CompanyView;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.DisabledAccount;
-import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
-import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
-import com.realtech.socialsurvey.core.entities.Keyword;
-import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
-import com.realtech.socialsurvey.core.entities.MailContent;
-import com.realtech.socialsurvey.core.entities.MailContentSettings;
-import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
-import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
-import com.realtech.socialsurvey.core.entities.StateLookup;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
-import com.realtech.socialsurvey.core.entities.UploadValidation;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
-import com.realtech.socialsurvey.core.entities.VerticalsMaster;
-import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -62,7 +24,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentExceptio
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
+
 
 /**
  * @author Ustav
@@ -1854,6 +1816,7 @@ public interface OrganizationManagementService
      */
     void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey );
 
+    CompanyStatistics fetchCompanyStatistics( long companyId ) throws NoRecordsFetchedException, InvalidInputException;
 
     void disableNotification( long companyId );
 
@@ -1903,12 +1866,33 @@ public interface OrganizationManagementService
      */
     public void updateCompanySettings(OrganizationUnitSettings companySettings, String columnName, String columnValue);
 
+    CustomerSuccessInformation fetchCustomerSuccessInformation( long companyId ) throws InvalidInputException, NoRecordsFetchedException;;
+
+    void updateCompanySettings( long companyId, String columnName, Object columnValue );
+    
+    /**
+     * Method will return all social survey admins
+     * @return Map<String, String>
+     */
+    public List<UserVo> getSocialSurveyAdmins();
+    
+    /**
+     * Update the customer information based in the parameters.
+     * 
+     * @param companyId
+     * @param keyToBeUpdated
+     * @param value
+     * @param modifiedBy
+     * @return message
+     */
+    public String updateCustomerInformation(long companyId, String keyToBeUpdated, Object value, long modifiedBy);
+
+    List<Notes> fetchNotes( long companyId, long startIndex, long limit ) throws InvalidInputException;
+
+    void updateSSAdminNotes( NotesVo notes ) throws NonFatalException;
 
     public boolean enableIncompleteSurveyDeleteToggle(long companyId, boolean incompleteSurveyDeleteFlag) throws InvalidInputException, NoRecordsFetchedException;
 
-    
-    void updateCompanySettings( long companyId, String columnName, Object columnValue );
-    
     /**
      * Update OrganizationSettings based on id and boolean value.
      * The id will contain the IDEN value which is used to set the criteria.

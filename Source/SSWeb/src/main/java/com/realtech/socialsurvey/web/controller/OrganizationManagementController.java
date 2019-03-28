@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 
-import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.vo.CompanyStatistics;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
@@ -30,10 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -48,27 +46,6 @@ import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.WidgetTemplateConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
-import com.realtech.socialsurvey.core.entities.AccountsMaster;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
-import com.realtech.socialsurvey.core.entities.DisplayMessage;
-import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.LockSettings;
-import com.realtech.socialsurvey.core.entities.MailContent;
-import com.realtech.socialsurvey.core.entities.MailContentSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ParsedHierarchyUpload;
-import com.realtech.socialsurvey.core.entities.StateLookup;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserEmailMapping;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserSettings;
-import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -4878,7 +4855,6 @@ public class OrganizationManagementController
                 .getDisplayMessage( DisplayMessageConstants.ADD_EMAIL_ID_FOR_USER__SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
         }
-	
 
 	@RequestMapping ( value = "/enableincompletesurveydeletetoggle", method = RequestMethod.POST)
 	@ResponseBody
@@ -4905,12 +4881,12 @@ public class OrganizationManagementController
     {
         User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
-        
+
         Response response = ssApiIntergrationBuilder.getIntegrationApi().disableNotification( companyId );
-        
+
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
-    
+
     @ResponseBody
     @RequestMapping ( value = "/updateencompassalertmail", method = RequestMethod.POST)
     public String updateEncompassAlertMail( HttpServletRequest request, Model model, @RequestParam ("alertMails") String alertMails )
@@ -4929,7 +4905,104 @@ public class OrganizationManagementController
         }catch(SSAPIException e) {
             return "INPUT_ERROR";
         }
-       
+    }
+    
+    @ResponseBody
+    @GetMapping( value = "/fetchcompanystatistics" )
+    public String fetchCompanyStatistics(Model model, HttpServletRequest request){
+        LOG.debug( "Method to fetchCompanyStatistics() started." );
+        final String authorizationHeader = CommonConstants.BASIC + authHeader;
+
+        try {
+            User admin = sessionHelper.getCurrentUser();
+            return  new Gson().toJson( ssApiIntergrationBuilder.getIntegrationApi().fetchCompanyStatistics(admin.getCompany().getCompanyId(), authorizationHeader) );
+        } catch ( Exception ex ){
+            
+            return ex.getMessage();
+        }
+    }
+    
+    @ResponseBody
+    @GetMapping(value = "/getsocialsurveyadmins")
+    public String getSocialSurveyAdmins(Model model, HttpServletRequest request){
+        LOG.info( "Method to getSocialSurveyAdmins() started." );
+        final String authorizationHeader = CommonConstants.BASIC + authHeader;
+
+        try {
+            
+            return  new Gson().toJson( ssApiIntergrationBuilder.getIntegrationApi().getSocialSurveyAdmins( authorizationHeader) );
+        }
+        catch ( Exception ex ){
+            
+            return ex.getMessage();
+        }
+    }
+    
+    @ResponseBody
+    @PostMapping(value = "/updatecustomerinformation")
+    public String updateCompanyInformation(Model model, HttpServletRequest request) {
+        
+        LOG.debug( "Method to updateCompanyInformation() started." );
+        final String authorizationHeader = CommonConstants.BASIC + authHeader;
+        try {
+            
+            HttpSession session = request.getSession( false );
+            
+            User user = sessionHelper.getCurrentUser();
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid == null ) {
+                throw new IllegalAccessException( "Logged In user is not a SocialSurvey Admin" );
+            }
+            
+            String keyToBeUpdated = request.getParameter("keyToBeUpdated");
+            String value = request.getParameter("value");
+
+            return  ssApiIntergrationBuilder.getIntegrationApi().updateCustomerInformation( authorizationHeader,
+                user.getCompany().getCompanyId(), keyToBeUpdated, value, adminUserid );
+        }
+        catch ( Exception ex ) {
+            
+            LOG.error( "Error in updateCompanyInformation()", ex );            
+            return ex.getMessage();
+        }
+    }
+
+    @ResponseBody
+    @GetMapping(value = "/fetchcustomersuccessinfo")
+    public String fetchCustomerSuccessInfo(Model model, HttpServletRequest request){
+        LOG.info( "Method to fetchCompanyStatistics() started." );
+        final String authorizationHeader = CommonConstants.BASIC + authHeader;
+        try {
+            User admin = sessionHelper.getCurrentUser();
+            return  new Gson().toJson( ssApiIntergrationBuilder.getIntegrationApi().
+                fetchCustomerSuccessInfo(admin.getCompany().getCompanyId(), authorizationHeader) );
+        } catch ( Exception ex ){
+            return ex.getMessage();
+        }
+    }
+
+    @ResponseBody
+    @GetMapping(value = "/fetchnotes")
+    public String fetchSSAdminNotes(Model model, HttpServletRequest request){
+        LOG.info( "Method to fetchSSAdminNotes() started." );
+        final String authorizationHeader = CommonConstants.BASIC + authHeader;
+        try {
+            long startIndex = Long.parseLong( request.getParameter( "startIndex" ) );
+            long limit = Long.parseLong( request.getParameter( "limit" ) );
+            User admin = sessionHelper.getCurrentUser();
+
+            return  new Gson().toJson( ssApiIntergrationBuilder.getIntegrationApi().
+                fetchSSAdminNotes(admin.getCompany().getCompanyId(),startIndex, limit, authorizationHeader) );
+        } catch ( Exception ex ){
+            return ex.getMessage();
+        }
+    }
+    
+    @GetMapping ( value = "/showadmindashboard")
+    public String showAdminDashboard( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method showAdminDashboard of OrganizationManagementController called" );
+        return JspResolver.SHOW_ADMIN_DASHBOARD;
     }
     
     /**

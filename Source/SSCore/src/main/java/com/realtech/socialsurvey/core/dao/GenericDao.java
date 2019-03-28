@@ -69,5 +69,7 @@ public interface GenericDao<T, ID extends Serializable> {
 	public void saveAll(List<T> entityList);
 
     long findNumberOfRowsByCriteria( Class<T> dataClass,  Criterion... criterion);
+
+    List<T> executeNativeQuery(Class<T> dataClass, Map<String, Object> queries, String nativeQuery);
 }
 // JIRA: SS-8: By RM05: EOC
