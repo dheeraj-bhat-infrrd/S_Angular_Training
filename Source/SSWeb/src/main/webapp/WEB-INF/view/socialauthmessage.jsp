@@ -68,8 +68,7 @@
 		var authUrl = "${authUrl}";
 		if (authUrl != null) {
 			location.href = authUrl;
-		}
-		else {
+			return false;
 		}
 	}
 	
@@ -77,8 +76,6 @@
 	var parentWindow;
 	if (window.opener != null && !window.opener.closed) {
 		parentWindow = window.opener;
-	}
-	else {
 	}
 	
 	// close on error
