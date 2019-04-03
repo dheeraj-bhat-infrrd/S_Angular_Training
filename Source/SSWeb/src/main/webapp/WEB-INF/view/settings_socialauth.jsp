@@ -72,7 +72,7 @@
 
 	
 </div>
-<div class="soc-nw-icns-cont clearfix">
+<%-- <div class="soc-nw-icns-cont clearfix">
 	<c:choose>
 		<c:when test="${not empty googleLink}">
 			<div class="social-media-disconnect float-left ${socialDisabled}"
@@ -87,7 +87,7 @@
 		onclick="openAuthPage(event,'google', ${isAutoLogin}, this);" data-link="${googleLink}"></div>
 	<div id="edt-prof-ggl-lnk" class="float-left soc-nw-icn-link"
 		data-social='google'>${googleLink}</div>
-</div>
+</div> --%>
 <!-- Zillow link -->
 <div class="soc-nw-icns-cont clearfix">
 	<c:choose>

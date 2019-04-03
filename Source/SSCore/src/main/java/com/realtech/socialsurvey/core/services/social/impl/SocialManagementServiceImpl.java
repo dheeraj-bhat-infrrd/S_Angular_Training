@@ -2768,11 +2768,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         links.append( "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.YELP_LABEL )
                             + ">" + CommonConstants.YELP_LABEL + "</a>" );
                     }*/
-                    if ( socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL ) != null ) {
+                    /*if ( socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL ) != null ) {
                         links.append(
                             "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL )
                                 + ">" + CommonConstants.GOOGLE_PLUS_LABEL + "</a>" );
-                    }
+                    }*/
                     if ( socialSitesWithSettings.get( CommonConstants.LINKEDIN_LABEL ) != null ) {
                         links.append(
                             "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.LINKEDIN_LABEL ) + ">"
@@ -2965,8 +2965,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         // build social site url's like Google Plus, LinkedIn, Twitter and
         // Facebook
-        socialSiteUrlMap.put( CommonConstants.GOOGLE_PLUS_LABEL,
-            generateSocialSiteUrl( survey, CommonConstants.GOOGLE_PLUS_LABEL, agentSettings ) );
+       /* socialSiteUrlMap.put( CommonConstants.GOOGLE_PLUS_LABEL,
+            generateSocialSiteUrl( survey, CommonConstants.GOOGLE_PLUS_LABEL, agentSettings ) );*/
         socialSiteUrlMap.put( CommonConstants.LINKEDIN_LABEL,
             generateSocialSiteUrl( survey, CommonConstants.LINKEDIN_LABEL, agentSettings ) );
         socialSiteUrlMap.put( CommonConstants.TWITTER_LABEL,
@@ -3006,9 +3006,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             case CommonConstants.YELP_LABEL:
                 url = organizationUnitSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
                 break;
-            case CommonConstants.GOOGLE_PLUS_LABEL:
+           /* case CommonConstants.GOOGLE_PLUS_LABEL:
                 url = "https://plus.google.com/share?url=" + organizationUnitSettings.getCompleteProfileUrl();
-                break;
+                break;*/
             case CommonConstants.LINKEDIN_LABEL:
                 url += "https://www.linkedin.com/shareArticle?mini=true&url=" + organizationUnitSettings.getCompleteProfileUrl()
                     + "/" + survey.get_id() + "&title=&summary=" + reviewText + "&source=";

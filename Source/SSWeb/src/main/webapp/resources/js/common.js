@@ -622,7 +622,7 @@ function shareOnYelp(agentId, location, yelpElement){
 	});
 }
 
-function shareOnGooglePlus(agentId, location, googleElement){
+/*function shareOnGooglePlus(agentId, location, googleElement){
 	var success = false;
 	var payload = {
 		"agentId" : agentId
@@ -663,7 +663,7 @@ function shareOnGooglePlus(agentId, location, googleElement){
 			showToast(e.responseText);
 		}
 	});
-}
+}*/
 
 
 

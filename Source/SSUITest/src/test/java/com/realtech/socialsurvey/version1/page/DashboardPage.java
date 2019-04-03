@@ -19,7 +19,7 @@ public class DashboardPage extends BasePage
     public static final String SENDSURVEY_BUTTON_LOCATOR = "id=dsh-btn1";
     public static final String CONNECTTO_LINKEDIN_BUTTON_LOCATOR = "xpath=//div[contains(text(), 'Connect to Linkedin')]";
     public static final String CONNECTTO_FACEBOOK_BUTTON_LOCATOR = "xpath=//div[contains(text(), 'Connect to Facebook')]";
-    public static final String CONNECTTO_GOOGLE_BUTTON_LOCATOR = "xpath=//div[contains(text(), 'Connect to Google+')]";
+    /*public static final String CONNECTTO_GOOGLE_BUTTON_LOCATOR = "xpath=//div[contains(text(), 'Connect to Google+')]";*/
     public static final String CONNECTTO_YELP_BUTTON_LOCATOR = "xpath=//div[contains(text(), 'Connect to Yelp')]";
     public static final String CONNECTTO_ZILLOW_BUTTON_LOCATOR = "xpath=//div[contains(text(), 'Connect to Zillow')]";
     public static final String ENTER_LICENSE_DETAILS_BUTTON_LOCATOR = "xpath=//div[contains(text(), 'Enter license details')]";
@@ -117,8 +117,8 @@ public class DashboardPage extends BasePage
 
     public void clickConnectToGoogle()
     {
-        WebElement googlePlusBtn = getElement( CONNECTTO_GOOGLE_BUTTON_LOCATOR );
-        googlePlusBtn.click();
+       /* WebElement googlePlusBtn = getElement( CONNECTTO_GOOGLE_BUTTON_LOCATOR );
+        googlePlusBtn.click();*/
     }
 
 

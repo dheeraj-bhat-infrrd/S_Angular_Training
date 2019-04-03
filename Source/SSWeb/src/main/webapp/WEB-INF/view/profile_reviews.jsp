@@ -244,7 +244,7 @@
 						 <span
 						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
 						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${completeProfileUrl}/${reviewItem._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(reviewItem.review)}&reviewid=${reviewItem._id}&source="></span>
-					<span class="float-left" title="Google+">
+					<%-- <span class="float-left" title="Google+">
 						<button
 							class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
 							data-contenturl="${completeProfileUrl}/${reviewItem._id}"
@@ -255,7 +255,7 @@
 							data-calltoactionurl="${completeProfileUrl}/${reviewItem._id}">
 							<span class="icon">&nbsp;</span> <span class="label">share</span>
 						</button>
-					</span>
+					</span> --%>
 					<span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(${start})">
                        	<input id="permalink_url_${start}" type="hidden" value="${completeProfileUrl}/${reviewItem._id}"/>
                     </span>
