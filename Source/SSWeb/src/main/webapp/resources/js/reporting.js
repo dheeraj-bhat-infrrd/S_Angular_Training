@@ -2592,8 +2592,6 @@ function reportingSocialMediaButtons(stages,columnName,columnValue){
 				contentToDisplay = '<div class="rep-fb-btn"></div>';
 			} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
 				contentToDisplay = '<div class="rep-zillow-btn"></div>';
-			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
-				contentToDisplay = '<div class="rep-google-btn"></div>';
 			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
 				contentToDisplay = '<div class="rep-twitter-btn"></div>';
 			} else if (stages[i].profileStageKey == 'YELP_PRF') {
@@ -2694,8 +2692,6 @@ var profileStageKey = $('#dsh-btn2').data('social');
 					contentToDisplay = '<div class="rep-fb-btn"></div>';
 				} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
 					contentToDisplay = '<div class="rep-zillow-btn"></div>';
-				} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
-					contentToDisplay = '<div class="rep-google-btn"></div>';
 				} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
 					contentToDisplay = '<div class="rep-twitter-btn"></div>';
 				} else if (stages[i].profileStageKey == 'YELP_PRF') {

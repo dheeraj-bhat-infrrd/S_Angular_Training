@@ -133,7 +133,6 @@ var defaultCountryCode = "US";
 var defaultCountry = "United States";
 
 var fb_app_id;
-var google_plus_app_id;
 var isZillowReviewsCallRunning = false;
 var zillowCallBreak = false;
 var existingCall;
@@ -7937,7 +7936,6 @@ function paintSurveyPage(jsonData) {
 	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
 	fb_app_id = jsonData.responseJSON.fbAppId;
-	google_plus_app_id = jsonData.responseJSON.googlePlusAppId;
 	surveyId = jsonData.responseJSON.surveyId;
 	zillowReviewLink =  jsonData.responseJSON.zillowLink;
 	subjectContentForZillowPost = jsonData.responseJSON.subjectContentForZillowPost;
@@ -7958,14 +7956,6 @@ function paintSurveyPage(jsonData) {
 	customeField5 = jsonData.responseJSON.customField5;
 
 	// If social token availiable populate the links
-	// if (googleEnabled) {
-	// var googleElement = document.getElementById('ggl-btn');
-	// //shareOnGooglePlus(agentId, window.location.origin + "/rest/survey/", googleElement);
-	// shareOnGooglePlus(agentId, getLocationOrigin() + "/rest/survey/", googleElement);
-	// } else {
-	// $('#ggl-btn').remove();
-	// }
-	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink + "/" + surveyId );
 
 	//SS-1452 remove yelp from all the pages
 	/*if (yelpEnabled) {
@@ -11108,8 +11098,6 @@ function paintDashboardButtons(data) {
 				contentToDisplay = 'Connect to Facebook';
 			} else if (stages[i].profileStageKey == 'ZILLOW_PRF') {
 				contentToDisplay = 'Connect to Zillow';
-			} else if (stages[i].profileStageKey == 'GOOGLE_PRF') {
-				contentToDisplay = 'Connect to Google+';
 			} else if (stages[i].profileStageKey == 'TWITTER_PRF') {
 				contentToDisplay = 'Connect to Twitter';
 			} else if (stages[i].profileStageKey == 'YELP_PRF') {
@@ -11146,8 +11134,6 @@ function paintDashboardButtons(data) {
 function dashboardButtonAction(buttonId, task, columnName, columnValue) {
 	if (task == 'FACEBOOK_PRF') {
 		openAuthPageDashboard('facebook', columnName, columnValue);
-	} else if (task == 'GOOGLE_PRF') {
-		openAuthPageDashboard('google', columnName, columnValue);
 	} else if (task == 'ZILLOW_PRF') {
 		openAuthPageDashboardZillow('#dsh-btn3');
 	} else if (task == 'YELP_PRF') {
@@ -15066,7 +15052,6 @@ function paintReviews(result, isRequestFromDashBoard) {
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
 		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '"></span>';
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
-		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"' + '' + 'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		if (reviewItem.source != "Zillow")
@@ -20900,13 +20885,13 @@ function closeSummitRibbon(){
 	$('#summit-ribbon-outer').hide();
 }
 
-function showLinkedinApiV2UpdateRibbon(){
+/*function showLinkedinApiV2UpdateRibbon(){
 	$('#linkedin-api-v2-update-ribbon-outer').show();
 }
 
 function closeLinkedinApiV2UpdateRibbon(){
 	$('#linkedin-api-v2-update-ribbon-outer').hide();
-}
+}*/
 
 $(document).on('click','#summit-popup-close-btn',function(e){
 	e.stopPropagation();
@@ -20923,10 +20908,10 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 	window.open('https://www.socialsurvey.com/top-performers-2018/', '_blank');
 });
 
-$(document).on('click','#linkedin-api-v2-update-ribbon-close-btn',function(e){
+/*$(document).on('click','#linkedin-api-v2-update-ribbon-close-btn',function(e){
 	e.stopPropagation();
 	closeLinkedinApiV2UpdateRibbon();
-});
+});*/
 
 $(document).on('click','#summit-ribbon-close-btn',function(e){
 	e.stopPropagation();
@@ -22565,14 +22550,14 @@ $('#linked-in-prof-url-popup-cancel').click(function() {
 	
 	var linkedInProfileUrl = $('#linked-in-popup-inp').val();
 	
-	if(linkedInProfileUrl == null || linkedInProfileUrl == undefined || linkedInProfileUrl == ''){
+	/*if(linkedInProfileUrl == null || linkedInProfileUrl == undefined || linkedInProfileUrl == ''){
 
 		var updateBanner = $("#linkedin-api-v2-update-ribbon-outer");
 		if(updateBanner) {
 				$(updateBanner).find(".linkedProfileUrl").removeClass("hide");
 				$(updateBanner).find(".linkedV2Token").addClass("hide");
 		}
-	}
+	}*/
 	
 	linkedInUrlPopupRevert();
 
@@ -22688,3 +22673,8 @@ function checkImgForProfile(ele){
 		});
 	}
 }
+
+$(document).on('click','#google-banner-close-btn',function(e){
+	e.stopPropagation();
+	$('#google-plus-banner').hide();
+});

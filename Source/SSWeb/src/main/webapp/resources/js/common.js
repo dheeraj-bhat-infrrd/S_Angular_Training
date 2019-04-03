@@ -622,51 +622,6 @@ function shareOnYelp(agentId, location, yelpElement){
 	});
 }
 
-function shareOnGooglePlus(agentId, location, googleElement){
-	var success = false;
-	var payload = {
-		"agentId" : agentId
-	};
-	$.ajax({
-		url : location + "getgooglepluslinkrest",
-		type : "GET",
-		dataType : "json",
-		cache : false,
-		data : payload,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				data = data.responseJSON;
-				if (data.host != undefined && data.profileServer != undefined && data.relativePath != undefined) {
-					if (googleElement == undefined) {
-						window.open(data.host + data.profileServer + data.relativePath);
-					}
-					else {
-						googleElement.href = data.host + data.profileServer + data.relativePath;
-					}
-				}
-				else {
-					$('#overlay-toast').html('Please setup your Google+ account to share.');
-					showToast();
-				}
-			}
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			$('#overlay-toast').html(e.responseText);
-			showToast(e.responseText);
-		}
-	});
-}
-
-
-
 function callAjaxGETAndAbortLastRequest(url,  callBackFunction, isAsync,disableEle) {
 	if ( $(disableEle).data('requestRunning') ) {
 		return;
