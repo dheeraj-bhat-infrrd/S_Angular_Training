@@ -13352,3 +13352,10 @@ body.ss-not-found-page {
     text-align: center;
     height: 36px;
 }
+
+.google-banner-outer {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    background-color: #7ab400;
+}

@@ -22673,3 +22673,8 @@ function checkImgForProfile(ele){
 		});
 	}
 }
+
+$(document).on('click','#google-banner-close-btn',function(e){
+	e.stopPropagation();
+	$('#google-plus-banner').hide();
+});
