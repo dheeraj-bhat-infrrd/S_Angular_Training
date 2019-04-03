@@ -1072,18 +1072,6 @@
 														data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(twitterReview)}&url=${reviewItem.completeProfileUrl}/${reviewItem._id}"></span>
 													<span class="float-left ppl-share-icns icn-lin-rev"
 														title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl}/${reviewItem._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(reviewItem.review)} + &source="></span>
-													<span class="float-left" title="Google+">
-														<button
-															class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
-															data-contenturl="${reviewItem.completeProfileUrl}/${reviewItem._id}"
-															data-clientid="${reviewItem.googleApi}"
-															data-cookiepolicy="single_host_origin"
-															data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(reviewItem.review)}"
-															data-calltoactionlabel="USE"
-															data-calltoactionurl="${reviewItem.completeProfileUrl}">
-															<span class="icon">&nbsp;</span> <span class="label">share</span>
-														</button>
-													</span>
 												</div>
 												<div class="float-right dash-flag-retake ">
 													<div class="clearfix">
