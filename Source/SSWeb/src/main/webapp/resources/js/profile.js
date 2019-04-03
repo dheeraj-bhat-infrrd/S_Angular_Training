@@ -905,7 +905,6 @@ function paintReviews(result){
 		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit-rev icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ profileUrl +'"></span>';	
 		reviewsHtml += '			<input type="hidden" class="linkedInSummary" value="'+reviewSummary+'" >'
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin-rev icn-lin-pp" title="LinkedIn" data-summary="'+reviewSummary+'" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&reviewid=' + reviewItem._id + '&source="></span>';
-		/*reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus-rev" data-contenturl="' + profileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + stringEscape(custDispName) + ' for ' + stringEscape(reviewItem.agentName) + ' at SocialSurvey - ' + stringEscape(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + profileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';*/
 		reviewsHtml += '			<span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(' + processedPermalink + ')"><input id="permalink_url_' + processedPermalink + '" type="hidden" value="' + profileUrl + '"/></span>';
 		reviewsHtml += '		</div>';
 		if(reviewItem.source != "Zillow")
@@ -2316,7 +2315,6 @@ function buildReviewPopupShareData(){
 	var score = parseFloat( $('#sr-review-info').data('score') );
 	var agentName = $('#sr-review-info').data('agent-name');
 	var _id = $('#sr-review-info').data('survey-mongo-id');
-	/*var googleApi = $('#sr-review-info').data('googleapi');*/
 	var review = $('#sr-review-info').data('review');
 	var faceBookShareUrl = $('#sr-review-info').data('facebookshareurl');
 	
@@ -2344,14 +2342,6 @@ function buildReviewPopupShareData(){
 	// linkedIn
 	//$('#linkedin_post').data( 'link', 'https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&reviewid=' + reviewItem._id + '&source=' );
 	
-	// google plus
-	//$('#gplus_post').data( 'contenturl', profileUrl );
-	//$('#gplus_post').data( 'clientid', reviewItem.googleApi ); 
-	//$('#gplus_post').data( 'cookiepolicy', "single_host_origin" );
-	//$('#gplus_post').data( 'prefilltext', reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + stringEscape(custDispName) + ' for ' + stringEscape(reviewItem.agentName) + ' at SocialSurvey - ' + stringEscape(reviewItem.review) );
-	//$('#gplus_post').data( 'calltoactionlabel',"USE");
-	//$('#gplus_post').data( 'data-calltoactionurl', profileUrl );
-	
 	var reviewSummary = score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ( agentName != undefined ? ' for ' + encodeURIComponent(agentName) : '' ) +' at SocialSurvey - ' + encodeURIComponent(review);
 	
 	socialPostHtml += '         <span id ="fb_post" class="float-left ppl-share-icns sr-icn-fb-rev icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + faceBookShareUrl + '&href=' +profileUrl.replace("localhost","127.0.0.1")+ '&quote=' + score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ( agentName != undefined ? ' for ' + encodeURIComponent(agentName) : '' ) + ' at SocialSurvey - ' + encodeURIComponent(review) + '&redirect_uri=https://www.facebook.com"></span>';
@@ -2359,7 +2349,6 @@ function buildReviewPopupShareData(){
 	socialPostHtml += '			<span id ="twitt_post" class="float-left ppl-share-icns sr-icn-twit-rev icn-twit-pp" onclick="processTwitterTextForSingleReview();" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ( agentName != undefined ? ' for ' + encodeURIComponent(agentName) : '' ) + ' at SocialSurvey - ' + encodeURIComponent(review) + ' &url='+ profileUrl +'"></span>';	
 	socialPostHtml += '			<input type="hidden" class"linkedInSummary" value="'+reviewSummary+'" >'
 	socialPostHtml += '			<span class="float-left ppl-share-icns sr-icn-lin-rev icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '&title=&summary=' + score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ( agentName != undefined ? ' for ' + encodeURIComponent(agentName) : '' ) +' at SocialSurvey - ' + encodeURIComponent(review) + '&reviewid=' + _id + '&source="></span>';
-	/*socialPostHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns sr-icn-gplus-rev" data-contenturl="' + profileUrl + '" data-clientid="' + googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + score.toFixed(scoreFixVal) + '-star response from ' + stringEscape(custDispName) + (agentName != undefined ? ' for ' + stringEscape(agentName) : '' ) + ' at SocialSurvey - ' + stringEscape(review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + profileUrl + '"> </button> </span>';*/
 	socialPostHtml += '			<span class="float-left ppl-share-icns permalink sr-icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(-1);"><input id="permalink_url_btn" type="hidden" value="' + profileUrl + '"/></span>';
 	
 	$('.sr-share-social').html( socialPostHtml );

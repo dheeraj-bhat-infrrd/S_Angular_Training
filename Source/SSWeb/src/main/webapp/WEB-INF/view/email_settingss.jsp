@@ -128,9 +128,6 @@
 										<span class="legend">[company_linkedin_link]</span>
 									</div>
 									<div class="legend-wrapper">
-										<span class="legend">[company_google_plus_link]</span>
-									</div>
-									<div class="legend-wrapper">
 										<span class="legend">[company_google_review_link]</span>
 									</div>
 									<div class="legend-wrapper">
@@ -153,9 +150,6 @@
 									</div>
 									<div class="legend-wrapper">
 										<span class="legend">[linkedin_link]</span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[google_plus_link]</span>
 									</div>
 									<div class="legend-wrapper">
 										<span class="legend">[google_review_link]</span>
@@ -190,7 +184,6 @@
 									<div class="legend-wrapper" title="Company Facebook Link">Company Facebook Link</div>
 									<div class="legend-wrapper" title="Company Twitter Link">Company Twitter Link</div>
 									<div class="legend-wrapper" title="Company LinkedIn Link">Company LinkedIn Link</div>
-									<!-- <div class="legend-wrapper" title="Company Google+ Link">Company Google+ Link</div> -->
 									<div class="legend-wrapper" title="Company Google Business Rate & Review Link">Company Google Business Rate & Review Link</div>
 									<div class="legend-wrapper" title="Company Zillow Link">Company Zillow Link</div>
 									<div class="legend-wrapper" title="Company Lending Tree Link">Company Lending Tree Link</div>
@@ -199,7 +192,6 @@
 									<div class="legend-wrapper" title="Facebook Link">Facebook Link</div>
 									<div class="legend-wrapper" title="Twitter Link">Twitter Link</div>
 									<div class="legend-wrapper" title="LinkedIn Link">LinkedIn Link</div>
-									<!-- <div class="legend-wrapper" title="Google+ Link">Google+ Link</div> -->
 									<div class="legend-wrapper" title="Google Business Rate & Review Link">Google Business Rate & Review Link</div>
 									<div class="legend-wrapper" title="Zillow Link">Zillow Link</div>
 									<div class="legend-wrapper" title="Lending Tree Link">Lending Tree Link</div>

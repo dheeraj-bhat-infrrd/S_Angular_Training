@@ -368,7 +368,6 @@
 						<a id="lt-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.lending_tree.txt"/></a>
 						<a id="zillow-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.zillow.txt"/></a>
 						<%-- <a id="ylp-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.yelp.txt"/></a> --%>
-						<%-- <a id="google-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.google_plus.txt"/></a> --%>
 						<a id="linkedin-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.linkedin.txt"/></a>
 						<a id="twitter-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.twitter.txt"/></a>
 						<a id="fb-btn" target="_blank" class="sq-btn-continue-survey sq-btn-post-social-btn col-sm-6"><spring:message code="btn.label.facebook.txt"/></a>
