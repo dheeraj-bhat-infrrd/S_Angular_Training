@@ -20885,13 +20885,13 @@ function closeSummitRibbon(){
 	$('#summit-ribbon-outer').hide();
 }
 
-function showLinkedinApiV2UpdateRibbon(){
+/*function showLinkedinApiV2UpdateRibbon(){
 	$('#linkedin-api-v2-update-ribbon-outer').show();
 }
 
 function closeLinkedinApiV2UpdateRibbon(){
 	$('#linkedin-api-v2-update-ribbon-outer').hide();
-}
+}*/
 
 $(document).on('click','#summit-popup-close-btn',function(e){
 	e.stopPropagation();
@@ -20908,10 +20908,10 @@ $(document).on('click','#summit-ribbon-outer',function(e){
 	window.open('https://www.socialsurvey.com/top-performers-2018/', '_blank');
 });
 
-$(document).on('click','#linkedin-api-v2-update-ribbon-close-btn',function(e){
+/*$(document).on('click','#linkedin-api-v2-update-ribbon-close-btn',function(e){
 	e.stopPropagation();
 	closeLinkedinApiV2UpdateRibbon();
-});
+});*/
 
 $(document).on('click','#summit-ribbon-close-btn',function(e){
 	e.stopPropagation();
@@ -22550,14 +22550,14 @@ $('#linked-in-prof-url-popup-cancel').click(function() {
 	
 	var linkedInProfileUrl = $('#linked-in-popup-inp').val();
 	
-	if(linkedInProfileUrl == null || linkedInProfileUrl == undefined || linkedInProfileUrl == ''){
+	/*if(linkedInProfileUrl == null || linkedInProfileUrl == undefined || linkedInProfileUrl == ''){
 
 		var updateBanner = $("#linkedin-api-v2-update-ribbon-outer");
 		if(updateBanner) {
 				$(updateBanner).find(".linkedProfileUrl").removeClass("hide");
 				$(updateBanner).find(".linkedV2Token").addClass("hide");
 		}
-	}
+	}*/
 	
 	linkedInUrlPopupRevert();
 
