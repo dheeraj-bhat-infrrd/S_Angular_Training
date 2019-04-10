@@ -102,10 +102,41 @@
 		</div>
 	</div>
 	
+	<div id="linkedin-overlay-main" class="overlay-main hide">
+		<div id="ln-overlay-pop-up" class="overlay-disable-wrapper">
+			<div id="ln-overlay-header" class="ol-header">
+				<!-- Populated by javascript -->
+			</div>
+			<div class="ol-content">
+				<div id="ln-overlay-text" class="ol-txt">
+					<!-- Populated by javascript -->
+				</div>
+				<div id="btn-section" class="clearfix">
+					<div class="float-left ln-ol-btn-wrapper">
+						<div id="ln-overlay-cancel" class="ol-btn cursor-pointer">
+							Cancel
+						</div>
+					</div>
+					<div class="float-left ln-ol-btn-wrapper">
+						<div id="ln-overlay-continue" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+					
+					<div class="float-left ln-ol-btn-wrapper">
+						<div id="ln-overlay-edit-link" class="ol-btn cursor-pointer">
+							Edit profile link
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 	<div id="linked-in-prof-url-popup-main" class="overlay-main hide">
 		<div id="linked-in-prof-url-popup" class="overlay-disable-wrapper" data-profileUrl="" data-fromDashboard="" data-restful="" data-socialFlow="" data-isFixSocialMedia="" data-message="" data-isManual="" data-columnName="" data-columnValue="" data-socialNetwork="linkedin"> 
 			<div id="linked-in-prof-url-popup-header" class="ol-header">
-				LinkedIn Url Confirmation
+				LinkedIn URL Confirmation
 			</div>
 			<div class="ol-content">
 				<div id="linked-in-prof-url-popup-text" class="ol-txt">
@@ -113,14 +144,20 @@
 					<input id="linked-in-popup-inp" type="text" class="linked-in-popup-inp" value="">
 				</div>
 				<div class="clearfix">
-					<div class="float-left ol-btn-wrapper">
+					<div class="float-left ln-ol-btn-wrapper">
 						<div id="linked-in-prof-url-popup-cancel" class="ol-btn cursor-pointer">
-							Exit
+							Cancel
 						</div>
 					</div>
-					<div class="float-left ol-btn-wrapper">
+					<div class="float-left ln-ol-btn-wrapper">
 						<div id="linked-in-prof-url-popup-continue" class="ol-btn cursor-pointer" data-btn-isDisabled=false>
-							Edit
+							Save
+						</div>
+					</div>
+					
+					<div class="float-left ln-ol-btn-wrapper">
+						<div id="linked-in-prof-url-popup-remove" class="ol-btn cursor-pointer" data-btn-isDisabled=false>
+							Delete URL
 						</div>
 					</div>
 				</div>

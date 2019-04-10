@@ -1925,4 +1925,36 @@ public interface OrganizationManagementService
      */
     public String saveLinkedInProfileUrl( String entityType, long entityId, String linkedInprofileUrl ) throws InvalidInputException;
 
+
+    /**
+     * Method to delete linkedin profiel url
+     * @param entityType
+     * @param entityId
+     * @return
+     * @throws InvalidInputException 
+     */
+    public String deleteLinkedInProfileUrl( String entityType, long entityId ) throws InvalidInputException;
+
+
+    /**
+     * Method to get profile url from unit setting
+     * @param socialMediaTokens
+     * @param socialNetwork
+     * @return
+     */
+    public SocialMediaStatusVO getProfileFromUnitSettingBySocialNetwork( SocialMediaTokens socialMediaTokens, String socialNetwork );
+
+
+    /**
+     * Method to get profile url and status of social media
+     * @param socialNetwork
+     * @param entityId
+     * @param entityType
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    public SocialMediaStatusVO getProfileUrlAndStatus( String socialNetwork, long entityId, String entityType )
+        throws InvalidInputException, NoRecordsFetchedException;
+
 }

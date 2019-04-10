@@ -451,9 +451,9 @@
 										data-link="${profile.socialMediaTokens.twitterToken.twitterPageLink }"></div>
 								</c:if>
 								<c:if
-									test="${not empty profile.socialMediaTokens.linkedInV2Token && not empty profile.socialMediaTokens.linkedInV2Token.linkedInPageLink}">
+									test="${not empty profile.socialMediaTokens.linkedInProfileUrl}">
 									<div id="icn-lin" class="float-left social-item-icon icn-lin"
-										data-link="${profile.socialMediaTokens.linkedInV2Token.linkedInPageLink }"></div>
+										data-link="${profile.socialMediaTokens.linkedInProfileUrl}"></div>
 								</c:if>
 								<c:if
 									test="${not empty profile.socialMediaTokens.yelpToken && not empty profile.socialMediaTokens.yelpToken.yelpPageLink}">

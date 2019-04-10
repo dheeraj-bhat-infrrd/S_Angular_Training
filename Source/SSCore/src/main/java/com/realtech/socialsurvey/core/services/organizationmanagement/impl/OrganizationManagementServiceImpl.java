@@ -87,7 +87,6 @@ import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandle
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.utils.CommonUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -338,9 +337,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private DashboardService dashboardServiceImpl;
     
     private List<String> keyList = null;
-    
-    @Autowired
-    private CommonUtils commonUtils;
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -1363,6 +1359,83 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Successfully fetched the branch settings for branch id: {} returning : {}", branchId, branchSettings );
         return organizationUnitSettings;
+    }
+    
+
+    @Override
+    public SocialMediaStatusVO getProfileUrlAndStatus( String socialNetwork, long entityId, String entityType )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        SocialMediaStatusVO socialMediaStatus = new SocialMediaStatusVO();
+
+        // Check for the collection to update
+        OrganizationUnitSettings unitSettings = null;
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            unitSettings = getCompanySettings( entityId );
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            unitSettings = getRegionSettings( entityId );
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            unitSettings = getBranchSettingsDefault( entityId );
+        } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            unitSettings = userManagementService.getUserSettings( entityId );
+        }
+
+        if ( unitSettings == null || unitSettings.getSocialMediaTokens() == null ) {
+            LOG.info( "returning empty Object for entityType:{}, entityId: {}", entityType, entityId );
+            return socialMediaStatus;
+        }
+
+        socialMediaStatus = getProfileFromUnitSettingBySocialNetwork( unitSettings.getSocialMediaTokens(), socialNetwork );
+
+        LOG.info("Method getProfileUrl() finished from SocialManagementController, returnning -  {} for entityType:{}, entityId: {}",
+            socialMediaStatus, entityType, entityId );
+        return socialMediaStatus;
+    }
+    
+    
+    /**
+     * Method to 
+     * @param socialMediaTokens
+     * @param socialNetwork
+     * @return
+     */
+    @Override
+    public SocialMediaStatusVO getProfileFromUnitSettingBySocialNetwork( SocialMediaTokens socialMediaTokens,
+        String socialNetwork )
+    {
+        SocialMediaStatusVO socialMediaStatus = new SocialMediaStatusVO();
+        if ( socialNetwork.equalsIgnoreCase( "facebook" ) && socialMediaTokens.getFacebookToken() != null
+            && socialMediaTokens.getFacebookToken().getFacebookPageLink() != null ) {
+            socialMediaStatus.setUrl( socialMediaTokens.getFacebookToken().getFacebookPageLink() );
+            socialMediaStatus.setConnected( true );
+        } else if ( socialNetwork.equalsIgnoreCase( "twitter" )
+            && socialMediaTokens.getTwitterToken().getTwitterPageLink() != null ) {
+            socialMediaStatus.setUrl( socialMediaTokens.getTwitterToken().getTwitterPageLink() );
+            socialMediaStatus.setConnected( true );
+        } else if ( socialNetwork.equals( "linkedin" ) ) {
+
+            socialMediaStatus.setUrl( socialMediaTokens.getLinkedInProfileUrl() );
+            if ( socialMediaTokens.getLinkedInV2Token() == null ) {
+                return socialMediaStatus;
+            }
+
+            if ( StringUtils.isNotEmpty( socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink() ) ) {
+                socialMediaStatus.setUrl( socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink() );
+            }
+            if ( StringUtils.isNotEmpty( socialMediaTokens.getLinkedInV2Token().getLinkedInAccessToken() ) ) {
+                socialMediaStatus.setConnected( true );
+            }
+
+        } else if ( socialNetwork.equalsIgnoreCase( "zillow" ) && socialMediaTokens.getZillowToken() != null
+            && socialMediaTokens.getZillowToken().getZillowProfileLink() != null ) {
+            socialMediaStatus.setUrl( socialMediaTokens.getZillowToken().getZillowProfileLink() );
+            socialMediaStatus.setConnected( true );
+        } else if ( socialNetwork.equalsIgnoreCase( "instagram" ) && socialMediaTokens.getInstagramToken() != null
+            && socialMediaTokens.getInstagramToken().getPageLink() != null ) {
+            socialMediaStatus.setUrl( socialMediaTokens.getInstagramToken().getPageLink() );
+            socialMediaStatus.setConnected( true );
+        }
+        return socialMediaStatus;
     }
 
 
@@ -11537,8 +11610,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public String saveLinkedInProfileUrl( String entityType, long entityId, String linkedInprofileUrl ) throws InvalidInputException
     {
         LOG.info( "saveLinkedInProfileUrl start" );
+        
+        if(StringUtils.isEmpty( linkedInprofileUrl )) {
+            LOG.warn("LinkedIn profile Url field cann't be empty");
+            throw new InvalidInputException( "LinkedIn profile Url field cann't be empty" );
+        }
 
-        String collectionName = null;
+        String profileUrl = setLinkedInUrl( entityType, entityId, linkedInprofileUrl );
+        LOG.info( "saveLinkedInProfileUrl end" );
+        return profileUrl;
+    }
+	
+	private String setLinkedInUrl(String entityType, long entityId, String linkedInprofileUrl) throws InvalidInputException{
+	    String collectionName = null;
         OrganizationUnitSettings unitSettings = null;
         switch ( entityType ) {
             case CommonConstants.COMPANY_ID_COLUMN:
@@ -11571,19 +11655,36 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         
         try {
-            if(unitSettings.getSocialMediaTokens() != null && unitSettings.getSocialMediaTokens().getLinkedInV2Token() != null) {
+            
+            if(StringUtils.isNotEmpty( linkedInprofileUrl )) {
+                if(unitSettings.getSocialMediaTokens() == null) {
+                    unitSettings.setSocialMediaTokens( new SocialMediaTokens() );
+                }
+                
                 unitSettings.getSocialMediaTokens().setLinkedInProfileUrl( linkedInprofileUrl );
-                unitSettings.getSocialMediaTokens().getLinkedInV2Token().setLinkedInPageLink( linkedInprofileUrl );
+                
+                if(unitSettings.getSocialMediaTokens().getLinkedInV2Token() != null) {
+                    unitSettings.getSocialMediaTokens().getLinkedInV2Token().setLinkedInPageLink( linkedInprofileUrl );
+                }
+                
                 organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-                    KEY_SOCIAL_MEDIA_TOKENS, unitSettings.getSocialMediaTokens(), unitSettings, collectionName );
+                        KEY_SOCIAL_MEDIA_TOKENS, unitSettings.getSocialMediaTokens(), unitSettings, collectionName );
             } else {
-                LOG.warn( "Linkedin token not persent for settings type {} and entity id {}" ,entityType,  entityId);
+                organizationUnitSettingsDao.removeLinkedInProfileUrlInUnitSettings( entityId, collectionName );
             }
             
         } catch ( Exception e ) {
             LOG.error( "Caught exception in saveLinkedInProfileUrl {}", e);
         }
-        LOG.info( "saveLinkedInProfileUrl end" );
         return linkedInprofileUrl;
+	}
+
+    @Override
+    public String deleteLinkedInProfileUrl( String entityType, long entityId ) throws InvalidInputException
+    {
+        LOG.info( "deleteLinkedInProfileUrl start" );
+        String url = setLinkedInUrl( entityType, entityId, null );
+        LOG.info( "deleteLinkedInProfileUrl end" );
+        return url;
     }
 }

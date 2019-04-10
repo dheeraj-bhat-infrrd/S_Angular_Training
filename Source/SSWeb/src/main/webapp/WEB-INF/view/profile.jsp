@@ -598,9 +598,9 @@
 										title="Twitter"></div>
 								</c:if>
 								<c:if
-									test="${not empty profile.socialMediaTokens.linkedInV2Token && not empty profile.socialMediaTokens.linkedInV2Token.linkedInPageLink}">
+									test="${not empty profile.socialMediaTokens.linkedInProfileUrl}">
 									<div id="icn-lin" class="float-left social-item-icon icn-lin"
-										data-link="${profile.socialMediaTokens.linkedInV2Token.linkedInPageLink}"
+										data-link="${profile.socialMediaTokens.linkedInProfileUrl}"
 										title="LinkedIn"></div>
 								</c:if>
 								<c:if

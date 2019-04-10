@@ -9,7 +9,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><spring:message code="label.completeregistration.title.key"></spring:message></title>
 	<link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
-	<script type="text/javascript" src="${initParam.resourcesPath}/resources/js/common.js"></script>
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-common.css">
@@ -57,6 +56,7 @@
 
  <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script> 
 <script>
  $(document).ready(function() {
@@ -108,18 +108,14 @@ $(window).on('unload', function(){
 	
 	var payloadForLinkedInPopup;
 	if (flow == "registration") {
-		payloadForLinkedInPopup = {
-			'socialNetwork' : "linkedin"
-		};
+		payloadForLinkedInPopup = "linkedin";
 	}else{
-		payloadForLinkedInPopup = {
-				'socialNetwork' : "${socialNetwork}"
-		};
+		payloadForLinkedInPopup = "${socialNetwork}";
 	}
 	
-	if(payloadForLinkedInPopup.socialNetwork == 'linkedin'){
-		fetchSocialProfileUrl(payloadForLinkedInPopup,function(data){
-			if(data.statusText == 'OK'){
+	if(payloadForLinkedInPopup == 'linkedin'){
+		parentWindow.fetchSocialProfileUrl("linkedin",function(data){
+			if(data.status == 200){
 				parentWindow.$('#linked-in-prof-url-popup').attr('data-fromDashboard',"${fromDashboard}");
 				parentWindow.$('#linked-in-prof-url-popup').attr('data-restful',"${restful}");
 				parentWindow.$('#linked-in-prof-url-popup').attr('data-socialFlow',"${socialFlow}");
@@ -129,15 +125,26 @@ $(window).on('unload', function(){
 				parentWindow.$('#linked-in-prof-url-popup').attr('data-columnName',"${fromDashboard}");
 				parentWindow.$('#linked-in-prof-url-popup').attr('data-columnValue',"${columnValue}");
 				
-				var profileUrlLink = data.responseText;
+				var responseObj = JSON.parse(data.responseText);
 				
-				parentWindow.$('#linked-in-prof-url-popup').attr('data-profileUrl');
+				var profileUrlLink = responseObj.url;
+				
+				
+				if(responseObj.connected){
+					parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", profileUrlLink);
+					$('.social-item-icon[data-source="${socialNetwork}"').attr('data-connected', true)
+				} else {
+					parentWindow.removeProfileLinkInEditProfilePage("${socialNetwork}");
+					$('.social-item-icon[data-source="${socialNetwork}"').attr('data-connected', false)
+				}
 				
 				if(profileUrlLink == '' || profileUrlLink == null || profileUrlLink == undefined || profileUrlLink.length <=0){
-					parentWindow.$('#linked-in-popup-text').html('We are sorry we cannot find the Linkedin URL for your profile, please provide the url in the following format "https://www.linkedin.com/in/esanchezmtg/');
+					parentWindow.$('#linked-in-popup-text').html('We are sorry we cannot find the Linkedin URL for your profile, please provide the url in the following format "https://www.linkedin.com/in/esanchezmtg"');
+					parentWindow.$('#linked-in-prof-url-popup-remove').parent().hide();
 				}else{
-					parentWindow.$('#linked-in-popup-text').html('Please confirm your LinkedIn Profile Url>');
+					parentWindow.$('#linked-in-popup-text').html('Please confirm your LinkedIn Profile Url');
 					parentWindow.$('#linked-in-popup-inp').val(profileUrlLink);
+					parentWindow.$('#linked-in-prof-url-popup-remove').parent().show();
 				}
 				
 				parentWindow.$('#linked-in-prof-url-popup-main').show();
@@ -167,48 +174,37 @@ $(window).on('unload', function(){
 		}
 		else if(restful != "1"){
 			if (flow == "registration") {
-				var payload = {
-					'socialNetwork' : "linkedin"
-				};
-				fetchSocialProfileUrl(payload, function(data) {
-					parentWindow.showLinkedInProfileUrl(data.responseText);
-					parentWindow.showProfileLink("linkedin", data.responseText);
+				parentWindow.fetchSocialProfileUrl("linkedin", function(data) {
+					if(data.status == 200){
+						var responseObj = JSON.parse(data.responseText);
+						var profileUrlLink = responseObj.url;
+						parentWindow.showLinkedInProfileUrl(profileUrlLink);
+						parentWindow.showProfileLink("linkedin", profileUrlLink);
+					}
 				});
 			}
 			else {
-				var payload = {
-					'socialNetwork' : "${socialNetwork}"
-				};
-				fetchSocialProfileUrl(payload, function(data) {
-					if(data.statusText == 'OK'){
+				var socialNetwork = "${socialNetwork}";
+				parentWindow.fetchSocialProfileUrl(socialNetwork, function(data){
+					if(data.status == 200){
 
 						parentWindow.loadSocialMediaUrlInPopup();
 						parentWindow.loadSocialMediaUrlInSettingsPage();
-
-						parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);
+						
+						var responseObj = JSON.parse(data.responseText);
+						
+						var profileUrlLink = responseObj.url;
+						
+						if(responseObj.connected){
+							parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", profileUrlLink);
+						} else {
+							parentWindow.removeProfileLinkInEditProfilePage("${socialNetwork}");
+						}
 					}
 				});
 			}
 		}
 	}
 });
- 
-function fetchSocialProfileUrl(payload, callBackFunction){
-	$.ajax({
-		url : './profileUrl.do',
-		type : "GET",
-		cache : false,
-		data : payload,
-		async : false,
-		complete : callBackFunction,
-		error : function(e) {
-			if(e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			redirectErrorpage();
-		}
-	});
-}
 </script>
 

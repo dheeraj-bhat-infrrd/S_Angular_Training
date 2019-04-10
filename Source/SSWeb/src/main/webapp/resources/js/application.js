@@ -14565,12 +14565,10 @@ function hideActiveUserLogoutOverlay() {
  */
 function confirmSocialAuth(socialNetwork, callBackFunction, link) {
 
-	var message = "";
+	var message = "Are you sure you want to connect to " + socialNetwork;
 
 	if (link && link.trim() != "") {
 		message = "Are you sure you want to disconnect your previous connection to " + socialNetwork + " and connect again";
-	} else {
-		message = "Are you sure you want to connect to " + socialNetwork;
 	}
 
 	$('#overlay-header').html("Confirm user Authentication");
@@ -14588,7 +14586,65 @@ function confirmSocialAuth(socialNetwork, callBackFunction, link) {
 
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-main').show();
-};
+}
+
+/**
+ * Functions to confirm social authentication
+ */
+function confirmSocialAuthLinkedin(socialNetwork, callBackFunction, link, isConnected) {
+
+	if (isConnected) {
+		$('#ln-overlay-continue').html("Reconnect");
+	} else {
+		$('#ln-overlay-continue').html("Connect");
+	}
+
+	$('#ln-overlay-header').html("LinkedIn connection confirmation");
+	$("#ln-overlay-text").html("Please choose one of the option below");
+	
+	$('#ln-overlay-continue').attr("onclick", "");
+	$('#ln-overlay-cancel').attr("onclick", "");
+
+	$('#ln-overlay-continue').click(function() {
+		if (callBackFunction != undefined && typeof (callBackFunction) == "function") {
+			$('#linkedin-overlay-main').hide();
+			$('#ln-overlay-continue').unbind('click');
+			callBackFunction();
+		}
+	});
+	
+	$('#ln-overlay-cancel').click(function() {
+		$('#linkedin-overlay-main').hide();
+		$('#ln-overlay-cancel').unbind('click');
+	});
+	
+	$('#ln-overlay-edit-link').click(function() {
+		
+		$('#ln-overlay-edit-link').unbind('click');
+		$('#linkedin-overlay-main').hide();
+		
+		fetchSocialProfileUrl("linkedin", function(data) {
+			if(data.status == 200){
+				var responseObj = JSON.parse(data.responseText);
+				var profileUrlLink = responseObj.url;
+				
+				if(profileUrlLink){
+					$('#linked-in-popup-text').html('Please confirm your LinkedIn Profile Url');
+					$('#linked-in-popup-inp').val(profileUrlLink);
+					$('#linked-in-prof-url-popup-remove').parent().show();
+				}else{
+					$('#linked-in-prof-url-popup-remove').parent().hide();
+					$('#linked-in-popup-text').html('We are sorry we cannot find the Linkedin URL for your profile, please provide the url in the following format "https://www.linkedin.com/in/esanchezmtg"');
+				}
+			}
+			
+			$('#linked-in-prof-url-popup-main').show();
+		});
+	});
+
+	$('#ln-overlay-cancel').html("Cancel");
+	$('#linkedin-overlay-main').show();
+}
 
 function confirmSocialAuthOk(callBackFunction) {
 	if (callBackFunction != undefined && typeof (callBackFunction) == "function") {
@@ -22491,7 +22547,7 @@ function saveLinkedInProfileUrl(linkedInProfileUrl,completeCallBack){
 		return;
 	}
 	
-	var url= "./savelinkedinprofileurl.do";
+	var url= "./linkedin/profileurl.do";
 	var payload = {
 		"linkedInProfileUrl" : linkedInProfileUrl	
 	}
@@ -22514,6 +22570,28 @@ function saveLinkedInProfileUrl(linkedInProfileUrl,completeCallBack){
 		}
 	});
 	
+}
+
+function removeLinkedInProfileUrl(completeCallBack){
+	
+	var url= "./linkedin/profileurl.do";
+	
+	$.ajax({
+		url : url,
+		type : "DELETE",
+		async : false,
+		complete: completeCallBack,
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			
+			$('#overlay-toast').html("Failed to remove LinkedIn profile URL");
+			showToast();
+			$('#overlay-continue').attr('btn-isDisbaled',false);
+		}
+	});
 }
 
 $('#linked-in-prof-url-popup-continue').click(function() {
@@ -22546,22 +22624,32 @@ $('#linked-in-prof-url-popup-continue').click(function() {
 	});
 });
 
+
+$('#linked-in-prof-url-popup-remove').click(function() {
+	var btnIsDisabled = $('#linked-in-prof-url-popup-remove').attr('btn-isDisabled');
+	
+	if(btnIsDisabled == true || btnIsDisabled == 'true'){
+		return;
+	}
+	
+	$('#linked-in-prof-url-popup-remove').attr('btn-isDisbaled',true);
+	
+	removeLinkedInProfileUrl(function(data){
+		if(data.status ==200){
+			$('#overlay-toast').html("Successfully removed LinkedIn profile URL");
+			showToast();
+			linkedInUrlPopupRevert();
+		}else{
+			$('#overlay-toast').html("Failed to remove LinkedIn profile URL");
+			showToast();
+		}
+		$('#linked-in-prof-url-popup-remove').attr('btn-isDisbaled',false);
+	});
+});
+
 $('#linked-in-prof-url-popup-cancel').click(function() {
 	
-	var linkedInProfileUrl = $('#linked-in-popup-inp').val();
-	
-	/*if(linkedInProfileUrl == null || linkedInProfileUrl == undefined || linkedInProfileUrl == ''){
-
-		var updateBanner = $("#linkedin-api-v2-update-ribbon-outer");
-		if(updateBanner) {
-				$(updateBanner).find(".linkedProfileUrl").removeClass("hide");
-				$(updateBanner).find(".linkedV2Token").addClass("hide");
-		}
-	}*/
-	
 	linkedInUrlPopupRevert();
-
-	updateUIForSocialMedia();
 });
 
 function updateUIForSocialMedia(){
@@ -22584,37 +22672,44 @@ function updateUIForSocialMedia(){
 	}
 	else if(restful != "1"){
 		if (flow == "registration") {
-			var payload = {
-				'socialNetwork' : "linkedin"
-			};
-			fetchSocialProfileUrl(payload, function(data) {
-				showLinkedInProfileUrl(data.responseText);
-				showProfileLink("linkedin", data.responseText);
+			
+			fetchSocialProfileUrl("linkedin", function(data) {
+				if(data.status == 200){
+					var responseObj = JSON.parse(data.responseText);
+					var profileUrlLink = responseObj.url;
+					showLinkedInProfileUrl(profileUrlLink);
+					showProfileLink("linkedin", profileUrlLink);
+				}
 			});
 		}
 		else {
-			var payload = {
-				'socialNetwork' : $('#linked-in-prof-url-popup').attr('data-socialNetwork')
-			};
-			fetchSocialProfileUrl(payload, function(data) {
-				if(data.statusText == 'OK'){
-
+			var socialNetwork = $('#linked-in-prof-url-popup').attr('data-socialNetwork');
+			
+			fetchSocialProfileUrl(socialNetwork, function(data) {
+				if(data.status == 200){
+					var responseObj = JSON.parse(data.responseText);
+					var profileUrlLink = responseObj.url;
 					loadSocialMediaUrlInPopup();
 					loadSocialMediaUrlInSettingsPage();
-
-					showProfileLinkInEditProfilePage($('#linked-in-prof-url-popup').attr('data-socialNetwork'), data.responseText);
+					
+					if(responseObj.connected){
+						showProfileLinkInEditProfilePage($('#linked-in-prof-url-popup').attr('data-socialNetwork'), profileUrlLink);
+					} else {
+						removeProfileLinkInEditProfilePage($('#linked-in-prof-url-popup').attr('data-socialNetwork'));
+					}
 				}
 			});
 		}
 	}
 }
 
-function fetchSocialProfileUrl(payload, callBackFunction){
+function fetchSocialProfileUrl(socialNetwork, callBackFunction){
+	var endPointUrl = './'+socialNetwork+'/profileurl.do';
 	$.ajax({
-		url : './profileUrl.do',
+		url : endPointUrl,
 		type : "GET",
 		cache : false,
-		data : payload,
+		dataType : "text",
 		async : false,
 		complete : callBackFunction,
 		error : function(e) {

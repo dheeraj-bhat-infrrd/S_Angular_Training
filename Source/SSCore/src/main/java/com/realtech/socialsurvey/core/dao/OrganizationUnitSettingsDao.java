@@ -560,4 +560,13 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public List<ProfileImageUrlEntity> getAllProfileImageUrl( Set<Long> entityIds, String collectionName );
+
+
+    /**
+     * Method to remove linkedin profile url from unit settings
+     * @param iden
+     * @param collectionName
+     * @return
+     */
+    public boolean removeLinkedInProfileUrlInUnitSettings( long iden, String collectionName );
 }

@@ -13353,6 +13353,11 @@ body.ss-not-found-page {
     height: 36px;
 }
 
+.ln-ol-btn-wrapper {
+	width: 33%;
+	padding: 15px;
+}
+
 .google-banner-outer {
     height: 50px;
     display: flex;

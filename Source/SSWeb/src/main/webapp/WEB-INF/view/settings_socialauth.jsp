@@ -56,7 +56,7 @@
 	</c:choose>
 	<div
 		class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj ${socialDisabled}"
-		onclick="openAuthPage(event,'linkedin', ${isAutoLogin}, this);" data-link="${linkedinLink}"></div>
+		onclick="openAuthPageLinkedIn(event,'linkedin', ${isAutoLogin}, this);" data-link="${linkedinLink}"></div>
 		
 	
 	<c:choose>

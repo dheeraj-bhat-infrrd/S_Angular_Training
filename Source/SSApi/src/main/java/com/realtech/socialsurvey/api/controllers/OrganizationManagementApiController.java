@@ -15,7 +15,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 
 import com.realtech.socialsurvey.core.vo.*;
-import com.realtech.socialsurvey.core.vo.NotesVo;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -633,8 +633,8 @@ public class OrganizationManagementApiController
     }
 
 
-    @RequestMapping ( value = "/linkedinprofileurl", method = RequestMethod.POST)
-    @ApiOperation ( value = "Save the linkedIn profile url fileds in socialMediaToken")
+    @PostMapping ( value = "/linkedin/profileurl")
+    @ApiOperation ( value = "Save the linkedIn profile url field in socialMediaToken")
     public ResponseEntity<?> saveLinkedInProfileUrl( String entityType, long entityId, String linkedInProfileUrl )
         throws SSApiException
     {
@@ -644,10 +644,41 @@ public class OrganizationManagementApiController
                 linkedInProfileUrl );
             return new ResponseEntity<>( linkedInProfileurl, HttpStatus.CREATED );
         } catch ( NonFatalException e ) {
-            LOGGER.error( "An exception occured while saving linkedInProfileurl error details {} ", e.getMessage() );
-            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+            LOGGER.error( "An exception occured while saving LinkedIn profile url error details {} ", e.getMessage() );
+            throw new SSApiException( "An exception occured while saving LinkedIn profile url", e.getErrorCode() );
         }
     }
+    
+    @ResponseBody
+    @GetMapping ( value = "/{socialNetwork}/profileurl")
+    public SocialMediaStatusVO getProfileUrlAndStatus(@PathVariable String socialNetwork, long entityId, String entityType  ) throws SSApiException
+    {
+        LOGGER.info( "Method getProfileUrl() called from SocialManagementController for {}", socialNetwork );
+        try {
+            SocialMediaStatusVO socialMediaStatus = organizationManagementService.getProfileUrlAndStatus( socialNetwork, entityId, entityType );
+            LOGGER.info( "Method getProfileUrl() finished from SocialManagementController, returnning -  {} for entityType:{}, entityId: {}", socialMediaStatus, entityType, entityId );
+            return socialMediaStatus;
+        } catch ( NonFatalException e ) {
+            LOGGER.error( "Error while fetching profile URL", e );
+            throw new SSApiException( "Error while getting social media url and conection status", "500");
+        }
+    }
+    
+    @DeleteMapping ( value = "/linkedin/profileurl")
+    @ApiOperation ( value = "Delete the linkedIn profile url field in socialMediaToken")
+    public ResponseEntity<?> deleteLinkedInProfileUrl( String entityType, long entityId )
+        throws SSApiException
+    {
+        LOGGER.info( "Start of Method deleteLinkedInProfileUrl with args: {}, {}",entityType, entityId);
+        try {
+            String linkedInProfileurl = organizationManagementService.deleteLinkedInProfileUrl( entityType, entityId );
+            return new ResponseEntity<>( linkedInProfileurl, HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            LOGGER.error( "An exception occured while deleting linkedInProfileurl error details {} ", e.getMessage() );
+            throw new SSApiException( "Error while deleting linkedin profile url", e.getErrorCode() );
+        }
+    }
+    
     /**
      * Api for fetching relevant company statistics required to show on admin dashboard
      * Calls {@link OrganizationManagementService#fetchCompanyStatistics(long)}} to get the
