@@ -244,19 +244,6 @@
 					 	<span
 						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
 						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${completeProfileUrl}/${feedback._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}&reviewid=${feedback._id}&source="></span>
-                       <span class="float-left" title="Google+">
-                       <button 
-                           class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
-                           data-contenturl="${completeProfileUrl}/${feedback._id}"
-                           data-clientid="${feedback.googleApi}"
-                           data-cookiepolicy="single_host_origin"
-                           data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}"
-                           data-calltoactionlabel="USE"
-                           data-calltoactionurl="${completeProfileUrl}/${feedback._id}">
-                          <span class="icon">&nbsp;</span>
-                          <span class="label">share</span>
-                      </button>
-                       </span>
                        <span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(${start})">
                        	<input id="permalink_url_${start}" type="hidden" value="${completeProfileUrl}/${feedback._id}"/>
                    		</span>

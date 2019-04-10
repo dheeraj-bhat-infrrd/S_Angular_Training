@@ -7337,13 +7337,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
-            if ( unitSettings.getSocialMediaTokens().getGoogleToken() != null ) {
-                LOG.debug( "Google+ is set" );
-                setterValue = setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf(factor) ) );
-
-            } else {
-                LOG.debug( "Google+ is not set" );
-            }
             if ( unitSettings.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
                 setterValue = setterValue.add( SettingsForApplication.YELP.getOrder().multiply( BigInteger.valueOf(factor) ) );
@@ -7819,13 +7812,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
-            if ( regionSetting.getSocialMediaTokens().getGoogleToken() != null ) {
-                LOG.debug( "Google+ is set" );
-                setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
-
-            } else {
-                LOG.debug( "Google+ is not set" );
-            }
             if ( regionSetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
                 setterValue.add( SettingsForApplication.YELP.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
@@ -7962,13 +7948,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
-            if ( regionSetting.getSocialMediaTokens().getGoogleToken() != null ) {
-                LOG.debug( "Google+ is set" );
-                setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
-
-            } else {
-                LOG.debug( "Google+ is not set" );
-            }
             if ( regionSetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
                 setterValue.add( SettingsForApplication.YELP.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
@@ -8090,13 +8069,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             } else {
                 LOG.debug( "Linkedin is not set" );
-            }
-            if ( branchSetting.getSocialMediaTokens().getGoogleToken() != null ) {
-                LOG.debug( "Google+ is set" );
-                setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
-
-            } else {
-                LOG.debug( "Google+ is not set" );
             }
             if ( branchSetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
@@ -8225,13 +8197,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             } else {
                 LOG.debug( "Linkedin is not set" );
-            }
-            if ( companySetting.getSocialMediaTokens().getGoogleToken() != null ) {
-                LOG.debug( "Google+ is set" );
-                setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
-
-            } else {
-                LOG.debug( "Google+ is not set" );
             }
             if ( companySetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );

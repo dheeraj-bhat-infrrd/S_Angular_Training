@@ -217,7 +217,6 @@ public class EmailFormatHelper
         String company_facebook_link = null;
         String company_twitter_link = null;
         String company_linkedin_link = null;
-        String company_google_plus_link = null;
         String company_google_review_link = null;
         String company_zillow_link = null;
         String company_lending_tree_link = null;
@@ -227,7 +226,6 @@ public class EmailFormatHelper
         String facebook_link = null;
         String twitter_link = null;
         String linkedin_link = null;
-        String google_plus_link = null;
         String google_review_link = null;
         String zillow_link = null;
         String lending_tree_link = null;
@@ -293,8 +291,6 @@ public class EmailFormatHelper
                     twitter_link = socialMediaTokens.getTwitterToken().getTwitterPageLink();
                 if ( socialMediaTokens.getLinkedInV2Token() != null )
                     linkedin_link = socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink();
-                if ( socialMediaTokens.getGoogleToken() != null )
-                    google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
                     google_review_link = socialMediaTokens.getGoogleBusinessToken().getGoogleBusinessLink();
                 if ( socialMediaTokens.getZillowToken() != null )
@@ -316,8 +312,6 @@ public class EmailFormatHelper
                     company_twitter_link = socialMediaTokens.getTwitterToken().getTwitterPageLink();
                 if ( socialMediaTokens.getLinkedInV2Token() != null )
                     company_linkedin_link = socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink();
-                if ( socialMediaTokens.getGoogleToken() != null )
-                    company_google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
                     company_google_review_link = socialMediaTokens.getGoogleBusinessToken().getGoogleBusinessLink();
                 if ( socialMediaTokens.getZillowToken() != null )
@@ -338,7 +332,6 @@ public class EmailFormatHelper
         content = content.replace( "[facebook_link]", processUrl( facebook_link ) );
         content = content.replace( "[twitter_link]", processUrl( twitter_link ) );
         content = content.replace( "[linkedin_link]", processUrl( linkedin_link ) );
-        content = content.replace( "[google_plus_link]", processUrl( google_plus_link ) );
         content = content.replace( "[google_review_link]", processUrl( google_review_link ) );
         content = content.replace( "[zillow_link]", processUrl( zillow_link ) );
         content = content.replace( "[lending_tree_link]", processUrl( lending_tree_link ) );
@@ -347,7 +340,6 @@ public class EmailFormatHelper
         content = content.replace( "[company_facebook_link]", processUrl( company_facebook_link ) );
         content = content.replace( "[company_twitter_link]", processUrl( company_twitter_link ) );
         content = content.replace( "[company_linkedin_link]", processUrl( company_linkedin_link ) );
-        content = content.replace( "[company_google_plus_link]", processUrl( company_google_plus_link ) );
         content = content.replace( "[company_google_review_link]", processUrl( company_google_review_link ) );
         content = content.replace( "[company_zillow_link]", processUrl( company_zillow_link ) );
         content = content.replace( "[company_lending_tree_link]", processUrl( company_lending_tree_link ) );
@@ -417,7 +409,6 @@ public class EmailFormatHelper
         String company_facebook_link = null;
         String company_twitter_link = null;
         String company_linkedin_link = null;
-        String company_google_plus_link = null;
         String company_google_review_link = null;
         String company_zillow_link = null;
         String company_lending_tree_link = null;
@@ -427,7 +418,6 @@ public class EmailFormatHelper
         String facebook_link = null;
         String twitter_link = null;
         String linkedin_link = null;
-        String google_plus_link = null;
         String google_review_link = null;
         String zillow_link = null;
         String lending_tree_link = null;
@@ -456,8 +446,6 @@ public class EmailFormatHelper
                     twitter_link = socialMediaTokens.getTwitterToken().getTwitterPageLink();
                 if ( socialMediaTokens.getLinkedInV2Token() != null )
                     linkedin_link = socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink();
-                if ( socialMediaTokens.getGoogleToken() != null )
-                    google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
                     google_review_link = socialMediaTokens.getGoogleBusinessToken().getGoogleBusinessLink();
                 if ( socialMediaTokens.getZillowToken() != null )
@@ -479,8 +467,6 @@ public class EmailFormatHelper
                     company_twitter_link = socialMediaTokens.getTwitterToken().getTwitterPageLink();
                 if ( socialMediaTokens.getLinkedInV2Token() != null )
                     company_linkedin_link = socialMediaTokens.getLinkedInV2Token().getLinkedInPageLink();
-                if ( socialMediaTokens.getGoogleToken() != null )
-                    company_google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
                     company_google_review_link = socialMediaTokens.getGoogleBusinessToken().getGoogleBusinessLink();
                 if ( socialMediaTokens.getZillowToken() != null )
@@ -499,7 +485,6 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[facebook_link]", processUrl( facebook_link ) );
         content = StringUtils.replace( content, "[twitter_link]", processUrl( twitter_link ) );
         content = StringUtils.replace( content, "[linkedin_link]", processUrl( linkedin_link ) );
-        content = StringUtils.replace( content, "[google_plus_link]", processUrl( google_plus_link ) );
         content = StringUtils.replace( content, "[google_review_link]", processUrl( google_review_link ) );
         content = StringUtils.replace( content, "[zillow_link]", processUrl( zillow_link ) );
         content = StringUtils.replace( content, "[lending_tree_link]", processUrl( lending_tree_link ) );
@@ -508,7 +493,6 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[company_facebook_link]", processUrl( company_facebook_link ) );
         content = StringUtils.replace( content, "[company_twitter_link]", processUrl( company_twitter_link ) );
         content = StringUtils.replace( content, "[company_linkedin_link]", processUrl( company_linkedin_link ) );
-        content = StringUtils.replace( content, "[company_google_plus_link]", processUrl( company_google_plus_link ) );
         content = StringUtils.replace( content, "[company_google_review_link]", processUrl( company_google_review_link ) );
         content = StringUtils.replace( content, "[company_zillow_link]", processUrl( company_zillow_link ) );
         content = StringUtils.replace( content, "[company_lending_tree_link]", processUrl( company_lending_tree_link ) );

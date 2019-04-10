@@ -1057,16 +1057,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 }
                 break;
 
-            case CommonConstants.GOOGLE_SOCIAL_SITE:
-                profileStage.setOrder( ProfileStages.GOOGLE_PRF.getOrder() );
-                profileStage.setProfileStageKey( ProfileStages.GOOGLE_PRF.name() );
-                keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_SOCIAL_MEDIA_TOKEN;
-                if ( removeFeed ) {
-                    // Remove from SOCIAL_POST
-                    removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
-                }
-                break;
-
             case CommonConstants.LINKEDIN_SOCIAL_SITE:
                 profileStage.setOrder( ProfileStages.LINKEDIN_PRF.getOrder() );
                 profileStage.setProfileStageKey( ProfileStages.LINKEDIN_PRF.name() );
@@ -2169,12 +2159,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     socialUpdateAction.setLink( mediaTokens.getTwitterToken().getTwitterPageLink() );
                 break;
 
-            case CommonConstants.GOOGLE_SOCIAL_SITE:
-                if ( ( mediaTokens.getGoogleToken() != null ) && ( mediaTokens.getGoogleToken().getProfileLink() != null )
-                    && !( mediaTokens.getGoogleToken().getProfileLink().isEmpty() ) )
-                    socialUpdateAction.setLink( mediaTokens.getGoogleToken().getProfileLink() );
-                break;
-
             case CommonConstants.LINKEDIN_SOCIAL_SITE:
                 if ( ( mediaTokens.getLinkedInV2Token() != null )
                     && ( mediaTokens.getLinkedInV2Token().getLinkedInPageLink() != null )
@@ -2327,17 +2311,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             if ( mediaTokens.getTwitterToken() != null ) {
                 String socialMedia = CommonConstants.TWITTER_SOCIAL_SITE;
                 SettingsForApplication settings = SettingsForApplication.TWITTER;
-                // disconnect social network in mongo
-                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
-                // Update settings set status
-                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
-                // update social connections history
-                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
-                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
-            }
-            if ( mediaTokens.getGoogleToken() != null ) {
-                String socialMedia = CommonConstants.GOOGLE_SOCIAL_SITE;
-                SettingsForApplication settings = SettingsForApplication.GOOGLE_PLUS;
                 // disconnect social network in mongo
                 disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
                 // Update settings set status
@@ -2768,11 +2741,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         links.append( "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.YELP_LABEL )
                             + ">" + CommonConstants.YELP_LABEL + "</a>" );
                     }*/
-                    if ( socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL ) != null ) {
-                        links.append(
-                            "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL )
-                                + ">" + CommonConstants.GOOGLE_PLUS_LABEL + "</a>" );
-                    }
                     if ( socialSitesWithSettings.get( CommonConstants.LINKEDIN_LABEL ) != null ) {
                         links.append(
                             "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.LINKEDIN_LABEL ) + ">"
@@ -2965,8 +2933,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         // build social site url's like Google Plus, LinkedIn, Twitter and
         // Facebook
-        socialSiteUrlMap.put( CommonConstants.GOOGLE_PLUS_LABEL,
-            generateSocialSiteUrl( survey, CommonConstants.GOOGLE_PLUS_LABEL, agentSettings ) );
         socialSiteUrlMap.put( CommonConstants.LINKEDIN_LABEL,
             generateSocialSiteUrl( survey, CommonConstants.LINKEDIN_LABEL, agentSettings ) );
         socialSiteUrlMap.put( CommonConstants.TWITTER_LABEL,
@@ -3005,9 +2971,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 break;
             case CommonConstants.YELP_LABEL:
                 url = organizationUnitSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
-                break;
-            case CommonConstants.GOOGLE_PLUS_LABEL:
-                url = "https://plus.google.com/share?url=" + organizationUnitSettings.getCompleteProfileUrl();
                 break;
             case CommonConstants.LINKEDIN_LABEL:
                 url += "https://www.linkedin.com/shareArticle?mini=true&url=" + organizationUnitSettings.getCompleteProfileUrl()

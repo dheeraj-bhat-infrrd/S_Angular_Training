@@ -10286,12 +10286,6 @@ ul.accordion li>a:before {
     border-radius: 4px;
 }
 
-.rep-google-btn{
-	height: 35px;
-    background: url(../images/gPlus_wide.png) no-repeat center #cf4139;
-    border-radius: 4px;
-}
-
 .rep-twitter-btn{
 	height: 35px;
     background: url(../images/twiter_wide.png) no-repeat center #00aee9;
@@ -13357,4 +13351,11 @@ body.ss-not-found-page {
     line-height: 36px;
     text-align: center;
     height: 36px;
+}
+
+.google-banner-outer {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    background-color: #5fba7d;
 }

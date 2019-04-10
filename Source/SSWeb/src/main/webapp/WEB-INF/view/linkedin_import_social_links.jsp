@@ -18,11 +18,6 @@
 	<div id="linkedin-profile-url" class="wc-icn-txt float-left">${linkedinProfileUrl}</div>
 </div>
 <div class="wc-social-icn-row clearfix">
-	<div class="wc-social-icn float-left icn-wide-gplus"
-		onclick="authenticate(event,'google');"></div>
-	<div id="ggl-profile-url" class="wc-icn-txt float-left">${googleProfileUrl}</div>
-</div>
-<div class="wc-social-icn-row clearfix">
 	<div class="wc-social-icn float-left icn-wide-zillow"
 		onclick="authenticateZillow(event);"></div>
 	<div id="zillow-profile-url" class="wc-icn-txt float-left">${zillowProfileUrl}</div>

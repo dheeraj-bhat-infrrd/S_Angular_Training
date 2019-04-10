@@ -300,7 +300,6 @@
 							<div id="icn-twit" class="float-left social-item-icon icn-twit ${socialDisabled}" data-source="twitter" data-link="${twtLink}" onclick="openAuthPage(event,'twitter', ${isAutoLogin}, this);" title="Twitter"></div>
 							<div id="icn-lin" class="float-left social-item-icon icn-lin ${socialDisabled}" data-source="linkedin" data-link="${lnLink}" onclick="openAuthPage(event,'linkedin', ${isAutoLogin}, this);" title="LinkedIn"></div>
 							<div id="icn-google-business" class="float-left social-item-icon icn-google-business" data-source="googleBusiness" data-link="${googleBusinessToken.googleBusinessLink}" title="Google Business Rate & Review Link"></div>
-							<div id="icn-gplus" class="float-left social-item-icon icn-gplus ${socialDisabled}" data-source="google" data-link="${googleLink}" onclick="openAuthPage(event,'google', ${isAutoLogin}, this);" title="Google+"></div>
 							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-source="yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
 							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPageZillow(event,'.icn-zillow');"></div>
 							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-source="lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
