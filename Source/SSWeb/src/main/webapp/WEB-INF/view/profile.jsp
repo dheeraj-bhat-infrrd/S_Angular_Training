@@ -610,13 +610,6 @@
 										title="Google Business Rate &amp; Review Link"></div>
 								</c:if>				
 								<c:if
-									test="${not empty profile.socialMediaTokens.googleToken && not empty profile.socialMediaTokens.googleToken.profileLink}">
-									<div id="icn-gplus"
-										class="float-left social-item-icon icn-gplus"
-										data-link="${profile.socialMediaTokens.googleToken.profileLink}"
-										title="Google+"></div>
-								</c:if>
-								<c:if
 									test="${not empty profile.socialMediaTokens.yelpToken && not empty profile.socialMediaTokens.yelpToken.yelpPageLink}">
 									<div id="icn-yelp" class="float-left social-item-icon icn-yelp"
 										data-link="${profile.socialMediaTokens.yelpToken.yelpPageLink}"

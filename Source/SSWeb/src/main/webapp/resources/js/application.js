@@ -7804,8 +7804,6 @@ function showProfileLink(source, profileUrl) {
 		$('#twitter-profile-url').html(profileUrl);
 	} else if (source == 'linkedin') {
 		$('#linkedin-profile-url').html(profileUrl);
-	} else if (source == 'google') {
-		$('#ggl-profile-url').html(profileUrl);
 	} else if (source == 'instagram') {
 		$('#instagram-profile-url').html(profileUrl);
 	}
@@ -9162,10 +9160,6 @@ $('.sq-pts-dgreen').click(function() {
 	$("#next-scale").removeClass("btn-com-disabled");
 });
 
-$('#ggl-btn').click(function(e) {
-	updateSharedOn("google", agentId, customerEmail);
-});
-
 $('#shr-post-chk-box').click(function() {
 	if ($('#shr-post-chk-box').hasClass('bd-check-img-checked')) {
 		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
@@ -10215,13 +10209,6 @@ function callBackUpdateHobbies(data) {
  * function updateLinkedInLink(link) { var payload = { "linkedinlink" : link }; if (isValidUrl(link)) { callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateSocialLink, payload); $('#icn-lin').attr("data-link", link); } else { $('#overlay-toast').html("Enter a valid url"); showToast(); } }
  */
 
-// Update Social links - google plus
-/*
- * $('body').on('click', '#prof-edit-social-link .icn-gplus', function() { $('#social-token-text').show(); var link = $(this).attr("data-link"); $('#social-token-text').attr({ "placeholder" : "Add Google link", "onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();" }); $('#social-token-text').val(link); });
- * 
- * function updateGoogleLink(link) { var payload = { "gpluslink" : link }; if (isValidUrl(link)) { callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload); $('#icn-gplus').attr("data-link", link); } else { $('#overlay-toast').html("Enter a valid url"); showToast(); } }
- */
-
 // Update Social links - yelp
 $('body').on('click', '#prof-edit-social-link .icn-yelp', function(e) {
 	e.stopPropagation();
@@ -11015,7 +11002,7 @@ function paintPosts(posts) {
 		var iconClass = "";
 		var href = "javascript:void(0)";
 		if (post.source == "google") {
-			iconClass = "icn-gplus";
+			return true;
 		} else if (post.source == "SocialSurvey")
 			iconClass = "icn-ss";
 		else if (post.source == "facebook") {
@@ -13430,7 +13417,7 @@ function paintPostsSolr(posts, entityType, entityId) {
 		var iconClass = "";
 		var href = "javascript:void(0)";
 		if (post.source == "google") {
-			iconClass = "icn-gplus";
+			return true;
 		} else if (post.source == "SocialSurvey")
 			iconClass = "icn-ss";
 		else if (post.source == "facebook") {

@@ -460,12 +460,7 @@
 									<div id="icn-yelp" class="float-left social-item-icon icn-yelp"
 										data-link="${profile.socialMediaTokens.yelpToken.yelpPageLink }"></div>
 								</c:if>
-								<c:if
-									test="${not empty profile.socialMediaTokens.googleToken && not empty profile.socialMediaTokens.googleToken.profileLink}">
-									<div id="icn-gplus"
-										class="float-left social-item-icon icn-gplus"
-										data-link="${profile.socialMediaTokens.googleToken.profileLink }"></div>
-								</c:if>
+								
 							</c:if>
 						</div>
 					</div>
@@ -780,9 +775,7 @@
                         <div class="tweet-panel tweet-panel-left tweet-panel-left-adj" id="prof-posts">
                         	<c:forEach var="postItem" items="${posts}">
                         	<c:choose>
-                        		<c:when test="${postItem.source == 'google' }">
-                        			<c:set var="iconClass" value="icn-gplus"></c:set>
-                        		</c:when>
+                        		
                         		<c:when test="${postItem.source == 'SocialSurvey' }">
                         			<c:set var="iconClass" value="icn-ss"></c:set>
                         		</c:when>
@@ -1039,7 +1032,6 @@
 											<div class="float-left ppl-share-icns icn-fb icn-fb-pp"></div>
 											<div class="float-left ppl-share-icns icn-twit icn-twit-pp"></div>
 											<div class="float-left ppl-share-icns icn-lin icn-lin-pp"></div>
-											<div class="float-left ppl-share-icns icn-gplus"></div>
 											<div class="float-left ppl-share-icns icn-yelp"></div>
 										</div>
 									</div> -->
