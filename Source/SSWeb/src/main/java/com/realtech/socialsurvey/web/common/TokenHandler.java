@@ -55,14 +55,19 @@ public class TokenHandler
             profileLink = profileLink.split( "&" )[0];
             linkedInToken.setLinkedInPageLink( profileLink );
         }
-
-        if ( mediaTokens.getLinkedInToken() != null ) {
-            linkedInToken.setLinkedInPageLink( mediaTokens.getLinkedInToken().getLinkedInPageLink() );
-        }
         
-        if ( StringUtils.isNotEmpty( mediaTokens.getLinkedInProfileUrl()) ) {
-            linkedInToken.setLinkedInPageLink( mediaTokens.getLinkedInProfileUrl() );
-        }
+  
+        if ( StringUtils.isEmpty( linkedInToken.getLinkedInPageLink() ) ) {
+            // Take it from backup url
+            if ( StringUtils.isNotEmpty( mediaTokens.getLinkedInProfileUrl()) ) {
+                linkedInToken.setLinkedInPageLink( mediaTokens.getLinkedInProfileUrl() );
+            } 
+            // Take it from old media token
+            else if ( mediaTokens.getLinkedInToken() != null ) {
+                linkedInToken.setLinkedInPageLink( mediaTokens.getLinkedInToken().getLinkedInPageLink() );
+                mediaTokens.setLinkedInProfileUrl( mediaTokens.getLinkedInToken().getLinkedInPageLink() );
+            }
+        } 
         
         mediaTokens.setLinkedInV2Token( linkedInToken );
         LOG.info( "Method updateLinkedInToken() finished for API version {}", version );

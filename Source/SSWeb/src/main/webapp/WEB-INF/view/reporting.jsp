@@ -239,14 +239,6 @@
 	</div>
 </div>
 
-<%--<div id="linkedin-api-v2-update-ribbon-outer" class="linkedin-api-v2-update-ribbon-outer ${linkedUpdateClass}">
-	<div id="linkedin-api-v2-update-ribbon-body" class="linkedin-api-v2-update-ribbon-body  cursor-pointer">
-		<span class="margin-left-auto linkedProfileUrl ${linkedProfileUrlClass}">Sorry, we couldn't find LinkedIn profile link, please enter LinkedIn profile link while reconnecting to LinkedIn, please <a onclick="openAuthPage(event,'linkedin', false, this);" data-link="${linkedinLink}">&nbsp;click here&nbsp;</a> and update your LinkedIn connection with your profile link</span>
-		<span class="margin-left-auto linkedV2Token ${linkedV2TokenClass}">We have updated our LinkedIn integration. To continue using LinkedIn with SocialSurvey, please <a onclick="openAuthPage(event,'linkedin', false, this);" data-link="${linkedinLink}">&nbsp;click here&nbsp;</a> and update your LinkedIn connection</span>
-	   <div id="linkedin-api-v2-update-ribbon-close-btn" class="linkedin-api-v2-update-ribbon-close-btn cursor-pointer">x</div>
-	</div>
-</div> --%>
-
 <div id="google-plus-banner" class="google-banner-outer">
 	<div id="google-banner-body" class="linkedin-api-v2-update-ribbon-body">
 		<span class="margin-left-auto">Since Google+ has gone away, you will no longer be able to use Google+ on SocialSurvey</span>

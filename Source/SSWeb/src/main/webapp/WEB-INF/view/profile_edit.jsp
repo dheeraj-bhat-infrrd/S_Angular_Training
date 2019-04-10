@@ -34,9 +34,9 @@
 		<c:set value="${socialMediaTokens.twitterToken.twitterPageLink}" var="twtLink"></c:set>
 	</c:if>
 	<c:if test="${not empty socialMediaTokens.linkedInV2Token && not empty socialMediaTokens.linkedInV2Token.linkedInAccessToken}">
-		<c:set value="${socialMediaTokens.linkedInV2Token.linkedInPageLink}" var="lnLink"></c:set>
 		<c:set value="true" var="linkedinConnected"></c:set>
 	</c:if>
+	
 	<c:if test="${not empty socialMediaTokens.googleToken && not empty socialMediaTokens.googleToken.profileLink}">
 		<c:set value="${socialMediaTokens.googleToken.profileLink}" var="googleLink"></c:set>
 	</c:if>
@@ -298,7 +298,7 @@
 						<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
 							<div id="icn-fb" class="float-left social-item-icon icn-fb ${socialDisabled}" data-source="facebook" data-link="${fbLink}" onclick="openAuthPage(event,'facebook', ${isAutoLogin}, this);" title="Facebook"></div>
 							<div id="icn-twit" class="float-left social-item-icon icn-twit ${socialDisabled}" data-source="twitter" data-link="${twtLink}" onclick="openAuthPage(event,'twitter', ${isAutoLogin}, this);" title="Twitter"></div>
-							<div id="icn-lin" class="float-left social-item-icon icn-lin ${socialDisabled}" data-source="linkedin" data-link="${lnLink}" onclick="openAuthPage(event,'linkedin', ${isAutoLogin}, this);" title="LinkedIn"></div>
+							<div id="icn-lin" class="float-left social-item-icon icn-lin ${socialDisabled}" data-source="linkedin" data-connected="${linkedinConnected}" data-link="${lnLink}" onclick="openAuthPageLinkedIn(event,'linkedin', ${isAutoLogin}, this);" title="LinkedIn"></div>
 							<div id="icn-google-business" class="float-left social-item-icon icn-google-business" data-source="googleBusiness" data-link="${googleBusinessToken.googleBusinessLink}" title="Google Business Rate & Review Link"></div>
 							<div id="icn-yelp" class="float-left social-item-icon icn-yelp" data-source="yelp" data-link="${yelpToken.yelpPageLink}" title="Yelp"></div>
 							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPageZillow(event,'.icn-zillow');"></div>
@@ -645,6 +645,12 @@ $(document).ready(function() {
 	paintForProfile();
 	focusOnElement();
 	$('#prof-edit-social-link').children('.social-item-icon').each(function() {
+		var dataSource = $(this).attr('data-source');
+		
+		if(dataSource =='linkedin' && $(this).attr('data-connected') == 'true'){
+			return true;
+		}
+		
 		var dataLink = $(this).attr('data-link');
 		if(dataLink == undefined || dataLink == "") {
 			$(this).addClass('icn-social-add');

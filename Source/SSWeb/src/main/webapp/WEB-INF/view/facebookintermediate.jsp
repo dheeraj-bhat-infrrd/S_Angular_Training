@@ -196,6 +196,17 @@ $(document).ready(function() {
 					enable(this);
 					parentWindow.loadSocialMediaUrlInSettingsPage();
 					parentWindow.loadSocialMediaUrlInPopup();
+					parentWindow.fetchSocialProfileUrl("facebook", function(data){
+						if(data.status == 200) {
+							var responseObj = JSON.parse(data.responseText);
+							var profileUrlLink = responseObj.url;
+							if(responseObj.connected){
+								parentWindow.showProfileLinkInEditProfilePage("facebook", profileUrlLink);
+							} else {
+								parentWindow.removeProfileLinkInEditProfilePage("facebook");
+							}
+						}
+					});
 					checkIfFacebookSet = true;
 					setTimeout(function() {
 						window.close();
@@ -214,23 +225,6 @@ $(document).ready(function() {
 	}
 });
 
-function fetchSocialProfileUrl(payload, callBackFunction){
-	$.ajax({
-		url : './profileUrl.do',
-		type : "GET",
-		data : payload,
-		async : false,
-		cache : false,
-		complete : callBackFunction,
-		error : function(e) {
-			if(e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			redirectErrorpage();
-		}
-	});
-}
 function disable(disableEle) {
 
 	if (disableEle) {

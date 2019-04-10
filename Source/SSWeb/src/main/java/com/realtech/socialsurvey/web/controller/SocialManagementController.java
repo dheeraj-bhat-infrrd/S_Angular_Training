@@ -93,6 +93,7 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.vo.IdInfoVO;
+import com.realtech.socialsurvey.core.vo.SocialMediaStatusVO;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.common.TokenHandler;
@@ -2749,85 +2750,7 @@ public class SocialManagementController
         }
         return CommonConstants.SUCCESS_ATTRIBUTE;
     }
-
-
-    @ResponseBody
-    @RequestMapping ( value = "/profileUrl")
-    public String getProfileUrl( HttpServletRequest request )
-    {
-        LOG.info( "Method getProfileUrl() called from SocialManagementController" );
-        String socialNetwork = request.getParameter( "socialNetwork" );
-        HttpSession session = request.getSession( false );
-        UserSettings usersettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-        
-        String profileUrl = "";
-        if ( usersettings == null) {
-            return profileUrl;
-        }
-        
-        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-        
-        OrganizationUnitSettings unitSettings = null;
-        
-        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            unitSettings = usersettings.getCompanySettings();
-            
-        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            if(usersettings.getRegionSettings() != null) {
-                unitSettings = usersettings.getRegionSettings().get( entityId);
-            }
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            if(usersettings.getBranchSettings() != null) {
-                unitSettings = usersettings.getBranchSettings().get( entityId);
-            }
-        }
-        if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            unitSettings = usersettings.getAgentSettings();
-        }
-        
-        if(unitSettings == null || unitSettings.getSocialMediaTokens() == null) {
-            return profileUrl;
-        }
-
-        SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
-        
-        if ( socialNetwork.equalsIgnoreCase( "facebook" ) ) {
-            if ( socialMediaTokens.getFacebookToken() != null
-                && socialMediaTokens.getFacebookToken().getFacebookPageLink() != null ) {
-                profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink();
-            }
-        } else if ( socialNetwork.equalsIgnoreCase( "twitter" ) ) {
-            if (  socialMediaTokens.getTwitterToken().getTwitterPageLink() != null ) {
-                profileUrl = socialMediaTokens.getTwitterToken().getTwitterPageLink();
-            }
-        } else if ( socialNetwork.equals( "linkedin" ) ) {
-            if (  socialMediaTokens.getLinkedInV2Token() != null) {
-                profileUrl = socialMediaTokens.getLinkedInProfileUrl();
-            }
-        } else if ( socialNetwork.equalsIgnoreCase( "google" ) ) {
-            if ( socialMediaTokens.getGoogleToken() != null
-                && socialMediaTokens.getGoogleToken().getProfileLink() != null ) {
-                profileUrl = socialMediaTokens.getGoogleToken().getProfileLink();
-            }
-        } else if ( socialNetwork.equalsIgnoreCase( "zillow" ) ) {
-            if (socialMediaTokens.getZillowToken() != null ) {
-                if ( socialMediaTokens.getZillowToken().getZillowProfileLink() != null ) {
-                    profileUrl = socialMediaTokens.getZillowToken().getZillowProfileLink();
-                }
-            }
-        } else if ( socialNetwork.equalsIgnoreCase( "instagram" ) ) {
-            if (  socialMediaTokens != null
-                    && socialMediaTokens.getInstagramToken() != null ) {
-                if ( socialMediaTokens.getInstagramToken().getPageLink() != null ) {
-                    profileUrl = socialMediaTokens.getInstagramToken().getPageLink();
-                }
-            }
-        }
-
-        LOG.info( "Method getProfileUrl() finished from SocialManagementController" );
-        return profileUrl;
-    }
+    
     
     /**
      * Disconnect Zillow either with or without deleting Zillow reviews
@@ -3183,8 +3106,7 @@ public class SocialManagementController
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
-            }
-            if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 unitSettings = userManagementService.getUserSettings( entityId );
             }
 
@@ -3301,15 +3223,8 @@ public class SocialManagementController
             LOG.error( "NoRecordsFetchedException while getting last build time. Reason  : ", e );
         }
 
-        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            model.addAttribute( "columnName", entityType );
-            model.addAttribute( "columnValue", entityId );
-            model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
-        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            model.addAttribute( "columnName", entityType );
-            model.addAttribute( "columnValue", entityId );
-            model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) || entityType.equals( CommonConstants.REGION_ID_COLUMN )
+            || entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             model.addAttribute( "columnName", entityType );
             model.addAttribute( "columnValue", entityId );
             model.addAttribute( "showSendSurveyPopupAdmin", String.valueOf( true ) );

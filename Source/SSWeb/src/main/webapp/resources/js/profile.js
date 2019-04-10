@@ -857,7 +857,6 @@ function paintReviews(result){
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
 		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ profileUrl +'"></span>';	
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
-		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + profileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + profileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		if(reviewItem.source != "Zillow")
@@ -1749,7 +1748,7 @@ function paintPublicPosts(posts) {
 		var iconClass = "";
 		var href="javascript:void(0)";
 		if (post.source == "google")
-			iconClass = "icn-gplus";
+			return true;
 		else if (post.source == "SocialSurvey")
 			iconClass = "icn-ss";
 		else if (post.source == "facebook"){

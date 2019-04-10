@@ -20,7 +20,6 @@ import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 
 import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.vo.CompanyStatistics;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
@@ -28,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -5050,7 +5051,7 @@ public class OrganizationManagementController
     }
     
     @ResponseBody
-    @RequestMapping (value = "/savelinkedinprofileurl", method = RequestMethod.POST)
+    @PostMapping (value = "/linkedin/profileurl")
     public String saveLinkedInProfileUrl( HttpServletRequest request )
     {
         HttpSession session = request.getSession( false );
@@ -5064,6 +5065,43 @@ public class OrganizationManagementController
             return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         }catch(SSAPIException e) {
             return "Unable to save profile url";
+        }
+    }
+    
+    @ResponseBody
+    @GetMapping ( value = "/{socialNetwork}/profileurl")
+    public ResponseEntity<?> getProfileUrl( @PathVariable String socialNetwork, HttpServletRequest request )
+    {
+        LOG.info( "Method getProfileUrl() called from SocialManagementController for {}", socialNetwork );
+
+        HttpSession session = request.getSession( false );
+
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getProfileUrlAndStatus(socialNetwork, entityType, entityId );
+
+        if ( response.getStatus() == 200 ) {
+            return new ResponseEntity<>( new String( ( (TypedByteArray) response.getBody() ).getBytes() ), HttpStatus.OK );
+        } else {
+            return new ResponseEntity<>( response.getReason(), HttpStatus.INTERNAL_SERVER_ERROR );
+        }
+    }
+    
+    @ResponseBody
+    @DeleteMapping (value = "/linkedin/profileurl")
+    public String deleteLinkedInProfileUrl(String socialNetwork, HttpServletRequest request )
+    {
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        
+        try {
+            Response response = ssApiIntergrationBuilder.getIntegrationApi().deleteLinkedInProfileUrl( entityType, entityId );
+            
+            return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        }catch(SSAPIException e) {
+            return "Unable to delete LinkedIn profile url";
         }
     }
 

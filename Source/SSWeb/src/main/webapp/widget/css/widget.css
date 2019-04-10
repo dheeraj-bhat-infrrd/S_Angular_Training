@@ -37,7 +37,6 @@
   color: #247ac2;
   font-size: 20px;
   display: flex !important;
-  letter-spacing: -2px !important;
 }
  .ss-widget-rev-count {
   text-align: center !important;
@@ -205,7 +204,6 @@
  .ss-widget-rev-stars {
   padding: 10px 15px 0 !important;
   font-size: 20px;
-  letter-spacing: -2px !important;
   color: #247ac2;
   padding-left: 0 !important;
   display: flex !important;
@@ -498,6 +496,47 @@
 .ss-widget-left-align-text{
 	text-align: left !important;	
 }
+
+/* New star style */
+.ss-widget-star-ratings-cont {
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    color: transparent;
+    overflow: hidden;
+    margin-right: 2px;
+}
+.ss-widget-full-stars {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #fde16d;
+}
+.ss-widget-empty-stars:before, .ss-widget-full-stars:before {
+    content:"\2605";
+    font-size: 20px;
+}
+.ss-widget-empty-stars:before {
+    -webkit-text-stroke: 1px #848484;
+}
+.ss-widget-full-stars:before {
+    -webkit-text-stroke: 1px orange;
+}
+/* Webkit-text-stroke is not supported on firefox or IE */
+
+/* Firefox */
+ @-moz-document url-prefix() {
+    .ss-widget-full-stars {
+        color: #ECBE24;
+    }
+}
+/* IE */
+ <!--[if IE]> .ss-widget-full-stars {
+    color: #ECBE24;
+}
+<![endif]-->
 
 @media (max-width: 767px) {
 

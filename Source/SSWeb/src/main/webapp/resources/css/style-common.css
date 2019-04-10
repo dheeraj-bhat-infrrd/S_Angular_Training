@@ -2003,8 +2003,8 @@ button.paypal.is-active {
 	background:url(../images/ss-icon-small-linkedin.png) no-repeat;
 	}
 .ppl-review-item:hover .icn-gplus-rev { 
-	background:url(../images/ss-icon-small-gplus.png) no-repeat;
-	}
+	display:none;
+}
 .ppl-review-item:hover .icn-flag  { 
 	background:url(../images/ss-icon-small-circle-flag.png) no-repeat;
 	}
@@ -2026,8 +2026,8 @@ button.paypal.is-active {
 	background:url(../images/ss-icon-small-linkedin.png) no-repeat;
 	}
 .ppl-review-item-last:hover .icn-gplus-rev { 
-	background:url(../images/ss-icon-small-gplus.png) no-repeat;
-	}
+	display:none;	
+}
 .ppl-review-item-last:hover .icn-flag  { 
 	background:url(../images/ss-icon-small-circle-flag.png) no-repeat;
 	}
@@ -2083,8 +2083,7 @@ button.paypal.is-active {
 
 
 .sr-icn-gplus-rev {
-	background: url(../images/ss-icon-grey-small-gplus.png) no-repeat;
-	border: 0px;
+	display:none;
 }
 
 .icn-ss {
@@ -2136,14 +2135,6 @@ button.paypal.is-active {
 	
 }
 
-.sr-icn-gplus-rev:hover { 
-	background:url(../images/ss-icon-small-gplus.png) no-repeat;
-	-ms-transform: scale(1.2, 1.2);
-    -webkit-transform: scale(1.2, 1.2);
-    transform: scale(1.2, 1.2);
-    transition: 0.3s ease-out;
-}
-
 .sr-icn-flag:hover {
 	background:url(../images/ss-icon-small-circle-flag.png) no-repeat;
 	-ms-transform: scale(1.2, 1.2);
@@ -2193,12 +2184,10 @@ button.paypal.is-active {
 }
 
 .icn-gplus {
-	background: url(../csssprites/icons_social.png) no-repeat -50px 0;
-	border: 0px;
+	display:none;
 }
 .icn-gplus-rev {
-	background: url(../images/ss-icon-grey-small-gplus.png) no-repeat;
-	border: 0px;
+	display:none
 }
 
 .icn-permalink-rev {
@@ -7849,7 +7838,7 @@ tr.u-tbl-header td {
 }
 
 .social-item-icon.icn-gplus {
-	background-position: -50px 3px;
+	display:none;
 }
 
 .social-item-icon.icn-yelp {
@@ -7885,7 +7874,7 @@ tr.u-tbl-header td {
 }
 
 .icn-social-add.icn-gplus {
-	background-position: -50px -38px;
+	display:none;
 }
 
 .icn-social-add.icn-yelp {
@@ -13351,6 +13340,11 @@ body.ss-not-found-page {
     line-height: 36px;
     text-align: center;
     height: 36px;
+}
+
+.ln-ol-btn-wrapper {
+	width: 33%;
+	padding: 15px;
 }
 
 .google-banner-outer {

@@ -106,6 +106,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_INSTAGRAM_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.instagramToken";
     public static final String KEY_FACEBOOK_PIXEL_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.facebookPixelToken";
     public static final String KEY_LINKEDIN_PROFILE = "socialMediaTokens.linkedInProfileUrl";
+    public static final String KEY_LINKEDIN_V2_TOKEN_PROFILE = "socialMediaTokens.linkedInV2Token.linkedInPageLink";
     public static final String KEY_CONTACT_NAME = "contact_details.name";
     public static final String KEY_POSTIONS = "positions";
     public static final String KEY_STATUS = "status";
@@ -370,8 +371,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public void updateParticularKeyOrganizationUnitSettings( String keyToUpdate, Object updatedRecord,
         OrganizationUnitSettings unitSettings, String collectionName )
     {
-        LOG.debug( "Updating unit setting in " + collectionName + " with " + unitSettings + " for key: " + keyToUpdate
-            + " wtih value: " + updatedRecord );
+        LOG.debug( "Updating unit setting in {} with {} for key: {} with value: {}", collectionName ,unitSettings , keyToUpdate, updatedRecord );
         Query query = new Query();
         query.addCriteria( Criteria.where( ID ).is( unitSettings.getId() ) );
         Update update = new Update();
@@ -1813,6 +1813,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
         Update update = new Update().unset( keyToUpdate );
         LOG.debug( "Updating the unit settings" );
+        WriteResult updateResult = mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
+        return updateResult.isUpdateOfExisting();
+    }
+    
+    @Override
+    public boolean removeLinkedInProfileUrlInUnitSettings( long iden, String collectionName )
+    {
+        LOG.debug( "Method removeLinkedInProfileUrlInUnitSettings() started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
+        Update update = new Update().unset( KEY_LINKEDIN_V2_TOKEN_PROFILE ).unset(KEY_LINKEDIN_PROFILE );
         WriteResult updateResult = mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
         return updateResult.isUpdateOfExisting();
     }

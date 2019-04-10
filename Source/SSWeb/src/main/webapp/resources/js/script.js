@@ -4171,7 +4171,7 @@ function closeSMPopup(closeSMParam){
 					'socialNetwork' : socialNetwork
 				};
 				fetchSocialProfileUrl(payload, function(data) {
-					if(data.statusText == 'OK'){
+					if(data.status == 200){
 					//	parentWindow.loadSocialMediaUrlInSettingsPage();
 						//parentWindow.showProfileLink("${socialNetwork}", data.responseText);
 						parentWindow.showProfileLinkInEditProfilePage(socialNetwork , data.responseText);					
