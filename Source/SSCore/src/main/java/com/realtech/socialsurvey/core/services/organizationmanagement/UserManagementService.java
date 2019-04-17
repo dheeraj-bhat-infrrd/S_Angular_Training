@@ -699,5 +699,12 @@ public interface UserManagementService
 	public boolean canAddAndDeleteUser(String entityType, long companyId, boolean addOrDeleteFlag) throws InvalidInputException;
 
 
+    /**
+     * Enables deletion of an agent's logo image.
+     * @param collection Collection name in Mongo
+     * @param unitSettings Representing organization settings. 
+     * @throws InvalidInputException
+     */
+    void removeLogoImage( String collection, OrganizationUnitSettings unitSettings ) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

@@ -1842,17 +1842,15 @@ public class ProfileManagementController
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         String logoUrl = "";
-
+        
+        
+        boolean forQuickEdits = false;
+        if(request.getParameter( "forQuickEdits" ) != null && (!request.getParameter( "forQuickEdits" ).isEmpty())) {
+            forQuickEdits = Boolean.parseBoolean(request.getParameter( "forQuickEdits" ));
+        }
+        
         try {
-            UserSettings userSettings = (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-            OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
-                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
-            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-            if ( userSettings == null || profileSettings == null || entityType == null ) {
-                throw new InvalidInputException( "No user settings found in session" );
-            }
+            
 
             String logoFileName = request.getParameter( "logoFileName" );
             try {
@@ -1868,60 +1866,14 @@ public class ProfileManagementController
                     messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
                 return JspResolver.MESSAGE_HEADER;
             }
-
-            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-                if ( companySettings == null ) {
-                    throw new InvalidInputException( "No company settings found in current session" );
+            
+            if(forQuickEdits){
+                long userIdForQuickEdits = 0;
+                if(request.getParameter( "userIdForQuickEdits" ) != null && (!request.getParameter( "userIdForQuickEdits" ).isEmpty())) {
+                    userIdForQuickEdits = Long.parseLong( request.getParameter( "userIdForQuickEdits" ));
                 }
-                Company company = userManagementService.getCompanyById( companySettings.getIden() );
-                if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
-                    userManagementService.updateCompany( company );
-                }
-                profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
-                    companySettings, logoUrl );
-                companySettings.setLogo( logoUrl );
-                companySettings.setLogoThumbnail( logoUrl );
-                userSettings.setCompanySettings( companySettings );
-
-
-            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
-                if ( regionSettings == null ) {
-                    throw new InvalidInputException( "No Region settings found in current session" );
-                }
-                profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
-                    regionSettings, logoUrl );
-                regionSettings.setLogo( logoUrl );
-                regionSettings.setLogoThumbnail( logoUrl );
-                userSettings.getRegionSettings().put( entityId, regionSettings );
-
-                Region region = userManagementService.getRegionById( regionSettings.getIden() );
-                if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
-                    userManagementService.updateRegion( region );
-                }
-
-
-            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
-                if ( branchSettings == null ) {
-                    throw new InvalidInputException( "No Branch settings found in current session" );
-                }
-                profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
-                    branchSettings, logoUrl );
-                branchSettings.setLogo( logoUrl );
-                branchSettings.setLogoThumbnail( logoUrl );
-                userSettings.getBranchSettings().put( entityId, branchSettings );
-                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
-                if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOGO, true );
-                    userManagementService.updateBranch( branch );
-                }
-
-            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-                AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                
+                AgentSettings agentSettings = userManagementService.getUserSettings( userIdForQuickEdits );
                 if ( agentSettings == null ) {
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
@@ -1929,16 +1881,89 @@ public class ProfileManagementController
                     agentSettings, logoUrl );
                 agentSettings.setLogo( logoUrl );
                 agentSettings.setLogoThumbnail( logoUrl );
-                userSettings.setAgentSettings( agentSettings );
-
-            } else {
-                throw new InvalidInputException( "Invalid input exception occurred in uploading logo.",
-                    DisplayMessageConstants.GENERAL_ERROR );
+                model.addAttribute( "logoUrlForQuickEdits", logoUrl );
+            }else{
+                UserSettings userSettings = (UserSettings) session
+                    .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+                OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                    .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+                long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+                String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+                if ( userSettings == null || profileSettings == null || entityType == null ) {
+                    throw new InvalidInputException( "No user settings found in session" );
+                }
+                
+                if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                    OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+                    if ( companySettings == null ) {
+                        throw new InvalidInputException( "No company settings found in current session" );
+                    }
+                    Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                    if ( company != null ) {
+                        settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.LOGO, true );
+                        userManagementService.updateCompany( company );
+                    }
+                    profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                        companySettings, logoUrl );
+                    companySettings.setLogo( logoUrl );
+                    companySettings.setLogoThumbnail( logoUrl );
+                    userSettings.setCompanySettings( companySettings );
+    
+    
+                } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                    OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                    if ( regionSettings == null ) {
+                        throw new InvalidInputException( "No Region settings found in current session" );
+                    }
+                    profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                        regionSettings, logoUrl );
+                    regionSettings.setLogo( logoUrl );
+                    regionSettings.setLogoThumbnail( logoUrl );
+                    userSettings.getRegionSettings().put( entityId, regionSettings );
+    
+                    Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                    if ( region != null ) {
+                        settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.LOGO, true );
+                        userManagementService.updateRegion( region );
+                    }
+    
+    
+                } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                    OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                    if ( branchSettings == null ) {
+                        throw new InvalidInputException( "No Branch settings found in current session" );
+                    }
+                    profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                        branchSettings, logoUrl );
+                    branchSettings.setLogo( logoUrl );
+                    branchSettings.setLogoThumbnail( logoUrl );
+                    userSettings.getBranchSettings().put( entityId, branchSettings );
+                    Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                    if ( branch != null ) {
+                        settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOGO, true );
+                        userManagementService.updateBranch( branch );
+                    }
+    
+                } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                    AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                    if ( agentSettings == null ) {
+                        throw new InvalidInputException( "No Agent settings found in current session" );
+                    }
+                    profileManagementService.updateLogo( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                        agentSettings, logoUrl );
+                    agentSettings.setLogo( logoUrl );
+                    agentSettings.setLogoThumbnail( logoUrl );
+                    userSettings.setAgentSettings( agentSettings );
+    
+                } else {
+                    throw new InvalidInputException( "Invalid input exception occurred in uploading logo.",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
+    
+                profileSettings.setLogo( logoUrl );
+                profileSettings.setLogoThumbnail( logoUrl );
+                sessionHelper.setLogoInSession( session, userSettings );
             }
-
-            profileSettings.setLogo( logoUrl );
-            profileSettings.setLogoThumbnail( logoUrl );
-            sessionHelper.setLogoInSession( session, userSettings );
             LOG.info( "Logo uploaded successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -1961,20 +1986,16 @@ public class ProfileManagementController
         HttpSession session = request.getSession( false );
         String profileImageUrl = "";
 
-        try {
-            UserSettings userSettings = (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-            OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
-                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
-            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-            if ( userSettings == null || profileSettings == null || entityType == null ) {
-                throw new InvalidInputException( "No user settings found in session" );
-            }
-            
+        try {    
             // new dash-board flag
+            
             boolean forNewDashboard = Boolean.parseBoolean( request.getParameter( "forNewDashboard" ) );
             
+            boolean forQuickEdits = false;
+            if(request.getParameter( "forQuickEdits" ) != null && (!request.getParameter( "forQuickEdits" ).isEmpty())) {
+                forQuickEdits = Boolean.parseBoolean(request.getParameter( "forQuickEdits" ));
+            }
+                       
             try {
                 int selectedX = Integer.parseInt( request.getParameter( "selected_x" ) );
                 int selectedY = Integer.parseInt( request.getParameter( "selected_y" ) );
@@ -2048,39 +2069,14 @@ public class ProfileManagementController
                 model.addAttribute( "message", "Unable to upload profile image" );
                 return JspResolver.MESSAGE_HEADER;
             }
-
-            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-                if ( companySettings == null ) {
-                    throw new InvalidInputException( "No company settings found in current session" );
+            
+            if(forQuickEdits) {
+                long userIdForQuickEdits = 0;
+                if(request.getParameter( "userIdForQuickEdits" ) != null && (!request.getParameter( "userIdForQuickEdits" ).isEmpty())) {
+                    userIdForQuickEdits = Long.parseLong( request.getParameter( "userIdForQuickEdits" ));
                 }
-                profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
-                    companySettings, profileImageUrl );
-                companySettings.setProfileImageUrl( profileImageUrl );
-                companySettings.setProfileImageUrlThumbnail( profileImageUrl );
-                userSettings.setCompanySettings( companySettings );
-            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
-                if ( regionSettings == null ) {
-                    throw new InvalidInputException( "No Region settings found in current session" );
-                }
-                profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
-                    regionSettings, profileImageUrl );
-                regionSettings.setProfileImageUrl( profileImageUrl );
-                regionSettings.setProfileImageUrlThumbnail( profileImageUrl );
-                userSettings.getRegionSettings().put( entityId, regionSettings );
-            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
-                if ( branchSettings == null ) {
-                    throw new InvalidInputException( "No Branch settings found in current session" );
-                }
-                profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
-                    branchSettings, profileImageUrl );
-                branchSettings.setProfileImageUrl( profileImageUrl );
-                branchSettings.setProfileImageUrlThumbnail( profileImageUrl );
-                userSettings.getBranchSettings().put( entityId, branchSettings );
-            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-                AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                
+                AgentSettings agentSettings = userManagementService.getUserSettings( userIdForQuickEdits );
                 if ( agentSettings == null ) {
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
@@ -2088,23 +2084,84 @@ public class ProfileManagementController
                     agentSettings, profileImageUrl );
                 agentSettings.setProfileImageUrl( profileImageUrl );
                 agentSettings.setProfileImageUrlThumbnail( profileImageUrl );
-                userSettings.setAgentSettings( agentSettings );
-
+                
                 // Modify Agent details in Solr
                 Map<String, Object> updateMap = new HashMap<String, Object>();
                 updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl );
                 updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, profileImageUrl );
                 updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
                 solrSearchService.editUserInSolrWithMultipleValues( agentSettings.getIden(), updateMap );
-            } else {
-                throw new InvalidInputException( "Invalid input exception occurred while uploading profile image.",
-                    DisplayMessageConstants.GENERAL_ERROR );
+                
+                model.addAttribute( "profileImageUrlThumbnailForQuickEdits",  profileImageUrl);
+            }else { 
+               
+                    UserSettings userSettings = (UserSettings) session
+                        .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+                    OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                        .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+                    long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+                    String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+                    if ( userSettings == null || profileSettings == null || entityType == null ) {
+                        throw new InvalidInputException( "No user settings found in session" );
+                    }
+                    
+                   if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                    OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+                    if ( companySettings == null ) {
+                        throw new InvalidInputException( "No company settings found in current session" );
+                    }
+                    profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                        companySettings, profileImageUrl );
+                    companySettings.setProfileImageUrl( profileImageUrl );
+                    companySettings.setProfileImageUrlThumbnail( profileImageUrl );
+                    userSettings.setCompanySettings( companySettings );
+                } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                    OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                    if ( regionSettings == null ) {
+                        throw new InvalidInputException( "No Region settings found in current session" );
+                    }
+                    profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                        regionSettings, profileImageUrl );
+                    regionSettings.setProfileImageUrl( profileImageUrl );
+                    regionSettings.setProfileImageUrlThumbnail( profileImageUrl );
+                    userSettings.getRegionSettings().put( entityId, regionSettings );
+                } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                    OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                    if ( branchSettings == null ) {
+                        throw new InvalidInputException( "No Branch settings found in current session" );
+                    }
+                    profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                        branchSettings, profileImageUrl );
+                    branchSettings.setProfileImageUrl( profileImageUrl );
+                    branchSettings.setProfileImageUrlThumbnail( profileImageUrl );
+                    userSettings.getBranchSettings().put( entityId, branchSettings );
+                } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                    AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                    if ( agentSettings == null ) {
+                        throw new InvalidInputException( "No Agent settings found in current session" );
+                    }
+                    profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                        agentSettings, profileImageUrl );
+                    agentSettings.setProfileImageUrl( profileImageUrl );
+                    agentSettings.setProfileImageUrlThumbnail( profileImageUrl );
+                    userSettings.setAgentSettings( agentSettings );
+    
+                    // Modify Agent details in Solr
+                    Map<String, Object> updateMap = new HashMap<String, Object>();
+                    updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl );
+                    updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, profileImageUrl );
+                    updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+                    solrSearchService.editUserInSolrWithMultipleValues( agentSettings.getIden(), updateMap );
+                } else {
+                    throw new InvalidInputException( "Invalid input exception occurred while uploading profile image.",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
+    
+                   profileSettings.setProfileImageUrl( profileImageUrl );
+                   profileSettings.setProfileImageUrlThumbnail( profileImageUrl );
             }
-
-            profileSettings.setProfileImageUrl( profileImageUrl );
-            profileSettings.setProfileImageUrlThumbnail( profileImageUrl );
-            
             model.addAttribute( "forNewDashboard", forNewDashboard );
+            model.addAttribute( "forQuickEdits", forQuickEdits );
 
             LOG.info( "Profile Image uploaded successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
@@ -2128,55 +2185,19 @@ public class ProfileManagementController
         HttpSession session = request.getSession( false );
         String profileImageUrl = "";
 
+        boolean forQuickEdits = false;
+        if(request.getParameter( "forQuickEdits" ) != null && (!request.getParameter( "forQuickEdits" ).isEmpty())) {
+            forQuickEdits = Boolean.parseBoolean(request.getParameter( "forQuickEdits" ));
+        }
+        
         try {
-            UserSettings userSettings = (UserSettings) session
-                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-            OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
-                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
-            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-            if ( userSettings == null || profileSettings == null || entityType == null ) {
-                throw new InvalidInputException( "No user settings found in session" );
-            }
-
-            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-                if ( companySettings == null ) {
-                    throw new InvalidInputException( "No company settings found in current session" );
+            if(forQuickEdits) {
+                long userIdForQuickEdits = 0;
+                if(request.getParameter( "userIdForQuickEdits" ) != null && (!request.getParameter( "userIdForQuickEdits" ).isEmpty())) {
+                    userIdForQuickEdits = Long.parseLong( request.getParameter( "userIdForQuickEdits" ));
                 }
-                profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
-                    companySettings );
-               
                 
-                companySettings.setProfileImageUrl( profileImageUrl );
-                companySettings.setProfileImageUrlThumbnail( profileImageUrl );
-                userSettings.setCompanySettings( companySettings );
-                
-            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
-                if ( regionSettings == null ) {
-                    throw new InvalidInputException( "No Region settings found in current session" );
-                }
-                profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
-                    regionSettings );
-                
-                regionSettings.setProfileImageUrl( profileImageUrl );
-                regionSettings.setProfileImageUrlThumbnail( profileImageUrl );
-                userSettings.getRegionSettings().put( entityId, regionSettings );
-                
-            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
-                if ( branchSettings == null ) {
-                    throw new InvalidInputException( "No Branch settings found in current session" );
-                }
-                profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
-                    branchSettings );
-                branchSettings.setProfileImageUrl( profileImageUrl );
-                branchSettings.setProfileImageUrlThumbnail( profileImageUrl );
-                userSettings.getBranchSettings().put( entityId, branchSettings );
-                
-            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-                AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                AgentSettings agentSettings = userManagementService.getUserSettings( userIdForQuickEdits );
                 if ( agentSettings == null ) {
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
@@ -2184,16 +2205,74 @@ public class ProfileManagementController
                     agentSettings );
                 agentSettings.setProfileImageUrl( profileImageUrl );
                 agentSettings.setProfileImageUrlThumbnail( profileImageUrl );
-                userSettings.setAgentSettings( agentSettings );
+               
+                model.addAttribute( "profileImageUrlThumbnailForQuickEdits",  profileImageUrl);
+            }else { 
+                UserSettings userSettings = (UserSettings) session
+                    .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+                OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                    .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+                long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+                String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+                if ( userSettings == null || profileSettings == null || entityType == null ) {
+                    throw new InvalidInputException( "No user settings found in session" );
+                }
                 
-            } else {
-                throw new InvalidInputException( "Invalid input exception occurred while removing profile image.",
-                    DisplayMessageConstants.GENERAL_ERROR );
+                if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                    OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+                    if ( companySettings == null ) {
+                        throw new InvalidInputException( "No company settings found in current session" );
+                    }
+                    profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                        companySettings );
+                   
+                    
+                    companySettings.setProfileImageUrl( profileImageUrl );
+                    companySettings.setProfileImageUrlThumbnail( profileImageUrl );
+                    userSettings.setCompanySettings( companySettings );
+                    
+                } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                    OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                    if ( regionSettings == null ) {
+                        throw new InvalidInputException( "No Region settings found in current session" );
+                    }
+                    profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                        regionSettings );
+                    
+                    regionSettings.setProfileImageUrl( profileImageUrl );
+                    regionSettings.setProfileImageUrlThumbnail( profileImageUrl );
+                    userSettings.getRegionSettings().put( entityId, regionSettings );
+                    
+                } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                    OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                    if ( branchSettings == null ) {
+                        throw new InvalidInputException( "No Branch settings found in current session" );
+                    }
+                    profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                        branchSettings );
+                    branchSettings.setProfileImageUrl( profileImageUrl );
+                    branchSettings.setProfileImageUrlThumbnail( profileImageUrl );
+                    userSettings.getBranchSettings().put( entityId, branchSettings );
+                    
+                } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                    AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                    if ( agentSettings == null ) {
+                        throw new InvalidInputException( "No Agent settings found in current session" );
+                    }
+                    profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                        agentSettings );
+                    agentSettings.setProfileImageUrl( profileImageUrl );
+                    agentSettings.setProfileImageUrlThumbnail( profileImageUrl );
+                    userSettings.setAgentSettings( agentSettings );
+                    
+                } else {
+                    throw new InvalidInputException( "Invalid input exception occurred while removing profile image.",
+                        DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+                profileSettings.setProfileImageUrl( profileImageUrl );
+                profileSettings.setProfileImageUrlThumbnail( profileImageUrl );
             }
-
-            profileSettings.setProfileImageUrl( profileImageUrl );
-            profileSettings.setProfileImageUrlThumbnail( profileImageUrl );
-
             LOG.info( "Profile Image removed successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.PROFILE_IMAGE_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -5696,6 +5775,25 @@ public class ProfileManagementController
         return response;
 
     }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/validateprofileurl", method = RequestMethod.POST)
+    public String validateProfileUrl( Model model, HttpServletRequest request )
+    {
+        String profileUrl = request.getParameter( "profileUrl" );
+        boolean profileExists = false;
+        try {
+            User profileNameUser = profileManagementService.getUserByProfileName( profileUrl, false );
+            if(profileNameUser != null) {
+                profileExists = true;
+                LOG.debug( "Profile URL for "+profileUrl+" already exists, can not be assigned." );
+            }
+        }
+        catch(ProfileNotFoundException | NoRecordsFetchedException | InvalidInputException e) {
+            LOG.error("Exception while fetching profile records by name. "+e.getMessage());
+        }
+        return Boolean.toString( profileExists );
+    }    
 
 
     @RequestMapping ( value = "/updatefacebookpixelid", method = RequestMethod.POST)

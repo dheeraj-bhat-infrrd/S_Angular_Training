@@ -34,6 +34,11 @@ public class UserFromSearch {
 	private long reviewCount;
 	private boolean isProfileImageSet;
 	private List<SocialMediaVO> socialMediaVOs;
+	private String address;
+	private String contactNumber;
+	private String disclaimer;
+	private String webUrl;
+	private Licenses licenses;
 
 	public List<Long> getRegions() {
 		return regions;
@@ -254,7 +259,49 @@ public class UserFromSearch {
 	{
 		this.socialMediaVOs = socialMediaVOs;
 	}
+	
+	
 
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getContactNumber() {
+		return contactNumber;
+	}
+
+	public void setContactNumber(String contactNumber) {
+		this.contactNumber = contactNumber;
+	}
+
+	public String getDisclaimer() {
+		return disclaimer;
+	}
+
+	public void setDisclaimer(String disclaimer) {
+		this.disclaimer = disclaimer;
+	}
+
+	public String getWebUrl() {
+		return webUrl;
+	}
+
+	public void setWebUrl(String webUrl) {
+		this.webUrl = webUrl;
+	}
+	
+	public Licenses getLicenses() {
+		return licenses;
+	}
+
+	public void setLicenses(Licenses licenses) {
+		this.licenses = licenses;
+	}
 
 	@Override public String toString()
 	{

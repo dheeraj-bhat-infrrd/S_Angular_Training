@@ -24,6 +24,7 @@ var cityLookupList; // cityLookupList
 var phoneFormat = '(ddd) ddd-dddd'; // defualt phone format
 var selectedCountryRegEx = "";
 var findProCompanyProfileName;
+var USPhoneRegex = /^([\+][0-9]{1,3}([\s\.\-])?)?([\(]{1}[0-9]{3}[\)])?([0-9A-Z\s\.\-]{1,32})((x|ext|ext.|extension)?\s{0,1}[0-9]{1,5}?)$/;
 
 const PRICING_URL = "http://www.socialsurvey.com/pricing/";
 
@@ -447,6 +448,23 @@ function validateEmailId(elementId, isOnlyToast) {
 	}
 }
 
+function validateEmailIdForQuickEdits(elementId){
+	var emailId = $('#' + elementId).val();
+	
+	if (emailId != "") {
+		emailId = emailId.trim();
+		
+		if (emailRegex.test(emailId) == true) {
+			return true;
+		} else {
+			return false;
+		}
+	}else{
+		return false;
+	}
+	
+}
+
 // Function to validate the first name
 function validateFirstName(elementId) {
 	if ($('#' + elementId).val() != "") {
@@ -570,7 +588,7 @@ function escapeRegExp(str) {
 }
 
 // Function to validate the phone number
-function validatePhoneNumber(elementId, isOnlyShowToast) {
+function validatePhoneNumber(elementId, isOnlyShowToast, forQuickEdits) {
 	var regExToTest = phoneRegex;
 	if (currentPhoneRegEx && currentPhoneRegEx != "") {
 		var regExToTestStr = currentPhoneRegEx;
@@ -578,12 +596,25 @@ function validatePhoneNumber(elementId, isOnlyShowToast) {
 		regExToTestStr = regExToTestStr.replace(/d/g, '\\d');
 		regExToTest = new RegExp(regExToTestStr);
 	}
+	
+	if(forQuickEdits){
+		var countryData = $('#selected-user-phone').intlTelInput("getSelectedCountryData");
+		if(countryData.iso2 == 'us'){
+			regExToTest = USPhoneRegex;
+		}else{
+			regExToTest = /^[0-9]+$/;
+		}
+	}
+	
 	if ($('#' + elementId).val() != "") {
 		if (regExToTest.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
 			var msg = 'Please enter a valid phone number';
-			if (isOnlyShowToast) {
+			
+			if(forQuickEdits){
+				return false;
+			}else if (isOnlyShowToast) {
 				$('#overlay-toast').html(msg);
 				showToast();
 			} else {
@@ -593,7 +624,10 @@ function validatePhoneNumber(elementId, isOnlyShowToast) {
 		}
 	} else {
 		var msg = 'Please enter phone number';
-		if (isOnlyShowToast) {
+		
+		if(forQuickEdits){
+			return false;
+		}else if (isOnlyShowToast) {
 			$('#overlay-toast').html(msg);
 			showToast();
 		} else {

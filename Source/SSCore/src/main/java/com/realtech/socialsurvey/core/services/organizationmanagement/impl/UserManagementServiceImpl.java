@@ -5275,4 +5275,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 throw new InvalidInputException( "Invalid Entity Type." );
         }
     }
+    
+
+    @Override
+    public void removeLogoImage( String collection, OrganizationUnitSettings unitSettings ) throws InvalidInputException
+    {
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
+        }
+        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( unitSettings.getIden(), collection, false,
+            CommonConstants.IMAGE_TYPE_LOGO );
+
+    }
 }

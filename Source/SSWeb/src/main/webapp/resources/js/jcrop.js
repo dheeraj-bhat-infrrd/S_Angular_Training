@@ -6,14 +6,20 @@ var ratio = 1;
 $(document).on('change', '#prof-image', function() {
 	overlayRevert();
 	createPopupCanvas();
-	initiateJcrop(this, false);
+	initiateJcrop(this, false,false);
 });
 
 
 $(document).on('change', '#rep-prof-image', function() {
 	overlayRevert();
 	createPopupCanvas();
-	initiateJcrop(this, true);
+	initiateJcrop(this, true,false);
+});
+
+$(document).on('change', '#v-ed-prof-image', function() {
+	overlayRevert();
+	createPopupCanvas();
+	initiateJcrop(this, false,true);
 });
 
 function initiatePopupForImgFix(){
@@ -102,6 +108,8 @@ function initiateJcropForImgFix(profImg,forNewDashboard) {
 			formData.append("imageFileName", forNewDashboard == true ? $('#rep-prof-container').attr('data-prof-name') :"");
 			formData.append("imageBase64", dataurl);
 			formData.append("forNewDashboard",forNewDashboard == true ? true : false );
+			formData.append("forQuickEdits", false);
+			formData.append("userIdForQuickEdits","");
 			formData.append("forProfileImageFix",true );
 			
 			$.ajax({
@@ -144,7 +152,7 @@ function createPopupCanvas() {
 }
 
 // Function to crop and upload profile image
-function initiateJcrop(input, forNewDashboard) {
+function initiateJcrop(input, forNewDashboard, forQuickEdits) {
 	if (input.files && input.files[0]) {
 		var reader = new FileReader();
 		reader.onload = function(e) {
@@ -216,9 +224,11 @@ function initiateJcrop(input, forNewDashboard) {
 			formData.append("selected_h", Math.round(selected_h * boxToOriginalRatio));
 			formData.append("width", Math.round($('#target').width() * boxToOriginalRatio));
 			formData.append("height", Math.round($('#target').height() * boxToOriginalRatio));
-			formData.append("imageFileName", forNewDashboard == true ? $('#rep-prof-image').prop("files")[0].name : $('#prof-image').prop("files")[0].name);
+			formData.append("imageFileName", forNewDashboard == true ? $('#rep-prof-image').prop("files")[0].name : (forQuickEdits == true ?$('#v-ed-prof-image').prop("files")[0].name :$('#prof-image').prop("files")[0].name));
 			formData.append("imageBase64", dataurl);
 			formData.append("forNewDashboard",forNewDashboard == true ? true : false );
+			formData.append("forQuickEdits", forQuickEdits == true ? true : false);
+			formData.append("userIdForQuickEdits",$('#selected-userid-hidden').val());
 			formData.append("forProfileImageFix",false );
 			
 			overlayRevert();
@@ -232,7 +242,9 @@ function initiateJcrop(input, forNewDashboard) {
 				success : callBackOnProfileImageUpload,
 				complete : function() {
 					hideOverlay();
-					if( forNewDashboard == true ){
+					if(forQuickEdits == true){
+						$('#v-ed-prof-image').val('');
+					}else if( forNewDashboard == true ){
 						$('#rep-prof-image').val('');
 					} else {
 						$('#prof-image').val('');
@@ -246,6 +258,17 @@ function initiateJcrop(input, forNewDashboard) {
 					redirectErrorpage();
 				}
 			});
+		});
+		
+		$('#overlay-cancel').off('click');
+		$('#overlay-cancel').click(function() {
+			$('#v-ed-prof-image').val('');
+			$('#rep-prof-image').val('');
+			$('#prof-image').val('');
+			
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
 		});
 	}
 }

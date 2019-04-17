@@ -246,7 +246,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     {
         LOG.debug( "Method findPrimaryUserProfileByAgentId() called for agent id : {}", entityId );
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
-        String hqlQuery = "select u.company.companyId, u.regionId, u.branchId, u.agentId from UserProfile u where u.agentId=? AND u.isPrimary = ?";
+        String hqlQuery = "select u.company.companyId, u.regionId, u.branchId, u.agentId from UserProfile u where u.user.userId=? AND u.isPrimary = ?";
         Query query = getSession().createQuery( hqlQuery );
         query.setParameter( 0, entityId );
         query.setParameter( 1, 1 );

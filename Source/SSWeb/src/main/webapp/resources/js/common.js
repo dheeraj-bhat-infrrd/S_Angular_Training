@@ -423,34 +423,46 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 	});
 }
 
-function changeRatingPattern(rating, ratingParent, isOverallRating, source, isProfilePage) {
+function changeRatingPattern(rating, ratingParent, isOverallRating, source, isProfilePage,isQuickEdits) {
 	var ratingIntVal = 0;
 	var roundedFloatingVal = parseFloat(rating).toFixed(2);
 	var ratingFloat= parseFloat(roundedFloatingVal).toFixed(2);
 	var ratingInt= parseInt(ratingFloat*4);
 	ratingIntVal=(ratingInt/4).toFixed(2);
-	if(source != undefined && source == "Zillow"){
-		ratingImgHtml = "<div class='rating-image cursor-pointer  float-left star-rating-green-"+ ratingIntVal +"' title='"+roundedFloatingVal+"/5.0' ></div>";
-	}else if(source =="encompass" || source == "DOTLOOP"){
-		ratingImgHtml = "<div class='rating-image  cursor-pointer float-left star-rating-"+ ratingIntVal +"' title='"+roundedFloatingVal+"/5.0'></div>";
+	
+	if(isQuickEdits == undefined){
+		isQuickEdits = false;
+	}
+	
+	if(isQuickEdits){
+		roundedFloatingVal = parseFloat(roundedFloatingVal).toFixed(1);
+		ratingImgHtml = "<div class='rating-image star-rating-"+ratingIntVal+"' title='"+roundedFloatingVal+"/5.0'></div>";
+		ratingValHtml = "<div class='v-ed-minrat-star-text'>"+ roundedFloatingVal + "</div>";
 		
-	}
-		else {
-		ratingImgHtml = "<div class='rating-image cursor-pointer float-left  star-rating-"+ratingIntVal+"' title='"+roundedFloatingVal+"/5.0'></div>";		
-	}
+		ratingParent.html(ratingImgHtml);
+		ratingParent.append(ratingValHtml);
+	}else{
+		if(source != undefined && source == "Zillow"){
+			ratingImgHtml = "<div class='rating-image cursor-pointer  float-left star-rating-green-"+ ratingIntVal +"' title='"+roundedFloatingVal+"/5.0' ></div>";
+		}else if(source =="encompass" || source == "DOTLOOP"){
+			ratingImgHtml = "<div class='rating-image  cursor-pointer float-left star-rating-"+ ratingIntVal +"' title='"+roundedFloatingVal+"/5.0'></div>";
+		}else {
+			ratingImgHtml = "<div class='rating-image cursor-pointer float-left  star-rating-"+ratingIntVal+"' title='"+roundedFloatingVal+"/5.0'></div>";		
+		}
+		
+		var ratingValHtml = "<div class='rating-rounded float-left' style='font-size:15px;line-height:22px;' >"+ roundedFloatingVal + "</div>";
+		if (isOverallRating) {
+			ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
+		}
+		if (isProfilePage) {
+			ratingValHtml = "<div class='rating-rounded float-left'> <span itemprop='ratingValue'>"+ roundedFloatingVal + "</span> - </div>";
+		}
+		
+		ratingParent.html('');
+		ratingParent.append(ratingImgHtml);
+		ratingParent.append(ratingValHtml);
+	}	
 	
-	var ratingValHtml = "<div class='rating-rounded float-left' style='font-size:15px;line-height:22px;' >"+ roundedFloatingVal + "</div>";
-	if (isOverallRating) {
-		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
-	}
-	if (isProfilePage) {
-		ratingValHtml = "<div class='rating-rounded float-left'> <span itemprop='ratingValue'>"+ roundedFloatingVal + "</span> - </div>";
-	}
-	
-
-	ratingParent.html('');
-	ratingParent.append(ratingImgHtml);
-	ratingParent.append(ratingValHtml);
 };
 
 function proRatingPattern(rating, ratingParent, isOverallRating, source) {
@@ -1151,7 +1163,7 @@ function attachFocusEventCity(stateId, cityId) {
   	});
 }
 
-function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityRowId, cityId, phoneNumberId) {
+function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityRowId, cityId, phoneNumberId,isForQuickEdits) {
 	
 	//check for the existing value of country code and set defualt to us if not set
 	var countryCode = "US";
@@ -1196,6 +1208,8 @@ function attachAutocompleteCountry(countryId, countryCodeId, stateId, stateCityR
 			}else{
 				hideStateCityRow(stateCityRowId, stateId);
 			}
+			
+			$('#selected-user-phone').intlTelInput("setCountry", ui.item.code);
 			
 			if(phoneNumberId) {
 				//update phone number masking

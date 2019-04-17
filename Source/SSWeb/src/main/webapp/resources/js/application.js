@@ -245,6 +245,8 @@ var jspData;
 
 var widgetDropDownHandlerSetup = false;
 
+var editIndicator = 0;
+
 /**
  * js functions for landing page
  */
@@ -377,10 +379,7 @@ $(document).on('click', function(e) {
 		$('#report-abuse-overlay').hide();
 		enableBodyScroll();
 	}
-	if ($('#overlay-main').is(':visible')) {
-		$('#overlay-main').hide();
-		enableBodyScroll();
-	}
+	
 	if ($('.overlay-payment').is(':visible')) {
 		$('.overlay-payment').hide();
 		enableBodyScroll();
@@ -527,6 +526,11 @@ $(document).on('keyup', function(e) {
 		}
 		if ($('#overlay-main').is(':visible')) {
 			$('#overlay-main').hide();
+			
+			$('#v-ed-prof-image').val('');
+			$('#rep-prof-image').val('');
+			$('#prof-image').val('');
+			
 			enableBodyScroll();
 		}
 		if ($('.overlay-payment').is(':visible')) {
@@ -7347,29 +7351,40 @@ function getUserAssignments(userId, element) {
 }
 
 $(document).on('click', '#user-edit-btn', function(e) {
-
+	
+	editIndicator = 1;
 	$('#user-edit-btn-row').hide();
-	$('form input[data-editable="true"]').removeAttr("readonly");
 	$('#btn-save-user-assignment').show();
 
+	enableQuickEdits();
 	//$("#alw-ptnr-srvy-for-usr-chk-box").removeClass('disable-click');
 	//$("#alw-ptnr-srvy-for-usr-chk-box").addClass('enable-click');
 	
 	$("#user-edit-save").off('click');
 	$("#user-edit-save").on('click', function(e) {
-		var firstName = $('#um-user-first-name').val();
-		if (validateUserDetailsUserManagement(firstName)) {
+		if (validateQuickEditsForm()) {
 			saveUserDetailsByAdmin();
+			
+			disableQuickEdits();
+			
+			editIndicator = 0;
 			// refreshing right section after assignment
 			setTimeout(function() {
 				getUserAssignments($('#selected-userid-hidden').val());
 			}, 2000);
+		}else{
+			$('#overlay-toast').html('Please Enter valid data.');
+			showToast();
 		}
 	});
 	$('#user-edit-cancel').on('click', function() {
 		setTimeout(function() {
 			getUserAssignments($('#selected-userid-hidden').val());
 		}, 1000);
+		
+		resetQuickEditsForm();
+		
+		disableQuickEdits();
 	});
 });
 
@@ -7416,19 +7431,103 @@ function validateUserDetailsUserManagement(firstName) {
 function saveUserDetailsByAdmin() {
 	var url = "./updateuserbyadmin.do";
 	var userId = $('#selected-userid-hidden').val();
-	var firstName = $('#um-user-first-name').val();
-	var lastName = $('#um-user-last-name').val();
-	var emailID = $('#selected-user-txt').val();
+	var firstName = $('#selected-user-first-name').val();
+	var lastName = $('#selected-user-last-name').val();
+	var emailID = $('#selected-user-email').val();
+	var title = $('#selected-user-title').val();
 	var name = firstName;
+	var profileUrl = $('#selected-user-profileurl').val();
+	var address1 = $('#selected-user-address1').val();
+	var address2 = $('#selected-user-address2').val();
+	var country = $('#selected-user-country').val();
+	var countryCode = $('#selected-user-country-code').val();
+	var city = $('#selected-user-city').val();
+	var state = $('#selected-user-state').val();
+	var zipcode = $('#selected-user-zip').val();
+	var contactNumber = $('#selected-user-phone').val();
+	var webUrl = $('#selected-user-website').val();
+	var disclaimer = $('#selected-user-disclaimer').val();
+	var aboutMe = $('#selected-user-aboutme').val();
+	
 	if (lastName && lastName != "") {
 		name += " " + lastName;
 	}
+	
+	var address = name;
+
+	if (address1 != undefined) {
+		address += ' ' + address1;
+	}
+	if (address2 != undefined) {
+		address += ' ' + address2;
+	}
+	if (country != undefined) {
+		address += ' ' + country;
+	}
+	if (zipcode != undefined) {
+		address += ' ' + zipcode;
+	}
+	
+	var isAutoPostEnabled = $('#selected-user-autopost-enabled').val();
+	var isSSAdmin = $('#v-ed-ss-admin').val();
+	var hidePublicPage = $('#v-ed-hide-public-page').val();
+	if(hidePublicPage == null || hidePublicPage == undefined){
+		hidePublicPage = '';
+	}
+	
+	var autoPostScore = $('#selected-user-autopost').val();
+	
+	if(!(countryCode == 'US' || countryCode == 'us')){
+		city = '';
+		state = '';
+	}
+	
+	// Getting license authorizations to submit
+	/*var licenceList = [];
+	var statusEdited = false;
+
+	$('#authorised-in-container').children().each(function() {
+		var status = $(this).children().first().attr('data-status');
+		var value = $(this).children().first().val();
+		if (value != "" && status != 'removed') {
+			var licence = value;
+			licenceList.push(licence);
+
+			statusEdited = true;
+		} else if (status == 'removed') {
+			statusEdited = true;
+		}
+	});
+	if (!statusEdited) {
+		return;
+	}
+
+	licenceList = JSON.stringify(licenceList);*/
+	
 	var payload = {
 		"userId" : userId,
 		"name" : name,
 		"firstName" : firstName,
 		"lastName" : lastName,
-		"emailId" : emailID
+		"emailId" : emailID,
+		"title": title,
+		"profileUrl": profileUrl,
+		"address": address,
+		"address1": address1,
+		"address2": address2,
+		"country": country,
+		"countryCode" : countryCode,
+		"state": state,
+		"city": city,
+		"zipcode": zipcode,
+		"contactNumber" : contactNumber,
+		"webUrl" : webUrl,
+		"disclaimer" : disclaimer,
+		"aboutMe" : aboutMe,
+		"autoPostScore" : autoPostScore,
+		"allowAutoPost" : isAutoPostEnabled,
+		"hidePublicPage" : hidePublicPage,
+		"isSSAdmin" : isSSAdmin
 	};
 
 	showOverlay();
@@ -7589,6 +7688,7 @@ function updateUserProfile(profileId, profileStatus) {
 
 function bindEditUserClick() {
 	$('.edit-user').click(function(e) {
+		var title1 = $(this).parent().data('title');
 		e.stopPropagation();
 		$('.v-um-tbl-icn-wraper').hide();
 		if ($(this).hasClass('v-tbl-icn-disabled')) {
@@ -9726,13 +9826,28 @@ $(document).on('change', '#prof-logo', function() {
 	}, 1000);
 });
 
-
 // Function to crop and upload profile image
 function callBackOnProfileImageUpload(data) {
 	
 	$('#prof-message-header').html(data);
 	
-	if( $('#new-dash-flag').val() == "true" ){
+	if($('#quick-edits-img-flag').val() == "true"){
+		
+		$('#overlay-toast').html($('#display-msg-div').text().trim());
+		showToast();
+		
+		var updatedProfImgUrlForQuickEdits = $('#quick-edits-profile-img-url').val();
+		if(updatedProfImgUrlForQuickEdits != null && updatedProfImgUrlForQuickEdits != undefined && updatedProfImgUrlForQuickEdits != ''){
+			$('#selected-user-prof-img').show();
+			$('#qe-default-prof-img').hide();
+			$('#selected-user-prof-img').attr('src',updatedProfImgUrlForQuickEdits);
+		}else{
+			$('#selected-user-prof-img').hide();
+			$('#qe-default-prof-img').show();
+		}
+				
+		$('#prof-message-header').html('');
+	}else if( $('#new-dash-flag').val() == "true" ){
 		
 		$('#overlay-toast').html($('#display-msg-div').text().trim());
 		showToast();
@@ -9809,22 +9924,22 @@ $(document).on('mouseout', '.lp-dummy-row', function() {
 
 // remove agent details
 $(document).on('click', '.lp-ach-item-img', function(e) {
-	e.stopPropagation();
-	$(this).prev().attr('data-status', 'removed');
-
 	var type = $(this).data('type');
-	$(this).parent().hide();
-
-	if (type == 'association') {
-		updateAssociations();
-	} else if (type == 'achievement') {
-		updateAchievements();
-	} else if (type == 'license') {
-		updateLicenseAuthorizations();
-	} else if (type == 'expertise') {
-		updateExpertise();
-	} else if (type == 'hobby') {
-		updateHobbies();
+	if(type != 'license' || editIndicator == 1){
+		e.stopPropagation();
+		$(this).prev().attr('data-status', 'removed');		
+		$(this).parent().hide();
+		if (type == 'association') {
+			updateAssociations();
+		} else if (type == 'achievement') {
+			updateAchievements();
+		} else if (type == 'license') {
+			updateLicenseAuthorizations();
+		} else if (type == 'expertise') {
+			updateExpertise();
+		} else if (type == 'hobby') {
+			updateHobbies();
+		}
 	}
 
 });
@@ -9975,29 +10090,31 @@ function callBackUpdateAchievements(data) {
 
 // Function to update License authorizations
 function addAuthorisedIn() {
-	if ($('#authorised-in-container > div').length <= 0) {
-		$('#authorised-in-container').empty();
+	if(editIndicator == 1){
+		if ($('#authorised-in-container > div').length <= 0) {
+			$('#authorised-in-container').empty();
+		}
+	
+		var newDiv = $('<div>').attr({
+			"class" : "lp-dummy-row clearfix"
+		});
+		$('#authorised-in-container').append(newDiv);
+	
+		var newAuthorisation = $('<input>').attr({
+			"class" : "lp-auth-row lp-row clearfix prof-edditable-sin-agent",
+			"placeholder" : "Authorized in",
+			"data-status" : "new"
+		});
+		var newAuthorizationButton = $('<div>').attr({
+			"class" : "lp-ach-item-img hide",
+			"data-type" : "license"
+		});
+	
+		$('#authorised-in-container').children().last().append(newAuthorisation);
+		$('#authorised-in-container').children().last().append(newAuthorizationButton);
+		newAuthorisation.focus();
+		newAuthorizationButton.addClass('float-right');
 	}
-
-	var newDiv = $('<div>').attr({
-		"class" : "lp-dummy-row clearfix"
-	});
-	$('#authorised-in-container').append(newDiv);
-
-	var newAuthorisation = $('<input>').attr({
-		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin-agent",
-		"placeholder" : "Authorized in",
-		"data-status" : "new"
-	});
-	var newAuthorizationButton = $('<div>').attr({
-		"class" : "lp-ach-item-img hide",
-		"data-type" : "license"
-	});
-
-	$('#authorised-in-container').children().last().append(newAuthorisation);
-	$('#authorised-in-container').children().last().append(newAuthorizationButton);
-	newAuthorisation.focus();
-	newAuthorizationButton.addClass('float-right');
 }
 
 $(document).on('blur', '#authorised-in-container input', function(e) {
@@ -22756,7 +22873,621 @@ function checkImgForProfile(ele){
 	}
 }
 
+
+// quick edits
+
+function updateEventsQuickEditsAddress() {
+	var countryCode = $('#selected-user-country-code').val();
+	if (countryCode == "US") {
+		showStateCityRow('v-ed-state-city-row', 'selected-user-state', 'selected-user-city');
+		selectedCountryRegEx = "^" + "\\b\\d{5}\\b(?:[- ]{1}\\d{4})?" + "$";
+		selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+	} else {
+		hideStateCityRow('v-ed-state-city-row', 'selected-user-state');
+	}
+
+	attachAutocompleteCountry('selected-user-country', 'selected-user-country-code', 'selected-user-state', 'v-ed-state-city-row', 'selected-user-city',undefined,true);
+}
+
+function updateEventsQuickEditsPhone(phoneNumber){
+	phoneNumber = phoneNumber.replace(/\(|\)|\-|x| /g,'');
+	
+	$('#selected-user-phone').intlTelInput({
+		utilsScript : "../resources/js/utils.js"
+	}).done(initializeWorkPhoneNumberForQuickEdits(phoneNumber));
+
+	$('.dial-country-code').css('font-size', '13px');
+	$('.dial-country-code').css('line-height', '39px')
+	$('.intl-tel-input').css('float', 'left');
+	$('.intl-tel-input.allow-dropdown').find('input').css('padding-left','80px')
+
+	var countryData = $('#selected-user-phone').intlTelInput("getSelectedCountryData");
+	$("#selected-user-phone").on("countrychange", function(e, countryData) {
+		maskPhoneNumber("selected-user-phone", countryData.iso2);
+	});
+
+	initializeWorkPhoneNumberForQuickEdits(phoneNumber);
+
+	if ($('#selected-user-phone').val() == '(') {
+		$('#selected-user-phone').val('');
+	}
+	
+	if($('#selected-user-phone').val() != ''){
+		maskPhoneNumber("selected-user-phone", countryData.iso2);
+	}
+}
+
+function initializeWorkPhoneNumberForQuickEdits(phoneNumber) {
+	var countryCode = $('#selected-user-country-code').val();
+	if (countryCode == undefined || countryCode == "") {
+		countryCode = "us";
+	}
+	$('#selected-user-phone').intlTelInput("setCountry", countryCode);
+	$('#selected-user-phone').intlTelInput("setNumber", phoneNumber);
+}
+
+$(document).on('change', '#v-ed-prof-logo', function() {
+
+	if (!logoValidate('#v-ed-prof-logo')) {
+		console.log("inside log");
+		return false;
+	}
+	showOverlay();
+	var formData = new FormData();
+	formData.append("logo", $(this).prop("files")[0]);
+	formData.append("logoFileName", $(this).prop("files")[0].name);
+	formData.append("forQuickEdits",true);
+	formData.append("userIdForQuickEdits",$('#selected-userid-hidden').val());
+	
+	delay(function() {
+		callAjaxPOSTWithTextData("./updatelogo.do", function(data) {
+			$('#prof-message-header').html(data);
+			
+			var updatedLogoUrlForQuickEdits = $('#quick-edits-logo-url').val();
+			if(updatedLogoUrlForQuickEdits != null && updatedLogoUrlForQuickEdits != undefined && updatedLogoUrlForQuickEdits != ''){
+				$('#selected-user-logo').show();
+				$('#qe-default-user-logo').hide();
+				$('#selected-user-logo').attr('src',updatedLogoUrlForQuickEdits);
+			}else{
+				$('#selected-user-logo').hide();
+				$('#qe-default-user-logo').show();
+			}
+			adjustImage();
+			
+			$('#overlay-toast').html($('#display-msg-div').text().trim());
+			showToast();
+		}, false, formData);
+	}, 1000);
+});
+
+
+function disableQuickEdits(){
+	$('form input[data-editable="true"]').prop('readonly', true);
+	$('form textarea[data-editable="true"]').prop('readonly', true);
+	$('form input[data-locked="true"]').prop('readonly', true);
+	$('form textarea[data-locked="true"]').prop('readonly', true);
+	
+	$('.v-ed-click-item').addClass('v-ed-disable-item');
+	$(document).off('click','#selected-user-prof-img-edit');
+	$(document).on('click','#selected-user-prof-img-edit',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+				
+		$(this).addClass('v-ed-disable-item');
+			
+		if(!$('#btn-save-user-assignment').is(':visible')){
+			$('#overlay-toast').html('Please click the edit button!!');
+			showToast();
+		}
+	});
+			
+	$(document).off('click','#selected-user-prof-img-del');
+	$(document).on('click','#selected-user-prof-img-del',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+			
+		$(this).addClass('v-ed-disable-item');
+			
+		if(!$('#btn-save-user-assignment').is(':visible')){
+			$('#overlay-toast').html('Please click the edit button!!');
+			showToast();
+		}
+	});
+	
+	$(document).off('click','#selected-user-logo-edit');
+	$(document).on('click','#selected-user-logo-edit',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+				
+		$(this).addClass('v-ed-disable-item');
+			
+		if($('#selected-user-logo-cont').attr('data-locked') != undefined && ($('#selected-user-logo-cont').attr('data-locked') == 'true' )){
+			$('#overlay-toast').html('Logo has been locked by your Admin. Contact Admin');
+			showToast();
+		}else if(!$('#btn-save-user-assignment').is(':visible')){
+			$('#overlay-toast').html('Please click the edit button!!');
+			showToast();
+		}
+	});
+			
+	$(document).off('click','#selected-user-logo-del');
+	$(document).on('click','#selected-user-logo-del',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+			
+		$(this).addClass('v-ed-disable-item');
+			
+		if($('#selected-user-logo-cont').attr('data-locked') != undefined && ($('#selected-user-logo-cont').attr('data-locked') == 'true' )){
+			$('#overlay-toast').html('Logo has been locked by your Admin. Contact Admin');
+			showToast();
+		}else if(!$('#btn-save-user-assignment').is(':visible')){
+			$('#overlay-toast').html('Please click the edit button!!');
+			showToast();
+		}
+	});
+	
+	$(document).off('click','#selected-user-autopost');
+	$(document).off('click','.v-ed-checkbox');
+	$('#selected-user-state').prop('disabled',true);
+	
+	initalizeUMEditSection();
+}
+
+function enableQuickEdits(){
+	$('form input[data-editable="true"]').removeAttr("readonly");
+	$('form textarea[data-editable="true"]').removeAttr("readonly");
+	$('form input[data-locked="true"]').prop('readonly', true);
+	$('form textarea[data-locked="true"]').prop('readonly', true);
+	$('.v-ed-click-item').removeClass('v-ed-disable-item');
+	$('#selected-user-state').prop('disabled',false);
+	
+	if($('#selected-user-logo-cont').attr('data-locked') != undefined && ($('#selected-user-logo-cont').attr('data-locked') == 'true' )){
+		$(document).off('click','#selected-user-logo-edit');
+		$(document).on('click','#selected-user-logo-edit',function(e){
+			e.stopPropagation();
+			e.stopImmediatePropagation();
+			e.preventDefault();
+				
+			$(this).addClass('v-ed-disable-item');
+			
+			$('#overlay-toast').html('Logo has been locked by your Admin. Contact Admin');
+			showToast();
+		});
+			
+		$(document).off('click','#selected-user-logo-del');
+		$(document).on('click','#selected-user-logo-del',function(e){
+			e.stopPropagation();
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			
+			$(this).addClass('v-ed-disable-item');
+			
+			$('#overlay-toast').html('Logo has been locked by your Admin. Contact Admin');
+			showToast();
+		});
+	}else{
+		$(document).off('click','#selected-user-logo-edit');
+		$(document).on('click','#selected-user-logo-edit',function(e){
+			e.stopPropagation();
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			
+			$('#v-ed-prof-logo').trigger('click');
+		});
+		
+		$(document).off('click','#selected-user-logo-del');
+		$(document).on('click', '#selected-user-logo-del', function(e){
+			e.stopPropagation();
+
+			var userId = $('#selected-userid-hidden').val();
+			removeProfileLogo(userId);
+			
+			$('#selected-user-logo').hide();
+			$('#qe-default-user-logo').show();
+		});
+	}
+	
+	$(document).off('click','#selected-user-prof-img-edit');
+	$(document).on('click','#selected-user-prof-img-edit' , function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		$('#v-ed-prof-image').trigger('click');
+	});
+
+	$(document).off('click','#selected-user-autopost');
+	$(document).on('click','#selected-user-autopost', function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		$('.v-ed-rat-dropdown').slideToggle('fast','swing');
+		
+		$(document).off('click','.v-ed-rat-drop-item');
+		$(document).on('click','.v-ed-rat-drop-item',function(e){
+			e.stopPropagation();
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			
+			$('#selected-user-autopost').val($(this).html());
+			$('.v-ed-rat-dropdown').slideToggle('fast','swing');
+			
+			var rating = $('#selected-user-autopost').val();
+			var ratingParent = $('#v-ed-minrat-star-cont');
+			changeRatingPattern(rating, ratingParent , false, "", false, true);
+		});
+	});
+
+	$(document).off('click','.v-ed-checkbox');
+	$(document).on('click','.v-ed-checkbox',function(e){
+		if($(this).hasClass('v-ed-checkbox-unchecked')){
+			$(this).addClass('v-ed-checkbox-checked');
+			$(this).removeClass('v-ed-checkbox-unchecked');
+			$(this).siblings('.v-ed-checkbox-inp').val(true);
+		}else{
+			$(this).removeClass('v-ed-checkbox-checked');
+			$(this).addClass('v-ed-checkbox-unchecked');
+			$(this).siblings('.v-ed-checkbox-inp').val(false);
+		}
+	});
+
+	$(document).off('click', '#selected-user-prof-img-del');
+	$(document).on('click', '#selected-user-prof-img-del', function(e){
+		e.stopPropagation();
+
+		var payload = {
+				"forQuickEdits" : true,
+				"userIdForQuickEdits" : $('#selected-userid-hidden').val()
+		};
+		
+		callAjaxPostWithPayloadData( "./removeprofileimage.do", function(data){
+				$('#overlay-toast').html($('#display-msg-div').text().trim());
+				showToast();
+				
+				$('#selected-user-prof-img').hide();
+				$('#qe-default-prof-img').show();
+				
+			}, payload, true);
+	});
+
+	$('#selected-user-profileurl').off('blur');
+	$('#selected-user-profileurl').on('blur',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+	    if(!$(this).prop('readonly')){
+	    	if($(this).val() != $(this).attr('data-value')){
+	    		validateProfileUrl();
+	    	}
+	    }
+	});
+	
+	initalizeUMEditSection();
+}
+
+function initializeQuickEditsAutoPostScore(){
+	var rating = $('#selected-user-autopost').val();
+	var ratingParent = $('#v-ed-minrat-star-cont');
+	changeRatingPattern(rating, ratingParent , false, "", false, true);
+}
+
+function validateQuickEditsForm(){
+	var isValid = true;
+	
+	if($('#selected-user-first-name').val() == ''){
+		$('#selected-user-first-name').parent().siblings('.v-ed-invalid-input').show();
+		isValid = false;
+	}else{
+		$('#selected-user-first-name').parent().siblings('.v-ed-invalid-input').hide();
+	}
+	
+	if(!validateEmailIdForQuickEdits('selected-user-email')){
+		$('#selected-user-email').parent().siblings('.v-ed-invalid-input').show();
+		isValid = false;
+	}else{
+		$('#selected-user-email').parent().siblings('.v-ed-invalid-input').hide();
+	}
+	
+	if($('#selected-user-address1').val() == ''){
+		$('#selected-user-address1').parent().siblings('.v-ed-invalid-input').show();
+		isValid = false;
+	}else{
+		$('#selected-user-address1').parent().siblings('.v-ed-invalid-input').hide();
+	}
+	
+	if(($('#selected-user-country-code').val() == 'US' || $('#selected-user-country-code').val() == 'us') ){
+		if($('#selected-user-city').val() == ''){	
+			$('#selected-user-city').parent().siblings('.v-ed-invalid-input').show();
+			isValid = false;
+		}else{
+			$('#selected-user-city').parent().siblings('.v-ed-invalid-input').hide();
+		}
+		
+		if($('#selected-user-state').val() == null || $('#selected-user-state').val() == undefined || $('#selected-user-state').val() == ''){	
+			$('#selected-user-state').parent().siblings('.v-ed-invalid-input').show();
+			isValid = false;
+		}else{
+			$('#selected-user-state').parent().siblings('.v-ed-invalid-input').hide();
+		}
+	}
+	
+	if($('#selected-user-zip').val() == ''){
+		$('#selected-user-zip').parent().siblings('.v-ed-invalid-input').show();
+		isValid = false;
+	}else{
+		$('#selected-user-zip').parent().siblings('.v-ed-invalid-input').hide();
+	}
+	
+	if(!validateCountryProfileForQuickEdits($('#selected-user-country').val())){
+		$('#selected-user-country').parent().siblings('.v-ed-invalid-input').show();
+		isValid = false;
+	}else{
+		$('#selected-user-country').parent().siblings('.v-ed-invalid-input').hide();
+	}
+	
+	if(!(validatePhoneNumber('selected-user-phone',false,true))){
+		if($('#selected-user-phone').val() == ''){
+			$('#selected-user-phone').closest('.v-ed-row').find('.v-ed-invalid-input').html('* Enter a phone number!');
+		}else{
+			$('#selected-user-phone').closest('.v-ed-row').find('.v-ed-invalid-input').html('* Enter a valid phone number!');
+		}
+		$('#selected-user-phone').closest('.v-ed-row').find('.v-ed-invalid-input').show();
+		isValid = false;
+	}else{
+		$('#selected-user-phone').closest('.v-ed-row').find('.v-ed-invalid-input').hide();
+	}
+	
+	if($('#selected-user-profileurl').val() == ''){
+		$('#selected-user-profileurl').parent().siblings('.v-ed-invalid-input').show();
+		isValid = false;
+	}else{
+		$('#selected-user-profileurl').parent().siblings('.v-ed-invalid-input').hide();
+	}
+	
+	return isValid;
+}
+
+function validateCountryProfileForQuickEdits() {
+	var country = $.trim($('#selected-user-country').val());
+	if (country == "") {
+		return false;
+	} else {
+		var countryCode = $.trim($('#selected-user-country-code').val());
+		if (countryCode == "") {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
+$('#selected-user-country').on('keypress',function(e){
+	$('#selected-user-country-code').val('');
+});
+
+$('#selected-user-country').on('blur',function(e){
+	if($(this).val() == $(this).attr('data-value')){
+		$('#selected-user-country-code').val($('#selected-user-country-code').attr('data-value'));
+	}
+});
+
+function resetQuickEditsForm(){
+	$('form input[data-editable]').each(function(){
+		$(this).val($(this).attr('data-value'));
+	});
+	
+	$('form textarea[data-editable]').each(function(){
+		$(this).val($(this).attr('data-value'));
+	});
+	
+	$('#selected-user-country-code').val($('#selected-user-country-code').attr('data-value'));
+	
+	$('#selected-user-state').attr('data-value',$('#selected-user-state').parent().attr('data-value'));
+	$('#selected-user-state').val($('#selected-user-state').attr('data-value'));
+	
+	$('#selected-user-autopost').val($('#selected-user-autopost').attr('data-value'));
+	
+	var rating = $('#selected-user-autopost').val();
+	var ratingParent = $('#v-ed-minrat-star-cont');
+	changeRatingPattern(rating, ratingParent , false, "", false, true);
+	
+	var isAutoPostEnabled = $('#selected-user-autopost-enabled').attr('data-value');
+	if(isAutoPostEnabled == 'true'){
+		if(!$('#selected-user-autopost-enabled').siblings('.v-ed-checkbox').hasClass('v-ed-checkbox-checked')){
+			$('#selected-user-autopost-enabled').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-unchecked');
+			$('#selected-user-autopost-enabled').siblings('.v-ed-checkbox').addClass('v-ed-checkbox-checked');
+		}
+	}else{
+		if(!$('#selected-user-autopost-enabled').siblings('.v-ed-checkbox').hasClass('v-ed-checkbox-unchecked')){
+			$('#selected-user-autopost-enabled').siblings('.v-ed-checkbox').addClass('v-ed-checkbox-unchecked');
+			$('#selected-user-autopost-enabled').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-checked');
+		}
+	}
+	
+	var hidePublicPage = $('#v-ed-hide-public-page').attr('data-value');
+	if(hidePublicPage == 'true'){
+		if(!$('#v-ed-hide-public-page').siblings('.v-ed-checkbox').hasClass('v-ed-checkbox-checked')){
+			$('#v-ed-hide-public-page').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-unchecked');
+			$('#v-ed-hide-public-page').siblings('.v-ed-checkbox').addClass('v-ed-checkbox-checked');
+		}
+	}else{
+		if(!$('#v-ed-hide-public-page').siblings('.v-ed-checkbox').hasClass('v-ed-checkbox-unchecked')){
+			$('#v-ed-hide-public-page').siblings('.v-ed-checkbox').addClass('v-ed-checkbox-unchecked');
+			$('#v-ed-hide-public-page').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-checked');
+		}
+	}
+	
+}
+
+function validateProfileUrl(){
+	var url='./validateprofileurl.do';
+		
+	var profileUrl = $('#selected-user-profileurl').val();
+	var payload = {
+			"profileUrl" : profileUrl
+		};
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		data : payload,
+		async : false,
+		success : editProfileUrlForQuickEdits,
+		complete: function(){
+		},
+		error : function(e) {
+				if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+}
+
+function editProfileUrlForQuickEdits(data) {
+	
+	if(data.toLowerCase() == 'true'){
+		$('#overlay-toast').html('Profile URL already exists. Please try again!!');
+		showToast();
+		$('#selected-user-profileurl').val($('#originalUrl').attr('data-value'));
+	}else{
+		callAjaxGET("/showurleditwarning.do", function(data) {
+			createEditProfileUrlPopupForQuickEdits("Warning", data);
+		}, true);
+	}
+}
+
+function createEditProfileUrlPopupForQuickEdits(header, body) {
+	$('#overlay-header').html(header);
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Continue");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-continue').off();
+	
+	$('#overlay-continue').click(function(e) {
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		overlayRevert();
+	});
+	
+	$('#overlay-cancel').off();
+	$('#overlay-cancel').click(function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		$('#selected-user-profileurl').val($('#selected-user-profileurl').attr('data-value'));
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		overlayRevert();
+		
+	});
+
+	$('#overlay-main').show();
+	disableBodyScroll();
+}
+
+function removeProfileLogo(userId){
+	var url='./removelogoimage.do';
+	
+	var payload = {
+			"userId" : userId
+		};
+	
+	callAjaxPostWithPayloadData( url, function(data){
+		$('#overlay-toast').html($('#display-msg-div').text().trim());
+		showToast();
+		
+		var updatedProfileImage = $('#quick-edits-logo-url').val();
+		$('#selected-user-logo').attr('src',updatedProfileImage);
+		
+	}, payload, true);
+
+}
+
+function initalizeUMEditSection(){
+
+	$(document).off('click','.v-ed-txt-item');
+	$(document).on('click','.v-ed-txt-item',function(e){
+		if($(this).prop('readonly')){
+			if($(this).attr('data-locked') != undefined){
+				if($(this).attr('data-locked') == 'true'){
+					var variable = $(this).closest('.v-ed-row').find('.v-ed-lbl').html();
+					$('#overlay-toast').html(variable + ' has been locked by the Admin. Contact admin!!');
+					showToast();
+				}else if(!$('#btn-save-user-assignment').is(':visible')){
+					$('#overlay-toast').html('Please click on the Edit button!!');
+					showToast();
+				}
+			}else if(!$('#btn-save-user-assignment').is(':visible')){
+				$('#overlay-toast').html('Please click on the Edit button!!');
+				showToast();
+			}
+		}
+	});
+
+	$(document).off('click','.v-ed-textarea');
+	$(document).on('click','.v-ed-textarea',function(e){
+		if($(this).prop('readonly')){
+			if($(this).attr('data-locked') != undefined){
+				if($(this).attr('data-locked') == 'true'){
+					var variable = $(this).closest('.v-ed-row').find('.v-ed-lbl').html();
+					$('#overlay-toast').html(variable + ' has been locked by the Admin. Contact admin!!');
+					showToast();
+				}else if(!$('#btn-save-user-assignment').is(':visible')){
+					$('#overlay-toast').html('Please click on the Edit button!!');
+					showToast();
+				}
+			}else if(!$('#btn-save-user-assignment').is(':visible')){
+				$('#overlay-toast').html('Please click on the Edit button!!');
+				showToast();
+			}
+		}
+	});
+	
+	$(document).off('click','.v-ed-openlink-icn');
+	$(document).on('click','.v-ed-openlink-icn',function(e){
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		var url = '';
+		if($(this).attr('id') == 'v-ed-profurl-open'){
+			url = $('#v-ed-app-base-url').html();
+			url += $('#selected-user-profileurl').val();
+		}else{
+			url = $(this).siblings('.v-ed-inp-cont').find('.v-ed-txt-item').val();
+		}
+		
+		if(url != ''){
+			if(!/^(http|https):\/\//.test(url)){
+				url = "//" + url;
+		    }
+			window.open(url,'_blank');
+		}
+	});
+}
+
+function initializeQuickEditsPage(applicationBaseUrl){
+	var domainRegex = /^(http|https):\/\//;
+	
+	applicationBaseUrl = applicationBaseUrl.replace(domainRegex,'');
+	
+	$('#v-ed-app-base-url').html(applicationBaseUrl + 'pages/');
+}
+
 $(document).on('click','#google-banner-close-btn',function(e){
 	e.stopPropagation();
 	$('#google-plus-banner').hide();
 });
+

@@ -172,11 +172,11 @@
 			<c:when test="${not empty contactNumbers && not empty contactNumbers.work }">
 				<c:choose>
 					<c:when test="${parentLock.isWorkPhoneLocked && profilemasterid != 4}">
-						<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" readonly>
+						<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work">
 						<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 					</c:when>
 					<c:when test="${parentLock.isWorkPhoneLocked && profilemasterid == 4}">
-						<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work" readonly>
+						<input id="phone-number-work" type="tel" class="reg-details float-left  prof-edditable-sin" data-phone-number="work">
 						<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
 					</c:when>
 					<c:when test="${not parentLock.isWorkPhoneLocked && profilemasterid == 4}">
@@ -254,6 +254,13 @@
 		if ($('#phone-number-work').val() == '(') {
 			$('#phone-number-work').val('');
 		}
+		
+		maskPhoneNumber("phone-number-work", countryData.iso2);
+		
+		var isWorkPhoneLocked = "${parentLock.isWorkPhoneLocked}";
+		if(isWorkPhoneLocked == 'true'){
+			$('#phone-number-work').prop('readonly',true);
+		}
 	});
 
 	function initializeWorkPhoneNumber() {
@@ -261,7 +268,10 @@
 		if (countryCode == undefined || countryCode == "") {
 			countryCode = "us";
 		}
+		
+		var contactNumber = '${contactNumbers.work}';
+		contactNumber = contactNumber.replace(/\(|\)|\-|x| /g,'')
 		$('#phone-number-work').intlTelInput("setCountry", countryCode);
-		$('#phone-number-work').intlTelInput("setNumber", '${contactNumbers.work}');
+		$('#phone-number-work').intlTelInput("setNumber",contactNumber );
 	}
 </script>

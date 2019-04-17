@@ -5,7 +5,7 @@
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 
 	<div class="hm-header-main-wrapper">
-		<div class="container">
+		<div class="container" style="padding: 0">
 			<div class="hm-header-row hm-header-row-main clearfix">
 				<div class="float-left hm-header-row-left text-center">
 					<spring:message code="label.header.usermanagement.key" />

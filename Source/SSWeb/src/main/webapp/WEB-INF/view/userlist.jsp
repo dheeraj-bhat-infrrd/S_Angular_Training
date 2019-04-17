@@ -12,6 +12,12 @@
 		<td class="v-tbl-email mng-tbl-email"><spring:message code="label.emailid.key" /></td>
 		<td class="v-tbl-email mng-tbl-soc-conn">Social Connections</td>
 		<td class="v-tbl-rgn-adm text-center mng-tbl-ticks">
+			<c:if test="${accountTypeId == 4 || accountTypeId == 3}">
+				<spring:message code="label.company.key" /><br />
+				<spring:message code="label.admin.key" />
+			</c:if>
+		</td>
+		<td class="v-tbl-rgn-adm text-center mng-tbl-ticks">
 			<c:if test="${accountTypeId == 4}">
 				<spring:message code="label.region.key" /><br />
 				<spring:message code="label.admin.key" />
@@ -34,6 +40,22 @@
 	<c:choose>
 		<c:when test="${not empty userslist}">
 			<c:forEach var="userfromsearch" items="${userslist}">
+				<c:set var="title" value="${userfromsearch.title}" />
+				<c:set var="aboutMe" value="${userfromsearch.aboutMe}" />
+				<c:set var="profileUrl" value="${userfromsearch.profileUrl}" />
+				<c:set var="address" value="${userfromsearch.address}" />
+				<c:set var="contactNumber" value="${userfromsearch.contactNumber}" />
+				<c:set var="webUrl" value="${userfromsearch.webUrl}" />
+				<c:set var="disclaimer" value="${userfromsearch.disclaimer}" />
+				
+				<!-- For Company admin -->
+				<c:if test="${accountTypeId == 4 || accountTypeId == 3}">
+					<c:set var="companyadmintickclass" value="" />
+					<c:if test="${userfromsearch.isOwner != null &&  userfromsearch.isOwner == 1}">
+						<c:set var="companyadmintickclass" value="v-icn-tick" />
+					</c:if>
+				</c:if>
+				
 				<!-- For Region admin -->
 				<c:if test="${accountTypeId == 4}">
 					<c:set var="regionadmintickclass" value="" />
@@ -63,6 +85,9 @@
 					<c:set var="regstatustickclass" value="v-icn-fmail" />
 					<c:set var="userstatustickclass" value="v-icn-notverified" />
 				</c:if>
+				<c:if test="${not empty userfromsearch && not empty userfromsearch.licenses}">
+					<c:set var="authorisedInList" value="${userfromsearch.licenses.authorized_in}" />
+				</c:if>
 
 				<!-- if admin can edit -->
 				<c:choose>
@@ -84,9 +109,11 @@
 				</c:choose>
 
 				<tr class="u-tbl-row user-row" id="user-row-${userfromsearch.userId}" data-editable="${userfromsearch.canEdit}">
+				
 					<td class="v-tbl-uname fetch-name mng-tbl-name" data-first-name="${userfromsearch.firstName}" data-last-name="${userfromsearch.lastName}"
 						data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
 					<td class="v-tbl-email fetch-email mng-tbl-email"><div class="mng-tbl-email-div" title="${userfromsearch.emailId}">${userfromsearch.emailId}</div></td>
+					
 					<td class="v-tbl-email mng-tbl-soc-conn">
 						<c:forEach var="socialMediaVO" items="${userfromsearch.socialMediaVOs}">
 							<c:set var="status" value="${socialMediaVO.status}" />
@@ -245,6 +272,7 @@
 						<div class="${fbpClass} mgn-tbl-conn-icn"></div>
 						<div class="${instaClass} mgn-tbl-conn-icn"></div> 
 					</td>
+					<td class="v-tbl-ln-of mng-tbl-ticks ${companyadmintickclass}"></td>
 					<td class="v-tbl-rgn-adm mng-tbl-ticks ${regionadmintickclass}"></td>
 					<td class="v-tbl-of-adm mng-tbl-ticks ${branchadmintickclass}"></td>
 					<td class="v-tbl-ln-of mng-tbl-ticks ${agenttickclass}"></td>
@@ -292,7 +320,7 @@
 				   </td>
 				</tr>
 				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="7">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="8">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>

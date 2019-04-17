@@ -1,15 +1,23 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -22,6 +30,7 @@ import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,6 +42,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -66,6 +77,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
+import sun.misc.BASE64Decoder;
 
 
 // JIRA SS-37 BY RM02 BOC
@@ -118,6 +130,9 @@ public class UserManagementController
     
     @Autowired
     private SSApiIntergrationBuilder sSApiIntergrationBuilder;
+    
+    @Value ( "${APPLICATION_BASE_URL}")
+    private String applicationBaseUrl;
 
     private final static int SOLR_BATCH_SIZE = 20;
 
@@ -319,11 +334,13 @@ public class UserManagementController
         HttpSession session = request.getSession( false );
         int startIndex = 0;
         int batchSize = 0;
+        
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         try {
             String startIndexStr = request.getParameter( "startIndex" );
             String batchSizeStr = request.getParameter( "batchSize" );
+            
             try {
                 if ( startIndexStr == null || startIndexStr.isEmpty() ) {
                     LOG.warn( "Invalid value found in startIndex. It cannot be null or empty." );
@@ -362,6 +379,7 @@ public class UserManagementController
             if ( admin.isCompanyAdmin() ) {
                 usersList = userManagementService.getUsersUnderCompanyAdmin( admin, startIndex,
                     batchSize );
+
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
 
                 model.addAttribute( "numFound", userManagementService.getUsersUnderCompanyAdminCount( admin ) );
@@ -377,6 +395,7 @@ public class UserManagementController
                 model.addAttribute( "numFound", userManagementService.getUsersUnderBranchAdminCount( admin ) );
             }
             usersList = userManagementService.getUserSocialMediaList( usersList );
+            usersList = this.addAgentDetailsToUserList( usersList);
             model.addAttribute( "userslist", usersList );
             model.addAttribute( "canDelete", userManagementService.canAddAndDeleteUser(entityType,admin.getCompany().getCompanyId(), false));
 
@@ -1567,8 +1586,15 @@ public class UserManagementController
     {
         LOG.info( "Method getUserAssignments() called from UserManagementController" );
         HttpSession session = request.getSession();
+        boolean isSSAdmin = false;
 
         try {
+            // Determine whether the user is logged in as SS Admin or not.
+            if ( session.getAttribute( CommonConstants.REALTECH_USER_ID ) != null ) {
+                isSSAdmin = userManagementService
+                    .isUserSocialSurveyAdmin( (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID ) );
+            }
+
             long userId = 0l;
             try {
                 userId = Long.parseLong( request.getParameter( "userId" ) );
@@ -1576,130 +1602,75 @@ public class UserManagementController
                 throw new InvalidInputException( "NumberFormatException while parsing userId.Reason: " + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
+            // Get user setting info
             User user = null;
             AgentSettings agentSettings = null;
-            try {
-                user = userManagementService.getUserByUserId( userId );
-                agentSettings = userManagementService.getUserSettings( userId );
-            } catch ( InvalidInputException e ) {
-                throw new InvalidInputException( "InvalidInputException while getting user.Reason: " + e.getMessage(),
-                    DisplayMessageConstants.GENERAL_ERROR, e );
-            }
+            user = userManagementService.getUserByUserId( userId );
+            agentSettings = userManagementService.getUserSettings( userId );
 
             //partner survey details
             model.addAttribute( "partnerSurveyAllowedForCompany",
                 organizationManagementService.isPartnerSurveyAllowedForComapny( user.getCompany().getCompanyId() ) );
             model.addAttribute( "partnerSurveyAllowedForUser", agentSettings.isAllowPartnerSurvey() );
 
-
-            //user assignments
-            UserHierarchyAssignments assignments = (UserHierarchyAssignments) session
-                .getAttribute( CommonConstants.USER_ASSIGNMENTS );
-            Map<Long, String> regions = assignments.getRegions();
-            Map<Long, String> branches = assignments.getBranches();
-
-            String branchName = "";
-            String regionName = "";
-            List<UserAssignment> userAssignments = new ArrayList<UserAssignment>();
-            for ( UserProfile userProfile : user.getUserProfiles() ) {
-                // Check if profile is complete
-                if ( userProfile.getIsProfileComplete() != CommonConstants.PROCESS_COMPLETE
-                    || userProfile.getStatus() != CommonConstants.STATUS_ACTIVE ) {
-                    continue;
-                }
-                UserAssignment assignment = new UserAssignment();
-                assignment.setUserId( user.getUserId() );
-                assignment.setProfileId( userProfile.getUserProfileId() );
-                assignment.setStatus( userProfile.getStatus() );
-
-                long regionId;
-                long branchId;
-                int profileMaster = userProfile.getProfilesMaster().getProfileId();
-                switch ( profileMaster ) {
-                    case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-                        regionId = userProfile.getRegionId();
-                        if ( regionId == 0l ) {
-                            continue;
-                        }
-
-                        // if region is not default
-                        regionName = regions.get( regionId );
-                        if ( regionName != null ) {
-                            assignment.setEntityId( regionId );
-                            assignment.setEntityName( regionName );
-                        }
-                        // if region is default
-                        else {
-                            continue;
-                        }
-                        assignment.setRole( ROLE_ADMIN );
-
-                        break;
-
-                    case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-                        branchId = userProfile.getBranchId();
-                        if ( branchId == 0l ) {
-                            continue;
-                        }
-
-                        // if branch is not default
-                        branchName = branches.get( branchId );
-                        if ( branchName != null ) {
-                            assignment.setEntityId( branchId );
-                            assignment.setEntityName( branchName );
-                        }
-                        // if branch is default
-                        else {
-                            continue;
-                        }
-                        assignment.setRole( ROLE_ADMIN );
-
-                        break;
-
-                    case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-                        branchId = userProfile.getBranchId();
-                        if ( branchId == 0l ) {
-                            continue;
-                        }
-
-                        // if branch is not default
-                        branchName = branches.get( branchId );
-                        if ( branchName != null ) {
-                            assignment.setEntityId( branchId );
-                            assignment.setEntityName( branchName );
-                        }
-                        // if branch is default
-                        else {
-                            regionId = userProfile.getRegionId();
-                            if ( regionId == 0l ) {
-                                continue;
-                            }
-
-                            // if region is not default
-                            regionName = regions.get( regionId );
-                            if ( regionName != null ) {
-                                assignment.setEntityId( regionId );
-                                assignment.setEntityName( regionName );
-                            }
-                            // if region is default
-                            else {
-                                assignment.setEntityId( user.getCompany().getCompanyId() );
-                                assignment.setEntityName( user.getCompany().getCompany() );
-                            }
-                        }
-                        assignment.setRole( ROLE_USER );
-                        break;
-                        
-                    case CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID:
-                        assignment.setEntityId( user.getCompany().getCompanyId() );
-                        assignment.setEntityName( user.getCompany().getCompany() );
-                        assignment.setRole( ROLE_SM_ADMIN );
-                        break;
-                        
-                    default:
-                }
-                userAssignments.add( assignment );
+            // Get agent contact details
+            if ( agentSettings.getContact_details() != null ) {
+                if ( !StringUtils.isEmpty( agentSettings.getContact_details().getTitle() ) )
+                    model.addAttribute( "title", agentSettings.getContact_details().getTitle() );
+                if ( !StringUtils.isEmpty( agentSettings.getContact_details().getAbout_me() ) )
+                    model.addAttribute( "aboutMe", agentSettings.getContact_details().getAbout_me() );
+                if ( agentSettings.getContact_details().getContact_numbers() != null )
+                    model.addAttribute( "contactNumber", agentSettings.getContact_details().getContact_numbers().getWork() );
+                if ( agentSettings.getContact_details().getWeb_addresses() != null )
+                    model.addAttribute( "webUrl", agentSettings.getContact_details().getWeb_addresses().getWork() );
+                model.addAttribute( "address", agentSettings.getContact_details().getAddress() );
+                model.addAttribute( "address1", agentSettings.getContact_details().getAddress1() );
+                model.addAttribute( "address2", agentSettings.getContact_details().getAddress2() );
+                model.addAttribute( "city", agentSettings.getContact_details().getCity() );
+                model.addAttribute( "state", agentSettings.getContact_details().getState() );
+                model.addAttribute( "country", agentSettings.getContact_details().getCountry() );
+                model.addAttribute( "zipcode", agentSettings.getContact_details().getZipcode() );
+                model.addAttribute( "countryCode", agentSettings.getContact_details().getCountryCode() );
             }
+            model.addAttribute( "disclaimer", agentSettings.getDisclaimer() );
+
+            // Get user profile info
+            String profileUrl = agentSettings.getProfileUrl();
+            if ( agentSettings.getProfileUrl().charAt( 0 ) == '/' ) {
+                profileUrl = agentSettings.getProfileUrl().substring( 1 );
+            }
+            model.addAttribute( "profileUrl", profileUrl );
+            model.addAttribute( "licenses", agentSettings.getLicenses() );
+            model.addAttribute( "isSSAdmin", isSSAdmin );
+            model.addAttribute( "showSurveyAboveScore", agentSettings.getSurvey_settings().getShow_survey_above_score() );
+            model.addAttribute( "autoPostScore", agentSettings.getSurvey_settings().getAuto_post_score() );
+            model.addAttribute( "allowAutoPost", agentSettings.getSurvey_settings().isAutoPostEnabled() );
+            model.addAttribute( "profilePicUrl", agentSettings.getProfileImageUrl() );
+            model.addAttribute( "profilePicUrlThumbnail", agentSettings.getProfileImageUrlThumbnail() );
+            model.addAttribute( "hidePublicPage", agentSettings.isHidePublicPage() );
+
+            // Get user assignments
+            Map<Long, String> regionsMap = new LinkedHashMap<>();
+            Map<Long, String> branchesMap = new LinkedHashMap<>();
+            Company company = user.getCompany();
+            List<Region> regions = organizationManagementService.getAllRegionsForCompanyWithProjections( company );
+            if ( regions != null && !regions.isEmpty() ) {
+                for ( Region region : regions ) {
+                    regionsMap.put( region.getRegionId(), region.getRegion() );
+                }
+            }
+
+            // Fetch branches data for company
+            List<Branch> branches = organizationManagementService.getAllBranchesForCompanyWithProjections( company );
+            if ( branches != null && !branches.isEmpty() ) {
+                for ( Branch branch : branches ) {
+                    branchesMap.put( branch.getBranchId(), branch.getBranch() );
+                }
+            }
+            
+            List<UserAssignment> userAssignments = this.getUserAssignments( regionsMap, branchesMap, user );
+            Collections.reverse( userAssignments );
+            model.addAttribute( "profiles", userAssignments );
 
             // set the request parameters in model
             model.addAttribute( "firstName", user.getFirstName() );
@@ -1707,20 +1678,50 @@ public class UserManagementController
             model.addAttribute( "emailId", user.getEmailId() );
             model.addAttribute( "userId", user.getUserId() );
             model.addAttribute( "status", user.getStatus() );
-            
-            try {
-            	boolean isSocialMonitorEnabled = reportingDashboardManagement.isSocialMonitorEnabled(user.getCompany().getCompanyId());
-            	model.addAttribute( "isSocialMonitorEnabled", isSocialMonitorEnabled );
-            }catch ( InvalidInputException e ) {
-                LOG.error( "fetching isSocialMonitorEnabled varibale value failed.", e );
-            }catch ( NoRecordsFetchedException e ) {
-                LOG.error( "No records found while checking if social monitor enabled.", e );
+            model.addAttribute( "applicationBaseUrl", applicationBaseUrl );
+
+            // Get agent lock information
+            LockSettings parentLock = null;
+            long branchId = 0;
+            long regionId = 0;
+            long companyId = 0;
+            String entityType = CommonConstants.AGENT_ID_COLUMN;
+
+            Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, userId );
+            if ( hierarchyDetails == null ) {
+                LOG.warn( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile for type : " + entityType + " and ID : " + userId );
             }
-            
-            // returning in descending order
-            Collections.reverse( userAssignments );
-            model.addAttribute( "profiles", userAssignments );
-        } catch ( NonFatalException e ) {
+            branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+            regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+            companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+            parentLock = profileManagementService.fetchHierarchyLockSettings( companyId, branchId, regionId, entityType );
+            model.addAttribute( CommonConstants.PARENT_LOCK, parentLock );
+
+            // Check if social monitor enabled
+            boolean isSocialMonitorEnabled = reportingDashboardManagement
+                .isSocialMonitorEnabled( user.getCompany().getCompanyId() );
+            model.addAttribute( "isSocialMonitorEnabled", isSocialMonitorEnabled );
+
+            // Logo information
+            AgentSettings individualProfile = this.getLogoForAgent( userId, companyId, branchId, regionId );
+            model.addAttribute( "logo", individualProfile.getLogo() );
+            model.addAttribute( "logoThumbnail", individualProfile.getLogoThumbnail() );
+
+            boolean isRealTechOrSSAdmin = false;
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid != null ) {
+                isRealTechOrSSAdmin = true;
+            }
+            model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
+        } 
+        catch ( InvalidInputException | InvalidSettingsStateException | ProfileNotFoundException
+            | NoRecordsFetchedException e ) {
+            LOG.error( " Exception while fetching agent information:"+e );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+        }        
+        catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while finding user assignments Reason : " + e.getMessage(), e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -1729,6 +1730,34 @@ public class UserManagementController
 
         LOG.info( "Method getUserAssignments() finished from UserManagementController" );
         return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
+    }
+
+    /**
+     * This enables fetching of logo image from the hierarchy
+     * after an agent's own logo has been deleted.
+     * @param userId
+     * @return
+     */
+    private String fetchLogoForAgentAfterDelete( long userId )
+    {
+        AgentSettings individualProfile = null;
+        String logoUrl = "";
+        String entityType = CommonConstants.AGENT_ID_COLUMN;
+        try {
+            Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, userId );
+            if ( hierarchyDetails == null ) {
+                LOG.warn( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile for type : " + entityType + " and ID : " + userId );
+            }
+            long branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+            long regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+            long companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+            individualProfile = this.getLogoForAgent( userId, companyId, branchId, regionId );
+            logoUrl = individualProfile.getLogo();
+        } catch ( InvalidInputException | ProfileNotFoundException e ) {
+            LOG.error( " Exception while fetching agent information:" + e );
+        }
+        return logoUrl;
     }
 
 
@@ -1741,7 +1770,10 @@ public class UserManagementController
         String firstName = request.getParameter( "firstName" );
         String lastName = request.getParameter( "lastName" );
         String emailId = request.getParameter( "emailId" );
+        String profileUrl = request.getParameter( "profileUrl" );
+        String requestProfileName = profileUrl;
 
+        // Format name values
         if ( firstName != null && firstName != "" ) {
             firstName = replaceQuoteInString( firstName );
         }
@@ -1756,6 +1788,9 @@ public class UserManagementController
             fullName += " " + lastName;
         }
 
+        if(!profileUrl.startsWith( "/" )) {
+            profileUrl = "/"+profileUrl;
+        }
 
         try {
             long userId = 0;
@@ -1774,7 +1809,20 @@ public class UserManagementController
                 }
             } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                 LOG.warn( "No users found with given emailId" );
-            }
+            }            
+
+            /*String licenseList = request.getParameter( "licenceList" );
+            List<String> authorisedIn = null;
+            if ( licenseList != null ) {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    authorisedIn = mapper.readValue( licenseList,
+                        TypeFactory.defaultInstance().constructCollectionType( List.class, String.class ) );
+                } catch ( IOException ioException ) {
+                    throw new NonFatalException( "Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR,
+                        ioException );
+                }
+            }*/
 
             // Update AgentSetting in MySQL
             User user = userManagementService.getUserByUserId( userId );
@@ -1783,6 +1831,7 @@ public class UserManagementController
             user.setEmailId( emailId );
             user.setLoginName( emailId );
             user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            // user.setProfileUrl( publicPageUrl );
 
             // update in solr
             Map<String, Object> userMap = new HashMap<>();
@@ -1800,30 +1849,113 @@ public class UserManagementController
             contactDetails.setLastName( lastName );
             contactDetails.setName( fullName );
             contactDetails.getMail_ids().setWork( emailId );
+            contactDetails.setTitle( request.getParameter( "title" ) );
+            contactDetails.setAbout_me( request.getParameter( "aboutMe" ) );
+            contactDetails.setAddress( request.getParameter( "address" ) );
+            contactDetails.setAddress1( request.getParameter( "address1" ) );
+            contactDetails.setAddress2( request.getParameter( "address2" ) );
+            contactDetails.setCity( request.getParameter( "city" ) );
+            contactDetails.setState( request.getParameter( "state" ) );
+            contactDetails.setZipcode( request.getParameter( "zipcode" ) );
+            contactDetails.setCountry( request.getParameter( "country" ) );
+            contactDetails.setCountryCode( request.getParameter( "countryCode" ) );
+            contactDetails.setUpdatedBySystem(false);
+            
+            // Update contact details
+            ContactNumberSettings contactNumberSettings = ( contactDetails.getContact_numbers() != null )
+                ? contactDetails.getContact_numbers() : new ContactNumberSettings();
+            contactNumberSettings.setWork( request.getParameter( "contactNumber" ) );
+            contactDetails.setContact_numbers( contactNumberSettings );
+            WebAddressSettings webAddress = (contactDetails.getWeb_addresses() != null)? 
+                contactDetails.getWeb_addresses() : new WebAddressSettings();
+            webAddress.setWork( request.getParameter( "webUrl" ) );
+            contactDetails.setWeb_addresses( webAddress );
+            
+            agentSettings.setDisclaimer( request.getParameter( "disclaimer" ) );
+            /*Licenses licenses = (agentSettings.getLicenses() != null)? agentSettings.getLicenses() :
+                new Licenses();
+            licenses.setAuthorized_in( authorisedIn );
+            agentSettings.setLicenses( licenses );*/
+            agentSettings.setProfileUrl( profileUrl );
+            agentSettings.setProfileName( requestProfileName );
+        
+            profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                agentSettings, agentSettings.getContact_details() );
+            
             if ( user.getStatus() == CommonConstants.STATUS_ACCOUNT_DISABLED ) {
                 String profileName = userManagementService.generateIndividualProfileName( user.getUserId(),
                     contactDetails.getName(), user.getEmailId() );
                 agentSettings.setProfileName( profileName );
 
-                String profileUrl = utils.generateAgentProfileUrl( profileName );
+                profileUrl = utils.generateAgentProfileUrl( profileName );
                 agentSettings.setProfileUrl( profileUrl );
                 userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName,
                     user.getCompany().getCompanyId(), profileName, user.getLoginName(), false );
-
-                // Update the profile pic URL
-                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-                    MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, agentSettings.getProfileUrl(), agentSettings,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
 
                 organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
                     MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, agentSettings.getProfileName(), agentSettings,
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             }
+        
+            boolean profileExists = false;
+            try {
+                User profileNameUser = profileManagementService.getUserByProfileName( requestProfileName, false );
+                if(profileNameUser != null) {
+                    profileExists = true;
+                    LOG.debug( "Profile URL already exists, can not be assigned." );
+                }
+            }
+            catch(ProfileNotFoundException e) {
+                
+            }
+            if(!profileExists) {
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                    MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, agentSettings.getProfileUrl(), agentSettings,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                    MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, agentSettings.getProfileName(), agentSettings,
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            }
+            
+            /*profileManagementService.addLicences( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+                authorisedIn );*/
+            
+            // Prepare update query
+            Map<String, Object> queryMap = new HashMap<>();
+            Map<String, Object> updateMap = new HashMap<>();
+            queryMap.put( "_id", agentSettings.getId() );
+            updateMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_DISCLAIMER, request.getParameter( "disclaimer" ));
+            
+            String isSSAdminStr = request.getParameter( "isSSAdmin" );
+            boolean isSSAdmin = false;
+            if(isSSAdminStr != null) {
+                isSSAdmin = Boolean.parseBoolean( isSSAdminStr );
+            }
+            
+            if(isSSAdmin) {
+                boolean hidePublicPage = false;
+                if(request.getParameter( "hidePublicPage" ) != null) {
+                    hidePublicPage = Boolean.parseBoolean( request.getParameter( "hidePublicPage" ) );
+                }
+                updateMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE, hidePublicPage);  
+            }
+            
+            SurveySettings surveySettings = agentSettings.getSurvey_settings();
+            boolean allowAutoPost = false;
+            surveySettings.setAuto_post_score(Float.parseFloat( request.getParameter( "autoPostScore" ) ));
+            if(request.getParameter( "allowAutoPost" ) != null) {
+                allowAutoPost = Boolean.parseBoolean( request.getParameter( "allowAutoPost" ) );
+            }   
+            surveySettings.setAutoPostEnabled(allowAutoPost);
+          
+            updateMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings);
 
-            profileManagementService.updateContactDetails( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-                agentSettings, contactDetails );
+            organizationUnitSettingsDao.updateOrganizationSettingsByQuery( queryMap, updateMap, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in updateUserByAdmin(). Nested exception is ", e );
+            return e.getMessage();
+        } catch ( Exception e ) {
+            LOG.error( "Exception caught in updateUserByAdmin(). Nested exception is ", e );
             return e.getMessage();
         }
 
@@ -2104,6 +2236,233 @@ public class UserManagementController
         LOG.info( "Method fetchUserProfileFlags() finished." );
         return responseString;
     }
+    
+
+    private List<UserFromSearch> addAgentDetailsToUserList( List<UserFromSearch> usersList ) throws InvalidInputException
+    {
+        List<Long> userIdList = new ArrayList<Long>();
+        for ( UserFromSearch user : usersList ) {
+            userIdList.add( user.getUserId() );
+        }
+        List<AgentSettings> agentSettings = organizationUnitSettingsDao.fetchMultipleAgentSettingsById( userIdList);
+        for(UserFromSearch user : usersList) {
+            for(AgentSettings agent : agentSettings) {
+                if(user.getUserId() == agent.getIden()) {                    
+                    user.setProfileImageThumbnail( agent.getProfileImageUrlThumbnail() );
+                    user.setProfileUrl( agent.getProfileUrl() );                    
+                    user.setDisclaimer(agent.getDisclaimer());
+                    if(agent.getContact_details() != null) {
+                    	user.setTitle( agent.getContact_details().getTitle() );
+                    	user.setAboutMe( agent.getContact_details().getAbout_me());
+                    	if(agent.getContact_details().getContact_numbers() != null)
+                    		user.setContactNumber(agent.getContact_details().getContact_numbers().getWork());
+                    	if(agent.getContact_details().getWeb_addresses() != null)
+                    		user.setWebUrl(agent.getContact_details().getWeb_addresses().getWork());
+                    }
+                    user.setLicenses( agent.getLicenses());
+
+                }
+            }
+        }
+        return usersList;
+
+    }
+    
+
+    /**
+     * Enables deletion of an agent's logo image.
+     * @param model
+     * @param request user ID is required as a request parameter.
+     * @return String value indicating the JSP rendered post-process.
+     */
+    @RequestMapping ( value = "/removelogoimage", method = RequestMethod.POST)
+    public String removeLogoImage( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method removeLogoImage() called from UserManagementController" );
+
+        // Validate user ID
+        String userIdStr = request.getParameter( "userId" );
+        long userId = 0;
+        String logoUrl = "";
+        try {
+            userId = Long.parseLong( userIdStr );
+        } catch ( NumberFormatException e ) {
+            LOG.error( "NumberFormatException while parsing user id. Reason : " + e.getMessage(), e );
+            throw e;
+        }
+
+        try {
+            AgentSettings agentSettings = userManagementService.getUserSettings( userId );
+            if ( agentSettings == null ) {
+                throw new InvalidInputException( "No Agent settings found for the user ID." );
+            }
+            userManagementService.removeLogoImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                agentSettings );
+            logoUrl = this.fetchLogoForAgentAfterDelete( userId );
+            model.addAttribute( "logoUrlForQuickEdits", logoUrl );
+            
+            LOG.info( "Logo Image removed successfully" );
+            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.LOGO_IMAGE_DELETE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ) );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while removing logo. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.LOGO_IMAGE_DELETE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+        }
+        return JspResolver.MESSAGE_HEADER;
+    }
+ // JIRA SS-77 BY RM07 EOC
+ // JIRA SS-37 BY RM02 EOC
+    
+
+    /**
+     * Gets the agent's logo information from the hierarchy.
+     * @param userId
+     * @param companyId
+     * @param branchId
+     * @param regionId
+     * @return
+     */
+    private AgentSettings getLogoForAgent( long userId, long companyId, long branchId, long regionId )
+    {
+
+        Map<SettingsForApplication, OrganizationUnit> map = null;
+        OrganizationUnitSettings companyProfile = null;
+        OrganizationUnitSettings regionProfile = null;
+        OrganizationUnitSettings branchProfile = null;
+        AgentSettings individualProfile = null;
+        try {
+            companyProfile = organizationManagementService.getCompanySettings( companyId );
+            regionProfile = organizationManagementService.getRegionSettings( regionId );
+            branchProfile = organizationManagementService.getBranchSettingsDefault( branchId );
+            individualProfile = userManagementService.getAgentSettingsForUserProfiles( userId );
+
+            map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, userId );
+        } catch ( InvalidInputException | InvalidSettingsStateException | ProfileNotFoundException
+            | NoRecordsFetchedException e ) {
+            LOG.error( " Exception while fetching hierarchy for user: "+userId+"\n"+e );
+        }
+        if ( map == null ) {
+            LOG.warn( "Unable to fetch primary profile for this user " );
+            throw new FatalException( "Unable to fetch primary profile this user " + userId );
+        }
+        individualProfile = (AgentSettings) profileManagementService.fillUnitSettings( individualProfile,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, companyProfile, regionProfile, branchProfile,
+            individualProfile, map, false );
+        return individualProfile;
+    }
+    
+    /**
+     * This method gets the agent's assignments.
+     * @param assignments
+     * @param user
+     * @return
+     */    
+    private List<UserAssignment> getUserAssignments(Map<Long, String> regions, Map<Long, String> branches, User user) {
+        
+        String branchName = "";
+        String regionName = "";
+        List<UserAssignment> userAssignments = new ArrayList<UserAssignment>();
+        for ( UserProfile userProfile : user.getUserProfiles() ) {
+            // Check if profile is complete
+            if ( userProfile.getIsProfileComplete() != CommonConstants.PROCESS_COMPLETE
+                || userProfile.getStatus() != CommonConstants.STATUS_ACTIVE ) {
+                continue;
+            }
+            UserAssignment assignment = new UserAssignment();
+            assignment.setUserId( user.getUserId() );
+            assignment.setProfileId( userProfile.getUserProfileId() );
+            assignment.setStatus( userProfile.getStatus() );
+
+            long regionId;
+            long branchId;
+            int profileMaster = userProfile.getProfilesMaster().getProfileId();
+            switch ( profileMaster ) {
+                case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                    regionId = userProfile.getRegionId();
+                    if ( regionId == 0l ) {
+                        continue;
+                    }
+
+                    // if region is not default
+                    regionName = regions.get( regionId );
+                    if ( regionName != null ) {
+                        assignment.setEntityId( regionId );
+                        assignment.setEntityName( regionName );
+                    }
+                    // if region is default
+                    else {
+                        continue;
+                    }
+                    assignment.setRole( ROLE_ADMIN );
+
+                    break;
+
+                case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                    branchId = userProfile.getBranchId();
+                    if ( branchId == 0l ) {
+                        continue;
+                    }
+
+                    // if branch is not default
+                    branchName = branches.get( branchId );
+                    if ( branchName != null ) {
+                        assignment.setEntityId( branchId );
+                        assignment.setEntityName( branchName );
+                    }
+                    // if branch is default
+                    else {
+                        continue;
+                    }
+                    assignment.setRole( ROLE_ADMIN );
+
+                    break;
+
+                case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+                    branchId = userProfile.getBranchId();
+                    if ( branchId == 0l ) {
+                        continue;
+                    }
+
+                    // if branch is not default
+                    branchName = branches.get( branchId );
+                    if ( branchName != null ) {
+                        assignment.setEntityId( branchId );
+                        assignment.setEntityName( branchName );
+                    }
+                    // if branch is default
+                    else {
+                        regionId = userProfile.getRegionId();
+                        if ( regionId == 0l ) {
+                            continue;
+                        }
+
+                        // if region is not default
+                        regionName = regions.get( regionId );
+                        if ( regionName != null ) {
+                            assignment.setEntityId( regionId );
+                            assignment.setEntityName( regionName );
+                        }
+                        // if region is default
+                        else {
+                            assignment.setEntityId( user.getCompany().getCompanyId() );
+                            assignment.setEntityName( user.getCompany().getCompany() );
+                        }
+                    }
+                    assignment.setRole( ROLE_USER );
+                    break;
+                    
+                case CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID:
+                    assignment.setEntityId( user.getCompany().getCompanyId() );
+                    assignment.setEntityName( user.getCompany().getCompany() );
+                    assignment.setRole( ROLE_SM_ADMIN );
+                    break;
+                    
+                default:
+            }
+            userAssignments.add( assignment );
+        }
+        return userAssignments;
+    }
 }
-// JIRA SS-77 BY RM07 EOC
-// JIRA SS-37 BY RM02 EOC
+

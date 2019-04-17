@@ -49,3 +49,15 @@
 <c:if test="${not empty forNewDashboard}">
 	<input id="new-dash-flag" class="hidden" value="${forNewDashboard}">
 </c:if>
+
+<c:if test="${not empty forQuickEdits}">
+	<input id="quick-edits-img-flag" class="hidden" value="${forQuickEdits}">
+</c:if>
+
+<c:if test="${not empty profileImageUrlThumbnailForQuickEdits}">
+	<input id="quick-edits-profile-img-url" class="hidden" value="${profileImageUrlThumbnailForQuickEdits}">
+</c:if>
+
+<c:if test="${not empty logoUrlForQuickEdits}">
+	<input id="quick-edits-logo-url" class="hidden" value="${logoUrlForQuickEdits}">
+</c:if>
