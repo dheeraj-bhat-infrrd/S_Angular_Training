@@ -6553,12 +6553,12 @@ tr.u-tbl-header td {
     text-align: right;
     font-size: 12px;
     font-weight: bold !important;
-    width: 169px;
+    width: 33%;
 }
 
 .v-ed-prof-url-inp-cont{
 	padding: 0 15px;
-    width: 52%;
+    width: 50%;
 }
 
 .v-ed-textarea {
