@@ -3444,5 +3444,115 @@ public class SocialManagementController
         long entityId = Long.parseLong( request.getParameter( "entityId" ) );
         return socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
     }
+    
+    @RequestMapping ( value = "/rest/survey/socialauth", method = RequestMethod.GET)
+    public String getSocialAuthPageForSurvey( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method getSocialAuthPageForSurvey() called from SocialManagementController" );
+        HttpSession session = request.getSession( false );
+        if ( session == null ) {
+            LOG.error( "Session is null!" );
+        }
+
+        // AuthUrl for diff social networks
+        String socialNetwork = request.getParameter( "social" );
+        String socialFlow = request.getParameter( "flow" );
+
+        session.removeAttribute( CommonConstants.SOCIAL_FLOW );
+        String serverBaseUrl = requestUtils.getRequestServerName( request );
+        switch ( socialNetwork ) {
+
+            // Building facebook authUrl
+            case "facebook":
+                Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
+                // Setting authUrl in model
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, facebook );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
+                    facebook.getOAuthAuthorizationURL( serverBaseUrl + facebookRedirectUri ) );
+                break;
+
+            // Building twitter authUrl
+            case "twitter":
+                RequestToken requestToken;
+                try {
+                    requestToken = socialManagementService.getTwitterRequestToken( serverBaseUrl );
+                } catch ( Exception e ) {
+                    LOG.error( "Exception while getting request token. Reason : " + e.getMessage(), e );
+                    model.addAttribute( "message", e.getMessage() );
+                    return JspResolver.ERROR_PAGE;
+                }
+
+                // We will keep the request token in session
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, requestToken );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, requestToken.getAuthorizationURL() );
+
+                LOG.info( "Returning the twitter authorizationurl : " + requestToken.getAuthorizationURL() );
+                break;
+                
+             // Building linkedin authUrl
+            case "linkedin":
+                if ( socialFlow != null && !socialFlow.isEmpty() ) {
+                    session.setAttribute( CommonConstants.SOCIAL_FLOW, socialFlow );
+                }
+                //String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
+                
+                String linkedInAuthV2 = socialManagementService.getLinkedinAuthUrl( linkedinAuthUriV2, linkedInApiKeyV2, serverBaseUrl + linkedinRedirectUri, linkedinScopeV2 );
+                
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuthV2 );
+
+                LOG.info( "Returning the linkedin authorizationurl : {}", linkedInAuthV2 );
+                break;
+
+            // Building Google authUrl
+            case "google":
+                StringBuilder googleAuth = new StringBuilder( "https://accounts.google.com/o/oauth2/auth" );
+                googleAuth.append( "?scope=" ).append( googleApiScope );
+                googleAuth.append( "&state=" ).append( "security_token" );
+                googleAuth.append( "&response_type=" ).append( "code" );
+                googleAuth.append( "&redirect_uri=" ).append( serverBaseUrl + googleApiRedirectUri );
+                googleAuth.append( "&client_id=" ).append( googleApiKey );
+                googleAuth.append( "&access_type=" ).append( "offline" );
+                googleAuth.append( "&approval_prompt=" ).append( "force" );
+
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, googleAuth.toString() );
+
+                if(LOG.isInfoEnabled())
+                    LOG.info( "Returning the google authorizationurl : {}", googleAuth.toString() );
+                break;
+
+            case "zillow":
+                break;
+            // TODO Building Yelp authUrl
+            case "yelp":
+                break;
+
+            // TODO Building RSS authUrl
+            case "rss":
+                break;
+
+            case "instagram" :
+                Facebook fb = socialManagementService.getFacebookInstance( serverBaseUrl, instagramRedirectUri );
+
+                // Setting authUrl in model
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, fb );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
+                        fb.getOAuthAuthorizationURL( serverBaseUrl + instagramRedirectUri ) );
+                break;
+
+            default:
+                LOG.error( "Social Network Type invalid in getSocialAuthPage" );
+        }
+
+        model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
+        if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") )
+            return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+        else if ( socialNetwork.equalsIgnoreCase( "zillow" ) ) {
+            session.setAttribute( "zillowNonLenderURI", CommonConstants.ZILLOW_PROFILE_URL);
+            session.setAttribute( "zillowLenderURI", CommonConstants.ZILLOW_LENDER_PROFILE_URL);
+            return JspResolver.SOCIAL_ZILLOW_INTERMEDIATE;
+        }
+        else
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+    }
 
 }
