@@ -23486,8 +23486,14 @@ function initializeQuickEditsPage(applicationBaseUrl){
 	$('#v-ed-app-base-url').html(applicationBaseUrl + 'pages/');
 }
 
+
 $(document).on('click','#google-banner-close-btn',function(e){
 	e.stopPropagation();
 	$('#google-plus-banner').hide();
 });
+
+function showProfileImageForSurvey(profileImage){
+	$('#survey-profile-image-url').val(profileImage);
+	
+}
 

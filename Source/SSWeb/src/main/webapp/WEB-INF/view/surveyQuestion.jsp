@@ -4,6 +4,15 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 
+<c:choose>
+	<c:when test="${isAutoLogin == 'true' && allowOverrideForSocialMedia == 'false' }">
+		<c:set var="socialDisabled" value="social-auth-disabled"></c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="isAutoLogin" value="false"></c:set>
+	</c:otherwise>
+</c:choose>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -289,6 +298,7 @@
 				
 				<!-- For text area -->
 				<div data-ques-type="smiley-text-final" class="sq-quest-item hide">
+					<input type="hidden" id="survey-profile-image-url" value="">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
 					<hr class="hr-survey">
@@ -326,6 +336,11 @@
 							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
 -							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
 							<div class="float-left bd-check-txt survey-authorize-font-size"><spring:message code="label.survey.authorize.key"/></div>
+							<div class="reg_form_row clearfix">
+					       <div class="reg_btn" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
+					       <div class="reg_btn" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
+					       <div class="reg_btn" id="import-Twitter" onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
+				          </div>
 						</div>
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>
