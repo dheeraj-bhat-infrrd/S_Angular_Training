@@ -5,7 +5,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:set var="accountType" value="${user.company.licenseDetails[0].accountsMaster.accountName}" />
-<c:set var="editIndicator" value="0"/>
 <c:set var="parentLock" value="${parentLock}"/>
 <div id="prof-message-header" class="hide"></div>
 
