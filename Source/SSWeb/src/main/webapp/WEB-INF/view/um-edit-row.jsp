@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:set var="accountType" value="${user.company.licenseDetails[0].accountsMaster.accountName}" />
 <c:set var="editIndicator" value="0"/>
@@ -163,16 +165,19 @@
 				</c:choose>
 				<div class="v-ed-lock-icn ${websiteLockStatus}"></div>
 			</div>
+			
+			<c:set value="${fn:escapeXml(aboutMe)}" var="aboutMeTxt"></c:set>
+			<c:set value="${fn:escapeXml(disclaimer)}" var="disclaimerTxt"></c:set>
 			<div class="v-ed-row">
 				<div class="v-ed-lbl col-lg-2 col-md-2 col-sm-2 col-xs-2 v-ed-txtarea-lbl"><spring:message code='label.um.aboutme.key'/></div>
 				<div class="v-ed-inp-cont col-lg-10 col-md-10 col-sm-10 col-xs-12">
-	            	<textarea class="v-ed-textarea" rows="5" placeholder="<spring:message code='label.um.aboutme.key'/>" id="selected-user-aboutme" name="selectedUserAboutMe" data-editable="true" data-value="${aboutMe}">${aboutMe}</textarea>
+	            	<textarea class="v-ed-textarea" rows="5" placeholder="<spring:message code='label.um.aboutme.key'/>" id="selected-user-aboutme" name="selectedUserAboutMe" data-editable="true" data-value="${aboutMeTxt}">${aboutMeTxt}</textarea>
 				</div>
 			</div>
 			<div class="v-ed-row">
 				<div class="v-ed-lbl col-lg-2 col-md-2 col-sm-2 col-xs-2 v-ed-txtarea-lbl"><spring:message code='label.um.disclaimer.key'/></div>
 				<div class="v-ed-inp-cont col-lg-10 col-md-10 col-sm-10 col-xs-12">
-	            	<textarea class="v-ed-textarea" rows="5" placeholder="<spring:message code='label.um.disclaimer.key'/>" id="selected-user-disclaimer" name="selectedUserDisclaimer" data-editable="true" data-value="${disclaimer}">${disclaimer}</textarea>
+	            	<textarea class="v-ed-textarea" rows="5" placeholder="<spring:message code='label.um.disclaimer.key'/>" id="selected-user-disclaimer" name="selectedUserDisclaimer" data-editable="true" data-value="${disclaimerTxt}">${disclaimerTxt}</textarea>
 				</div>
 			</div>
 		</div>
