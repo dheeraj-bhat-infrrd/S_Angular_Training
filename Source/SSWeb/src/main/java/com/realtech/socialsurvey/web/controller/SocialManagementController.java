@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -163,7 +164,7 @@ public class SocialManagementController
     private String applicationBaseUrl;
 
     // Facebook
-    @Value ( "${FB_REDIRECT_URI}")
+	@Value("${FB_REDIRECT_URI}")
     private String facebookRedirectUri;
 
     @Value ( "${FB_CLIENT_ID}")
@@ -174,6 +175,9 @@ public class SocialManagementController
 
     @Value ( "${FB_URI}")
     private String facebookUri;
+    
+    @Value("${FB_REDIRECT_URI IMAGE}")
+    private String facebookRedirectImageUri;
 
     // Instagram
     @Value ( "${IG_REDIRECT_URI}" )
@@ -3443,6 +3447,184 @@ public class SocialManagementController
         String surveyMongoId = request.getParameter( "surveyMongoId" );
         long entityId = Long.parseLong( request.getParameter( "entityId" ) );
         return socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
+    }
+    
+    @RequestMapping ( value = "/rest/survey/socialauth", method = RequestMethod.GET)
+    public String getSocialAuthPageForSurvey( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method getSocialAuthPageForSurvey() called from SocialManagementController" );
+        HttpSession session = request.getSession( false );
+        if ( session == null ) {
+            LOG.error( "Session is null!" );
+        }
+
+        // AuthUrl for diff social networks
+        String socialNetwork = request.getParameter( "social" );
+        String socialFlow = request.getParameter( "flow" );
+
+        session.removeAttribute( CommonConstants.SOCIAL_FLOW );
+        String serverBaseUrl = requestUtils.getRequestServerName( request );
+        switch ( socialNetwork ) {
+
+            // Building facebook authUrl
+            case "facebook":
+                Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
+                // Setting authUrl in model
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, facebook );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
+                    facebook.getOAuthAuthorizationURL( serverBaseUrl + facebookRedirectUri ) );
+                break;
+
+            // Building twitter authUrl
+            case "twitter":
+                RequestToken requestToken;
+                try {
+                    requestToken = socialManagementService.getTwitterRequestToken( serverBaseUrl );
+                } catch ( Exception e ) {
+                    LOG.error( "Exception while getting request token. Reason : " + e.getMessage(), e );
+                    model.addAttribute( "message", e.getMessage() );
+                    return JspResolver.ERROR_PAGE;
+                }
+
+                // We will keep the request token in session
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, requestToken );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, requestToken.getAuthorizationURL() );
+
+                LOG.info( "Returning the twitter authorizationurl : " + requestToken.getAuthorizationURL() );
+                break;
+                
+             // Building linkedin authUrl
+            case "linkedin":
+                if ( socialFlow != null && !socialFlow.isEmpty() ) {
+                    session.setAttribute( CommonConstants.SOCIAL_FLOW, socialFlow );
+                }
+                //String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
+                
+                String linkedInAuthV2 = socialManagementService.getLinkedinAuthUrl( linkedinAuthUriV2, linkedInApiKeyV2, serverBaseUrl + linkedinRedirectUri, linkedinScopeV2 );
+                
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuthV2 );
+
+                LOG.info( "Returning the linkedin authorizationurl : {}", linkedInAuthV2 );
+                break;
+
+            // Building Google authUrl
+            case "google":
+                StringBuilder googleAuth = new StringBuilder( "https://accounts.google.com/o/oauth2/auth" );
+                googleAuth.append( "?scope=" ).append( googleApiScope );
+                googleAuth.append( "&state=" ).append( "security_token" );
+                googleAuth.append( "&response_type=" ).append( "code" );
+                googleAuth.append( "&redirect_uri=" ).append( serverBaseUrl + googleApiRedirectUri );
+                googleAuth.append( "&client_id=" ).append( googleApiKey );
+                googleAuth.append( "&access_type=" ).append( "offline" );
+                googleAuth.append( "&approval_prompt=" ).append( "force" );
+
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, googleAuth.toString() );
+
+                if(LOG.isInfoEnabled())
+                    LOG.info( "Returning the google authorizationurl : {}", googleAuth.toString() );
+                break;
+
+            case "zillow":
+                break;
+            // TODO Building Yelp authUrl
+            case "yelp":
+                break;
+
+            // TODO Building RSS authUrl
+            case "rss":
+                break;
+
+            case "instagram" :
+                Facebook fb = socialManagementService.getFacebookInstance( serverBaseUrl, instagramRedirectUri );
+
+                // Setting authUrl in model
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, fb );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
+                        fb.getOAuthAuthorizationURL( serverBaseUrl + instagramRedirectUri ) );
+                break;
+
+            default:
+                LOG.error( "Social Network Type invalid in getSocialAuthPage" );
+        }
+
+        model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
+        if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") )
+            return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+        else if ( socialNetwork.equalsIgnoreCase( "zillow" ) ) {
+            session.setAttribute( "zillowNonLenderURI", CommonConstants.ZILLOW_PROFILE_URL);
+            session.setAttribute( "zillowLenderURI", CommonConstants.ZILLOW_LENDER_PROFILE_URL);
+            return JspResolver.SOCIAL_ZILLOW_INTERMEDIATE;
+        }
+        else
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+    }
+    
+    @RequestMapping ( value = "/facebookauthimage", method = RequestMethod.GET)
+    public String authenticateFacebookAccessForImage( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Facebook authentication url requested" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        boolean isNewUser = true;
+
+        try {
+            // On auth error
+            String errorCode = request.getParameter( "error" );
+            if ( errorCode != null ) {
+                LOG.error( "Error code : {}", errorCode );
+                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
+                return JspResolver.SOCIAL_AUTH_MESSAGE;
+            }
+
+            // Getting Oauth accesstoken for facebook
+            String oauthCode = request.getParameter( "code" );
+            Facebook facebook = (Facebook) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            String profileLink = null;
+            URL profileImageUrl = null;
+            facebook4j.auth.AccessToken accessToken = null;
+            SocialMediaTokens mediaTokens = null;
+            List<FacebookPage> facebookPages = new ArrayList<>();
+            try {
+                accessToken = facebook.getOAuthAccessToken( oauthCode,
+                    requestUtils.getRequestServerName( request ) + facebookRedirectImageUri );
+                facebook4j.User fbUser = facebook.getUser( facebook.getId() );
+                if ( user != null ) {
+                    profileLink = facebookUri + facebook.getId();
+                    profileImageUrl = facebook.getPictureURL(facebook.getId());
+                   String saveProfilePic = socialManagementService.saveProfilePicForReviewer(profileImageUrl);
+                    //call dao from service to set the image and save it in surveydetails table.
+					/*
+					 * FacebookPage personalUserAccount = new FacebookPage();
+					 * personalUserAccount.setProfileImageUrl( profileImageUrl ); facebookPages.add(
+					 * personalUserAccount );
+					 */
+                }
+            } catch ( FacebookException e ) {
+                LOG.error( "Error while creating access token for facebook: ", e );
+            }
+            
+            String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
+            model.addAttribute( "pageNames", facebookPages );
+            
+            model.addAttribute( "fbAccessToken", fbAccessTokenStr );
+            String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
+            model.addAttribute( "mediaTokens", mediaTokensStr );
+
+        } catch ( Exception e ) {
+            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            LOG.error( "Exception while getting facebook access token. Reason : ", e );
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+        }
+
+        // Updating attributes
+        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        model.addAttribute( "isNewUser", isNewUser );
+        model.addAttribute( "socialNetwork", "facebook" );
+        model.addAttribute(CommonConstants.CALLBACK, "./data/storeFeedBack.do");
+        LOG.info( "Facebook Access tokens obtained  successfully!" );
+        return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
 
 }
