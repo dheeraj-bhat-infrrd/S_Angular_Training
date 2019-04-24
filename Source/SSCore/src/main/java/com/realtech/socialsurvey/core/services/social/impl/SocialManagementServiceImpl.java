@@ -250,6 +250,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     private String twitterConsumerSecret;
     @Value ( "${TWITTER_REDIRECT_URI}")
     private String twitterRedirectUri;
+    
+    @Value ( "${TWITTER_REDIRECT_URI_IMAGE}")
+    private String twitterRedirectImageUri;
+    
 
     // Linkedin
     @Value ( "${LINKED_IN_REST_API_URI}")
@@ -329,6 +333,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     {
         Twitter twitter = getTwitterInstance();
         RequestToken requestToken = twitter.getOAuthRequestToken( serverBaseUrl + twitterRedirectUri );
+        return requestToken;
+    }
+    
+    @Override
+    public RequestToken getTwitterRequestTokenForReviewer( String serverBaseUrl ) throws TwitterException
+    {
+        Twitter twitter = getTwitterInstance();
+        RequestToken requestToken = twitter.getOAuthRequestToken( serverBaseUrl + twitterRedirectImageUri );
         return requestToken;
     }
 
@@ -4379,10 +4391,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         return surveyPreInitiationListVO;
     } 
     
-    @Override
-    public String saveProfilePicForReviewer(URL profileImageUrl) {
-    	
-    	//surveyDetailsDao.
-    	return;
-    }
+	/*
+	 * @Override public String saveProfilePicForReviewer(URL profileImageUrl) {
+	 * 
+	 * //surveyDetailsDao. return; }
+	 */
 }

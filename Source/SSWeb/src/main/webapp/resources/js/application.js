@@ -245,8 +245,6 @@ var jspData;
 
 var widgetDropDownHandlerSetup = false;
 
-var editIndicator = 0;
-
 /**
  * js functions for landing page
  */
@@ -7352,7 +7350,6 @@ function getUserAssignments(userId, element) {
 
 $(document).on('click', '#user-edit-btn', function(e) {
 	
-	editIndicator = 1;
 	$('#user-edit-btn-row').hide();
 	$('#btn-save-user-assignment').show();
 
@@ -7367,7 +7364,6 @@ $(document).on('click', '#user-edit-btn', function(e) {
 			
 			disableQuickEdits();
 			
-			editIndicator = 0;
 			// refreshing right section after assignment
 			setTimeout(function() {
 				getUserAssignments($('#selected-userid-hidden').val());
@@ -9924,24 +9920,23 @@ $(document).on('mouseout', '.lp-dummy-row', function() {
 
 // remove agent details
 $(document).on('click', '.lp-ach-item-img', function(e) {
-	var type = $(this).data('type');
-	if(type != 'license' || editIndicator == 1){
-		e.stopPropagation();
-		$(this).prev().attr('data-status', 'removed');		
-		$(this).parent().hide();
-		if (type == 'association') {
-			updateAssociations();
-		} else if (type == 'achievement') {
-			updateAchievements();
-		} else if (type == 'license') {
-			updateLicenseAuthorizations();
-		} else if (type == 'expertise') {
-			updateExpertise();
-		} else if (type == 'hobby') {
-			updateHobbies();
-		}
-	}
+	e.stopPropagation();
+	$(this).prev().attr('data-status', 'removed');
 
+	var type = $(this).data('type');
+	$(this).parent().hide();
+
+	if (type == 'association') {
+		updateAssociations();
+	} else if (type == 'achievement') {
+		updateAchievements();
+	} else if (type == 'license') {
+		updateLicenseAuthorizations();
+	} else if (type == 'expertise') {
+		updateExpertise();
+	} else if (type == 'hobby') {
+		updateHobbies();
+	}
 });
 
 // Function to update association/membership list
@@ -10090,8 +10085,7 @@ function callBackUpdateAchievements(data) {
 
 // Function to update License authorizations
 function addAuthorisedIn() {
-	if(editIndicator == 1){
-		if ($('#authorised-in-container > div').length <= 0) {
+	if ($('#authorised-in-container > div').length <= 0) {
 			$('#authorised-in-container').empty();
 		}
 	
@@ -10114,7 +10108,6 @@ function addAuthorisedIn() {
 		$('#authorised-in-container').children().last().append(newAuthorizationButton);
 		newAuthorisation.focus();
 		newAuthorizationButton.addClass('float-right');
-	}
 }
 
 $(document).on('blur', '#authorised-in-container input', function(e) {
@@ -23486,8 +23479,14 @@ function initializeQuickEditsPage(applicationBaseUrl){
 	$('#v-ed-app-base-url').html(applicationBaseUrl + 'pages/');
 }
 
+
 $(document).on('click','#google-banner-close-btn',function(e){
 	e.stopPropagation();
 	$('#google-plus-banner').hide();
 });
+
+function showProfileImageForSurvey(profileImage){
+	$('#survey-profile-image-url').val(profileImage);
+	
+}
 
