@@ -4403,5 +4403,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             surveyPreInitiationListVO.setTotalRecord( count );
         }
         return surveyPreInitiationListVO;
-    }   
+    } 
+    
+    @Override
+    public String saveProfilePicForReviewer(URL profileImageUrl) {
+    	
+    	//surveyDetailsDao.
+    	return;
+    }
 }

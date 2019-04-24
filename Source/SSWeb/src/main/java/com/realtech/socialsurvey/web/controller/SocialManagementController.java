@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -163,7 +164,7 @@ public class SocialManagementController
     private String applicationBaseUrl;
 
     // Facebook
-    @Value ( "${FB_REDIRECT_URI}")
+	@Value("${FB_REDIRECT_URI}")
     private String facebookRedirectUri;
 
     @Value ( "${FB_CLIENT_ID}")
@@ -174,6 +175,9 @@ public class SocialManagementController
 
     @Value ( "${FB_URI}")
     private String facebookUri;
+    
+    @Value("${FB_REDIRECT_URI IMAGE}")
+    private String facebookRedirectImageUri;
 
     // Instagram
     @Value ( "${IG_REDIRECT_URI}" )
@@ -3551,6 +3555,74 @@ public class SocialManagementController
         }
         else
             return JspResolver.SOCIAL_AUTH_MESSAGE;
+    }
+    
+    @RequestMapping ( value = "/facebookauthimage", method = RequestMethod.GET)
+    public String authenticateFacebookAccessForImage( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Facebook authentication url requested" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        boolean isNewUser = true;
+
+        try {
+            // On auth error
+            String errorCode = request.getParameter( "error" );
+            if ( errorCode != null ) {
+                LOG.error( "Error code : {}", errorCode );
+                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
+                return JspResolver.SOCIAL_AUTH_MESSAGE;
+            }
+
+            // Getting Oauth accesstoken for facebook
+            String oauthCode = request.getParameter( "code" );
+            Facebook facebook = (Facebook) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            String profileLink = null;
+            URL profileImageUrl = null;
+            facebook4j.auth.AccessToken accessToken = null;
+            SocialMediaTokens mediaTokens = null;
+            List<FacebookPage> facebookPages = new ArrayList<>();
+            try {
+                accessToken = facebook.getOAuthAccessToken( oauthCode,
+                    requestUtils.getRequestServerName( request ) + facebookRedirectImageUri );
+                facebook4j.User fbUser = facebook.getUser( facebook.getId() );
+                if ( user != null ) {
+                    profileLink = facebookUri + facebook.getId();
+                    profileImageUrl = facebook.getPictureURL(facebook.getId());
+                   String saveProfilePic = socialManagementService.saveProfilePicForReviewer(profileImageUrl);
+                    //call dao from service to set the image and save it in surveydetails table.
+					/*
+					 * FacebookPage personalUserAccount = new FacebookPage();
+					 * personalUserAccount.setProfileImageUrl( profileImageUrl ); facebookPages.add(
+					 * personalUserAccount );
+					 */
+                }
+            } catch ( FacebookException e ) {
+                LOG.error( "Error while creating access token for facebook: ", e );
+            }
+            
+            String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
+            model.addAttribute( "pageNames", facebookPages );
+            
+            model.addAttribute( "fbAccessToken", fbAccessTokenStr );
+            String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
+            model.addAttribute( "mediaTokens", mediaTokensStr );
+
+        } catch ( Exception e ) {
+            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            LOG.error( "Exception while getting facebook access token. Reason : ", e );
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+        }
+
+        // Updating attributes
+        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        model.addAttribute( "isNewUser", isNewUser );
+        model.addAttribute( "socialNetwork", "facebook" );
+        model.addAttribute(CommonConstants.CALLBACK, "./data/storeFeedBack.do");
+        LOG.info( "Facebook Access tokens obtained  successfully!" );
+        return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
 
 }
