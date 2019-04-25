@@ -8911,6 +8911,9 @@ $('.sq-np-item-next').click(function() {
 			
 			storeCustomerAnswer(ratingVal);
 		} 
+	
+		qno++;
+		paintSurveyPageFromJson();
 		
 		$(".sq-star").removeClass('sq-full-star');
 		$(".sq-smile").removeClass('sq-full-smile');
@@ -8927,8 +8930,8 @@ $('.sq-np-item-next').click(function() {
 		    }	
 		});
 
-	qno++;
-	paintSurveyPageFromJson();
+	//qno++;
+	//paintSurveyPageFromJson();
 
 	if (questionDetails.questionType == "sb-range-star") {
 		var starVal = parseInt(questionDetails.customerResponse);
@@ -9084,6 +9087,7 @@ $('.sq-np-item-prev').click(function() {
 		} else{
 			if(!isNaN(ratingVal)){
 				$('.sq-radio').each(function() {
+					$(this).removeClass('radio-outer-gray');
 				    $(this).children().hide();
 				    $(this).parent().find('.popover').hide();
 				    $(this).css("cursor","pointer");
