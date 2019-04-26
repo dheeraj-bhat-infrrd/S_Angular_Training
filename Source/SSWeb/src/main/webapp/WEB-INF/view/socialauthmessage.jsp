@@ -91,7 +91,9 @@
 		window.close();
 	}, 3000);
 });
-
+ 
+ var isFbImagePopup = "${isFbImagePopup}";
+ if(isFbImagePopup == '' || isFbImagePopup == null || isFbImagePopup == undefined){
 $(window).on('unload', function(){
 
 	var parentWindow = null;
@@ -206,5 +208,6 @@ $(window).on('unload', function(){
 		}
 	}
 });
+ }
 </script>
 

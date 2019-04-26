@@ -3449,7 +3449,7 @@ public class SocialManagementController
         return socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
     }
     
-    @RequestMapping ( value = "/rest/survey/socialauth", method = RequestMethod.GET)
+    @RequestMapping ( value = "/socialAuthImage", method = RequestMethod.GET)
     public String getSocialAuthPageForSurvey( Model model, HttpServletRequest request )
     {
         LOG.info( "Method getSocialAuthPageForSurvey() called from SocialManagementController" );
@@ -3468,11 +3468,16 @@ public class SocialManagementController
 
             // Building facebook authUrl
             case "facebook":
+            	try {
+            	LOG.info("inside facebook");
                 Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectImageUri );
                 // Setting authUrl in model
                 session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, facebook );
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
                     facebook.getOAuthAuthorizationURL( serverBaseUrl + facebookRedirectImageUri ) );
+            	} catch(Exception e) {
+            		LOG.error("Error redirecting from facebook " + e + e.getMessage());
+            	}
                 break;
 
             // Building twitter authUrl
@@ -3512,6 +3517,7 @@ public class SocialManagementController
         }
 
         model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
+        LOG.info("returning to facebook intermediate from socialAuth");
         if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") )
             return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
         else
@@ -3522,13 +3528,21 @@ public class SocialManagementController
     public String authenticateFacebookAccessForImage( Model model, HttpServletRequest request )
     {
         LOG.info( "Facebook authentication url requested" );
-        User user = sessionHelper.getCurrentUser();
+        //User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        boolean isNewUser = true;
+        if ( session.getAttribute( "columnName" ) != null ) {
+            String columnName = (String) session.getAttribute( "columnName" );
+            String columnValue = (String) session.getAttribute( "columnValue" );
+            session.removeAttribute( "columnName" );
+            session.removeAttribute( "columnValue" );
+            model.addAttribute( "columnName", columnName );
+            model.addAttribute( "columnValue", columnValue );
+            model.addAttribute( "fromDashboard", 1 );
+        }
         URL profileImageUrl = null;
-
         try {
+        	model.addAttribute( "isFbImagePopup", "true" );
             // On auth error
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
@@ -3542,34 +3556,30 @@ public class SocialManagementController
             Facebook facebook = (Facebook) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
             String profileLink = null;
             facebook4j.auth.AccessToken accessToken = null;
-            SocialMediaTokens mediaTokens = null;
             List<FacebookPage> facebookPages = new ArrayList<>();
             try {
                 accessToken = facebook.getOAuthAccessToken( oauthCode,
                     requestUtils.getRequestServerName( request ) + facebookRedirectImageUri );
                 facebook4j.User fbUser = facebook.getUser( facebook.getId() );
-                if ( user != null ) {
-                    profileLink = facebookUri + facebook.getId();
-                    profileImageUrl = facebook.getPictureURL(facebook.getId());
-                  //String saveProfilePic = socialManagementService.saveProfilePicForReviewer(profileImageUrl);
-                    //call dao from service to set the image and save it in surveydetails table.
-					/*
-					 * FacebookPage personalUserAccount = new FacebookPage();
-					 * personalUserAccount.setProfileImageUrl( profileImageUrl ); facebookPages.add(
-					 * personalUserAccount );
-					 */
-                }
+                profileLink = facebookUri + facebook.getId();
+                profileImageUrl = facebook.getPictureURL(facebook.getId());
+                LOG.info("ProfilePic url " + profileImageUrl);
+                FacebookPage personalUserAccount = new FacebookPage();
+                personalUserAccount.setId( facebook.getId() );
+                personalUserAccount.setAccessToken( accessToken.getToken() );
+                personalUserAccount.setName( fbUser.getName() );
+                personalUserAccount.setProfileUrl( profileLink );
+                facebookPages.add( personalUserAccount );
             } catch ( FacebookException e ) {
                 LOG.error( "Error while creating access token for facebook: ", e );
             }
+            // Storing token
+            facebookPages.addAll( socialManagementService.getFacebookPages( accessToken, profileLink ) );
             
             String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
             model.addAttribute( "pageNames", facebookPages );
             
             model.addAttribute( "fbAccessToken", fbAccessTokenStr );
-            String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
-            model.addAttribute( "mediaTokens", mediaTokensStr );
-
         } catch ( Exception e ) {
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
             LOG.error( "Exception while getting facebook access token. Reason : ", e );
@@ -3579,11 +3589,9 @@ public class SocialManagementController
         // Updating attributes
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
-        model.addAttribute( "isNewUser", isNewUser );
         model.addAttribute("profileImage", profileImageUrl);
         model.addAttribute( "socialNetwork", "facebook" );
-        model.addAttribute(CommonConstants.CALLBACK, "./data/storeFeedBack.do");
-        LOG.info( "Facebook Access tokens obtained  successfully!" );
+        LOG.info( "Facebook Access tokens obtained successfully!" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
     
