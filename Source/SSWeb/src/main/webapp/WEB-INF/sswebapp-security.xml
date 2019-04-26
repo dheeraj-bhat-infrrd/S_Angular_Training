@@ -68,7 +68,13 @@
 		
 		<!--  generate api key -->
 		<intercept-url pattern="/generateApiKey.do" access="permitAll" />
-
+		<!-- Facebook auth -->
+		<intercept-url pattern="/socialAuthImage.do" access="permitAll" />
+		<intercept-url pattern="*/facebookauthimage.do" access="permitAll" />
+		<intercept-url pattern="/facebookauthimage.do" access="permitAll" />
+		<intercept-url pattern="/facebookintermediate.do" access="permitAll" />
+		<intercept-url pattern="*/facebookintermediate.do" access="permitAll" />
+		
 		<!-- Registration urls -->
 		<intercept-url pattern="registeraccount/*.do" access="permitAll" />
 		<intercept-url pattern="/newlogin.do" access="permitAll" />

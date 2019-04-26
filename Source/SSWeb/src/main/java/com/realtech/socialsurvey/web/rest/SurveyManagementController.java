@@ -274,6 +274,8 @@ public class SurveyManagementController
 			String isAbusiveStr = request.getParameter("isAbusive");
 			String serverBaseUrl = requestUtils.getRequestServerName(request);
 			String onlyPostToSocialSurveyStr = request.getParameter("onlyPostToSocialSurvey");
+			String profImageUrl = request.getParameter("profImageUrl");
+			
 			boolean onlyPostToSocialSurvey = Boolean.parseBoolean(onlyPostToSocialSurveyStr);
 			
 	        LOG.info("Inside method storeFeedbackAndCloseSurvey with mood {}, surveyid {}", mood,surveyId);
@@ -304,7 +306,7 @@ public class SurveyManagementController
 
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			//update gateway question response and score 
-	        Response response = ssApiIntergrationBuilder.getIntegrationApi().updateScore(surveyId, mood, feedback, isAbusive, agreedToShare);
+	        Response response = ssApiIntergrationBuilder.getIntegrationApi().updateScore(surveyId, mood, feedback, isAbusive, agreedToShare, profImageUrl);
 	        /*  surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);*/
 	        //get score from the api response
 	        String surveyScoreString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
