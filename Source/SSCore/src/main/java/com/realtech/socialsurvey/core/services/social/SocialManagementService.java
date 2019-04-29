@@ -378,5 +378,13 @@ public interface SocialManagementService
 
 	public RequestToken getTwitterRequestTokenForReviewer(String serverBaseUrl)throws TwitterException;
 
+
+	/**
+	 * @param serverBaseUrl
+	 * @return
+	 * @throws TwitterException
+	 */
+	public RequestToken getTwitterRequestTokenForAuthImage(String serverBaseUrl) throws TwitterException;
+
 }
 // JIRA SS-34 BY RM02 BOC
