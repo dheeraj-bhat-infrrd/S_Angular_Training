@@ -3484,7 +3484,7 @@ public class SocialManagementController
             case "twitter":
                 RequestToken requestToken;
                 try {
-                    requestToken = socialManagementService.getTwitterRequestTokenForReviewer( serverBaseUrl );
+                    requestToken = socialManagementService.getTwitterRequestTokenForAuthImage( serverBaseUrl );
                 } catch ( Exception e ) {
                     LOG.error( "Exception while getting request token. Reason : " + e.getMessage(), e );
                     model.addAttribute( "message", e.getMessage() );
@@ -3676,11 +3676,7 @@ public class SocialManagementController
     public String authenticateTwitterImageAccess( Model model, HttpServletRequest request )
     {
         LOG.info( "Twitter authentication url requested" );
-        User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
-        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        
-        SocialMediaTokens mediaTokens = null;
         try {
 
             // On auth error
@@ -3698,12 +3694,17 @@ public class SocialManagementController
             Twitter twitter = socialManagementService.getTwitterInstance();
             String oauthVerifier = request.getParameter( "oauth_verifier" );
             RequestToken requestToken = (RequestToken) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            model.addAttribute( "isFbImagePopup", "true" );
             try {
                 accessToken = twitter.getOAuthAccessToken( requestToken, oauthVerifier );
                 twitter4j.User twitterUser = twitter.showUser( twitter.getId() );
                 if ( twitterUser != null && twitterUser.getScreenName() != null ) {
                     profileLink = CommonConstants.TWITTER_BASE_URL + twitterUser.getScreenName();
-                    profileImage = twitterUser.getOriginalProfileImageURL(); 
+                    profileImage = twitterUser.getOriginalProfileImageURL();
+                    model.addAttribute("profileImage", profileImage);
+                    LOG.info("Twitter profile image is " + profileImage);
+                } else {
+                	LOG.error("User doesn't exist");
                 }
             } catch ( TwitterException te ) {
                 if ( TwitterException.UNAUTHORIZED == te.getStatusCode() ) {
