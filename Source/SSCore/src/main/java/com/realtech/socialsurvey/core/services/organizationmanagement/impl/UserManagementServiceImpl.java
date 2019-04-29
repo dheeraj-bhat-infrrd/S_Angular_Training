@@ -49,6 +49,8 @@ import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -259,6 +261,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     
     @Autowired
     private EmailUnsubscribeService unsubscribeService;
+    
+    @Autowired
+    private RegionDao regionDaoImpl;
     
     @Autowired
     private GenericDao<DeleteDataTracker, Long> deleteDataTrackerDao;
@@ -1997,6 +2002,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         queries.put( CommonConstants.COMPANY_COLUMN, user.getCompany() );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
         LOG.debug( "Method getAllUserProfilesForUser() finised successfully" );
+        return userProfiles;
+    }
+    
+    /*
+     * Method to fetch all the user profiles for the user
+     */
+    @Override
+    @Transactional
+    public List<UserProfile> getAllUserProfilesForRegionOrBranch( long id, String columnName ) throws InvalidInputException
+    {
+        if ( id <= 0 ) {
+            throw new InvalidInputException( "Invalid {} passed in getAllUserProfilesForRegion method", columnName );
+        }
+        LOG.debug( "Method getAllUserProfilesForRegionOrBranch() called to fetch the list of user profiles for the {}", columnName );
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        queries.put( columnName, id );
+        List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+        LOG.debug( "Method getAllUserProfilesForRegionOrBranch() finished successfully" );
         return userProfiles;
     }
 
@@ -4954,7 +4978,115 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         return userIds;
     }
+    
+    @Override
+    public List<Long> getBranchIdsUnderCompany( long companyId ) throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( "Invalid company id passed in getBranchIdsUnderCompany method" );
+        }
 
+        LOG.info( "Method getBranchIdsUnderCompany started for companyId " + companyId );
+
+        List<Long> branchIds = branchDao.getAllBranchIdsOfCompany( companyId );
+
+        return branchIds;
+    }
+    
+    @Override
+    public List<Long> getRegionIdsUnderCompany( long companyId ) throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( "Invalid company id passed in getRegionIdsUnderCompany method" );
+        }
+
+        LOG.info( "Method getRegionIdsUnderCompany started for companyId " + companyId );
+
+        List<Long> regionIds = regionDaoImpl.getRegionIdsUnderCompany( companyId );
+
+        return regionIds;
+    }
+    
+    @Override
+    public List<Long> getBranchIdsUnderRegion( long regionId ) throws InvalidInputException
+    {
+        if ( regionId <= 0 ) {
+            throw new InvalidInputException( "Invalid region id passed in getBranchIdsUnderRegion method" );
+        }
+
+        LOG.info( "Method getBranchIdsUnderRegion started for regionId " + regionId );
+
+        List<Long> branchIds = branchDao.getAllBranchIdsOfRegion( regionId );
+
+        return branchIds;
+    }
+    
+    @Override
+    public Set<Long> getUserIdsUnderRegion( long regionId ) throws InvalidInputException
+    {
+        if ( regionId <= 0 ) {
+            throw new InvalidInputException( "Invalid region id passed in getUserIdsUnderRegion method" );
+        }
+
+        Set<Long> userIds = new HashSet<Long>();
+        List<UserProfile> adminUserProfiles = getAllUserProfilesForRegionOrBranch( regionId, CommonConstants.REGION_ID );
+
+        ProfilesMaster agentProfileMaster = profilesMasterDao.findById( ProfilesMaster.class,
+            CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
+
+        for ( UserProfile userProfile : adminUserProfiles ) {
+            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                Map<String, Object> queries = new HashMap<>();
+                queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
+                queries.put( CommonConstants.BRANCH_ID_COLUMN, userProfile.getBranchId() );
+                List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+
+                for ( UserProfile agentProfile : userProfiles ) {
+                    userIds.add( agentProfile.getAgentId() );
+                }
+            } else if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                Map<String, Object> queries = new HashMap<>();
+                queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
+                queries.put( CommonConstants.REGION_ID_COLUMN, userProfile.getRegionId() );
+                List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+
+                for ( UserProfile agentProfile : userProfiles ) {
+                    userIds.add( agentProfile.getAgentId() );
+                }
+            }
+        }
+
+        return userIds;
+    }
+    
+    @Override
+    public Set<Long> getUserIdsUnderBranch( long branchId ) throws InvalidInputException
+    {
+        if ( branchId <= 0 ) {
+            throw new InvalidInputException( "Invalid branch id passed in getUserIdsUnderBranch method" );
+        }
+
+        Set<Long> userIds = new HashSet<Long>();
+        List<UserProfile> adminUserProfiles = getAllUserProfilesForRegionOrBranch( branchId, CommonConstants.BRANCH_ID );
+
+        ProfilesMaster agentProfileMaster = profilesMasterDao.findById( ProfilesMaster.class,
+            CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID );
+
+        for ( UserProfile userProfile : adminUserProfiles ) {
+            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                Map<String, Object> queries = new HashMap<>();
+                queries.put( CommonConstants.PROFILE_MASTER_COLUMN, agentProfileMaster );
+                queries.put( CommonConstants.BRANCH_ID_COLUMN, userProfile.getBranchId() );
+                List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+
+                for ( UserProfile agentProfile : userProfiles ) {
+                    userIds.add( agentProfile.getAgentId() );
+                }
+            }
+        }
+
+        return userIds;
+    }
 
     @Override
     @Transactional ( rollbackFor = Exception.class)

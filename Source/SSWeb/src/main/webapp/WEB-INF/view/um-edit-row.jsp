@@ -76,6 +76,7 @@
 					</c:otherwise>
 				</c:choose>
 				<input type="hidden" id="qe-profile-exists" value="${qeProfileUrlExists}">
+
 				<input type="hidden" id="originalUrl" data-value="${profileUrl}" value="${profileUrl}"/>
 				<div class="v-ed-lbl col-lg-2 col-md-2 col-sm-2 col-xs-2"><spring:message code='label.um.profileurl.key'/></div>
 				<div id="v-ed-app-base-url" class="v-ed-prof-url-txt">${applicationBaseUrl}pages/</div>

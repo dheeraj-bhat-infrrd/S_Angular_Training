@@ -311,6 +311,66 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
         LOG.info( "Method to get all branch ids under company id : " + companyId + ",getBranchIdsUnderCompany() ended." );
         return criteria.list();
     }
+	
+	/**
+     * Method to get all branch Ids of a company
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getAllBranchIdsOfCompany( long companyId ) throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( "Invalid company id passed in getAllBranchIdsOfCompany method" );
+        }
+        LOG.info( "Method to get all branch ids under company id : " + companyId + ",getAllBranchIdsOfCompany() started." );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( Branch.class );
+            criteria.setProjection( Projections.property( CommonConstants.BRANCH_ID_COLUMN ).as(
+                CommonConstants.BRANCH_ID_COLUMN ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getAllBranchIdsOfCompany(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getAllBranchIdsOfCompany().", e );
+        }
+        LOG.info( "Method to get all branch ids under company id : " + companyId + ",getAllBranchIdsOfCompany() ended." );
+        return criteria.list();
+    }
+    
+    /**
+     * Method to get all branch Ids of a company
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getAllBranchIdsOfRegion( long regionId ) throws InvalidInputException
+    {
+        if ( regionId <= 0 ) {
+            throw new InvalidInputException( "Invalid region id passed in getAllBranchIdsOfRegion method" );
+        }
+        LOG.info( "Method to get all branch ids under region id : " + regionId + ",getAllBranchIdsOfRegion() started." );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( Branch.class );
+            criteria.setProjection( Projections.property( CommonConstants.BRANCH_ID_COLUMN ).as(
+                CommonConstants.BRANCH_ID_COLUMN ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, regionDao.findById( Region.class, regionId ) ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getAllBranchIdsOfRegion(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getAllBranchIdsOfRegion().", e );
+        }
+        LOG.info( "Method to get all branch ids under region id : " + regionId + ",getAllBranchIdsOfRegion() ended." );
+        return criteria.list();
+    }
 
 
     @SuppressWarnings ( "unchecked")

@@ -18,7 +18,9 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -29,6 +31,7 @@ import org.mockito.Spy;
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -109,6 +112,9 @@ public class OrganizationManagementServiceImplTest
     
     @Mock
     private SurveyDetailsDao surveyDetailsDao;
+    
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
     
     @Mock
     private List<String> keyList = null;
@@ -308,7 +314,52 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.updateSurveySettings( null, new SurveySettings() );
     }
-
+    
+    @Test
+    public void testUpdateSecondaryWorkflow() throws InvalidInputException
+    {
+        assertTrue( organizationManagementServiceImpl.updateSecondaryWorkflow( "", new OrganizationUnitSettings(), new SurveySettings() ) );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSecondaryWorkflowExcpectException() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateSecondaryWorkflow( "", null, new SurveySettings() );
+    }
+    
+    @Test
+    public void testUpdateSecondaryWorkflowExcpectExceptionMessage() throws InvalidInputException
+    {
+        thrown.expect(InvalidInputException.class);
+        thrown.expectMessage("Settings cannot be null.");
+        organizationManagementServiceImpl.updateSecondaryWorkflow( "", null, new SurveySettings() );
+    }
+    
+    @Test
+    public void testUpdateEntitySettings() {
+        
+        String entityType = CommonConstants.COMPANY_ID_COLUMN;
+        long entityId = 0l;
+        String flagToBeUpdated = MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW;
+        String status = "false";
+        OrganizationUnitSettings unitSettings = new OrganizationUnitSettings();
+        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( entityId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ).thenReturn( unitSettings );
+        
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, Boolean.FALSE, entityId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        
+        assertTrue( organizationManagementServiceImpl.updateEntitySettings( entityType, entityId, flagToBeUpdated, status ) );
+    }
+    
+    @Test
+    public void testUpdateEntitySettingsInvalidInputType() {
+        
+        String entityType = null;
+        long entityId = 0l;
+        String flagToBeUpdated = MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW;
+        String status = "false";
+        
+        assertFalse( organizationManagementServiceImpl.updateEntitySettings( entityType, entityId, flagToBeUpdated, status ) );
+    }
 
     @Test ( expected = InvalidInputException.class)
     public void testUpdateScoreForSurveyWithNullUnitSettings() throws InvalidInputException

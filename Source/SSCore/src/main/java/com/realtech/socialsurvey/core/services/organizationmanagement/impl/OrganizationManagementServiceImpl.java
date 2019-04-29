@@ -55,6 +55,27 @@ import org.springframework.util.CollectionUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.FilterKeywordsComparator;
+import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
+import com.realtech.socialsurvey.core.commons.TrustedSourceComparator;
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.MongoApplicationSettingsDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RedisDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.RemovedUserDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
+import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import static com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl.*;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -332,6 +353,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     @Autowired
     private SearchEngineManagementServices searchEngineManagementServices;
+    
+    @Autowired
+    private MongoApplicationSettingsDao mongoApplicationSettingsDao;
     
     @Autowired
     private DashboardService dashboardServiceImpl;
@@ -1509,6 +1533,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Updating comapnySettings: " + companySettings + " with surveySettings: " + surveySettings );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             KEY_SURVEY_SETTINGS, surveySettings, companySettings, COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Updated the record successfully" );
+
+        return true;
+    }
+    
+    @Override
+    public boolean updateSecondaryWorkflow( String entityType, OrganizationUnitSettings unitSettings, SurveySettings surveySettings )
+        throws InvalidInputException
+    {
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Settings cannot be null." );
+        }
+
+        LOG.debug( "Updating " + entityType + " with surveySettings: " + surveySettings );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, unitSettings,
+            entityType );
         LOG.debug( "Updated the record successfully" );
 
         return true;
@@ -5924,6 +5965,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
        
         return surveySettings;
     }
+    
+    @Override
+    public SurveySettings retrieveDefaultSecondaryWorkflowValues() {
+        
+        SurveySettings surveySettings = new SurveySettings();
+        ApplicationSettings applicationSettings = mongoApplicationSettingsDao.getApplicationSettings();
+        surveySettings.setHappyTextPartner( applicationSettings.getDefaultHappyTextPartner() );
+        surveySettings.setNeutralTextPartner( applicationSettings.getDefaultNeutralTextPartner() );
+        surveySettings.setSadTextPartner( applicationSettings.getDefaultSadTextPartner() );
+        surveySettings.setHappyTextCompletePartner( applicationSettings.getDefaultHappyTextCompletePartner() );
+        surveySettings.setNeutralTextCompletePartner( applicationSettings.getDefaultNeutralTextCompletePartner() );
+        surveySettings.setSadTextCompletePartner( applicationSettings.getDefaultSadTextCompletePartner() );
+        return surveySettings;
+    }
 
 
     @Override
@@ -5947,7 +6002,34 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else if ( mood.equalsIgnoreCase( "sadComplete" ) ) {
             surveySettings.setSadTextComplete( sadTextComplete );
             return sadTextComplete;
-        }  else {
+        } else if(mood.contains( "Partner" )) {
+            
+            SurveySettings defaultSurveySettingsForPartner = this.retrieveDefaultSecondaryWorkflowValues();
+            
+            if ( mood.equalsIgnoreCase( "happyPartner" ) ) {
+                surveySettings.setHappyTextPartner( defaultSurveySettingsForPartner.getHappyTextPartner() );
+                return defaultSurveySettingsForPartner.getHappyTextPartner();
+            } else if ( mood.equalsIgnoreCase( "neutralPartner" ) ) {
+                surveySettings.setNeutralTextPartner( defaultSurveySettingsForPartner.getNeutralTextPartner() );
+                return defaultSurveySettingsForPartner.getNeutralTextPartner();
+            } else if ( mood.equalsIgnoreCase( "sadPartner" ) ) {
+                surveySettings.setSadTextPartner( defaultSurveySettingsForPartner.getSadTextPartner() );
+                return defaultSurveySettingsForPartner.getSadTextPartner();
+            } else if ( mood.equalsIgnoreCase( "happyCompletePartner" ) ) {
+                surveySettings.setHappyTextCompletePartner( defaultSurveySettingsForPartner.getHappyTextCompletePartner() );
+                return defaultSurveySettingsForPartner.getHappyTextCompletePartner();
+            } else if ( mood.equalsIgnoreCase( "neutralCompletePartner" ) ) {
+                surveySettings.setNeutralTextCompletePartner( defaultSurveySettingsForPartner.getNeutralTextCompletePartner() );
+                return defaultSurveySettingsForPartner.getNeutralTextCompletePartner();
+            } else if ( mood.equalsIgnoreCase( "sadCompletePartner" ) ) {
+                surveySettings.setSadTextCompletePartner( defaultSurveySettingsForPartner.getSadTextCompletePartner() );
+                return defaultSurveySettingsForPartner.getSadTextCompletePartner();
+            }
+            else {                
+                return "";
+            }
+        }
+        else {
             return "";
         }
     }
@@ -9014,7 +9096,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.info( "Updated the AllowPartnerSurvey for users successfully" );
     }
+    
+    @Override
+    public void updateKeyForAllUsersOfCollection( List<Long> userIds, String field, boolean value, String collectionType)
+        throws InvalidInputException
+    {
+        if ( userIds == null || userIds.isEmpty() ) {
+            return;
+        }
 
+        LOG.info( "Updating {} for users with value {} ", field, value );
+        List<Object> userIdList = new ArrayList<Object>();
+        userIdList.addAll( userIds );
+
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(field, value,
+            MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, userIdList,
+            collectionType );
+
+        LOG.info( "Updated {} for users with value {} ", field, value );
+    }
 
     @Override
     public void updatellowPartnerSurveyForUser( AgentSettings agentSettings, boolean allowPartnerSurvey )
@@ -10421,12 +10521,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     "No settings found for entityType " + entityType + "and entityId " + entityId );
             }
             
-            if ( flagToBeUpdated.equals( KEY_HIDE_PUBLIC_PAGE )
-                || flagToBeUpdated.equals( KEY_HIDDEN_SECTION )
-                || flagToBeUpdated.equals( KEY_SEND_EMAIL_FROM_COMPANY )
-                || flagToBeUpdated.equals( KEY_HIDE_FROM_BREAD_CRUMB )
-                || flagToBeUpdated.equals( KEY_INCLUDE_FOR_TRANSACTION_MONITOR )
-                || flagToBeUpdated.equals( KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA ) ) {
+            if ( flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDDEN_SECTION )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_SEND_EMAIL_FROM_COMPANY )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_FROM_BREAD_CRUMB )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW )) {
+            	
                 boolean flag = Boolean.parseBoolean( status );
                 organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, flag,
                     unitSettings.getIden(), collection );
@@ -11197,6 +11299,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(KEY_ALLOW_PARTNER_SURVEY,
             allowPartnerSurvey, unitSettings, COMPANY_SETTINGS_COLLECTION);
+    }
+    
+    @Override
+    public void updateAllowPartnerSurveyForCollection( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey, String collectionType ) {
+        
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
+            allowPartnerSurvey, unitSettings, collectionType);
     }
     
     /**

@@ -60,6 +60,7 @@ import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
@@ -766,7 +767,7 @@ public class OrganizationManagementController
         if ( entityType == null || entityType.isEmpty() ) {
             entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         }
-
+        
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
         OrganizationUnitSettings unitSettings = null;
@@ -787,7 +788,13 @@ public class OrganizationManagementController
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
             }
-
+                            
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
+            model.addAttribute( "partnerSurveyAllowedAtCompany", companySettings.isAllowPartnerSurvey() );
+            model.addAttribute( "allowPartnerSurvey", companySettings.isAllowPartnerSurvey() );
+                
+            Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
             SurveySettings surveySettings = null;
             AgentSettings agentSettings = null;
             // In case of individual account, the survey settings should be taken from agent collection
@@ -814,6 +821,12 @@ public class OrganizationManagementController
                     organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings );
                 }
             }
+            
+            if(companySettings.isAllowPartnerSurvey())
+                unitSettings.setSurvey_settings( this.updatePartnerSurveySettings( unitSettings ));
+
+            unitSettings.setSurvey_settings( this.copyCompanySettingsForPartnerSurvey( 
+                unitSettings, entityType, hierarchyDetails ));
 
             model.addAttribute( "columnName", entityType );
             model.addAttribute( "columnValue", entityId );
@@ -836,18 +849,12 @@ public class OrganizationManagementController
             }
             model.addAttribute( "userNotifyRecipients", userNotifyRecipients );
 
-            //set allow parter survey
-            boolean allowPartnerSurvey = false;
-            if(unitSettings != null)
-                allowPartnerSurvey = unitSettings.isAllowPartnerSurvey();
-
-            model.addAttribute( "allowPartnerSurvey", allowPartnerSurvey );
             model.addAttribute( "includeForTransactionMonitor", unitSettings.getIncludeForTransactionMonitor() );
 
 
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-            model.addAttribute( "reviewSortCriteria", profileManagementService.processSortCriteria( companySettings.getIden(),
-                companySettings.getReviewSortCriteria() ) );
+            OrganizationUnitSettings userCompanySettings = organizationManagementService.getCompanySettings( user );
+            model.addAttribute( "reviewSortCriteria", profileManagementService.processSortCriteria( userCompanySettings.getIden(),
+                userCompanySettings.getReviewSortCriteria() ) );
             
             model.addAttribute( "hidePublicPage", unitSettings.isHidePublicPage() );
             model.addAttribute( "hiddenSection", unitSettings.isHiddenSection() );
@@ -879,6 +886,12 @@ public class OrganizationManagementController
             //enocode before sending to UI
             encodeSurveySettings( defaultSurveySettings );
             model.addAttribute( "defaultSurveyProperties", defaultSurveySettings );
+            
+            //get default setting for secondary workflow and store in model
+            SurveySettings defaultSurveySettingsForPartner = organizationManagementService.retrieveDefaultSecondaryWorkflowValues();
+            //enocode before sending to UI
+            encodeSurveySettings( defaultSurveySettingsForPartner );
+            model.addAttribute( "defaultSurveyPropertiesForPartner", defaultSurveySettingsForPartner ); 
 
             if ( companySettings.getSendEmailThrough() == null ) {
                 model.addAttribute( "sendEmailThrough", CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME );
@@ -886,7 +899,7 @@ public class OrganizationManagementController
                 model.addAttribute( "sendEmailThrough", companySettings.getSendEmailThrough() );
 
             }
-
+            model.addAttribute( "allowToConfigSecondaryWorkflow", unitSettings.getAllowConfigureSecondaryWorkflow() );
             
          // adding the survey completion mail threshold
             if ( unitSettings.getSurvey_settings() != null ) {
@@ -923,7 +936,7 @@ public class OrganizationManagementController
             model.addAttribute( "allowRegionAdminToAddUser", unitSettings.getRegionAdminAllowedToAddUser() );
             model.addAttribute( "allowRegionAdminToDeleteUser", unitSettings.getRegionAdminAllowedToDeleteUser() );
             
-        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+        } catch ( InvalidInputException | NoRecordsFetchedException| ProfileNotFoundException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason : ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
@@ -2583,10 +2596,50 @@ public class OrganizationManagementController
 
             //decode text
             text = new String( DatatypeConverter.parseBase64Binary( text ) );
-            LOG.info("Testing!!!!"+text+" "+mood);
+            
+            OrganizationUnitSettings unitSettings = null;
+            String collection = null;
+            
+            HttpSession session = request.getSession();
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                
+                unitSettings = organizationManagementService.getCompanySettings( user );
+                collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            }
+            else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            }
+            else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            }
+            else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+              
+                unitSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+                collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            } else {
+                throw new InvalidInputException( "Invalid input entityType : " + entityType,
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+            
+            if(unitSettings == null) {
+                LOG.error( "No user found for userId : " + user.getUserId() );
+                throw new InvalidInputException( "No user found for userId : " + user.getUserId() );
+            }
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
 
-            SurveySettings surveySettings = companySettings.getSurvey_settings();
+            SurveySettings surveySettings = unitSettings.getSurvey_settings();
+            if( mood.equalsIgnoreCase( "happyUrl" ) || mood.equalsIgnoreCase( "okUrl" ) || mood.equalsIgnoreCase( "sadUrl" ) ) {
+            	
+            	surveySettings = companySettings.getSurvey_settings();
+            }
             if ( mood.equalsIgnoreCase( "happy" ) )
                 surveySettings.setHappyText( text );
             else if ( mood.equalsIgnoreCase( "neutral" ) )
@@ -2599,22 +2652,55 @@ public class OrganizationManagementController
                 surveySettings.setNeutralTextComplete( text );
             else if ( mood.equalsIgnoreCase( "sadComplete" ) )
                 surveySettings.setSadTextComplete( text );
+            else if ( mood.equalsIgnoreCase( "happyPartner" ) )
+                surveySettings.setHappyTextPartner( text );
+            else if ( mood.equalsIgnoreCase( "neutralPartner" ) )
+                surveySettings.setNeutralTextPartner( text );
+            else if ( mood.equalsIgnoreCase( "sadPartner" ) )
+                surveySettings.setSadTextPartner( text );
+            else if ( mood.equalsIgnoreCase( "happyCompletePartner" ) )
+                surveySettings.setHappyTextCompletePartner( text );
+            else if ( mood.equalsIgnoreCase( "neutralCompletePartner" ) )
+                surveySettings.setNeutralTextCompletePartner( text );
+            else if ( mood.equalsIgnoreCase( "sadCompletePartner" ) )
+                surveySettings.setSadTextCompletePartner( text );
             else if ( mood.equalsIgnoreCase( "happyUrl" ) )
                 surveySettings.setHappyUrl( text );
             else if ( mood.equalsIgnoreCase( "okUrl" ) )
                 surveySettings.setOkUrl( text );
             else if ( mood.equalsIgnoreCase( "sadUrl" ) )
-                surveySettings.setSadUrl( text );            
-
-            organizationManagementService.updateSurveySettings( companySettings, surveySettings );
-            status = CommonConstants.SUCCESS_ATTRIBUTE;
+                surveySettings.setSadUrl( text );
 
             // Updating settings in session
-            HttpSession session = request.getSession();
             UserSettings userSettings = (UserSettings) session
                 .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-            if ( userSettings != null )
-                userSettings.setCompanySettings( companySettings );
+            
+            //Update Secondary workflow
+            organizationManagementService.updateSecondaryWorkflow(collection, unitSettings, surveySettings);
+            
+            if(collection.equals(CommonConstants.COMPANY_SETTINGS_COLLECTION)) {
+                
+                userSettings.setCompanySettings( unitSettings );
+            }
+            else if(collection.equals(CommonConstants.BRANCH_SETTINGS_COLLECTION)) {
+                
+                if( userSettings.getBranchSettings() == null ) {
+                    userSettings.setBranchSettings( new HashMap<Long, OrganizationUnitSettings>() );
+                }
+                userSettings.getBranchSettings().put( entityId, unitSettings );
+            }
+            else if(collection.equals(CommonConstants.REGION_SETTINGS_COLLECTION)) {
+                
+                if( userSettings.getRegionSettings() == null ) {
+                    userSettings.setRegionSettings( new HashMap<Long, OrganizationUnitSettings>() );
+                }
+                userSettings.getRegionSettings().put( entityId, unitSettings );
+            }
+            else if(collection.equals(CommonConstants.AGENT_SETTINGS_COLLECTION)) {
+                
+                userSettings.setAgentSettings( (AgentSettings) unitSettings );
+            }
+            status = CommonConstants.SUCCESS_ATTRIBUTE;
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in storeTextForFlow(). Nested exception is ", e );
         }
@@ -2647,20 +2733,81 @@ public class OrganizationManagementController
                 throw new InvalidInputException( "Null or empty value found in resetTextForFlow() for mood." );
             }
 
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
-
-            SurveySettings surveySettings = companySettings.getSurvey_settings();
-            message = organizationManagementService.resetDefaultSurveyText( companySettings.getSurvey_settings(), mood );
-            organizationManagementService.updateSurveySettings( companySettings, surveySettings );
-
-            message = makeJsonMessage( CommonConstants.STATUS_ACTIVE, message );
-
-            // Updating settings in session
+            OrganizationUnitSettings unitSettings = null;
+            String collection = null;
+            
             HttpSession session = request.getSession();
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            long entityId = (Long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                
+                unitSettings = organizationManagementService.getCompanySettings( user );
+                collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            	
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            	
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+              
+                unitSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+                collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            } else {
+                throw new InvalidInputException( "Invalid input entityType : " + entityType,
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+            
+            if(unitSettings == null) {
+                LOG.error( "No user found for userId {} ", user.getUserId() );
+                throw new InvalidInputException( "No user found for userId : " + user.getUserId() );
+            }
+
+            SurveySettings surveySettings = unitSettings.getSurvey_settings();
+            message = organizationManagementService.resetDefaultSurveyText( unitSettings.getSurvey_settings(), mood );
+            
+            // Updating settings in session
             UserSettings userSettings = (UserSettings) session
                 .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
-            if ( userSettings != null )
-                userSettings.setCompanySettings( companySettings );
+            if(collection.equals(CommonConstants.COMPANY_SETTINGS_COLLECTION)) {
+                organizationManagementService.updateSurveySettings( unitSettings, surveySettings );
+                userSettings.setCompanySettings( unitSettings );
+            }
+            else if(collection.equals(CommonConstants.REGION_SETTINGS_COLLECTION)) {
+                organizationManagementService.updateSecondaryWorkflow(collection, unitSettings, surveySettings);
+                Map<Long, OrganizationUnitSettings> regionSettings = null;
+                if( userSettings.getRegionSettings() == null ) {
+                	
+                	regionSettings = new HashMap<>();
+                	regionSettings.put(entityId, unitSettings);
+                }
+                else {
+                	
+                	userSettings.getRegionSettings().put(entityId, unitSettings);
+                }
+            }
+            else if(collection.equals(CommonConstants.BRANCH_SETTINGS_COLLECTION)) {
+                organizationManagementService.updateSecondaryWorkflow(collection, unitSettings, surveySettings);
+                Map<Long, OrganizationUnitSettings> branchSettings = null;
+                if( userSettings.getBranchSettings() == null ) {
+                	
+                	branchSettings = new HashMap<>();
+                	branchSettings.put(entityId, unitSettings);
+                }
+                else {
+                	
+                	userSettings.getBranchSettings().put(entityId, unitSettings);
+                }
+            }
+            else if(collection.equals(CommonConstants.AGENT_SETTINGS_COLLECTION)) {
+                organizationManagementService.updateSecondaryWorkflow(collection, unitSettings, surveySettings);
+                userSettings.setAgentSettings( (AgentSettings) unitSettings );
+            }
+
+            message = makeJsonMessage( CommonConstants.STATUS_ACTIVE, message );
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in resetTextForFlow(). Nested exception is ", e );
         }
@@ -4293,32 +4440,81 @@ public class OrganizationManagementController
     @ResponseBody
     public String updateAllowPartnerSurveyForCompany( HttpServletRequest request )
     {
-        LOG.info( "Method to update AllowPartnerSurvey started" );
+        LOG.info( "Method updateAllowPartnerSurveyForCompany() to update AllowPartnerSurvey started" );
 
         try {
 
             HttpSession session = request.getSession();
-            long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            long id = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
 
             String allowPartnerSurveyString = request.getParameter( "allowPartnerSurvey" );
 
             boolean allowPartnerSurvey = Boolean.parseBoolean( allowPartnerSurveyString );
-
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-            User companyAdmin = userManagementService.getCompanyAdmin( companyId );
-            Set<Long> userIds = userManagementService.getUserIdsUnderAdmin( companyAdmin );
-            organizationManagementService.updateAllowPartnerSurveyForAllUsers( userIds, allowPartnerSurvey );
-
-            if ( companySettings == null )
-                throw new Exception();
-
-            try {
+            
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            
+            if(CommonConstants.COMPANY_ID_COLUMN.equalsIgnoreCase( entityType )) {
+                
+                //Get company setting
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( id );
+                User companyAdmin = userManagementService.getCompanyAdmin( id );
+                
+                //Update company settings
                 organizationManagementService.updateAllowPartnerSurvey( companySettings, allowPartnerSurvey );
-            } catch ( ClassCastException e ) {
-                return "Encompass is not connected for company";
+                
+                //Get all regions
+                List<Long> regionIds = userManagementService.getRegionIdsUnderCompany( id );
+                
+                //Update all regions
+                organizationManagementService.updateKeyForAllUsersOfCollection(regionIds, MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY, allowPartnerSurvey, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+                
+                //Get all branhes
+                List<Long> branchIds = userManagementService.getBranchIdsUnderCompany( id );
+                
+                //Update all branches
+                organizationManagementService.updateKeyForAllUsersOfCollection(branchIds, MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY, allowPartnerSurvey, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+                
+                //Get all users
+                Set<Long> userIds = userManagementService.getUserIdsUnderAdmin( companyAdmin );
+                
+                //Update all users
+                organizationManagementService.updateAllowPartnerSurveyForAllUsers( userIds, allowPartnerSurvey );
             }
-
-
+            else if(CommonConstants.REGION_ID_COLUMN.equalsIgnoreCase( entityType )) {
+                
+                //Get region settings
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( id );
+                
+                //Update region settings
+                organizationManagementService.updateAllowPartnerSurveyForCollection( regionSettings, allowPartnerSurvey, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                
+                //Get all branhes
+                List<Long> branchIds = userManagementService.getBranchIdsUnderRegion( id );
+                
+                //Update all branches
+                organizationManagementService.updateKeyForAllUsersOfCollection(branchIds, MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY, allowPartnerSurvey, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+                
+                //Get all users
+                Set<Long> userIds = userManagementService.getUserIdsUnderRegion( id );
+                
+                //Update all users
+                organizationManagementService.updateAllowPartnerSurveyForAllUsers( userIds, allowPartnerSurvey );
+            }
+            else if(CommonConstants.BRANCH_ID_COLUMN.equalsIgnoreCase( entityType )) {
+                
+                //Get branh settings
+                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( id );
+                
+                //Update branch settings
+                organizationManagementService.updateAllowPartnerSurveyForCollection( branchSettings, allowPartnerSurvey, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                
+                //Get all users
+                Set<Long> userIds = userManagementService.getUserIdsUnderBranch( id );
+                
+                //Update all users
+                organizationManagementService.updateAllowPartnerSurveyForAllUsers( userIds, allowPartnerSurvey );
+            }
+            LOG.info( "Method updateAllowPartnerSurveyForCompany() to update AllowPartnerSurvey finished" );
         } catch ( Exception error ) {
             LOG.error( "Exception occured in updateallowpartnersurvey(). Nested exception is ", error );
             return error.getMessage();
@@ -4383,6 +4579,23 @@ public class OrganizationManagementController
         if ( surveySettings.getNeutralTextComplete() != null )
             surveySettings.setNeutralTextComplete(
                 DatatypeConverter.printBase64Binary( surveySettings.getNeutralTextComplete().getBytes() ) );
+        
+        if ( surveySettings.getHappyTextPartner() != null )
+            surveySettings.setHappyTextPartner( DatatypeConverter.printBase64Binary( surveySettings.getHappyTextPartner().getBytes() ) );
+        if ( surveySettings.getSadTextPartner() != null )
+            surveySettings.setSadTextPartner( DatatypeConverter.printBase64Binary( surveySettings.getSadTextPartner().getBytes() ) );
+        if ( surveySettings.getNeutralTextPartner() != null )
+            surveySettings.setNeutralTextPartner( DatatypeConverter.printBase64Binary( surveySettings.getNeutralTextPartner().getBytes() ) );
+
+        if ( surveySettings.getHappyTextCompletePartner() != null )
+            surveySettings.setHappyTextCompletePartner(
+                DatatypeConverter.printBase64Binary( surveySettings.getHappyTextCompletePartner().getBytes() ) );
+        if ( surveySettings.getSadTextCompletePartner() != null )
+            surveySettings
+                .setSadTextCompletePartner( DatatypeConverter.printBase64Binary( surveySettings.getSadTextCompletePartner().getBytes() ) );
+        if ( surveySettings.getNeutralTextCompletePartner() != null )
+            surveySettings.setNeutralTextCompletePartner(
+                DatatypeConverter.printBase64Binary( surveySettings.getNeutralTextCompletePartner().getBytes() ) );
         // Redirect URL Changes
         if ( surveySettings.getHappyUrl() != null )
             surveySettings.setHappyUrl(
@@ -4690,6 +4903,29 @@ public class OrganizationManagementController
         } else {
             message = "Some problem occurred while updating settings. Please try again later";
         }
+        if(settingName.equals("allowConfigureSecondaryWorkflow") && settingStatus.equals( "true" )) {
+            OrganizationUnitSettings unitSettings = null;
+            try {
+                if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                    unitSettings = organizationManagementService.getRegionSettings( entityId );  
+                }
+                else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                    unitSettings = organizationManagementService.getRegionSettings( entityId );    
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                    unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                    unitSettings = organizationManagementService.getAgentSettings( entityId );
+                } else {
+                    throw new InvalidInputException( "Invalid Collection Type" );
+                }
+                    
+            }
+            catch(InvalidInputException | NoRecordsFetchedException e) {
+                LOG.error( "Error while updating survey settings: "+e.getMessage() );
+            }
+        }
+        
         return message;
     }    
 
@@ -5103,6 +5339,106 @@ public class OrganizationManagementController
         }catch(SSAPIException e) {
             return "Unable to delete LinkedIn profile url";
         }
+    }
+    
+    private SurveySettings copyCompanySettingsForPartnerSurvey(OrganizationUnitSettings unitSettings,
+         String entityType, Map<String, Long> hierarchyDetails) {
+        
+        SurveySettings unitSurveySettings = unitSettings.getSurvey_settings(); 
+       
+        long branchId = 0, regionId = 0, companyId = 0;
+        branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+        regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+        companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+        
+        OrganizationUnitSettings companySettings = null;
+        OrganizationUnitSettings regionSettings = null;
+        OrganizationUnitSettings branchSettings = null;
+        
+        try {
+            companySettings = organizationManagementService.getCompanySettings( companyId );
+            if(regionId != 0)
+                regionSettings = organizationManagementService.getRegionSettings( regionId );
+            if(branchId != 0)
+                branchSettings = organizationManagementService.getBranchSettingsDefault( branchId );
+            }
+        catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( " Exception while fetching hierarchy for user: "+unitSettings.getIden()+"\n"+e );
+        }        
+        
+        if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
+            if(hierarchyDetails.get( CommonConstants.HAS_BRANCH ) == 1)
+                this.replaceWithHierarchyTexts( unitSurveySettings, branchSettings.getSurvey_settings() );
+            if(hierarchyDetails.get( CommonConstants.HAS_REGION ) == 1)
+                this.replaceWithHierarchyTexts( unitSurveySettings, regionSettings.getSurvey_settings() );
+            this.replaceWithHierarchyTexts( unitSurveySettings, companySettings.getSurvey_settings() );                
+        }
+        else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )) {
+            if(hierarchyDetails.get( CommonConstants.HAS_REGION ) == 1)
+                this.replaceWithHierarchyTexts( unitSurveySettings, regionSettings.getSurvey_settings() );
+            this.replaceWithHierarchyTexts( unitSurveySettings, companySettings.getSurvey_settings() );                 
+        }
+        else {
+            this.replaceWithHierarchyTexts( unitSurveySettings, companySettings.getSurvey_settings() );                 
+        }
+
+        return unitSurveySettings;
+    }
+    
+    private void replaceWithHierarchyTexts(SurveySettings unitSurveySettings, SurveySettings hierarchySurveySettings) {
+        if(StringUtils.isEmpty(  unitSurveySettings.getHappyTextPartner() ))
+            unitSurveySettings.setHappyTextPartner( hierarchySurveySettings.getHappyTextPartner() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getNeutralTextPartner() ))
+            unitSurveySettings.setNeutralTextPartner( hierarchySurveySettings.getNeutralTextPartner() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getSadTextPartner() ))
+            unitSurveySettings.setSadTextPartner( hierarchySurveySettings.getSadTextPartner() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getHappyTextCompletePartner() ))
+            unitSurveySettings.setHappyTextCompletePartner( hierarchySurveySettings.getHappyTextCompletePartner() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getNeutralTextCompletePartner() ))
+            unitSurveySettings.setNeutralTextCompletePartner( hierarchySurveySettings.getNeutralTextCompletePartner() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getSadTextCompletePartner() ))
+            unitSurveySettings.setSadTextCompletePartner( hierarchySurveySettings.getSadTextCompletePartner() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getHappyText() ))
+            unitSurveySettings.setHappyText( hierarchySurveySettings.getHappyText() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getNeutralText() ))
+            unitSurveySettings.setNeutralText( hierarchySurveySettings.getNeutralText() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getSadText() ))
+            unitSurveySettings.setSadText( hierarchySurveySettings.getSadText() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getHappyTextComplete() ))
+            unitSurveySettings.setHappyTextComplete( hierarchySurveySettings.getHappyTextComplete() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getNeutralTextComplete() ))
+            unitSurveySettings.setNeutralTextComplete( hierarchySurveySettings.getNeutralTextComplete() );
+        if(StringUtils.isEmpty(  unitSurveySettings.getSadTextComplete() ))
+            unitSurveySettings.setSadTextComplete( hierarchySurveySettings.getSadTextComplete() );
+    }
+    
+
+    private SurveySettings updatePartnerSurveySettings( OrganizationUnitSettings unitSettings )
+    {
+
+        SurveySettings unitSurveySettings = unitSettings.getSurvey_settings();
+
+        if ( StringUtils.isEmpty( unitSurveySettings.getHappyTextPartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getHappyText() ) )
+            unitSurveySettings.setHappyTextPartner( unitSurveySettings.getHappyText() );
+        if ( StringUtils.isEmpty( unitSurveySettings.getNeutralTextPartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getNeutralText() ) )
+            unitSurveySettings.setNeutralTextPartner( unitSurveySettings.getNeutralText() );
+        if ( StringUtils.isEmpty( unitSurveySettings.getSadTextPartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getSadText() ) )
+            unitSurveySettings.setSadTextPartner( unitSurveySettings.getSadText() );
+
+        if ( StringUtils.isEmpty( unitSurveySettings.getHappyTextCompletePartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getHappyTextComplete() ) )
+            unitSurveySettings.setHappyTextCompletePartner( unitSurveySettings.getHappyTextComplete() );
+        if ( StringUtils.isEmpty( unitSurveySettings.getNeutralTextCompletePartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getNeutralTextComplete() ) )
+            unitSurveySettings.setNeutralTextCompletePartner( unitSurveySettings.getNeutralTextComplete() );
+        if ( StringUtils.isEmpty( unitSurveySettings.getSadTextCompletePartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getSadTextComplete() ) )
+            unitSurveySettings.setSadTextCompletePartner( unitSurveySettings.getSadTextComplete() );
+
+        return unitSurveySettings;
     }
 
 }

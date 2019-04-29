@@ -24,6 +24,13 @@ public class SurveySettings {
 	private String happyTextComplete;
 	private String neutralTextComplete;
 	private String sadTextComplete;
+	
+	private String happyTextPartner;
+	private String neutralTextPartner;
+	private String sadTextPartner;
+	private String happyTextCompletePartner;
+	private String neutralTextCompletePartner;
+	private String sadTextCompletePartner;
 	private ComplaintResolutionSettings complaint_res_settings;
 	private AbusiveMailSettings abusive_mail_settings;
 	private String happyUrl;
@@ -180,6 +187,66 @@ public class SurveySettings {
 	public void setSadTextComplete(String sadTextComplete) {
 		this.sadTextComplete = sadTextComplete;
 	}
+
+    public String getHappyTextPartner()
+    {
+        return happyTextPartner;
+    }
+
+    public void setHappyTextPartner( String happyTextPartner )
+    {
+        this.happyTextPartner = happyTextPartner;
+    }
+
+    public String getNeutralTextPartner()
+    {
+        return neutralTextPartner;
+    }
+
+    public void setNeutralTextPartner( String neutralTextPartner )
+    {
+        this.neutralTextPartner = neutralTextPartner;
+    }
+
+    public String getSadTextPartner()
+    {
+        return sadTextPartner;
+    }
+
+    public void setSadTextPartner( String sadTextPartner )
+    {
+        this.sadTextPartner = sadTextPartner;
+    }
+
+    public String getHappyTextCompletePartner()
+    {
+        return happyTextCompletePartner;
+    }
+
+    public void setHappyTextCompletePartner( String happyTextCompletePartner )
+    {
+        this.happyTextCompletePartner = happyTextCompletePartner;
+    }
+
+    public String getNeutralTextCompletePartner()
+    {
+        return neutralTextCompletePartner;
+    }
+
+    public void setNeutralTextCompletePartner( String neutralTextCompletePartner )
+    {
+        this.neutralTextCompletePartner = neutralTextCompletePartner;
+    }
+
+    public String getSadTextCompletePartner()
+    {
+        return sadTextCompletePartner;
+    }
+
+    public void setSadTextCompletePartner( String sadTextCompletePartner )
+    {
+        this.sadTextCompletePartner = sadTextCompletePartner;
+    }
 
     public ComplaintResolutionSettings getComplaint_res_settings()
     {

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -506,9 +507,7 @@ public class UserManagementController
             usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
 
             model.addAttribute( "userslist", usersList );
-        } catch (
-
-        NonFatalException e ) {
+        } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException in findusers. Reason : ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -1654,6 +1653,7 @@ public class UserManagementController
             Map<Long, String> branchesMap = new LinkedHashMap<>();
             Company company = user.getCompany();
             List<Region> regions = organizationManagementService.getAllRegionsForCompanyWithProjections( company );
+
             if ( regions != null && !regions.isEmpty() ) {
                 for ( Region region : regions ) {
                     regionsMap.put( region.getRegionId(), region.getRegion() );
@@ -1662,6 +1662,7 @@ public class UserManagementController
 
             // Fetch branches data for company
             List<Branch> branches = organizationManagementService.getAllBranchesForCompanyWithProjections( company );
+
             if ( branches != null && !branches.isEmpty() ) {
                 for ( Branch branch : branches ) {
                     branchesMap.put( branch.getBranchId(), branch.getBranch() );

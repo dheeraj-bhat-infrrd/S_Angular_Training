@@ -269,7 +269,8 @@ public interface UserManagementService
     // JIRA SS-42 by RM-06:BOC
 
     public List<UserProfile> getAllUserProfilesForUser( User user ) throws InvalidInputException;
-
+    
+    public List<UserProfile> getAllUserProfilesForRegionOrBranch( long regionId, String columnName ) throws InvalidInputException;
 
     public boolean userExists( String userName ) throws InvalidInputException;
 
@@ -627,7 +628,16 @@ public interface UserManagementService
 
 
     public Set<Long> getUserIdsUnderAdmin( User adminUser ) throws InvalidInputException;
-
+    
+    public List<Long> getBranchIdsUnderCompany( long companyId ) throws InvalidInputException;
+    
+    public List<Long> getRegionIdsUnderCompany( long companyId ) throws InvalidInputException;
+    
+    public List<Long> getBranchIdsUnderRegion( long regionId ) throws InvalidInputException;
+    
+    public Set<Long> getUserIdsUnderRegion( long regionId ) throws InvalidInputException;
+    
+    public Set<Long> getUserIdsUnderBranch( long regionId ) throws InvalidInputException;
 
     public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId , String createdAndModifiedBy)
             throws InvalidInputException, NoRecordsFetchedException;

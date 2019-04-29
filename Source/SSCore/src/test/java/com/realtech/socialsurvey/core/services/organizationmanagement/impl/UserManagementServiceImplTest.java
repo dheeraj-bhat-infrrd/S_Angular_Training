@@ -13,7 +13,9 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -39,6 +41,7 @@ import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -89,6 +92,9 @@ public class UserManagementServiceImplTest
 
     @Mock
     private GenericDao<LicenseDetail, Long> licenseDetailsDao;
+    
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
@@ -1001,6 +1007,7 @@ public class UserManagementServiceImplTest
         userManagementServiceImpl.restoreDeletedUser( 50l, false, 0l );
     }
     
+    /*
     @Test ( expected = InvalidInputException.class)
     public void testRestoreDeletedUserForNoActiveBranchAssignment() throws InvalidInputException, NoRecordsFetchedException, SolrException
     {
@@ -1078,6 +1085,7 @@ public class UserManagementServiceImplTest
         Mockito.when(regionDao.findById(Mockito.eq( Region.class ),Matchers.anyLong())).thenReturn(region);
         userManagementServiceImpl.restoreDeletedUser( 50l, false, 56l );
     }
+    */
 
 
     //Tests for SearchUsersInCompanyByMultipleCriteria
@@ -1205,6 +1213,76 @@ public class UserManagementServiceImplTest
     public void testgetUsersAndEmailMappingForCompanyForInvalidCompanyId() throws InvalidInputException, NoRecordsFetchedException
     {
         userManagementServiceImpl.getUsersAndEmailMappingForCompany( 0, 1, 10, -1 );
+    }
+    
+    @Test(expected = InvalidInputException.class)
+    public void testGetRegionIdsUnderCompany() throws InvalidInputException {
+        
+        userManagementServiceImpl.getRegionIdsUnderCompany( 0l );
+    }
+    
+    @Test
+    public void testGetRegionIdsUnderCompanyExcpectExceptionMessage() throws InvalidInputException
+    {
+        thrown.expect(InvalidInputException.class);
+        thrown.expectMessage("Invalid company id passed in getRegionIdsUnderCompany method");
+        userManagementServiceImpl.getRegionIdsUnderCompany( 0l );
+    }
+    
+    @Test(expected = InvalidInputException.class)
+    public void testGetBranchIdsUnderCompany() throws InvalidInputException {
+        
+        userManagementServiceImpl.getBranchIdsUnderCompany( 0 );
+    }
+    
+    @Test
+    public void testGetBranchIdsUnderCompanyExcpectExceptionMessage() throws InvalidInputException
+    {
+        thrown.expect(InvalidInputException.class);
+        thrown.expectMessage("Invalid company id passed in getBranchIdsUnderCompany method");
+        userManagementServiceImpl.getBranchIdsUnderCompany( 0 );
+    }
+    
+    @Test(expected = InvalidInputException.class)
+    public void testGetBranchIdsUnderRegion() throws InvalidInputException {
+        
+        userManagementServiceImpl.getBranchIdsUnderRegion( 0 );
+    }
+    
+    @Test
+    public void testGetBranchIdsUnderRegionExcpectExceptionMessage() throws InvalidInputException
+    {
+        thrown.expect(InvalidInputException.class);
+        thrown.expectMessage("Invalid region id passed in getBranchIdsUnderRegion method");
+        userManagementServiceImpl.getBranchIdsUnderRegion( 0 );
+    }
+    
+    @Test(expected = InvalidInputException.class)
+    public void testGetUserIdsUnderRegion() throws InvalidInputException {
+        
+        userManagementServiceImpl.getUserIdsUnderRegion( 0 );
+    }
+    
+    @Test
+    public void testGetUserIdsUnderRegionExcpectExceptionMessage() throws InvalidInputException
+    {
+        thrown.expect(InvalidInputException.class);
+        thrown.expectMessage("Invalid region id passed in getUserIdsUnderRegion method");
+        userManagementServiceImpl.getUserIdsUnderRegion( 0 );
+    }
+    
+    @Test(expected = InvalidInputException.class)
+    public void testGetUserIdsUnderBranch() throws InvalidInputException {
+        
+        userManagementServiceImpl.getUserIdsUnderBranch( 0 );
+    }
+    
+    @Test
+    public void testGetUserIdsUnderBranchExcpectExceptionMessage() throws InvalidInputException
+    {
+        thrown.expect(InvalidInputException.class);
+        thrown.expectMessage("Invalid branch id passed in getUserIdsUnderBranch method");
+        userManagementServiceImpl.getUserIdsUnderBranch( 0 );
     }
     
     @Test

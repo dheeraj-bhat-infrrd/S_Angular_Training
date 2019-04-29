@@ -182,7 +182,7 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
      */
     @SuppressWarnings ( "unchecked")
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Long> getRegionIdsOfCompany( long companyId ) throws InvalidInputException
     {
         if ( companyId <= 0 ) {
@@ -196,6 +196,36 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
                 CommonConstants.REGION_ID_COLUMN ) );
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) ) );
             criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getRegionIdsUnderCompany(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getRegionIdsUnderCompany().", e );
+        }
+        LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() ended." );
+        return criteria.list();
+    }
+    
+    /**
+     * Method to get Region Ids of a company
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<Long> getRegionIdsUnderCompany( long companyId ) throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( "Invalid company id passed in getRegionIdsUnderCompany method" );
+        }
+        LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() started." );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( Region.class );
+            criteria.setProjection( Projections.property( CommonConstants.REGION_ID_COLUMN ).as(
+                CommonConstants.REGION_ID_COLUMN ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) ) );
             criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
         } catch ( HibernateException e ) {
             LOG.error( "HibernateException caught in getRegionIdsUnderCompany(). Reason: " + e.getMessage(), e );

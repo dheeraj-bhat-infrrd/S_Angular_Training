@@ -1795,93 +1795,457 @@ public class SurveyManagementController
 		
 		Map<String, String> surveyMap = emailFormatHelper.fetchSurveySourceId(user.getUserId(), survey.getCustomerEmail(),
 				dateFormat.format(new Date()));
-		if (companySettings != null && companySettings.getSurvey_settings() != null) {
-			LOG.info("Setting company specific values for surveyAndStage started");
-			SurveySettings surveySettings = companySettings.getSurvey_settings();
 		
-			if (StringUtils.isNotEmpty(surveySettings.getHappyText())) {
-			    //add Facebook pixel tag in happy text 
-			    String happyText = surveySettings.getHappyText() + facebookPixelTag;
-				surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyText, unitSettings, user,
-						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-				isHappyTextSet = true;
-			}
-			if (StringUtils.isNotEmpty(surveySettings.getNeutralText())) {
-				surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralText(), unitSettings, user,
-						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-				isNeutralTextSet = true;
-			}
-			if (StringUtils.isNotEmpty(surveySettings.getSadText())) {
-				surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadText(), unitSettings, user,
-						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-				isSadTextSet = true;
-			}
-			if (StringUtils.isNotEmpty(surveySettings.getHappyTextComplete())) {
-				surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextComplete(), unitSettings,
-						user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-				isHappyTextCompleteSet = true;
-			}
-			if (StringUtils.isNotEmpty(surveySettings.getNeutralTextComplete())) {
-				surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextComplete(),
-						unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-				isNeutralTextCompleteSet = true;
-			}
-			if (StringUtils.isNotEmpty(surveySettings.getSadTextComplete())) {
-				surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextComplete(), unitSettings,
-						user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-				isSadTextCompleteSet = true;
-			}
-			if(StringUtils.isNotEmpty(surveySettings.getHappyUrl())) {
-				String happyUrl = surveySettings.getHappyUrl();
-				surveyAndStage.put("happyUrl", surveyHandler.replaceGatewayQuestionText(happyUrl, unitSettings, user,
-						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-			}
-			if(StringUtils.isNotEmpty(surveySettings.getOkUrl())) {
-				String okUrl = surveySettings.getOkUrl();
-				surveyAndStage.put("okUrl", surveyHandler.replaceGatewayQuestionText(okUrl, unitSettings, user,
-						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-			}
-			if(StringUtils.isNotEmpty(surveySettings.getSadUrl())) {
-				String sadUrl = surveySettings.getSadUrl();
-				surveyAndStage.put("sadUrl", surveyHandler.replaceGatewayQuestionText(sadUrl, unitSettings, user,
-						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-			}	
-			LOG.info("Setting company specific values for surveyAndStage finished");
-		}
+		if ( companySettings != null && companySettings.isAllowPartnerSurvey() && 
+			    ( surveyPreInitiation.getParticipantType() == CommonConstants.SURVEY_PARTICIPANT_TYPE_BUYER_AGENT ||
+			    surveyPreInitiation.getParticipantType() == CommonConstants.SURVEY_PARTICIPANT_TYPE_SELLER_AGENT ) ) {
 
-		// If any of the texts are not set by the company, store default values
-		// for them.
-		if (!(isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet)) {
-			LOG.info("Setting default values for surveyAndStage started");
-			SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
-			if (!isHappyTextSet) {
-			  //add Facebook pixel tag in happy text 
-                String happyText = defaultSurveySettings.getHappyText() + facebookPixelTag;
-				surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyText, unitSettings, user,
-						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			    //Set GatewayQuestions configured at Agentlevel
+			    if( unitSettings != null && unitSettings.getSurvey_settings() != null && 
+			        (unitSettings.getAllowConfigureSecondaryWorkflow() != null && unitSettings.getAllowConfigureSecondaryWorkflow())) {
+
+			        SurveySettings surveySettings = unitSettings.getSurvey_settings();
+			        surveySettings = this.updatePartnerSurveySettings( unitSettings );
+
+			        if (StringUtils.isNotEmpty(surveySettings.getHappyTextPartner())) {
+
+			            String happyTextPartner = surveySettings.getHappyTextPartner() + facebookPixelTag;
+			            surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyTextPartner, unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isHappyTextSet = true;
+			        }
+			        if (StringUtils.isNotEmpty(surveySettings.getNeutralTextPartner())) {
+			            surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextPartner(), unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isNeutralTextSet = true;
+			        }
+			        if (StringUtils.isNotEmpty(surveySettings.getSadTextPartner())) {
+			            surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextPartner(), unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isSadTextSet = true;
+			        }
+			        if (StringUtils.isNotEmpty(surveySettings.getHappyTextCompletePartner())) {
+			            surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextCompletePartner(), unitSettings,
+			                user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isHappyTextCompleteSet = true;
+			        }
+			        if (StringUtils.isNotEmpty(surveySettings.getNeutralTextCompletePartner())) {
+			            surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextCompletePartner(),
+			                unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isNeutralTextCompleteSet = true;
+			        }
+			        if (StringUtils.isNotEmpty(surveySettings.getSadTextCompletePartner())) {
+			            surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextCompletePartner(), unitSettings,
+			                user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isSadTextCompleteSet = true;
+			        }
+			    }
+			    
+			    //Set GatewayQuestions configured at BranchLevel
+	            if( branchSettings != null && branchSettings.getOrganizationUnitSettings() != null && branchSettings.getOrganizationUnitSettings().getSurvey_settings() != null &&
+	                !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet )
+	                && (branchSettings.getOrganizationUnitSettings().getAllowConfigureSecondaryWorkflow() != null && 
+	                branchSettings.getOrganizationUnitSettings().getAllowConfigureSecondaryWorkflow())) {
+
+	                SurveySettings surveySettings = branchSettings.getOrganizationUnitSettings().getSurvey_settings();
+	                surveySettings = this.updatePartnerSurveySettings( branchSettings.getOrganizationUnitSettings() );
+
+	                if (!isHappyTextSet && StringUtils.isNotEmpty(surveySettings.getHappyTextPartner())) {
+
+	                    String happyTextPartner = surveySettings.getHappyTextPartner() + facebookPixelTag;
+	                    surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyTextPartner, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextSet = true;
+	                }
+	                if (!isNeutralTextSet && StringUtils.isNotEmpty(surveySettings.getNeutralTextPartner())) {
+	                    surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextPartner(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextSet = true;
+	                }
+	                if (!isSadTextSet && StringUtils.isNotEmpty(surveySettings.getSadTextPartner())) {
+	                    surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextPartner(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextSet = true;
+	                }
+	                if (!isHappyTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getHappyTextCompletePartner())) {
+	                    surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextCompletePartner(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextCompleteSet = true;
+	                }
+	                if (!isNeutralTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getNeutralTextCompletePartner())) {
+	                    surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextCompletePartner(),
+	                        unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextCompleteSet = true;
+	                }
+	                if (!isSadTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getSadTextCompletePartner())) {
+	                    surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextCompletePartner(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextCompleteSet = true;
+	                }
+	            }
+	            
+	            //Set GatewayQuestions configured at Region level
+	            if( regionSettings.getSurvey_settings() != null && !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet )
+	                && (regionSettings.getAllowConfigureSecondaryWorkflow() != null && regionSettings.getAllowConfigureSecondaryWorkflow())) {
+
+	                SurveySettings surveySettings = regionSettings.getSurvey_settings();
+	                surveySettings = this.updatePartnerSurveySettings( regionSettings );
+
+	                if (!isHappyTextSet && StringUtils.isNotEmpty(surveySettings.getHappyTextPartner())) {
+
+	                    String happyTextPartner = surveySettings.getHappyTextPartner() + facebookPixelTag;
+	                    surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyTextPartner, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextSet = true;
+	                }
+	                if (!isNeutralTextSet && StringUtils.isNotEmpty(surveySettings.getNeutralTextPartner())) {
+	                    surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextPartner(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextSet = true;
+	                }
+	                if (!isSadTextSet && StringUtils.isNotEmpty(surveySettings.getSadTextPartner())) {
+	                    surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextPartner(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextSet = true;
+	                }
+	                if (!isHappyTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getHappyTextCompletePartner())) {
+	                    surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextCompletePartner(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextCompleteSet = true;
+	                }
+	                if (!isNeutralTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getNeutralTextCompletePartner())) {
+	                    surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextCompletePartner(),
+	                        unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextCompleteSet = true;
+	                }
+	                if (!isSadTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getSadTextCompletePartner())) {
+	                    surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextCompletePartner(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextCompleteSet = true;
+	                }
+	            }
+
+			    //Set GatewayQuestions configured at Company level
+			    if( companySettings.getSurvey_settings() != null && !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet ) ) {
+
+			        SurveySettings surveySettings = companySettings.getSurvey_settings();
+			        surveySettings = this.updatePartnerSurveySettings( companySettings );
+
+			        if (!isHappyTextSet && StringUtils.isNotEmpty(surveySettings.getHappyTextPartner())) {
+
+	                    String happyTextPartner = surveySettings.getHappyTextPartner() + facebookPixelTag;
+	                    surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyTextPartner, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextSet = true;
+	                }
+	                if (!isNeutralTextSet && StringUtils.isNotEmpty(surveySettings.getNeutralTextPartner())) {
+	                    surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextPartner(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextSet = true;
+	                }
+	                if (StringUtils.isNotEmpty(surveySettings.getSadTextPartner())) {
+	                    surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextPartner(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextSet = true;
+	                }
+	                if (!isHappyTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getHappyTextCompletePartner())) {
+	                    surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextCompletePartner(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextCompleteSet = true;
+	                }
+	                if (!isNeutralTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getNeutralTextCompletePartner())) {
+	                    surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextCompletePartner(),
+	                        unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextCompleteSet = true;
+	                }
+	                if (!isSadTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getSadTextCompletePartner())) {
+	                    surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextCompletePartner(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextCompleteSet = true;
+	                }
+			    }
+
+			    if( companySettings.getSurvey_settings() != null ) {
+
+			        SurveySettings surveySettings = companySettings.getSurvey_settings();
+			        if(StringUtils.isNotEmpty(surveySettings.getHappyUrl())) {
+			            String happyUrl = surveySettings.getHappyUrl();
+			            surveyAndStage.put("happyUrl", surveyHandler.replaceGatewayQuestionText(happyUrl, unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			        }
+			        if(StringUtils.isNotEmpty(surveySettings.getOkUrl())) {
+			            String okUrl = surveySettings.getOkUrl();
+			            surveyAndStage.put("okUrl", surveyHandler.replaceGatewayQuestionText(okUrl, unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			        }
+			        if(StringUtils.isNotEmpty(surveySettings.getSadUrl())) {
+			            String sadUrl = surveySettings.getSadUrl();
+			            surveyAndStage.put("sadUrl", surveyHandler.replaceGatewayQuestionText(sadUrl, unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			        }
+			    }
+			    
+			    // If any of the texts are not set by the company, store default values
+			    // for them. from ApplicationSettings
+			    if (!(isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet)) {
+			        
+			        SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSecondaryWorkflowValues();
+			        
+			        if (!isHappyTextSet && StringUtils.isNotEmpty(defaultSurveySettings.getHappyTextPartner())) {
+
+	                    String happyTextPartner = defaultSurveySettings.getHappyTextPartner() + facebookPixelTag;
+	                    surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyTextPartner, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextSet = true;
+	                }
+	                if (!isNeutralTextSet && StringUtils.isNotEmpty(defaultSurveySettings.getNeutralTextPartner())) {
+	                    surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralTextPartner(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextSet = true;
+	                }
+	                if (!isSadTextSet && StringUtils.isNotEmpty(defaultSurveySettings.getSadTextPartner())) {
+	                    surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadTextPartner(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextSet = true;
+	                }
+	                if (!isHappyTextCompleteSet && StringUtils.isNotEmpty(defaultSurveySettings.getHappyTextCompletePartner())) {
+	                    surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getHappyTextCompletePartner(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextCompleteSet = true;
+	                }
+	                if (!isNeutralTextCompleteSet && StringUtils.isNotEmpty(defaultSurveySettings.getNeutralTextCompletePartner())) {
+	                    surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralTextCompletePartner(),
+	                        unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextCompleteSet = true;
+	                }
+	                if (!isSadTextCompleteSet && StringUtils.isNotEmpty(defaultSurveySettings.getSadTextCompletePartner())) {
+	                    surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadTextCompletePartner(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextCompleteSet = true;
+	                }
+			    }
 			}
-			if (!isNeutralTextSet) {
-				surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralText(), unitSettings, user,
-						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			else {
+			    
+			    //Set GatewayQuestions configured at Agentlevel
+			    if (unitSettings != null && unitSettings.getSurvey_settings() != null &&
+			        (unitSettings.getAllowConfigureSecondaryWorkflow() != null && unitSettings.getAllowConfigureSecondaryWorkflow()) ) {
+	                LOG.info("Setting agent specific values for surveyAndStage started");
+	                SurveySettings surveySettings = unitSettings.getSurvey_settings();
+
+	                if (StringUtils.isNotEmpty(surveySettings.getHappyText())) {
+	                    //add Facebook pixel tag in happy text              
+	                    String happyText = surveySettings.getHappyText() + facebookPixelTag;
+	                    surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyText, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextSet = true;
+	                }
+	                if (StringUtils.isNotEmpty(surveySettings.getNeutralText())) {
+	                    surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralText(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextSet = true;
+	                }
+	                if (StringUtils.isNotEmpty(surveySettings.getSadText())) {
+	                    surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadText(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextSet = true;
+	                }
+	                if (StringUtils.isNotEmpty(surveySettings.getHappyTextComplete())) {
+	                    surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextComplete(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextCompleteSet = true;
+	                }
+	                if (StringUtils.isNotEmpty(surveySettings.getNeutralTextComplete())) {
+	                    surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextComplete(),
+	                        unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextCompleteSet = true;
+	                }
+	                if (StringUtils.isNotEmpty(surveySettings.getSadTextComplete())) {
+	                    surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextComplete(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextCompleteSet = true;
+	                }
+	                LOG.info("Setting company specific values for surveyAndStage finished");
+	            }
+			    
+			    //Set GatewayQuestions configured at Branch level
+			    if ( branchSettings != null && branchSettings.getOrganizationUnitSettings() != null && branchSettings.getOrganizationUnitSettings().getSurvey_settings() != null &&
+			        !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet ) &&
+			        (branchSettings.getOrganizationUnitSettings().getAllowConfigureSecondaryWorkflow() != null && branchSettings.getOrganizationUnitSettings().getAllowConfigureSecondaryWorkflow())) {
+	                LOG.info("Setting branch specific values for surveyAndStage started");
+	                SurveySettings surveySettings = branchSettings.getOrganizationUnitSettings().getSurvey_settings();
+
+	                if (!isHappyTextSet && StringUtils.isNotEmpty(surveySettings.getHappyText())) {
+	                    //add Facebook pixel tag in happy text              
+	                    String happyText = surveySettings.getHappyText() + facebookPixelTag;
+	                    surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyText, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextSet = true;
+	                }
+	                if (!isNeutralTextSet && StringUtils.isNotEmpty(surveySettings.getNeutralText())) {
+	                    surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralText(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextSet = true;
+	                }
+	                if (!isSadTextSet && StringUtils.isNotEmpty(surveySettings.getSadText())) {
+	                    surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadText(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextSet = true;
+	                }
+	                if (!isHappyTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getHappyTextComplete())) {
+	                    surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextComplete(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextCompleteSet = true;
+	                }
+	                if (!isNeutralTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getNeutralTextComplete())) {
+	                    surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextComplete(),
+	                        unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextCompleteSet = true;
+	                }
+	                if (!isSadTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getSadTextComplete())) {
+	                    surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextComplete(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextCompleteSet = true;
+	                }
+	                LOG.info("Setting branch specific values for surveyAndStage finished");
+	            }
+			    
+			    //Set GatewayQuestions configured at Region level
+	            if (regionSettings != null && regionSettings.getSurvey_settings() != null 
+	                && !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet ) &&
+	                (regionSettings.getAllowConfigureSecondaryWorkflow() != null && regionSettings.getAllowConfigureSecondaryWorkflow())) {
+	                LOG.info("Setting region specific values for surveyAndStage started");
+	                SurveySettings surveySettings = regionSettings.getSurvey_settings();
+
+	                if (!isHappyTextSet && StringUtils.isNotEmpty(surveySettings.getHappyText())) {
+	                    //add Facebook pixel tag in happy text              
+	                    String happyText = surveySettings.getHappyText() + facebookPixelTag;
+	                    surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyText, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextSet = true;
+	                }
+	                if (!isNeutralTextSet && StringUtils.isNotEmpty(surveySettings.getNeutralText())) {
+	                    surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralText(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextSet = true;
+	                }
+	                if (!isSadTextSet && StringUtils.isNotEmpty(surveySettings.getSadText())) {
+	                    surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadText(), unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextSet = true;
+	                }
+	                if (!isHappyTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getHappyTextComplete())) {
+	                    surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextComplete(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isHappyTextCompleteSet = true;
+	                }
+	                if (!isNeutralTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getNeutralTextComplete())) {
+	                    surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextComplete(),
+	                        unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isNeutralTextCompleteSet = true;
+	                }
+	                if (!isSadTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getSadTextComplete())) {
+	                    surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextComplete(), unitSettings,
+	                        user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                    isSadTextCompleteSet = true;
+	                }
+	                LOG.info("Setting region specific values for surveyAndStage finished");
+	            }
+			    
+			    //Set GatewayQuestions configured at Company level
+			    if (companySettings != null && companySettings.getSurvey_settings() != null && !( isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet )) {
+			        LOG.info("Setting company specific values for surveyAndStage started");
+			        SurveySettings surveySettings = companySettings.getSurvey_settings();
+
+			        if (!isHappyTextSet && StringUtils.isNotEmpty(surveySettings.getHappyText())) {
+			            //add Facebook pixel tag in happy text			    
+			            String happyText = surveySettings.getHappyText() + facebookPixelTag;
+			            surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyText, unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isHappyTextSet = true;
+			        }
+			        if (!isNeutralTextSet && StringUtils.isNotEmpty(surveySettings.getNeutralText())) {
+			            surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralText(), unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isNeutralTextSet = true;
+			        }
+			        if (!isSadTextSet && StringUtils.isNotEmpty(surveySettings.getSadText())) {
+			            surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadText(), unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isSadTextSet = true;
+			        }
+			        if (!isHappyTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getHappyTextComplete())) {
+			            surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyTextComplete(), unitSettings,
+			                user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isHappyTextCompleteSet = true;
+			        }
+			        if (!isNeutralTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getNeutralTextComplete())) {
+			            surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getNeutralTextComplete(),
+			                unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isNeutralTextCompleteSet = true;
+			        }
+			        if (!isSadTextCompleteSet && StringUtils.isNotEmpty(surveySettings.getSadTextComplete())) {
+			            surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(surveySettings.getSadTextComplete(), unitSettings,
+			                user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			            isSadTextCompleteSet = true;
+			        }
+			        LOG.info("Setting company specific values for surveyAndStage finished");
+			    }
+
+			    if( companySettings != null && companySettings.getSurvey_settings() != null ) {
+
+	                SurveySettings surveySettings = companySettings.getSurvey_settings();
+	                if(StringUtils.isNotEmpty(surveySettings.getHappyUrl())) {
+	                    String happyUrl = surveySettings.getHappyUrl();
+	                    surveyAndStage.put("happyUrl", surveyHandler.replaceGatewayQuestionText(happyUrl, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                }
+	                if(StringUtils.isNotEmpty(surveySettings.getOkUrl())) {
+	                    String okUrl = surveySettings.getOkUrl();
+	                    surveyAndStage.put("okUrl", surveyHandler.replaceGatewayQuestionText(okUrl, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                }
+	                if(StringUtils.isNotEmpty(surveySettings.getSadUrl())) {
+	                    String sadUrl = surveySettings.getSadUrl();
+	                    surveyAndStage.put("sadUrl", surveyHandler.replaceGatewayQuestionText(sadUrl, unitSettings, user,
+	                        companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+	                }
+	            }
+			    
+			    // If any of the texts are not set by the company, store default values
+			    // for them.
+			    if (!(isHappyTextSet && isNeutralTextSet && isSadTextSet && isHappyTextCompleteSet && isNeutralTextCompleteSet && isSadTextCompleteSet)) {
+			        LOG.info("Setting default values for surveyAndStage started");
+			        SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
+			        if (!isHappyTextSet) {
+			            //add Facebook pixel tag in happy text 
+			            String happyText = defaultSurveySettings.getHappyText() + facebookPixelTag;
+			            surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyText, unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			        }
+			        if (!isNeutralTextSet) {
+			            surveyAndStage.put("neutralText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralText(), unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			        }
+			        if (!isSadTextSet) {
+			            surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadText(), unitSettings, user,
+			                companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			        }
+			        if (!isHappyTextCompleteSet) {
+			            surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getHappyTextComplete(),
+			                unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			        }
+			        if (isNeutralTextCompleteSet) {
+			            surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralTextComplete(),
+			                unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			        }
+			        if (isSadTextCompleteSet) {
+			            surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadTextComplete(),
+			                unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
+			        }
+			        LOG.info("Setting default values for surveyAndStage finished");
+			    }
 			}
-			if (!isSadTextSet) {
-				surveyAndStage.put("sadText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadText(), unitSettings, user,
-						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-			}
-			if (!isHappyTextCompleteSet) {
-				surveyAndStage.put("happyTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getHappyTextComplete(),
-						unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-			}
-			if (isNeutralTextCompleteSet) {
-				surveyAndStage.put("neutralTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getNeutralTextComplete(),
-						unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-			}
-			if (isSadTextCompleteSet) {
-				surveyAndStage.put("sadTextComplete", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getSadTextComplete(),
-						unitSettings, user, companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
-			}
-			LOG.info("Setting default values for surveyAndStage finished");
-		}
 
 		// Fetching Yelp Url
 		surveyHandler.updateSurveyStageForYelp(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage);
@@ -2092,6 +2456,35 @@ public class SurveyManagementController
         postToSocialMedia.setZillow(false);
         return postToSocialMedia;
 	}
+	
+    private SurveySettings updatePartnerSurveySettings( OrganizationUnitSettings unitSettings)
+    {
+
+        SurveySettings unitSurveySettings = unitSettings.getSurvey_settings();
+
+        if ( StringUtils.isEmpty( unitSurveySettings.getHappyTextPartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getHappyText() ) )
+            unitSurveySettings.setHappyTextPartner( unitSurveySettings.getHappyText() );
+        if ( StringUtils.isEmpty( unitSurveySettings.getNeutralTextPartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getNeutralText() ) )
+            unitSurveySettings.setNeutralTextPartner( unitSurveySettings.getNeutralText() );
+        if ( StringUtils.isEmpty( unitSurveySettings.getSadTextPartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getSadText() ) )
+            unitSurveySettings.setSadTextPartner( unitSurveySettings.getSadText() );
+
+        if ( StringUtils.isEmpty( unitSurveySettings.getHappyTextCompletePartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getHappyTextComplete() ) )
+            unitSurveySettings.setHappyTextCompletePartner( unitSurveySettings.getHappyTextComplete() );
+        if ( StringUtils.isEmpty( unitSurveySettings.getNeutralTextCompletePartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getNeutralTextComplete() ) )
+            unitSurveySettings.setNeutralTextCompletePartner( unitSurveySettings.getNeutralTextComplete() );
+        if ( StringUtils.isEmpty( unitSurveySettings.getSadTextCompletePartner() )
+            && !StringUtils.isEmpty( unitSurveySettings.getSadTextComplete() ) )
+            unitSurveySettings.setSadTextCompletePartner( unitSurveySettings.getSadTextComplete() );
+        
+
+        return unitSurveySettings;
+    }
 
 }
 // JIRA SS-119 by RM-05 : EOC

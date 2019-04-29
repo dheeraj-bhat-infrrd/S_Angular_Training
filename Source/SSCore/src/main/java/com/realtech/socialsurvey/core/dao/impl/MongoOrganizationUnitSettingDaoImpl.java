@@ -133,6 +133,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SEND_EMAIL_FROM_COMPANY = "sendEmailFromCompany";
     public static final String KEY_HIDE_FROM_BREAD_CRUMB = "hideFromBreadCrumb";
     public static final String KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA = "allowOverrideForSocialMedia";
+    public static final String KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW = "allowConfigureSecondaryWorkflow";
 
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";

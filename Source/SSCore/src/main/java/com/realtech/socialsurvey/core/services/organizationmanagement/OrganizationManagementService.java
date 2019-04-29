@@ -151,7 +151,18 @@ public interface OrganizationManagementService
      */
     public boolean updateSurveySettings( OrganizationUnitSettings companySettings, SurveySettings surveySettings )
         throws InvalidInputException;
-
+    
+    /**
+     * 
+     * Updates the SurveySettings
+     * @param entityType
+     * @param unitSettings
+     * @param surveySettings
+     * @return
+     * @throws InvalidInputException
+     */
+    public boolean updateSecondaryWorkflow(String entityType, OrganizationUnitSettings unitSettings, SurveySettings surveySettings )
+        throws InvalidInputException;
 
     /**
      * Updates the LocationEnbling in the settings
@@ -949,6 +960,11 @@ public interface OrganizationManagementService
      * @return
      */
     public SurveySettings retrieveDefaultSurveyProperties();
+    
+    /**
+     * @return
+     */
+    public SurveySettings retrieveDefaultSecondaryWorkflowValues();
 
 
     /**
@@ -1444,7 +1460,8 @@ public interface OrganizationManagementService
 
 
     void updateAllowPartnerSurveyForAllUsers( Set<Long> userIds, boolean allowPartnerSurvey ) throws InvalidInputException;
-
+    
+    public void updateKeyForAllUsersOfCollection( List<Long> userIds, String field, boolean value, String collectionType) throws InvalidInputException;
 
     void updatellowPartnerSurveyForUser( AgentSettings agentSettings, boolean allowPartnerSurvey );
 
@@ -1815,6 +1832,14 @@ public interface OrganizationManagementService
      * @param allowPartnerSurvey
      */
     void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey );
+    
+    /**
+     * Updates the allowPartner survey field for given unit settings
+     * @param unitSettings
+     * @param allowPartnerSurvey
+     * @param collectionType
+     */
+    void updateAllowPartnerSurveyForCollection( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey, String collectionType );
 
     CompanyStatistics fetchCompanyStatistics( long companyId ) throws NoRecordsFetchedException, InvalidInputException;
 

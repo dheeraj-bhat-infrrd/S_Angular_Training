@@ -32,6 +32,7 @@ public class OrganizationUnitSettings implements Serializable
     private String profileUrl;
     private String profileImageUrl;
     private String logo;
+    private Boolean allowConfigureSecondaryWorkflow;
     private boolean isLocationEnabled;
     private boolean isAccountDisabled;
     private boolean isDefaultBySystem;
@@ -342,6 +343,18 @@ public class OrganizationUnitSettings implements Serializable
     public void setLogo( String logo )
     {
         this.logo = logo;
+    }
+
+
+    public Boolean getAllowConfigureSecondaryWorkflow()
+    {
+        return allowConfigureSecondaryWorkflow;
+    }
+
+
+    public void setAllowConfigureSecondaryWorkflow( Boolean allowConfigureSecondaryWorkflow )
+    {
+        this.allowConfigureSecondaryWorkflow = allowConfigureSecondaryWorkflow;
     }
 
 

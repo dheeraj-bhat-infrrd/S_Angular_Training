@@ -32,7 +32,10 @@ public interface BranchDao extends GenericDao<Branch, Long> {
 	Map<String, String> getBranchAndRegionName(long regionId, long branchId) throws InvalidInputException;
 
     public List<Long> getBranchIdsOfCompany( long companyId ) throws InvalidInputException;
-
+    
+    public List<Long> getAllBranchIdsOfCompany( long companyId ) throws InvalidInputException;
+    
+    public List<Long> getAllBranchIdsOfRegion( long regionId ) throws InvalidInputException;
 
     public Map<Long, Long> getCompanyIdsForBranchIds( List<Long> branchIds );
     

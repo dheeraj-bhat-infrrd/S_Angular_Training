@@ -6660,6 +6660,49 @@ function paintTextForMood(happyText, neutralText, sadText, happyTextComplete, ne
 	$('#sad-complete-url').text(decodeURIComponent( escape( window.atob( sadUrl))));	
 }
 
+function paintTextForMoodPartner(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete) {
+	$('#happy-text-partner').text(decodeURIComponent( escape( window.atob( happyText ) ) ));
+	$('#neutral-text-partner').text(decodeURIComponent( escape( window.atob( neutralText ) ) ));
+	$('#sad-text-partner').text(decodeURIComponent( escape( window.atob( sadText ) ) ));
+
+	$('#happy-text-complete-partner').text(decodeURIComponent( escape( window.atob( happyTextComplete ) ) ));
+	$('#neutral-text-complete-partner').text(decodeURIComponent( escape( window.atob( neutralTextComplete ) ) ));
+	$('#sad-text-complete-partner').text(decodeURIComponent( escape( window.atob( sadTextComplete ) ) ));
+}
+
+function paintTextForMoodCustomer(happyText, neutralText, sadText, happyTextComplete, neutralTextComplete, sadTextComplete,
+		happyUrl, okUrl, sadUrl) {
+	$('#happy-text-customer').text(decodeURIComponent( escape( window.atob( happyText ) ) ));
+	$('#neutral-text-customer').text(decodeURIComponent( escape( window.atob( neutralText ) ) ));
+	$('#sad-text-customer').text(decodeURIComponent( escape( window.atob( sadText ) ) ));
+
+	$('#happy-text-complete-customer').text(decodeURIComponent( escape( window.atob( happyTextComplete ) ) ));
+	$('#neutral-text-complete-customer').text(decodeURIComponent( escape( window.atob( neutralTextComplete ) ) ));
+	$('#sad-text-complete-customer').text(decodeURIComponent( escape( window.atob( sadTextComplete ) ) ));
+	
+	$('#happy-complete-url').text(decodeURIComponent( escape( window.atob( happyUrl) ) ));
+	$('#ok-complete-url').text(decodeURIComponent( escape( window.atob( okUrl) ) ));
+	$('#sad-complete-url').text(decodeURIComponent( escape( window.atob( sadUrl))));
+}
+
+function enableSecondaryWorkflowSetting(allowSecWorkflow, disableEle) {
+	var payload = {
+		"entityType" : "agentId",
+		"entityId" : "${userId}",
+		"settingName" : "allowConfigureSecondaryWorkflow",
+		"settingStatus" : allowSecWorkflow
+	};
+
+	callAjaxPostWithPayloadData("./updateentitysettings.do",function(data) {
+		if (data == "Successfully updated settings") {
+			$('#overlay-toast').html("Secondary workflow toggle Updated Sucessfully.");
+		} else {
+			$('#overlay-toast').html("Unable to toggle secondary workflow.");
+		}
+		showToast();
+	}, payload, true, disableEle);
+}
+
 // User management
 $(document).on('click', '.um-user-row', function() {
 	if (!isUserManagementAuthorized)
@@ -12953,6 +12996,32 @@ $('body').on('click', '#st-settings-account-off', function(e) {
 	createPopupConfirm("Cancel Your Subscription", "By cancelling your subscription, you will not be able to access your SocialSurvey profile after the current billing cycle. Also for Branch or Company Accounts, this will disable all accounts in your hierarchy under this account.<br/> Do you want to Continue?");
 	overlayAccount();
 });
+$(document).on('click','#customer-tab-id',function(e){
+	e.stopPropagation();
+
+	document.getElementById("customer-survey-panel-id-1").style.display = "block";
+	document.getElementById("customer-survey-panel-id-2").style.display = "block";
+	document.getElementById("partner-survey-panel-id-1").style.display = "none";
+	document.getElementById("partner-survey-panel-id-2").style.display = "none";
+});
+
+$(document).on('click','#partner-tab-id',function(e){
+	e.stopPropagation();
+
+	document.getElementById("partner-survey-panel-id-1").style.display = "block";
+	document.getElementById("partner-survey-panel-id-2").style.display = "block";
+	document.getElementById("customer-survey-panel-id-1").style.display = "none";
+	document.getElementById("customer-survey-panel-id-2").style.display = "none";
+});
+$('body').on('click', '#conf-sec-flow-chk-box', function() {
+	if ($('#conf-sec-flow-chk-box').hasClass('bd-check-img-checked')) {
+		$('#conf-sec-flow-chk-box').removeClass('bd-check-img-checked');
+		enableSecondaryWorkflowSetting(true, '#conf-sec-flow-chk-box');
+	} else {
+		$('#conf-sec-flow-chk-box').addClass('bd-check-img-checked');
+		enableSecondaryWorkflowSetting(false, '#conf-sec-flow-chk-box');
+	}
+});
 
 $('body').on('blur', '#happy-text', function() {
 	saveTextForMoodFlow($("#happy-text").val(), "happy");
@@ -12973,6 +13042,44 @@ $('body').on('blur', '#neutral-text-complete', function() {
 $('body').on('blur', '#sad-text-complete', function() {
 	saveTextForMoodFlow($("#sad-text-complete").val(), "sadComplete");
 });
+$('body').on('blur', '#happy-text-partner', function() {
+	saveTextForMoodFlow($("#happy-text-partner").val(), "happyPartner");
+});
+$('body').on('blur', '#neutral-text-partner', function() {
+	saveTextForMoodFlow($("#neutral-text-partner").val(), "neutralPartner");
+});
+$('body').on('blur', '#sad-text-partner', function() {
+	saveTextForMoodFlow($("#sad-text-partner").val(), "sadPartner");
+});
+
+$('body').on('blur', '#happy-text-complete-partner', function() {
+	saveTextForMoodFlow($("#happy-text-complete-partner").val(), "happyCompletePartner");
+});
+$('body').on('blur', '#neutral-text-complete-partner', function() {
+	saveTextForMoodFlow($("#neutral-text-complete-partner").val(), "neutralCompletePartner");
+});
+$('body').on('blur', '#sad-text-complete-partner', function() {
+	saveTextForMoodFlow($("#sad-text-complete-partner").val(), "sadCompletePartner");
+});
+$('body').on('blur', '#happy-text-customer', function() {
+	saveTextForMoodFlow($("#happy-text-customer").val(), "happy");
+});
+$('body').on('blur', '#neutral-text-customer', function() {
+	saveTextForMoodFlow($("#neutral-text-customer").val(), "neutral");
+});
+$('body').on('blur', '#sad-text-customer', function() {
+	saveTextForMoodFlow($("#sad-text-customer").val(), "sad");
+});
+
+$('body').on('blur', '#happy-text-complete-customer', function() {
+	saveTextForMoodFlow($("#happy-text-complete-customer").val(), "happyComplete");
+});
+$('body').on('blur', '#neutral-text-complete-customer', function() {
+	saveTextForMoodFlow($("#neutral-text-complete-customer").val(), "neutralComplete");
+});
+$('body').on('blur', '#sad-text-complete-customer', function() {
+	saveTextForMoodFlow($("#sad-text-complete-customer").val(), "sadComplete");
+});
 $('body').on('blur', '#happy-complete-url', function() {
 	saveTextForMoodFlow($("#happy-complete-url").val(), "happyUrl");
 });
@@ -12990,18 +13097,30 @@ $('body').on('click', '.reset-icon', function() {
 	var resetId = $(this).prev().attr('id');
 	var resetTag = "";
 
-	if (resetId == 'happy-text') {
+	if (resetId == 'happy-text' || resetId == 'happy-text-customer') {
 		resetTag = 'happy';
-	} else if (resetId == 'neutral-text') {
+	} else if (resetId == 'neutral-text' || resetId == 'neutral-text-customer') {
 		resetTag = 'neutral';
-	} else if (resetId == 'sad-text') {
+	} else if (resetId == 'sad-text' || resetId == 'sad-text-customer') {
 		resetTag = 'sad';
-	} else if (resetId == 'happy-text-complete') {
+	} else if (resetId == 'happy-text-complete' || resetId == 'happy-text-complete-customer') {
 		resetTag = 'happyComplete';
-	} else if (resetId == 'neutral-text-complete') {
+	} else if (resetId == 'neutral-text-complete' || resetId == 'neutral-text-complete-customer') {
 		resetTag = 'neutralComplete';
-	} else if (resetId == 'sad-text-complete') {
+	} else if (resetId == 'sad-text-complete' || resetId == 'sad-text-complete-customer') {
 		resetTag = 'sadComplete';
+	} else if (resetId == 'happy-text-partner') {
+		resetTag = 'happyPartner';
+	} else if (resetId == 'neutral-text-partner') {
+		resetTag = 'neutralPartner';
+	} else if (resetId == 'sad-text-partner') {
+		resetTag = 'sadPartner';
+	} else if (resetId == 'happy-text-complete-partner') {
+		resetTag = 'happyCompletePartner';
+	} else if (resetId == 'neutral-text-complete-partner') {
+		resetTag = 'neutralCompletePartner';
+	} else if (resetId == 'sad-text-complete-partner') {
+		resetTag = 'sadCompletePartner';
 	}
 	showOverlay();
 	resetTextForMoodFlow(resetTag, resetId);
@@ -23358,6 +23477,7 @@ function editProfileUrlForQuickEdits(data) {
 			createEditProfileUrlPopupForQuickEdits("Warning", data);
 		}, true);
 	}
+	
 }
 
 function createEditProfileUrlPopupForQuickEdits(header, body) {
@@ -23382,7 +23502,7 @@ function createEditProfileUrlPopupForQuickEdits(header, body) {
 		e.stopPropagation();
 		e.stopImmediatePropagation();
 		e.preventDefault();
-		
+
 		$('#selected-user-profileurl').val($('#selected-user-profileurl').attr('data-value'));
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
