@@ -3505,7 +3505,7 @@ public class SocialManagementController
                 }
                 //String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
                 
-                String linkedInAuthV2 = socialManagementService.getLinkedinAuthUrl( linkedinAuthUriV2, linkedInApiKeyV2, serverBaseUrl + linkedinRedirectUri, linkedinScopeV2 );
+                String linkedInAuthV2 = socialManagementService.getLinkedinAuthUrl( linkedinAuthUriV2, "81m03i2x1jywqq", serverBaseUrl + "/linkedinauthimage.do", linkedinScopeV2 );
                 
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuthV2 );
 
@@ -3517,6 +3517,7 @@ public class SocialManagementController
         }
 
         model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
+        model.addAttribute( "isFbImagePopup", "true" );
         LOG.info("returning to facebook intermediate from socialAuth");
         if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") )
             return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
@@ -3598,19 +3599,9 @@ public class SocialManagementController
     @RequestMapping ( value = "/linkedinauthimage", method = RequestMethod.GET)
     public String authenticateLinkedInAccessV2Image( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method authenticateLinkedInAccessV2() called from SocialManagementController" );
-        return authenticateLinkedInAccessImage( model, request, V2, linkedInApiKeyV2, linkedInApiSecretV2, linkedinAccessUriV2,
-            linkedinRedirectUri );
-    }
-
-    public String authenticateLinkedInAccessImage( Model model, HttpServletRequest request, String version, String linkedInApiKey, String linkedInApiSecret, String linkedinAccessUri, String linkedinRedirectUri )
-    {
-        User user = sessionHelper.getCurrentUser();
+        //User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
-        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        
-        
-        SocialMediaTokens mediaTokens = null;
+        model.addAttribute( "isFbImagePopup", "true" );
         try {
 
             // On auth error
@@ -3627,13 +3618,13 @@ public class SocialManagementController
             params.add( new BasicNameValuePair( "grant_type", "authorization_code" ) );
             params.add( new BasicNameValuePair( "code", oauthCode ) );
             params.add(
-                new BasicNameValuePair( "redirect_uri", requestUtils.getRequestServerName( request ) + linkedinRedirectUri ) );
-            params.add( new BasicNameValuePair( "client_id", linkedInApiKey ) );
-            params.add( new BasicNameValuePair( "client_secret", linkedInApiSecret ) );
+                new BasicNameValuePair( "redirect_uri", requestUtils.getRequestServerName( request ) + "/linkedinauthimage.do" ) );
+            params.add( new BasicNameValuePair( "client_id", "81m03i2x1jywqq" ) );
+            params.add( new BasicNameValuePair( "client_secret", "Evwv7UljwOof4ic9" ) );
 
             // fetching access token
             HttpClient httpclient = HttpClientBuilder.create().build();
-            HttpPost httpPost = new HttpPost( linkedinAccessUri );
+            HttpPost httpPost = new HttpPost( linkedinAccessUriV2 );
             httpPost.setEntity( new UrlEncodedFormEntity( params, "UTF-8" ) );
             String accessTokenStr = httpclient.execute( httpPost, new BasicResponseHandler() );
             Map<String, Object> map = new Gson().fromJson( accessTokenStr, new TypeToken<Map<String, String>>() {}.getType() );
@@ -3643,13 +3634,23 @@ public class SocialManagementController
             if(StringUtils.isNotBlank( expiresInStr ))
                 expiresIn = Long.valueOf( expiresInStr ).longValue();
 
-            HttpGet httpGet = new HttpGet( linkedinProfileUriV2 );
-            httpGet.setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + accessToken );
-            httpGet.setHeader( CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE );
-            String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
-            IdInfoVO idInfoVO = new Gson().fromJson( basicProfileStr, IdInfoVO.class );
-            String profileLink = null;
+			/*
+			 * HttpGet httpGet = new HttpGet( linkedinProfileUriV2 ); httpGet.setHeader(
+			 * HttpHeaders.AUTHORIZATION, "Bearer " + accessToken ); httpGet.setHeader(
+			 * CommonConstants.X_RESTLI_PROTOCOL_VERSION,
+			 * CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE ); String basicProfileStr =
+			 * httpclient.execute( httpGet, new BasicResponseHandler() ); IdInfoVO idInfoVO
+			 * = new Gson().fromJson( basicProfileStr, IdInfoVO.class );
+			 */
             
+            HttpGet httpGetImage = new HttpGet( "https://api.linkedin.com/v2/me?projection=(id,profilePicture(displayImage~:playableStreams))" );
+            httpGetImage.setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + accessToken );
+            httpGetImage.setHeader( CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE );
+            String basicProfileStrResponse = httpclient.execute( httpGetImage, new BasicResponseHandler() );
+            basicProfileStrResponse = basicProfileStrResponse.substring(basicProfileStrResponse.indexOf("identifier"));
+            basicProfileStrResponse = basicProfileStrResponse.substring(basicProfileStrResponse.indexOf("http"), basicProfileStrResponse.indexOf(',')-1);
+            LOG.info("Linked in response for image is " + basicProfileStrResponse);
+            model.addAttribute("profileImage", basicProfileStrResponse);
             
         } catch ( Exception e ) {
             LOG.error( "Exception while getting linkedin access token. Reason : ", e );
@@ -3658,13 +3659,12 @@ public class SocialManagementController
 
         // Updating attributes
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
-        
         model.addAttribute( "socialNetwork", "linkedin" );
         
         LOG.info( "Method authenticateLinkedInAccess() finished from SocialManagementController" );
         return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
-    
+
     /**
      * The url that twitter send request to with the oauth verification code
      * 
