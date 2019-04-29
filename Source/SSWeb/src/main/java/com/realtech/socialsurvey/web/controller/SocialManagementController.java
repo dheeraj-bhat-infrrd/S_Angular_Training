@@ -3541,7 +3541,7 @@ public class SocialManagementController
             model.addAttribute( "columnValue", columnValue );
             model.addAttribute( "fromDashboard", 1 );
         }
-        URL profileImageUrl = null;
+        String profileImageUrl = null;
         try {
         	model.addAttribute( "isFbImagePopup", "true" );
             // On auth error
@@ -3563,7 +3563,7 @@ public class SocialManagementController
                     requestUtils.getRequestServerName( request ) + facebookRedirectImageUri );
                 facebook4j.User fbUser = facebook.getUser( facebook.getId() );
                 profileLink = facebookUri + facebook.getId();
-                profileImageUrl = facebook.getPictureURL(facebook.getId());
+                profileImageUrl = "http://graph.facebook.com/"+facebook.getId()+"/picture?type=large";
                 LOG.info("ProfilePic url " + profileImageUrl);
                 FacebookPage personalUserAccount = new FacebookPage();
                 personalUserAccount.setId( facebook.getId() );
