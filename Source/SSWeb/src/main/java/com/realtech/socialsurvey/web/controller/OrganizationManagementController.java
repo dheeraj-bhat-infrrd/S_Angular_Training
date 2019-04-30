@@ -46,6 +46,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.WidgetTemplateConstants;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -916,6 +917,10 @@ public class OrganizationManagementController
             
             // add isIncompleteSurveyDeleteEnabled flag
             model.addAttribute( "isIncompleteSurveyDeleteEnabled", unitSettings.isIncompleteSurveyDeleteEnabled());
+            
+            // add isSocialMonitorEnabled flag
+            model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
+            
             
             // add isEnableLoginButton flag
             model.addAttribute( "isEnableLogin", companySettings.getIsLoginEnableAllowed() );

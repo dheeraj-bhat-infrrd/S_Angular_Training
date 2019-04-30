@@ -106,6 +106,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.EmailUnsubscribeService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.DeleteDataTrackerService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
@@ -266,9 +267,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
-    
-    @Autowired
-    private GenericDao<DeleteDataTracker, Long> deleteDataTrackerDao;
 
     @Autowired
     private CsvUtils csvUtils;
@@ -288,9 +286,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     
     @Autowired
     private RegionDao regionDao;
-    
+
     @Autowired
     private GenericDao<SurveyPreInitiationTemp, Long> surveyPreinitiationTempDao;
+
+    @Autowired
+    private DeleteDataTrackerService deleteDataTrackerService;
 
     private static final int USER_EMAIL_ID_INDEX = 3;
     private static final int SURVEY_SOURCE_ID_INDEX = 2;
@@ -2632,23 +2633,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyDetails> documentsToBeDeleted = surveyDetailsDao.fetchSurveyForParticularHierarchyAndSource( entityId,
             entityType, source );
         surveyDetailsDao.removeExistingZillowSurveysByEntity( entityType, entityId, source );
-        writeToDeleteTracker(documentsToBeDeleted);
+        deleteDataTrackerService.writeToDeleteTrackerForSurveyDetails(documentsToBeDeleted);
         LOG.debug( "Method deleteExistingSurveysByEntity() finished" );
-    }
-    
-    private void writeToDeleteTracker( List<SurveyDetails> documentsToBeDeleted )
-    {
-        List<DeleteDataTracker> trackerList = new ArrayList<>();
-        for(SurveyDetails surveyDetails : documentsToBeDeleted) {
-            DeleteDataTracker tracker = new DeleteDataTracker();
-            tracker.setEntityId( surveyDetails.get_id() );
-            tracker.setEntityType( "SURVEY_DETAILS" );
-            tracker.setIsDeleted( 0 );
-            tracker.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-            tracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-            trackerList.add( tracker );
-        }
-        deleteDataTrackerDao.saveAll( trackerList );
     }
 
 

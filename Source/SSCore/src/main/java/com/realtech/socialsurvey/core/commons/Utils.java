@@ -61,6 +61,9 @@ public class Utils
     @Value ( "${SOCIALSURVEYME_SENDER_EMAIL_DOMAIN}")
     private String defaultEmailDomain;
 
+    @Value ( "${APPLICATION_BASE_URL}")
+    private  String applicationBaseUrl;
+
     @Autowired
     private EncryptionHelper encryptionHelper;
 
@@ -473,6 +476,24 @@ public class Utils
         Pattern pattern = Pattern.compile( CommonConstants.CUSTOMER_EMAIL_REGEX, Pattern.CASE_INSENSITIVE );
         Matcher matcher = pattern.matcher( emailId.trim() );
         return matcher.matches();
+    }
+
+    /*
+     * Method to generate complete profile URL for based on the profile
+     */
+    public  String getCompleteUrlForSettings(String profileUrl, String collectionName)
+    {
+            switch ( collectionName ) {
+                case CommonConstants.BRANCH_SETTINGS_COLLECTION:
+                    return applicationBaseUrl + CommonConstants.BRANCH_PROFILE_FIXED_URL + profileUrl ;
+                case CommonConstants.REGION_SETTINGS_COLLECTION:
+                    return applicationBaseUrl + CommonConstants.REGION_PROFILE_FIXED_URL + profileUrl;
+                case CommonConstants.COMPANY_SETTINGS_COLLECTION:
+                    return applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL + profileUrl ;
+                case CommonConstants.AGENT_SETTINGS_COLLECTION:
+                    return applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + profileUrl ;
+            }
+            return null;
     }
 
     /**

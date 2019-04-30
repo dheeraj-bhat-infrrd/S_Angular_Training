@@ -1,10 +1,35 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.dao.impl.UserProfileDaoImpl;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.EmailUnsubscribeService;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.referral.ReferralService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.vo.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,12 +44,12 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import com.realtech.socialsurvey.core.commons.SqlQueries;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.solr.common.SolrDocumentList;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -41,10 +66,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
-import com.realtech.socialsurvey.core.commons.Utils;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -57,7 +84,6 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserEmailMappingDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -96,28 +122,13 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.generator.URLGenerator;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.EmailUnsubscribeService;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
-import com.realtech.socialsurvey.core.services.referral.ReferralService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.services.upload.FileUploadService;
-import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EncryptionHelper;
-import com.realtech.socialsurvey.core.vo.SocialMediaVO;
-import com.realtech.socialsurvey.core.vo.UserList;
+import sun.misc.BASE64Decoder;
 
 
 /**
@@ -151,7 +162,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private EmailServices emailServices;
-    
+
     @Autowired
     private FileUploadService fileUploadService;
 
@@ -243,7 +254,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
-    
+
     @Autowired
     SessionFactory sessionFactory;
 
@@ -258,16 +269,27 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
-    
+
     @Autowired
     private EmailUnsubscribeService unsubscribeService;
+
+    @Autowired
+    private GenericDao<UserVo, Long> genericDao;
     
+    @Value ( "${CDN_PATH}")
+    private String amazonEndpoint;
+    
+    @Value ( "${AMAZON_LOGO_BUCKET}")
+    private String amazonLogoBucket;
+
+    @Value ( "${AMAZON_IMAGE_BUCKET}")
+    private String amazonImageBucket;
+
     @Autowired
     private RegionDao regionDaoImpl;
     
     @Autowired
     private GenericDao<DeleteDataTracker, Long> deleteDataTrackerDao;
-
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -438,7 +460,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     /**
      * This method creates a new user, user profile post validation of URL and also invalidates the
      * registration link used by the user to register
-     * 
+     *
      * @throws UserAlreadyExistsException
      * @throws UndeliveredEmailException
      */
@@ -516,7 +538,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * JIRA SS-35 BY RM02 Method to update the profile completion stage of user i.e the stage which
      * user has completed while registration, stores the next step to be taken by user while
      * registration process
-     * 
+     *
      * @throws InvalidInputException
      */
     @Override
@@ -556,7 +578,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to verify a user's account
-     * 
+     *
      * @param encryptedUrlParams
      * @throws InvalidInputException
      * @throws SolrException
@@ -583,7 +605,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to add a new user into a company. Admin sends the invite to user for registering.
-     * @throws NoRecordsFetchedException 
+     * @throws NoRecordsFetchedException
      */
     @Transactional
     @Override
@@ -612,7 +634,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Inserting agent settings for the user:" + user );
         insertAgentSettings( user );
-        
+
         // send user addition mail
         if( !isForHierarchyUpload && !isAddedByRealtechOrSSAdmin ) {
             organizationManagementService.sendUserAdditionMail( admin, user );
@@ -677,7 +699,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Method to deactivate user " + userIdToRemove + " called." );
         User userToBeDeactivated = userDao.findById( User.class, userIdToRemove );
-        if ( userToBeDeactivated == null ) {
+        if ( userToBeDeactivated == null || userToBeDeactivated.getStatus() == CommonConstants.STATUS_INACTIVE ) {
             throw new InvalidInputException( "No user found in databse for user id : " + userIdToRemove );
         }
 
@@ -837,7 +859,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         //update the mismatched record for  restored user's email id
         surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
-        
+
         //Restore mapped emailIds if possible
         List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByColumn( UserEmailMapping.class,
             CommonConstants.USER_COLUMN, user );
@@ -870,18 +892,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         String profileName = agentSettings.getProfileName();
         String newProfileName = null;
         String fullName = null;
-        
-        
-        
+
+
+
         if( ! StringUtils.isEmpty( user.getFirstName()) ){
             fullName = user.getFirstName().toLowerCase();
             if( ! StringUtils.isEmpty( user.getLastName() )){
                 fullName  +=  " " + user.getLastName().toLowerCase();
             }
         }
-             
+
         newProfileName = generateIndividualProfileName( user.getUserId(), fullName, user.getEmailId() );
-        
+
         user.setProfileName( profileName );
         user.setProfileUrl( "/" + profileName );
         if ( !profileName.equals( newProfileName ) ) {
@@ -986,7 +1008,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public User getUserByEmailAndCompanyFromUserEmailMappings( Company company, String emailId )
         throws InvalidInputException, NoRecordsFetchedException
     {
-    	
+
     		if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty" );
         }
@@ -995,7 +1017,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         LOG.debug( "Method getUserByEmailAndCompanyFromUserEmailMappings having emailId : {} companyId:{} started.", emailId,
         		company.getCompanyId() );
-        
+
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.EMAIL_ID, emailId );
         queries.put( CommonConstants.COMPANY + "." + CommonConstants.COMPANY_ID_COLUMN, company.getCompanyId() );
@@ -1055,7 +1077,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         List<User> users = userDao.findByKeyValue( User.class, queries );
         if ( users == null || users.isEmpty() ) {
-            throw new NoRecordsFetchedException( "No users found with the login name : {}", emailId );
+            throw new NoRecordsFetchedException( "No users found with the login name : "+ emailId );
         }
 
         LOG.debug( "Method getUserByEmail() finished from UserManagementService" );
@@ -1502,7 +1524,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to update a user's status
-     * 
+     *
      * @throws SolrException
      */
     @Override
@@ -1651,7 +1673,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     /**
-     * 
+     *
      * @param user
      * @param adminUser
      * @param profileId
@@ -1721,12 +1743,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public void updateUserProfile( User admin, long profileIdToUpdate, int status ) throws InvalidInputException
     {
-        LOG.debug( "Method to update a user called for user profile: " + profileIdToUpdate );
+        LOG.debug( "Method to update a user called for user profile: {}", profileIdToUpdate );
         if ( admin == null ) {
             throw new InvalidInputException( "No admin user present." );
         }
 
-        LOG.debug( "Method to assign user to a branch called by user : " + admin.getUserId() );
+        LOG.debug( "Method to assign user to a branch called by user : {}", admin.getUserId() );
         UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileIdToUpdate );
         if ( userProfile == null ) {
             throw new InvalidInputException( "No user profile present for the specified userId" );
@@ -1737,7 +1759,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfile.setStatus( status );
 
         userProfileDao.update( userProfile );
-        LOG.debug( "Method to update a user finished for user : " + profileIdToUpdate );
+        LOG.debug( "Method to update a user finished for user : {}", profileIdToUpdate );
     }
 
 
@@ -1745,7 +1767,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void removeUserProfile( long profileIdToDelete ) throws InvalidInputException
     {
-        LOG.debug( "Method to delete a profile called for user profile: " + profileIdToDelete );
+        LOG.info( "Method to delete a profile called for user profile: {}", profileIdToDelete );
 
         UserProfile userProfile = userProfileDao.findById( UserProfile.class, profileIdToDelete );
 
@@ -1763,8 +1785,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfileDao.delete( userProfile );
         LOG.debug( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
-
-
+    
     @Override
     @Transactional
     public void updateUserInSolr( User user ) throws InvalidInputException, SolrException
@@ -1884,7 +1905,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     /**
      * Sends an email to user with the link to complete registration. User has to provide password
      * to set. Also, user can choose to change name.
-     * 
+     *
      * @param emailId
      * @throws InvalidInputException
      */
@@ -1910,7 +1931,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         urlParams.put( CommonConstants.COMPANY, String.valueOf( companyId ) );
 
-        LOG.debug( "Generating URL" );
         String url = urlGenerator.generateUrl( urlParams,
             applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE );
         String name = firstName;
@@ -1936,7 +1956,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // Send reset password link to the user email ID
         emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName, holdSendingMail,
             hiddenSection );
-        
+
         // if the email is supposed to be either sent immediately or by batch without holding it, then update the invite sent date for the user 
         if( !holdSendingMail ){
         updateLastInviteSentDateIfUserExistsInDB( emailId );
@@ -2027,7 +2047,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to generate and send verification link
-     * 
+     *
      * @param user
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
@@ -2081,7 +2101,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     /**
      * Method to invite user for registration,includes storing invite in db, calling services to
      * send mail
-     * 
+     *
      * @param url
      * @param emailId
      * @param firstName
@@ -2114,7 +2134,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Calling email services to send registration invitation mail" );
         emailServices.sendRegistrationInviteMail( url, emailId, firstName, lastName );
-        
+
         updateLastInviteSentDateIfUserExistsInDB( emailId );
 
         LOG.debug( "Method inviteUser finished successfully" );
@@ -2123,7 +2143,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to extract the query parameter from encrypted url
-     * 
+     *
      * @param url
      * @return queryParam
      * @throws InvalidInputException
@@ -2146,7 +2166,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     /**
      * Method to store a registration invite, inserts a new invite if it doesn't exist otherwise
      * updates it with new timestamp values
-     * 
+     *
      * @param queryParam
      * @param emailId
      * @throws NonFatalException
@@ -2219,7 +2239,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to create a new user
-     * 
+     *
      * @param company
      * @param password
      * @param emailId
@@ -2262,7 +2282,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     /**
      * Method to check if an invite already exists for the same query parameters, if yes returns the
      * invite
-     * 
+     *
      * @param queryParam
      * @return
      */
@@ -2281,10 +2301,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to check whether a user with selected user name exists
-     * 
+     *
      * @param userName
      * @return
-     * @throws InvalidInputException 
+     * @throws InvalidInputException
      */
     @Transactional
     @Override
@@ -2581,7 +2601,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Assign a user directly under the company.
-     * 
+     *
      * @param admin
      * @param userId
      * @throws InvalidInputException
@@ -2652,7 +2672,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Checks if a user can add users to a particular region
-     * 
+     *
      * @param admin
      * @param regionId
      * @return
@@ -2695,7 +2715,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Assign a user directly to a region
-     * 
+     *
      * @param admin
      * @param userId
      * @param regionId
@@ -2834,7 +2854,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             	agentSettings.setHiddenSection(true);
             }
         }
-        
+
         MailIdSettings mail_ids = new MailIdSettings();
         mail_ids.setWork( user.getEmailId() );
         contactSettings.setMail_ids( mail_ids );
@@ -2885,7 +2905,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to generate a unique profile name from emailid and userId of individual
-     * 
+     *
      * @param userId
      * @param emailId
      * @return
@@ -2929,11 +2949,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to update profile name and url in agent settings
-     * 
+     *
      * @param profileName
      * @param profileUrl
      * @param agentSettings
-     * @throws InvalidInputException 
+     * @throws InvalidInputException
      */
     @Override
     public void updateProfileUrlInAgentSettings( String profileName, String profileUrl, AgentSettings agentSettings )
@@ -2953,7 +2973,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to update profile name and url in branch settings
-     * 
+     *
      * @param profileName
      * @param profileUrl
      * @param branchSettings
@@ -2981,7 +3001,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to update profile name and url in region settings
-     * 
+     *
      * @param profileName
      * @param profileUrl
      * @param regionSettings
@@ -3009,7 +3029,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to update profile name and url in company settings
-     * 
+     *
      * @param profileName
      * @param profileUrl
      * @param companySettings
@@ -3307,12 +3327,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             throw e;
         }
-        
+
         if( !isAddedByRealtechOrSSAdmin ) {
             // send user addition mail
             organizationManagementService.sendUserAdditionMail( admin, user );
         }
-        
+
         LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
 
         return user;
@@ -3331,7 +3351,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Adding newly added user {} to mongo", user.getFirstName() );
         insertAgentSettings( user );
-        
+
         LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
 
         LOG.debug( "Adding newly added user {} to solr", user.getFirstName() );
@@ -3350,7 +3370,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     /***
-     * 
+     *
      * @param userProfileNew
      * @param userProfiles
      * @return
@@ -3578,7 +3598,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfileDao.update( profileToMakePrimary );
         if(LOG.isDebugEnabled()){
         	LOG.debug( "marked a profile with profile id {} as primary for user with user id {}",profileToMakePrimary.getUserProfileId(),user.getUserId() );
-        }    
+        }
         LOG.debug( "method makeAProfileAsPrimaryOfAUser ended for user with userid : {}", user.getUserId() );
     }
 
@@ -3606,7 +3626,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     @Transactional
     public void updateBranch( Branch branch )
-    {	
+    {
     		//update modified on
     		branch.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         branchDao.update( branch );
@@ -3704,7 +3724,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     /**
-     * 
+     *
      */
     @Override
     @Transactional
@@ -3727,7 +3747,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     /**
-     * 
+     *
      * @param apiKey
      * @param apiSecret
      * @param companyId
@@ -3805,44 +3825,44 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     @Override
-    public int getUsersUnderBranchAdminCount( User admin )
+    public int getUsersUnderBranchAdminCount( User admin, String status )
     {
-        return userProfileDao.getUsersUnderBranchAdminCount( admin );
+        return userProfileDao.getUsersUnderBranchAdminCount( admin, status );
     }
 
 
     @Override
-    public int getUsersUnderRegionAdminCount( User admin )
+    public int getUsersUnderRegionAdminCount( User admin, String status )
     {
-        return userProfileDao.getUsersUnderRegionAdminCount( admin );
+        return userProfileDao.getUsersUnderRegionAdminCount( admin, status );
     }
 
 
     @Override
-    public int getUsersUnderCompanyAdminCount( User admin )
+    public int getUsersUnderCompanyAdminCount( User admin, String status )
     {
-        return userProfileDao.getUsersUnderCompanyAdminCount( admin );
+        return userProfileDao.getUsersUnderCompanyAdminCount( admin, status );
     }
 
 
     @Override
-    public List<UserFromSearch> getUsersUnderBranchAdmin( User admin, int startIndex, int batchSize )
+    public List<UserFromSearch> getUsersUnderBranchAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus  )
     {
-        return userProfileDao.findUsersUnderBranchAdmin( admin, startIndex, batchSize );
+        return userProfileDao.findUsersUnderBranchAdmin( admin, startIndex, batchSize, sortingOrder, userStatus );
     }
 
 
     @Override
-    public List<UserFromSearch> getUsersUnderRegionAdmin( User admin, int startIndex, int batchSize )
+    public List<UserFromSearch> getUsersUnderRegionAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus )
     {
-        return userProfileDao.findUsersUnderRegionAdmin( admin, startIndex, batchSize );
+        return userProfileDao.findUsersUnderRegionAdmin( admin, startIndex, batchSize, sortingOrder, userStatus);
     }
 
 
     @Override
-    public List<UserFromSearch> getUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize )
+    public List<UserFromSearch> getUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus)
     {
-        return userProfileDao.findUsersUnderCompanyAdmin( admin, startIndex, batchSize );
+        return userProfileDao.findUsersUnderCompanyAdmin( admin, startIndex, batchSize, sortingOrder, userStatus);
     }
 
 
@@ -3861,14 +3881,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         return userList;
     }
     
-    public List<UserFromSearch> getActiveUsersByUserIds( Set<Long> userIds ) throws InvalidInputException
+    public List<UserFromSearch> getActiveUsersByUserIds( Set<Long> userIds, String sortOrder ) throws InvalidInputException
     {
     	LOG.debug( "Method to find active users on the basis of user ids started for user ids : " + userIds );
     	if ( userIds == null || userIds.size() <= 0 ) {
     		LOG.warn("Invalid input parameter : Null or empty User Id List passed ");
     		throw new InvalidInputException( "Invalid input parameter : Null or empty User Id List passed " );
     	}
-    	List<UserFromSearch> userList = userProfileDao.getActiveUserFromSearchByUserIds( userIds );
+    	List<UserFromSearch> userList = userProfileDao.getActiveUserFromSearchByUserIds( userIds, sortOrder );
     	if ( userList == null ) {
     		LOG.warn("User not found for userId: {}", userIds );
     		throw new InvalidInputException( "User not found for userId:" + userIds );
@@ -3924,7 +3944,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
 
         User user = getUserByEmailAndCompanyFromUserEmailMappings( company, emailId );
-        
+
         List<UserProfile> userProfiles = user.getUserProfiles();
         for(UserProfile profile : userProfiles){
             if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID)
@@ -3933,7 +3953,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //if no agent profile found throw an exception
         throw new NoRecordsFetchedException( "No agent found" );
     }
-    
+
     /**
      *  Method to get a map of userId - review count given a list of userIds
      * @param userIds
@@ -4018,7 +4038,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to add a new user into a company. Admin sends the invite to user for registering.
-     * @throws UndeliveredEmailException 
+     * @throws UndeliveredEmailException
      */
     @Transactional
     @Override
@@ -4241,7 +4261,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         userList.setUsers( users );
         if(count == -1){
-            userList.setTotalRecord( userDao.getCountOfUsersAndEmailMappingForCompany( company ) ); 
+            userList.setTotalRecord( userDao.getCountOfUsersAndEmailMappingForCompany( company ) );
         }else{
             userList.setTotalRecord( count );
         }
@@ -4332,7 +4352,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Method to deleteUserEmailMapping for  emailMappingId : " + emailMappingId + " ended." );
     }
-    
+
     @Transactional
     @Override
     public void updateUserEmailMapping( UserEmailMapping userEmailMapping ) throws InvalidInputException
@@ -4341,7 +4361,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userEmailMapping == null ) {
             throw new InvalidInputException( "Passed parameter userEmailMapping is null " );
         }
-         
+
         long userEmailMappingId = userEmailMapping.getUserEmailMappingId();
         userEmailMapping = userEmailMappingDao.findById( UserEmailMapping.class, userEmailMapping.getUserEmailMappingId() );
 
@@ -4400,8 +4420,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload, boolean isDeletedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException
     {
-        LOG.debug( "Method deleteUserDataFromAllSources called for userId:" + userIdToBeDeleted );
-        
+        if( LOG.isDebugEnabled() ){
+            LOG.debug( "Method deleteUserDataFromAllSources called for userId: {} " , userIdToBeDeleted );
+        }
+
         //send user deletion mail
         if( !isForHierarchyUpload && !isDeletedByRealtechOrSSAdmin ) {
             try {
@@ -4424,7 +4446,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // Removing user data from solr.
         solrSearchService.removeUserFromSolr( userIdToBeDeleted );
 
-        LOG.debug( "Method deleteUserDataFromAllSources executed successfully" );
+        if( LOG.isDebugEnabled() ) {
+            LOG.debug( "Method deleteUserDataFromAllSources executed successfully" );
+        }
     }
 
 
@@ -4554,13 +4578,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     excelCreated = false;
                 }
             }
-            
-            
+
+
             boolean excelUploaded = false;
             if ( excelCreated ) {
                 try {
                     filePath = fileUploadService.uploadOldReport( file, fileName );
-                    
+
                     excelUploaded = true;
                 } catch ( NonFatalException e ) {
                     LOG.error( "Exception caught while uploading old report", e);
@@ -4574,7 +4598,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 if ( excelCreated && excelUploaded) {
                     List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
                     attachments.add( new EmailAttachment("CorruptRecords.xls", filePath) );
-                    
+
                     if ( companyAdminEnabled == "1" ) {
                         User companyAdmin = getCompanyAdmin( companyId );
                         if ( companyAdmin != null ) {
@@ -5108,15 +5132,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         this.saveIgnoredEmailCompanyMapping( emailId, companyId );
         socialManagementService.updateSurveyPreinitiationRecordsAsIgnored( emailId );
     }
-    
-    
+
+
     @Override
     @Transactional
     public void temporaryInactiveCompanyAdmin(long companyId){
         LOG.info( "method temporaryInactiveCompanyAdmin started for companyId : " + companyId );
         User admin = getAdminUserByCompanyId( companyId );
         if(admin != null){
-            admin.setStatus( CommonConstants.STATUS_TEMPORARILY_INACTIVE );    
+            admin.setStatus( CommonConstants.STATUS_TEMPORARILY_INACTIVE );
             admin.setLoginName( admin.getEmailId() );
             updateUser( admin );
         }
@@ -5128,8 +5152,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     @Transactional
     public void updateUserProfileObject( UserProfile userProfile ) throws InvalidInputException
-    {     
-        LOG.info( "method updateUserProfileObject started" ); 
+    {
+        LOG.info( "method updateUserProfileObject started" );
         if ( userProfile == null ){
             throw new InvalidInputException( "Passed parameter userProfile is null" );
         }
@@ -5137,7 +5161,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userProfileDao.update( userProfile );
         LOG.info( "method updateUserProfileObject finished for User : " + userProfile.getAgentId() );
     }
-    
+
     /**
      * method to update the last invitation sent date in users table in MySQL if the user entry exists.
      *
@@ -5162,9 +5186,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "Exception caught while checking for email id in USERS table." );
         }
     }
-    
-    
-    
+
+
+
     @Override
     public boolean isUserSocialSurveyAdmin( User user ) {
         LOG.trace( "method isUserSocialSurveyAdmin() called for {}", user );
@@ -5172,7 +5196,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.warn( "User object can't be null" );
             return false;
         } else {
-            
+
             //get primary profile profile of user
             List<UserProfile> userProfiles = user.getUserProfiles();
             for ( UserProfile userProfile : userProfiles ) {
@@ -5183,8 +5207,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
             return false;
         }
-        
-        
+
+
     }
 
 
@@ -5192,18 +5216,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<UserProfile> getUserProfiles( long userId ) throws InvalidInputException
     {
         LOG.debug( "method getUserProfiles() started" );
-        
+
         if( userId <= 0 ) {
             LOG.warn( "Invalid user ID" );
             throw new InvalidInputException( "Invalid user ID" );
         }
-        
-        List<UserProfile> profiles = userProfileDao.getUserProfiles( userId ); 
+
+        List<UserProfile> profiles = userProfileDao.getUserProfiles( userId );
 
         LOG.debug( "method getUserProfiles() finished" );
         return profiles;
     }
-    
+
 
     /*
      * Method to fetch all the agent/admin user profiles for the user
@@ -5233,7 +5257,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Method getAllAgentAdminProfilesForUser() finised successfully" );
         return (List<UserProfile>) criteria.list();
     }
-    
+
     @Override
     @Transactional
     public List<UserFromSearch> getUserSocialMediaList( List<UserFromSearch> usersList ) throws InvalidInputException
@@ -5335,7 +5359,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         return usersList;
     }
-    
+
     @Override
     @Transactional ( rollbackFor = Exception.class)
     public void updateAgentIdInSurveyPreinitiation( String emailId)
@@ -5344,9 +5368,257 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         User user = userDao.getActiveUser(emailId);
         socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmailForMismatch( user, emailId );
     }
-    
-    
-    
+
+    @Override
+    public boolean checkIfTheUserCanBeDeleted( User loggedInUser, User userToRemove )
+    {
+        boolean canBeDeleted = true;
+        if ( userToRemove == null ) {
+            canBeDeleted = false;
+        } else {
+            if ( loggedInUser.getUserId() == userToRemove.getUserId() ) {
+                canBeDeleted = false;
+            } else if ( userToRemove.isCompanyAdmin() ) {
+                canBeDeleted = false;
+            }
+        }
+        return canBeDeleted;
+    }
+
+
+    /**
+     * Deletes the users with given userIds
+     * @param userIds
+     * @param adminId
+     */
+    @Transactional
+    @Override
+    public ManageTeamBulkResponse removeExistingUsers( List<Long> userIds, long adminId ) throws InvalidInputException
+    {
+        //if the userdIds are empty or adminId is invalid return error
+        if ( userIds == null || userIds.isEmpty() || adminId < 0 ) {
+            LOG.warn( "Invalid input userIds = {}, agentId = {}", userIds, adminId );
+            throw new InvalidInputException( "Invalid input provided", DisplayMessageConstants.INVALID_DETAILS_PROVIDED );
+        }
+
+        User loggedInUser = getUserByUserId( adminId );
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+
+        for ( Long userId : userIds ) {
+            ManageTeamBulkActionVo bulkActionVo = new ManageTeamBulkActionVo();
+            bulkActionVo.setUserId( userId );
+            try {
+                User userToRemove = getUserByUserId( userId );
+                if ( checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
+
+                    deleteUserDataFromAllSources( loggedInUser, userId, CommonConstants.STATUS_INACTIVE, false,
+                        true );
+
+                    bulkActionVo.setMessage( CommonConstants.USER_DELETION_SUCCESS );
+                    successItems.add( bulkActionVo );
+                } else{
+                    throw new InvalidInputException( "Unable to delete the user " + userId + ". Might be the admin !!!" );
+                }
+
+            } catch ( InvalidInputException | SolrException exception ) {
+                bulkActionVo.setMessage( exception.getMessage() );
+                failedItems.add( bulkActionVo );
+            }
+        }
+
+        return new ManageTeamBulkResponse( successItems, failedItems );
+    }
+
+
+    /**
+     * Deletes the users with given emailids
+     * @param userEmailIds
+     * @param adminEmailId
+     * @return
+     */
+    @Transactional @Override public ManageTeamBulkResponse removeExistingUsersByEmail( List<String> userEmailIds, String adminEmailId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        //if the userdIds are empty or adminId is invalid return error
+        if ( userEmailIds == null || userEmailIds.isEmpty() || StringUtils.isEmpty( adminEmailId ) ) {
+            LOG.warn( "Invalid input userEmailIds = {}, agentEmailId = {}", userEmailIds, adminEmailId );
+            throw new InvalidInputException( "Invalid input provided", DisplayMessageConstants.INVALID_DETAILS_PROVIDED );
+        }
+
+        User loggedInUser = getUserByEmail( adminEmailId.trim() );
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+
+        for ( String mailId : userEmailIds ) {
+            ManageTeamBulkActionVo bulkActionVo = new ManageTeamBulkActionVo();
+            try {
+                User userToRemove = getUserByEmailAddress( mailId.trim() );
+                if ( checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
+                    deleteUserDataFromAllSources( loggedInUser, userToRemove.getUserId(), CommonConstants.STATUS_INACTIVE, false, true );
+
+                    bulkActionVo.setMessage( CommonConstants.USER_DELETION_SUCCESS );
+                    bulkActionVo.setUserEmailId( mailId );
+                    bulkActionVo.setUserId( userToRemove.getUserId() );
+
+                    successItems.add( bulkActionVo );
+                } else{
+                    throw new InvalidInputException( "Unable to delete the user " + mailId + ". Might be the admin !!!" );
+                }
+
+            } catch ( InvalidInputException | SolrException | NoRecordsFetchedException exception ) {
+                bulkActionVo.setUserEmailId( mailId );
+                bulkActionVo.setMessage( exception.getMessage() );
+
+                failedItems.add( bulkActionVo );
+            }
+        }
+
+        return new ManageTeamBulkResponse( successItems, failedItems );
+    }
+
+
+    /**
+     * Reinvites the users with given emailIds. This method takes care of the already invited users
+     * and the users which have been deleted from the system.
+     * @param emailIds
+     * @throws InvalidInputException
+     */
+    @Transactional @Override public ManageTeamBulkResponse reInviteUsers( List<String> emailIds ) throws InvalidInputException
+    {
+        if ( emailIds == null || emailIds.isEmpty() ) {
+            LOG.warn( "Invalid emailIds in input {}", emailIds );
+            throw new InvalidInputException( "Invalid email ids.", DisplayMessageConstants.INVALID_EMAILID );
+        }
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+        ManageTeamBulkActionVo manageTeamBulkActionVo = null;
+
+        if( LOG.isDebugEnabled() ) {
+            LOG.debug( "Sending invitation..." );
+        }
+
+        for ( String emailId : emailIds ) {
+            try {
+                manageTeamBulkActionVo = new ManageTeamBulkActionVo();
+                User invitedUser = getUserByEmail( emailId );
+
+                if( invitedUser.getStatus() == CommonConstants.STATUS_ACTIVE ){
+                    throw new InvalidInputException( " User has already accepted the invite " );
+                }
+
+                AgentSettings agentSettings = getUserSettings( invitedUser.getUserId() );
+                String profileName = agentSettings.getProfileName();
+                sendRegistrationCompletionLink( emailId, invitedUser.getFirstName(), invitedUser.getLastName(),
+                    invitedUser.getCompany().getCompanyId(), profileName, invitedUser.getLoginName(), false );
+
+                //set the completeProfileUrl for the user
+                manageTeamBulkActionVo.setPublicPageUrl( utils
+                    .getCompleteUrlForSettings( agentSettings.getProfileUrl(), CommonConstants.AGENT_SETTINGS_COLLECTION ) );
+                manageTeamBulkActionVo.setUserId( invitedUser.getUserId() );
+                manageTeamBulkActionVo.setProfileName( profileName );
+                manageTeamBulkActionVo.setMessage( "Invitation has been successfully resent" );
+                manageTeamBulkActionVo.setUserEmailId( emailId );
+                successItems.add( manageTeamBulkActionVo );
+
+            } catch ( InvalidInputException | UndeliveredEmailException | NoRecordsFetchedException exception ) {
+                manageTeamBulkActionVo.setMessage( exception.getMessage() );
+                manageTeamBulkActionVo.setUserEmailId( emailId );
+                failedItems.add( manageTeamBulkActionVo );
+            }
+        }
+
+        return new ManageTeamBulkResponse( successItems, failedItems );
+    }
+
+
+    /**
+     * Assigns the given users as social montior admin
+     * @param userIds
+     * @param adminId
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override public ManageTeamBulkResponse assignUsersAsSocialMonitorAdmin( List<Long> userIds, long adminId )
+        throws InvalidInputException
+    {
+        if( userIds == null || userIds.isEmpty() ||adminId <= 0 )
+            throw new InvalidInputException( "Invalid input provided", DisplayMessageConstants.INVALID_DETAILS_PROVIDED );
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+        ManageTeamBulkActionVo manageTeamBulkActionVo;
+
+        try {
+            User admin = getUserByUserId( adminId );
+
+            for ( long userId : userIds ) {
+                manageTeamBulkActionVo = new ManageTeamBulkActionVo();
+                manageTeamBulkActionVo.setUserId( userId );
+                try {
+                    User assigneeUser = getUserByUserId( userId );
+
+                    if(admin.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId()) {
+                        throw new InvalidInputException( "Admin and the user doesnot belong to the same company !!!" );
+                    } else if(assigneeUser.getStatus() == CommonConstants.STATUS_INACTIVE){
+                        throw new InvalidInputException( "User is currently inactive or deleted !!!" );
+                    }
+
+                    this.assignUserAsSocialMonitorAdmin( admin, assigneeUser );
+
+                    manageTeamBulkActionVo.setMessage( "User has been assigned successfully as socialMonitorAdmin" );
+                    successItems.add( manageTeamBulkActionVo );
+
+                } catch ( InvalidInputException | NoRecordsFetchedException exception ) {
+                    manageTeamBulkActionVo.setMessage( exception.getMessage() );
+                    failedItems.add( manageTeamBulkActionVo );
+                }
+            }
+        }catch ( InvalidInputException  ex){
+            throw new InvalidInputException( "Invalid adminId : " + adminId );
+        }
+
+        return new ManageTeamBulkResponse( successItems, failedItems );
+    }
+
+    /**
+     * This api assigns the given user as socialmonitor admin. Please note that the given
+     * users must be already present in the hierarchy.
+     * @param admin
+     * @param assigneeUser
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    @Transactional
+    @Override public void assignUserAsSocialMonitorAdmin( User admin, User assigneeUser )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        Region region = organizationManagementService.getDefaultRegionForCompany( admin.getCompany() );
+        Branch branch = organizationManagementService.getDefaultBranchForRegion(region.getRegionId());
+
+        List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            for ( UserProfile profile : userProfiles ) {
+                if ( ( profile.getUser().getUserId() ==  assigneeUser.getUserId()  )
+                    && profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID
+                    && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    throw new InvalidInputException( "Redundant assignment !!!" );
+                }
+            }
+        }
+        // create a social monitor profile for user using default branch and region of company
+        UserProfile userProfile = this.createUserProfile( assigneeUser, admin.getCompany(),
+            assigneeUser.getEmailId(), assigneeUser.getUserId(), branch.getBranchId(),
+            region.getRegionId(), CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID,
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.PROFILE_STAGES_COMPLETE,
+            CommonConstants.STATUS_ACTIVE, String.valueOf( admin.getUserId() ),
+            String.valueOf( admin.getUserId() ) );
+        userProfileDao.save( userProfile );
+    }
+
     //one time run job
     @Override
 	public void updateSurveyDetails() {
@@ -5407,7 +5679,345 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 throw new InvalidInputException( "Invalid Entity Type." );
         }
     }
+
+    @Override
+    public ManageTeamBulkResponse bulkUpdateSocialPostScoreForAgents( List<Long> userIds, double minimumPostScore )
+        throws InvalidInputException
+    {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug( "Method bulkUpdateSocialPostScoreForAgents() started" );
+        }
+
+        if ( minimumPostScore == 0 ) {
+            LOG.error( "Mimimum Post rating score is 0." );
+            throw new InvalidInputException( "Mimimum Post rating score is 0." );
+        }
+        if( userIds == null) {
+            LOG.error( "UserId is null." );
+            throw new InvalidInputException( "UserId is null." );
+        }
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+
+        ManageTeamBulkActionVo manageTeamBulkActionVo = new ManageTeamBulkActionVo();
+        try {
+            List<Object> agentIds = new ArrayList<>();
+            agentIds.addAll( userIds );
+
+            Map<String, Object> updateMap = new HashMap<>();
+            updateMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS_MINIMUM_SOCIAL_POST_SCORE, minimumPostScore );
+            updateMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_SHOW_SURVEY_ABOVE_SCORE, minimumPostScore );
+
+            organizationUnitSettingsDao.updateOrganizationUnitSettingsByInCriteria( updateMap,
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, agentIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+
+            manageTeamBulkActionVo.setMessage( "Social post score for all selected users updated successfully");
+            successItems.add( manageTeamBulkActionVo );
+        }catch ( Exception exception) {
+            manageTeamBulkActionVo.setMessage( exception.getMessage() );
+            failedItems.add( manageTeamBulkActionVo );
+        }
+
+        if(LOG.isDebugEnabled()) {
+            LOG.debug( "Method bulkUpdateSocialPostScoreForAgents() finished" );
+        }
+        return new ManageTeamBulkResponse( successItems, failedItems);
+    }
+
+    @Override
+    public ManageTeamBulkResponse bulkUpdateLogoForAgents( List<Long> userIds, String logoFileName, MultipartFile fileLocal )
+        throws InvalidInputException
+    {
+        if(LOG.isDebugEnabled()){
+            LOG.debug( "Method bulkUpdateLogoForAgents() started" );
+        }
+
+        if ( userIds == null || userIds.isEmpty() ) {
+            throw new InvalidInputException( "userIds passed can not be null" );
+        }
+
+        String logoUrl;
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+
+        ManageTeamBulkActionVo manageTeamBulkActionVo = new ManageTeamBulkActionVo();
+        try {
+            if ( logoFileName == null || logoFileName.isEmpty() ) {
+                throw new InvalidInputException( "Logo passed is null or empty" );
+            }
+            logoUrl = fileUploadService.uploadLogo( fileLocal, logoFileName );
+            logoUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonLogoBucket +
+                CommonConstants.FILE_SEPARATOR + logoUrl;
+
+            if(LOG.isDebugEnabled()) {
+                LOG.debug( "Updating logo" );
+            }
+
+            if ( logoUrl.isEmpty() ) {
+                throw new InvalidInputException( "Logo passed can not be null or empty" );
+            }
+
+            Map<String, Object> updateMap = new HashMap<>();
+            updateMap.put( CommonConstants.LOGO_COLUMN, logoUrl );
+            updateMap.put( CommonConstants.LOGO_THUMBNAIL_COLUMN, logoUrl);
+            updateMap.put( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, false );
+
+            List<Object> agentIds = new ArrayList<>();
+            agentIds.addAll( userIds );
+
+            organizationUnitSettingsDao.updateOrganizationUnitSettingsByInCriteria( updateMap,
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, agentIds,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+            if(LOG.isDebugEnabled()) {
+                LOG.debug( "Logo updated successfully" );
+            }
+
+            manageTeamBulkActionVo.setMessage( "Logo updated successfully");
+            successItems.add( manageTeamBulkActionVo );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while uploading Logo. Reason :" + e.getMessage(), e );
+
+            manageTeamBulkActionVo.setMessage( "NonFatalException while uploading Logo.");
+            failedItems.add( manageTeamBulkActionVo );
+        }
+        LOG.debug( "Method bulkUpdateLogoForAgents() finished" );
+        return new ManageTeamBulkResponse( successItems, failedItems);
+    }
+
+
+    @Override public ManageTeamBulkResponse uploadProfilePicToAgents( ManageTeamBulkRequest manageTeamBulkRequest )
+        throws NonFatalException
+    {
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+        ManageTeamBulkActionVo manageTeamBulkActionVo;
+
+        if ( manageTeamBulkRequest.getImageBase64() == null ||  manageTeamBulkRequest.getImageFileName() == null
+            || manageTeamBulkRequest.getImageBase64().isEmpty() || manageTeamBulkRequest.getImageFileName().isEmpty() ) {
+            throw new InvalidInputException( "image passed is null or empty" );
+        }
+
+        try {
+            // reading image
+            File dir = new File( CommonConstants.IMAGE_DIR );
+            if ( !dir.exists() ) {
+                dir.mkdirs();
+            }
+            String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR + CommonConstants.IMAGE_NAME;
+
+            BASE64Decoder decoder = new BASE64Decoder();
+            byte[] decodedBytes = decoder.decodeBuffer( manageTeamBulkRequest.getImageBase64().split( "," )[1] );
+            ByteArrayInputStream bis = new ByteArrayInputStream( decodedBytes );
+
+            // resizing image
+            if(LOG.isDebugEnabled()){
+                LOG.debug( "Dimensions for resizing: resizeWidth:{} resizeHeight: {}" ,
+                    manageTeamBulkRequest.getResizeWidth(), manageTeamBulkRequest.getResizeHeight() );
+
+            }
+            BufferedImage bufferedImage = ImageIO.read( bis );
+            FileOutputStream fileOuputStream = new FileOutputStream( filePath );
+            ImageIO.write( bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream );
+            fileOuputStream.close();
+            UploadUtils.resizeImage( filePath, filePath, manageTeamBulkRequest.getResizeWidth(),
+                manageTeamBulkRequest.getResizeHeight() );
+
+            // cropping image
+            if(LOG.isDebugEnabled()){
+                LOG.debug( "Co-ordinates for cropping: x:{} y:{} h:{} w:{}" , manageTeamBulkRequest.getSelectedX(),
+                    manageTeamBulkRequest.getSelectedY(), manageTeamBulkRequest.getSelectedH(),
+                    manageTeamBulkRequest.getSelectedW() );
+            }
+
+            BufferedImage resized = ImageIO.read( new File( filePath ) );
+            BufferedImage croppedImage = UploadUtils.cropImage( resized, manageTeamBulkRequest.getSelectedW(),
+                manageTeamBulkRequest.getSelectedH(), manageTeamBulkRequest.getSelectedX(),
+                manageTeamBulkRequest.getSelectedY() );
+
+            fileOuputStream = new FileOutputStream( filePath );
+            ImageIO.write( croppedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream );
+            fileOuputStream.close();
+
+            // uploading image
+            File fileLocal = new File( filePath );
+            String profileImageUrl = fileUploadService.uploadProfileImageFile( fileLocal, manageTeamBulkRequest.getImageFileName(),
+                false );
+            profileImageUrl =
+                amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket + CommonConstants.FILE_SEPARATOR + profileImageUrl;
+
+            //update the profile pic in the agents settings
+            Map<String, Object> updateQueryMap = new HashMap<>();
+            updateQueryMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl );
+            updateQueryMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, profileImageUrl);
+            updateQueryMap.put( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN, false );
+            updateQueryMap.put( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, false );
+
+            List<Object> agentIds = new ArrayList<>();
+            agentIds.addAll( manageTeamBulkRequest.getUserIds() );
+
+            organizationUnitSettingsDao.updateOrganizationUnitSettingsByInCriteria( updateQueryMap,
+                MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, agentIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+            //update the image in the solr
+            for ( long userId : manageTeamBulkRequest.getUserIds() ) {
+                manageTeamBulkActionVo = new ManageTeamBulkActionVo();
+                manageTeamBulkActionVo.setUserId( userId );
+                try {
+                    Map<String, Object> updateMap = new HashMap<>();
+                    updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl );
+                    updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, profileImageUrl );
+                    updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+                    solrSearchService.editUserInSolrWithMultipleValues( userId, updateMap );
+
+                    manageTeamBulkActionVo.setMessage( "Profile picture updation successful" );
+                    successItems.add( manageTeamBulkActionVo );
+                } catch ( SolrException e ) {
+                    LOG.error( "Updating profile image URL for agent {} failed with exception {}", userId, e.getMessage() );
+                    manageTeamBulkActionVo.setMessage( e.getMessage() );
+                    failedItems.add( manageTeamBulkActionVo );
+                }
+            }
+        } catch ( IOException io ) {
+            LOG.error( "IOException while uploading Profile Image. Reason : {}", io );
+            throw new NonFatalException( "IO exception while uploading profile pic to agents" );
+        }
+
+        return new ManageTeamBulkResponse( successItems, failedItems );
+    }
+
+
+    public List<UserVo> getActiveUsersInHierarchy( String entityType, long adminId, long companyId ) throws InvalidInputException
+    {
+        if(LOG.isDebugEnabled()){
+            LOG.debug( "getAllActiveUserForCompany started for the company {}", adminId );
+        }
+
+        if(entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ))
+            throw new InvalidInputException( "Invalid entity type {}", entityType );
+
+        Map<String,Object> queries = new HashMap<>();
+        queries.put( CommonConstants.COMPANY_ID, companyId );
+        queries.put( CommonConstants.USER_ID, adminId );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE );
+        
+        String query ;
+        if(entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            queries.put( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+            query = UserProfileDaoImpl.companyUserSearchQuery;
+        } else if(entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN )) {
+            queries.put( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+            query = UserProfileDaoImpl.regionUserSearchQuery;
+        } else {
+            queries.put( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
+            query = UserProfileDaoImpl.branchUserSearchQuery;
+        }
+        return genericDao.executeNativeQuery( UserVo.class, queries, query);
+    }
+
+
+    public List<UserVo> getUnverifiedUsersInHierarchy( long companyId, String entityType, long adminId )
+        throws InvalidInputException
+    {
+        if(LOG.isDebugEnabled()){
+            LOG.debug( "getUnverifiedUsersInHierarchy started for the company {}", companyId );
+        }
+
+        String query;
+        Map<String,Object> queries = new HashMap<>();
+
+        if(entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ))
+            throw new InvalidInputException( "Invalid entity type {}", entityType );
+
+        queries.put( CommonConstants.COMPANY_ID, companyId  );
+        queries.put( CommonConstants.USER_ID, adminId );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED );
+        if( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            queries.put( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+            query = UserProfileDaoImpl.companyUserSearchQueryByStatus;
+        } else if( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            queries.put( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+            query = UserProfileDaoImpl.regionUserSearchQueryByStatus;
+        } else {
+            queries.put( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
+            query = UserProfileDaoImpl.branchUserSearchQueryByStatus;
+        }
+
+        return genericDao.executeNativeQuery( UserVo.class, queries, query );
+    }
     
+    public List<UserVo> getVerifiedUsersInHierarchy( long companyId, String entityType, long adminId )
+        throws InvalidInputException
+    {
+        if(LOG.isDebugEnabled()){
+            LOG.debug( "getVerifiedUsersInHierarchy started for the company {} ", companyId );
+        }
+
+        String query;
+        Map<String,Object> queries = new HashMap<>();
+
+        if(entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ))
+            throw new InvalidInputException( "Invalid entity type {}", entityType );
+
+        queries.put( CommonConstants.COMPANY_ID, companyId );
+        queries.put( CommonConstants.USER_ID, adminId );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        if( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            queries.put( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+            query = UserProfileDaoImpl.companyUserSearchQueryByStatus;
+        } else if( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            queries.put( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+            query = UserProfileDaoImpl.regionUserSearchQueryByStatus;
+        } else {
+            queries.put( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
+            query = UserProfileDaoImpl.branchUserSearchQueryByStatus;
+        }
+            return genericDao.executeNativeQuery( UserVo.class, queries, query );
+    }
+
+    /**
+     * Returns all the users matching the name pattern and matching the given status
+     * If status is ACTIVE then the api returns all the users matching the login/display name to the pattern and whose status is not 0
+     * If status is VERIFIED then the api returns all the users matching the login/display name to the pattern and whose status is 1
+     * If status is UNVERIFIED then the api returns all the users matching the login/display name to the pattern and whose status is 2
+     * Calls {@link SolrSearchService#searchUsersByLoginNameOrNameUnderAdmin(String, User, UserFromSearch, String, String, String, int, int)}
+     * @param pattern
+     * @param adminId
+     * @param companyId
+     * @param status
+     * @param entityType
+     * @return { @link List<UserVo> }
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    @Override public List<UserVo> getActiveUsersInHierarchy( String pattern, long adminId, long companyId, String status,
+        String sortingOrder, String entityType )
+        throws InvalidInputException, SolrException
+    {
+        UserFromSearch adminUser;
+        User admin ;
+
+        if(entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN )){
+            throw new InvalidInputException( "Invalid entity type {}", entityType );
+
+        }
+        //fetch the admin details from SOLR using the adminId
+        String adminUserDoc = new Gson().toJson( solrSearchService.getUserByUniqueId( adminId ) );
+        Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
+        adminUser = new Gson().fromJson( adminUserDoc, searchedUser );
+
+        //fetch the user details from mySql using the adminId
+        admin = userDao.findById(User.class, adminId  );
+
+        //get the users matching the given name pattern
+        SolrDocumentList solrDocumentList = solrSearchService.searchUsersByLoginNameOrNameUnderAdmin( pattern, admin,
+            adminUser, status, sortingOrder, entityType, 0,0);
+
+        return new Gson().fromJson( new Gson().toJson( solrDocumentList ) ,
+            new TypeToken<List<UserVo>>(){}.getType() );
+    }
 
     @Override
     public void removeLogoImage( String collection, OrganizationUnitSettings unitSettings ) throws InvalidInputException

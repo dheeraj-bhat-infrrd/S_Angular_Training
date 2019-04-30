@@ -8,7 +8,7 @@
 	<div class="container" style="margin-top: 20px;height:100%; width:100%;">
 		<div style="height:40px">
 			<div style="display:inline; font-weight: 600 !important;">Unmatched/Processed Transactions</div>
-			<div class="float-right" id="download-report" style="color:#009FE0;cursor:pointer" onclick="downloadSurveyReport(selectedTabIdOnSurveyRecordsSection,${entityId})">
+			<div class="float-right" id="download-report" style="color:#2b69a9;cursor:pointer" onclick="downloadSurveyReport(selectedTabIdOnSurveyRecordsSection,${entityId})">
 				Download mismatch records report
 			</div>
 		</div>

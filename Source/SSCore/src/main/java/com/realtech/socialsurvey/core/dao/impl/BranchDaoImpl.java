@@ -231,7 +231,7 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
             branchAndRegionNameMap.put(CommonConstants.BRANCH_NAME_COLUMN, row[0].toString());
             branchAndRegionNameMap.put(CommonConstants.REGION_COLUMN, row[1].toString());
         }
-        LOG.info(branchAndRegionNameMap.toString());
+        LOG.debug(branchAndRegionNameMap.toString());
         return branchAndRegionNameMap;
     }
 
@@ -276,7 +276,8 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
 		LOG.debug( "Method to fetch regionId from branchId getRegionIdByBranchId() started." );
 		Query query = getSession().createSQLQuery( "SELECT region_id FROM BRANCH WHERE branch_id = :branchId " );
         query.setParameter( "branchId", branchId  );
-        long regionId = (int) query.uniqueResult();
+        Object result =  query.uniqueResult();
+        long regionId = result != null ? (int) result : 0 ;
         LOG.debug( "Method to fetch regionId from branchId getRegionIdByBranchId() finished." );
         return regionId;
 	}

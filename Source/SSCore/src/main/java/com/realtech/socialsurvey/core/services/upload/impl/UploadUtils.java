@@ -175,7 +175,7 @@ public final class UploadUtils {
 	/**
 	 * Method to resize image to given dimensions
 	 */
-	public void resizeImage(String inputImagePath, String outputImagePath, int scaledWidth, int scaledHeight) throws IOException {
+	public static void resizeImage(String inputImagePath, String outputImagePath, int scaledWidth, int scaledHeight) throws IOException {
 		LOG.debug("Method resizeImage() called from UploadUtils");
 		// reads input image
 		File inputFile = new File(inputImagePath);
@@ -200,7 +200,7 @@ public final class UploadUtils {
 	/**
 	 * Method to crop image to given co-ordinates
 	 */
-	public BufferedImage cropImage(BufferedImage img, int cropWidth, int cropHeight, int cropStartX, int cropStartY) {
+	public static BufferedImage cropImage(BufferedImage img, int cropWidth, int cropHeight, int cropStartX, int cropStartY) {
 		LOG.debug("Method cropImage() called from UploadUtils");
 
 		Rectangle clip;

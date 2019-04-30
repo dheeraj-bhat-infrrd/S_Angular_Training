@@ -67,6 +67,7 @@ var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
 var isUserManagementAuthorized = true;
 var isAddUser = true;
+var pageNumber = 1;
 
 // Variables for editprofile page
 var editProfileForYelp = false;
@@ -440,6 +441,23 @@ $(document).on('click', function(e) {
 		$('#ad-customer-success-name-dropdown').slideToggle(200);
 	}
 	
+	if ($('.ms-ba-options').is(':visible')) {
+		$('.ms-ba-options').slideUp('fast');
+		$('.ms-ba-chevron-up').hide();
+		$('.ms-ba-chevron-down').show();
+	}
+	
+	if ($('.ms-filters-options').is(':visible')) {
+		$('.ms-filters-options').slideUp('fast');
+		$('.ms-fil-chevron-up').hide();
+		$('.ms-fil-chevron-down').show();
+	}
+	
+	if ($('.ms-batch-size-options').is(':visible')) {
+		$('.ms-batch-size-options').slideUp('fast');
+		$('.ms-bs-chevron-up').hide();
+		$('.ms-bs-chevron-down').show();
+	}
 });
 
 function checkSocMonDropdowns(e){
@@ -595,6 +613,24 @@ $(document).on('keyup', function(e) {
 		if($('#mismatch-new-popup-main').is(':visible')){
 			$('#mismatch-new-popup-main').addClass('hide');
 			resetMismatchPopup();
+		}
+		
+		if ($('.ms-ba-options').is(':visible')) {
+			$('.ms-ba-options').slideUp('fast');
+			$('.ms-ba-chevron-up').hide();
+			$('.ms-ba-chevron-down').show();
+		}
+		
+		if ($('.ms-filters-options').is(':visible')) {
+			$('.ms-filters-options').slideUp('fast');
+			$('.ms-fil-chevron-up').hide();
+			$('.ms-fil-chevron-down').show();
+		}
+		
+		if ($('.ms-batch-size-options').is(':visible')) {
+			$('.ms-batch-size-options').slideUp('fast');
+			$('.ms-bs-chevron-up').hide();
+			$('.ms-bs-chevron-down').show();
 		}
 	}
 });
@@ -7095,7 +7131,11 @@ function paintUserListInUserManagement(startIndex) {
 			$('#user-list').html(data);
 			var numFound = $('#u-tbl-header').attr("data-num-found");
 			$('#users-count').val(numFound);
+			var pageCount = Math.ceil($('#users-count').val()/userBatchSize);
+			$('#stream-page-count').html(pageCount);
 			userStartIndex = startIndex;
+			var content = "Total users count : "+numFound;
+			$('#um-user-count').html(content);
 			updatePaginateButtons();
 			bindEditUserClick();
 			bindUMEvents();
@@ -7109,6 +7149,24 @@ function paintUserListInUserManagement(startIndex) {
 	});
 }
 
+function changeBatchSize(){
+$(document).on('change', function(e) {
+	userBatchSize = $('#um-batch-size').val();
+	if(batchSize == undefined || batchSize == null){
+		batchSize = 10;
+	}
+	
+	var searchKey = $('#search-users-key').val();
+	if(userStartIndex > 0 && userStartIndex < userBatchSize){
+		userStartIndex=0;
+	}
+	if (searchKey == undefined || searchKey == "") {
+		paginateManageTeam();
+	} 
+	else {
+		searchUsersByNameEmailLoginId(searchKey);
+	}
+});}
 /*
  * Function to activate or deactivate user
  */
@@ -7768,9 +7826,55 @@ function bindEditUserClick() {
 	});
 }
 
+$(document).on('keyup', '#sel-paginate-manage-team', function(e) {
+	if (e.which == 13) {
+		paginateManageTeam();
+	}
+});
+
+$(document).on('change', '#sel-paginate-manage-team', function(e) {
+   paginateManageTeam();
+   
+});	
+
+$(document).on('keypress', '#sel-paginate-manage-team', function(e) {
+	// if the letter is not digit then don't type anything
+	if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+		return false;
+	}
+});
+
+function paginateManageTeam() {
+var newIndex ;
+pageNumber = parseInt($('#sel-paginate-manage-team').val());
+var totalCount = $('#users-count').val();
+var pageCount = Math.ceil(totalCount/userBatchSize);
+if(pageNumber <= 0){
+	pageNumber = 1;
+}
+if(pageNumber > Number(pageCount)){
+	pageNumber = pageCount;
+}
+newIndex = parseInt(pageNumber - 1) * userBatchSize;
+//Set top count to the same value
+$('#sel-paginate-manage-team').val(pageNumber);
+$('#stream-page-count').html(pageCount);
+paintUserListInUserManagement(newIndex);
+}
+
 $(document).on('click', '#page-previous.paginate-button', function() {
-	var newIndex = userStartIndex - userBatchSize;
+	var newIndex;
+	pageNumber = parseInt($('#sel-paginate-manage-team').val());
+	var numFound = $('#u-tbl-header').attr('data-num-found');
+	if(pageNumber >= 1){
+		pageNumber = pageNumber - 1;
+	$('#sel-paginate-manage-team').val(pageNumber);
+	}
+	else{
+		$('#sel-paginate-manage-team').val(pageNumber);	
+	}
 	var searchKey = $('#search-users-key').val();
+	newIndex = parseInt(pageNumber - 1) * userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		if (searchKey == undefined || searchKey == "") {
 			paintUserListInUserManagement(newIndex);
@@ -7782,8 +7886,20 @@ $(document).on('click', '#page-previous.paginate-button', function() {
 });
 
 $(document).on('click', '#page-next.paginate-button', function() {
-	var newIndex = userStartIndex + userBatchSize;
+	var newIndex ;
+	var pageNumber = parseInt($('#sel-paginate-manage-team').val());
+	var numFound = $('#u-tbl-header').attr('data-num-found');
+	$('#users-count').val(numFound);
+	var pageCount = Math.ceil($('#users-count').val()/userBatchSize);
+	if(pageNumber < pageCount){
+		pageNumber = pageNumber + 1;
+	$('#sel-paginate-manage-team').val(pageNumber);
+	}
+	else{
+	$('#sel-paginate-manage-team').val(pageNumber);	
+	}
 	var searchKey = $('#search-users-key').val();
+	newIndex = parseInt(pageNumber - 1) * userBatchSize;
 	if (newIndex < $('#users-count').val()) {
 		if (searchKey == undefined || searchKey == "") {
 			paintUserListInUserManagement(newIndex);
@@ -7794,19 +7910,19 @@ $(document).on('click', '#page-next.paginate-button', function() {
 	}
 });
 function updatePaginateButtons() {
-	var numFound = $('#u-tbl-header').attr('data-num-found');
-	if (numFound > userBatchSize) {
+	var numFound = $('#u-tbl-header').attr('data-num-found');	
+	if (Number(numFound) > Number(userBatchSize)) {
 		$('#paginate-buttons').show();
 
 		// next button
-		if (userStartIndex <= 0) {
+		if (Number(userStartIndex) <= 0) {
 			$('#page-previous').removeClass('paginate-button');
 		} else {
 			$('#page-previous').addClass('paginate-button');
 		}
 
 		// previous button
-		if (userStartIndex + userBatchSize >= $('#users-count').val()) {
+		if (Number(userStartIndex) + Number(userBatchSize) >= $('#users-count').val()) {
 			$('#page-next').removeClass('paginate-button');
 		} else {
 			$('#page-next').addClass('paginate-button');
@@ -18819,7 +18935,7 @@ function drawStreamPage(streamPostList){
 			for(var picI=0; picI<streamPostList[i].mediaEntities.length; picI++){
 				if(streamPostList[i].mediaEntities[picI] != null && streamPostList[i].mediaEntities[picI] != undefined && streamPostList[i].mediaEntities[picI] != ''){
 					if(streamPostList[i].mediaEntities[picI].type === 'VIDEO') {
-						var videoIcon = '<div class="video-icon"><a href="'+streamPostList[i].postLink+'" target="_blank"><svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><title/><desc/><g><title>background</title><rect fill="none" id="canvas_background" height="62" width="62" y="-1" x="-1"/></g><g><title>Play</title><g stroke="null" id="Page-1" fill-rule="evenodd" fill="none"><g stroke="null" id="Icons-AV" fill="#009FE0"><g stroke="null" id="play-circle-outline"><path stroke="null" id="Shape" d="m24.200001,42.825l17.4,-12.825l-17.4,-12.825l0,25.65l0,0zm5.8,-41.325c-15.95,0 -29,12.825 -29,28.5c0,15.675 13.05,28.5 29,28.5c15.95,0 29,-12.825 29,-28.5c0,-15.675 -13.05,-28.5 -29,-28.5l0,0zm0,51.3c-12.76,0 -23.2,-10.26 -23.2,-22.8c0,-12.54 10.44,-22.8 23.2,-22.8c12.76,0 23.2,10.26 23.2,22.8c0,12.54 -10.44,22.8 -23.2,22.8l0,0z"/></g></g></g></g></svg></a></div>';
+						var videoIcon = '<div class="video-icon"><a href="'+streamPostList[i].postLink+'" target="_blank"><svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><title/><desc/><g><title>background</title><rect fill="none" id="canvas_background" height="62" width="62" y="-1" x="-1"/></g><g><title>Play</title><g stroke="null" id="Page-1" fill-rule="evenodd" fill="none"><g stroke="null" id="Icons-AV" fill="#2b69a9"><g stroke="null" id="play-circle-outline"><path stroke="null" id="Shape" d="m24.200001,42.825l17.4,-12.825l-17.4,-12.825l0,25.65l0,0zm5.8,-41.325c-15.95,0 -29,12.825 -29,28.5c0,15.675 13.05,28.5 29,28.5c15.95,0 29,-12.825 29,-28.5c0,-15.675 -13.05,-28.5 -29,-28.5l0,0zm0,51.3c-12.76,0 -23.2,-10.26 -23.2,-22.8c0,-12.54 10.44,-22.8 23.2,-22.8c12.76,0 23.2,10.26 23.2,22.8c0,12.54 -10.44,22.8 -23.2,22.8l0,0z"/></g></g></g></g></svg></a></div>';
 						var picContainer = '<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 float-right stream-post-pic-div" >'
 				   			+'<img src="'+streamPostList[i].mediaEntities[picI].thumbnailUrl+'" class="stream-post-details-pic float-left stream-post-pic">'+videoIcon+'</div>';
 						$('#stream-post-details-cont-'+postId).append(picContainer);

@@ -49,21 +49,24 @@ public class UsersFullImport implements Runnable
             LOG.debug( "Fetching Users" );
             try {
                 users = solrImportDao.fetchUsersPage( pageSize * ( pageNo - 1 ), pageSize );
-            } catch ( NoRecordsFetchedException e ) {
-                LOG.info( "NoRecordsFetchedException occurred while fetching users" );
-            }
 
             if ( users == null || users.isEmpty() ) {
                 break;
             }
 
             LOG.debug( "Adding Users to Solr" );
-            try {
+            
                 solrSearchService.addUsersToSolr( users );
             } catch ( InvalidInputException e ) {
                 LOG.error( "SolrException occurred while adding user to solr", e );
             } catch ( SolrException e ) {
                 LOG.error( "SolrException occurred while adding user to solr", e );
+            }
+            catch ( NoRecordsFetchedException e ) {
+                LOG.info( "NoRecordsFetchedException occurred while fetching users" );
+            }
+            catch(Exception ex) {
+                LOG.error( "SolrException occurred while adding user to solr", ex );
             }
             pageNo++;
         } while ( !users.isEmpty() );
