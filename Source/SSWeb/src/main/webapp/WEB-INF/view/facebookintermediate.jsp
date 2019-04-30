@@ -87,13 +87,16 @@ $(document).ready(function() {
 	var columnValue = "${columnValue}";
 	var socialNetwork = "${socialNetwork}";
 	var isFbImagePopup = "${isFbImagePopup}";
+	var profImage = "${profileImage}";
 
 	if(isFbImagePopup == 'true'){
-		$('#page').text('Thank you for sharing your ' + socialNetwork + ' picture.');
-		parentWindow.showProfileImageForSurvey("${profileImage}");
-		setTimeout(function() {
-			window.close();
-		}, 3000);
+		if(profImage != null && profImage != undefined && profImage != ''){
+			$('#page').text('Thank you for sharing your ' + socialNetwork + ' picture.');
+			parentWindow.showProfileImageForSurvey();
+			setTimeout(function() {
+				window.close();
+			}, 3000);
+		}
 	} else {
 		if(isFixSocialMedia ==  1){
 			if(isNewUser==true || isNewUser=="true"){
