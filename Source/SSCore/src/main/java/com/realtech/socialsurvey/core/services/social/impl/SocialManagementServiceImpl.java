@@ -4389,6 +4389,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             surveyPreInitiationListVO.setTotalRecord( count );
         }
         return surveyPreInitiationListVO;
+    }
+
+	@Override
+	public RequestToken getTwitterRequestTokenForAuthImage(String serverBaseUrl) throws TwitterException {
+        Twitter twitter = getTwitterInstance();
+        RequestToken requestToken = twitter.getOAuthRequestToken( serverBaseUrl + twitterRedirectImageUri );
+        return requestToken;
     } 
     
 	/*
