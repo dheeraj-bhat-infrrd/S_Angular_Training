@@ -95,6 +95,9 @@
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
 				<spring:message code="label.header.dashboard.key" />
 			</div>
+			<c:if test='${lastSuccessfulRun != "" && lastSuccessfulRun != null && lastSuccessfulRun !=undefined}'>
+				<span class="rep-disc-span last-run-time-text-span">Refreshed on ${lastSuccessfulRun}</span>
+			</c:if>
 			<!-- Add user assignment dropdown -->
 			<%@ include file="user_assignment_dropdown.jsp" %>
 		</div>
@@ -187,19 +190,19 @@
 	</c:if>
 </c:if>
 
-<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background:#2f69aa">
+<%-- <div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background:#2f69aa">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<c:if test='${lastSuccessfulRun != "" && lastSuccessfulRun != null && lastSuccessfulRun !=undefined}'>
 				<div class="float-left last-run-time-div">
 					<div class="align-center">
-						<span class="incomplete-trans-span rep-disc-span last-run-time-span">Last time data refresh run: ${lastSuccessfulRun}</span>
+						<span class="rep-disc-span last-run-time-text-span">Last time data refresh run: ${lastSuccessfulRun}</span>
 					</div>
 				</div>
 			</c:if>		
 		</div>
 	</div>
-</div>
+</div> --%>
 
 <%--  <div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
 	<div class="container">

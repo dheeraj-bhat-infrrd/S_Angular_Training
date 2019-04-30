@@ -136,7 +136,10 @@ public interface CommonConstants
     public static final int STATUS_DELETE = 3;
     public static final int STATUS_VIEW = 5;    
 
+    // Mysql table name constants
 
+    public static final String USER_PROFILE_TABLE = "USER_PROFILE";
+    public static final String SURVEY_DETAILS_TABLE = "SURVEY_DETAILS";
     
 
     public static final int IS_PRIMARY_FALSE = 0;
@@ -1808,7 +1811,10 @@ public interface CommonConstants
 
     public static final String HAS_REGION = "hasRegion";
     public static final String HAS_BRANCH = "hasBranch";
-    
+
+    String USER_DELETION_SUCCESS = "User deletion successfull";
+
+
     //Constants for top 10 LO search ranking
     public static final String SEARCH_ENGINE_SORT_BY_BEST_MATCH = "Best Match";
     public static final String SEARCH_ENGINE_SORT_BY_RATING = "Highest Rated";
@@ -1852,6 +1858,9 @@ public interface CommonConstants
     String ACTIVE = "ACTIVE";
     String INACTIVE = "INACTIVE";
     String ACCOUNT_STATUS = "accountStatus";
-    String PROFILE_MASTER_ID_COLUMN = "PROFILE_MASTER_ID_COLUMN";
+    String PROFILES_MASTER_ID_COLUMN = "profilesMasterId";
+    String VERIFIED = "VERIFIED";
+    String UN_VERIFIED = "UNVERIFIED";
+    String SORT_ORDER = "sortingOrder";
 }
 

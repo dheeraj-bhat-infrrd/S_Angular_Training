@@ -1,8 +1,12 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,13 +75,29 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
             jobLogDetailsResponse.setStatus( CommonConstants.STATUS_DUMMY );
         } else {
             jobLogDetailsResponse.setStatus( lastSuccessfulRun.getStatus() );
-            jobLogDetailsResponse.setTimestampInEst( utils.convertDateToTimeZone( lastSuccessfulRun.getJobStartTime().getTime(), CommonConstants.TIMEZONE_EST ) );
+            jobLogDetailsResponse.setTimestampInEst( convertDateToTimeZoneForLastEtlTime( lastSuccessfulRun.getJobStartTime().getTime(), CommonConstants.TIMEZONE_EST ) );
         }
 
         LOG.debug( "method to fetch the job-log details, getLastSuccessfulEtlTime() finished." );
         return jobLogDetailsResponse;
     }
 
+    /**
+     * Convert to different timezones
+     * @param date
+     * @param toTimeZone
+     * @return
+     */
+    @Override
+    public String convertDateToTimeZoneForLastEtlTime( long date, String toTimeZone )
+    {   
+        DateTime dateTime = new DateTime(new Date(date));
+        DateTimeZone dateTimeZone = DateTimeZone.forID(toTimeZone);
+        DateTime dateTimeWithZone = dateTime.withZone(dateTimeZone);
+        Date dateWithZone = dateTimeWithZone.toLocalDateTime().toDate();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMMM dd, yyyy 'at' hh:mm aaa 'EST'");
+        return (dateFormat.format(dateWithZone));
+    }
 
     @Override
     public boolean getIfEtlIsRunning() throws InvalidInputException

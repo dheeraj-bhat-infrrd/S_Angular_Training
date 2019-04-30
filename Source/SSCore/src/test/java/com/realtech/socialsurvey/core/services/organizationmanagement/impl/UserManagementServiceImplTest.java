@@ -2,8 +2,10 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +25,15 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
+
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import org.junit.*;
+import org.mockito.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.google.gson.annotations.Expose;
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -45,6 +56,7 @@ import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -52,6 +64,7 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 
 import ch.qos.logback.core.boolex.Matcher;
 
@@ -95,6 +108,11 @@ public class UserManagementServiceImplTest
     
     @Rule
     public ExpectedException thrown= ExpectedException.none();
+    @Mock
+    private FileUploadService fileUploadService;
+
+    @Mock
+    private Utils utils;
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
@@ -1320,4 +1338,166 @@ public class UserManagementServiceImplTest
     {
         userManagementServiceImpl.canAddAndDeleteUser( "companyId", 0l, true );
     }
+    
+    @Test
+    public void testbulkUpdateLogoForAgents() throws InvalidInputException 
+    {
+        Mockito.doReturn( "logourl" ).when( fileUploadService ).uploadLogo( Mockito.any( MultipartFile.class ),
+            Mockito.anyString());
+
+        userManagementServiceImpl.bulkUpdateLogoForAgents( Arrays.asList( 2l ), "logo", null );
+
+        verify( organizationUnitSettingsDao, times( 1 )).updateOrganizationUnitSettingsByInCriteria( Mockito.anyMap(),
+            Mockito.anyString(), Mockito.anyList(), Mockito.anyString());
+    }
+
+    @Test
+    public void testbulkUpdateLogoForAgentsWithEmptyLogoUrl() throws InvalidInputException
+    {
+        userManagementServiceImpl.bulkUpdateLogoForAgents( Arrays.asList( 1l ), "", null );
+
+        verify( organizationUnitSettingsDao, never()).updateOrganizationUnitSettingsByInCriteria(Mockito.anyMap(),
+            Mockito.anyString(), Mockito.anyList(), Mockito.anyString());
+    }
+
+    @Test
+    public void testbulkUpdateLogoForAgentsWithNullLogoUrl() throws InvalidInputException
+    {
+        userManagementServiceImpl.bulkUpdateLogoForAgents( Arrays.asList( 1l ), null, null );
+        verify( organizationUnitSettingsDao, never()).updateOrganizationUnitSettingsByInCriteria( Mockito.anyMap(), Mockito.anyString(),
+            Mockito.anyList(), Mockito.anyString() );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testbulkUpdateLogoForAgentsWithnullUserIds() throws InvalidInputException
+    {
+        userManagementServiceImpl.bulkUpdateLogoForAgents( null,"", null );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testbulkUpdateSocialPostScoreForAgentsForNullUserIds() throws InvalidInputException
+    {
+        userManagementServiceImpl.bulkUpdateSocialPostScoreForAgents(null, 1.0 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testbulkUpdateSocialPostScoreForAgentsForZeroMinimumPostScore() throws InvalidInputException
+    {
+        userManagementServiceImpl.bulkUpdateSocialPostScoreForAgents( Arrays.asList( 1l ), 0 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testReInviteUsersWithNullUserEmailIds() throws InvalidInputException{
+        userManagementServiceImpl.reInviteUsers( null );
+    }
+
+    @Test
+    public void testReInviteUsersWithAlreadyVerifiedUsers() throws InvalidInputException, NoRecordsFetchedException
+    {
+        User user = new User();
+        user.setStatus( 1 );
+        Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByEmail( Mockito.anyString() );
+        assertTrue(  !userManagementServiceImpl.reInviteUsers( Arrays.asList("dummyEmail") ).getFailedItems().isEmpty()  );
+    }
+
+    @Test
+    public void testReInviteUsersValidUserEmailIds()
+        throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException
+    {
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        User user = new User();
+        user.setCompany( company );
+        AgentSettings agentSettings = new AgentSettings();
+        String profileUrl =  "dummyUrl" ;
+
+        Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByEmail( Mockito.anyString() ) ;
+        Mockito.doReturn( agentSettings ).when( userManagementServiceImpl ).getUserSettings( Mockito.anyLong() );
+        Mockito.doNothing().when( userManagementServiceImpl ).sendRegistrationCompletionLink( Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyString(), Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(),
+            Mockito.anyBoolean() );
+        Mockito.doReturn( profileUrl ).when( utils).getCompleteUrlForSettings( Mockito.anyString(), Mockito.anyString() );
+
+        assertTrue( !userManagementServiceImpl.reInviteUsers( Arrays.asList( "dummyEmail" ) ).getSuccessItems().isEmpty() );
+    }
+
+    @Test
+    public void testReInviteUsersWithInvalidEmailIds() throws InvalidInputException
+    {
+       assertTrue( !userManagementServiceImpl.reInviteUsers( Arrays.asList( "dummyEmail" ) ).getFailedItems().isEmpty() );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testDeleteUsersWithNullOrEmptyUserIds() throws InvalidInputException
+    {
+        userManagementServiceImpl.removeExistingUsers( null, 1 );
+        userManagementServiceImpl.removeExistingUsers( new ArrayList<Long>(  ) , 1 );
+    }
+
+    @Test
+    public void testDeleteUsersWithValidUserIds() throws InvalidInputException, SolrException
+    {
+        User user = new User();
+
+        Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doReturn( true ).when( userManagementServiceImpl ).checkIfTheUserCanBeDeleted(
+            Mockito.any( User.class ), Mockito.any( User.class ) );
+        Mockito.doNothing(  ).when( userManagementServiceImpl ).deleteUserDataFromAllSources( Mockito.any( User.class ),
+            Mockito.anyLong(), Mockito.anyInt(), Mockito.anyBoolean(), Mockito.anyBoolean());
+
+        assertTrue( !userManagementServiceImpl.removeExistingUsers( Arrays.asList( 1l ), 1 ).getSuccessItems().isEmpty() );
+    }
+
+    @Test
+    public void testDeleteUsersWithInvalidAdminId() throws InvalidInputException, SolrException
+    {
+        User user = new User();
+
+        Mockito.doReturn( user ).when( userManagementServiceImpl ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doReturn( false ).when( userManagementServiceImpl ).checkIfTheUserCanBeDeleted(
+            Mockito.any( User.class ), Mockito.any( User.class ) );
+
+        assertTrue( !userManagementServiceImpl.removeExistingUsers( Arrays.asList( 1l ), 1 ).getFailedItems().isEmpty() );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testDeleteUsersWithInvalidUserIds() throws InvalidInputException
+    {
+        Mockito.when( userManagementServiceImpl.getUserByUserId( Mockito.anyLong() ) ).thenThrow( InvalidInputException.class );
+        assertTrue( !userManagementServiceImpl.removeExistingUsers( Arrays.asList( 1l ), 1 ).getFailedItems().isEmpty() );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersAsSocialMonitorAdminWithInvalidUserIds() throws InvalidInputException
+    {
+        userManagementServiceImpl.assignUsersAsSocialMonitorAdmin( null, 1 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersAsSocialMonitorAdminWithInvalidAdminId() throws InvalidInputException
+    {
+        userManagementServiceImpl.assignUsersAsSocialMonitorAdmin( Arrays.asList( 1l ), 0 );
+    }
+
+    @Test
+    public void testAssignUsersAsSocialMonitorAdmin() throws InvalidInputException, NoRecordsFetchedException
+    {
+        Company company = new Company();
+        company.setCompanyId( 1 );
+        User admin = new User();
+        admin.setCompany( company );
+        User assigneeUser = new User();
+        assigneeUser.setCompany( company );
+        assigneeUser.setStatus( 1 );
+
+        Mockito.doReturn( admin ).when( userManagementServiceImpl ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doReturn( assigneeUser ).when( userManagementServiceImpl ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doNothing().when( userManagementServiceImpl ).assignUserAsSocialMonitorAdmin( Mockito.any( User.class ),
+            Mockito.any( User.class ));
+
+        assertTrue( !userManagementServiceImpl.assignUsersAsSocialMonitorAdmin( Arrays.asList( 1l ), 1 ).
+            getSuccessItems().isEmpty() );
+    }
+
+
 }

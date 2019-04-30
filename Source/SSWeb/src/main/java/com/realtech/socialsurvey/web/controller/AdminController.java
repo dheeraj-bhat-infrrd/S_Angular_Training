@@ -827,7 +827,6 @@ public class AdminController
                 .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
 
-
         try {
             companyId = Long.valueOf( companyIdStr );
         } catch ( NumberFormatException e ) {
@@ -836,18 +835,30 @@ public class AdminController
                 .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
 
-        Company company = userManagementService.getCompanyById( companyId );
-        if ( company == null ) {
-            return messageUtils
-                .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
-        }
-        if ( company.getStatus() != CommonConstants.STATUS_ACTIVE ) {
-            return messageUtils
-                .getDisplayMessage( DisplayMessageConstants.INACTIVE_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE )
-                .getMessage();
-        }
-
+        User loggedInUser =  sessionHelper.getCurrentUser();
         try {
+            //if user is ssAdmin then he can generate accesstoken for any company
+            // if user is an admin and trying to access api key for someother company then we have to stop him
+            // if the loggerInUser companyId and the companyId which was given to generate api key are different the stop
+            if(!loggedInUser.isSuperAdmin()){
+                if( loggedInUser.getCompany().getCompanyId() != companyId ||
+                    ( !loggedInUser.isCompanyAdmin() && !loggedInUser.isRegionAdmin() && !loggedInUser.isBranchAdmin()) )
+                    return messageUtils.getDisplayMessage( DisplayMessageConstants.UNAUTHORISED_USER_ACCESS, DisplayMessageType.ERROR_MESSAGE )
+                        .getMessage();
+            }
+
+            Company company = userManagementService.getCompanyById( companyId );
+            if ( company == null ) {
+                return messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.INVALID_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE ).getMessage();
+            }
+            if ( company.getStatus() != CommonConstants.STATUS_ACTIVE ) {
+                return messageUtils
+                    .getDisplayMessage( DisplayMessageConstants.INACTIVE_COMPANY_ID, DisplayMessageType.ERROR_MESSAGE )
+                    .getMessage();
+            }
+
+
             UserApiKey userApiKey = userManagementService.getUserApiKeyForCompany( companyId );
             if ( userApiKey == null ) {
                 userApiKey = userManagementService.generateAndSaveUserApiKey( companyId );

@@ -2661,4 +2661,72 @@ public class OrganizationManagementServiceImplTest
     	Mockito.doNothing().when(organizationUnitSettingsDao).updateParticularKeyOrganizationUnitSettings("isIncompleteSurveyDeleteEnabled",false,unitSettings,"COMPANY_SETTINGS");
     	Assert.assertEquals(true, organizationManagementServiceImpl.enableIncompleteSurveyDeleteToggle(5, false));
     }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToBranchWithInvalidUserIds() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.assignBranchToUsers( null, 1 ,1 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToBranchWithInvalidBranchId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.assignBranchToUsers( Arrays.asList( 1l ), 1, 0 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToBranchWithInvalidAdminId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.assignBranchToUsers( Arrays.asList( 1l ), 0, 1 );
+    }
+
+    @Test
+    public void testAssignUsersToBranch() throws InvalidInputException, SolrException
+    {
+        User admin = new User();
+        User assigneeUser = new User();
+
+        Mockito.doReturn( admin ).when( userManagementService ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doReturn( assigneeUser ).when( userManagementService ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doReturn( 1l ).when( branchDao ).getRegionIdByBranchId( Mockito.anyLong() );
+        Mockito.doNothing().when( organizationManagementServiceImpl ).assignBranchToUser(Mockito.any( User.class ),
+            Mockito.anyLong(), Mockito.anyLong(), Mockito.any( User.class ));
+
+        assertTrue( !organizationManagementServiceImpl.assignBranchToUsers( Arrays.asList( 1l ), 1, 1 ).getSuccessItems().isEmpty() );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToRegionWithInvalidUserIds() throws InvalidInputException, NoRecordsFetchedException
+    {
+        organizationManagementServiceImpl.assignRegionToUsers( null, 1 ,1 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToRegionWithInvalidBranchId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        organizationManagementServiceImpl.assignRegionToUsers( Arrays.asList( 1l ), 1, 0 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToRegionWithInvalidAdminId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        organizationManagementServiceImpl.assignRegionToUsers( Arrays.asList( 1l ), 0, 1 );
+    }
+
+    @Test
+    public void testAssignUsersToRegion() throws InvalidInputException, SolrException, NoRecordsFetchedException
+    {
+        User admin = new User();
+        User assigneeUser = new User();
+
+        Mockito.doReturn( admin ).when( userManagementService ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doReturn( assigneeUser ).when( userManagementService ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doNothing().when( organizationManagementServiceImpl ).assignRegionToUser( Mockito.any( User.class ),
+            Mockito.anyLong(), Mockito.any( User.class ) );
+
+        assertTrue( !organizationManagementServiceImpl.assignRegionToUsers( Arrays.asList( 1l ), 1, 1 )
+            .getSuccessItems().isEmpty() );
+    }
+
+
 }

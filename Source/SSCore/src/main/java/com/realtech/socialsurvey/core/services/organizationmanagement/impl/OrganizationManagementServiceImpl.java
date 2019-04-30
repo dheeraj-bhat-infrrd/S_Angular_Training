@@ -34,6 +34,9 @@ import com.realtech.socialsurvey.core.dao.*;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.*;
 import com.realtech.socialsurvey.core.vo.*;
+import com.realtech.socialsurvey.core.vo.BranchVO;
+import com.realtech.socialsurvey.core.vo.ManageTeamBulkActionVo;
+import com.realtech.socialsurvey.core.vo.ManageTeamBulkResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -11260,6 +11263,86 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return true;
     }
 
+    @Override public ManageTeamBulkResponse assignBranchToUsers( List<Long> userIds, long adminId, long branchId )
+        throws InvalidInputException
+    {
+        if( userIds == null || userIds.isEmpty() ) {
+            throw new InvalidInputException( "Invalid userIds provided !!!" );
+        }
+        if(adminId <= 0l )
+            throw new InvalidInputException( "Invalid adminId : "+ adminId );
+        if(branchId <= 0l)
+            throw new InvalidInputException( "Invalid branchId : "+ branchId );
+
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+        ManageTeamBulkActionVo manageTeamBulkActionVo = null;
+
+        //get the admin details by using adminID
+        User admin = userManagementService.getUserByUserId( adminId );
+
+        //get the regionId by quering from branch
+        long regionId = branchDao.getRegionIdByBranchId( branchId );
+
+        for ( long userId : userIds ) {
+            try {
+                User assigneeUser = userManagementService.getUserByUserId( userId );
+                manageTeamBulkActionVo = new ManageTeamBulkActionVo();
+                manageTeamBulkActionVo.setUserId( userId );
+
+                this.assignBranchToUser( admin, branchId, regionId, assigneeUser );
+
+                manageTeamBulkActionVo.setMessage( "User has been assigned successfully to given branch" );
+                successItems.add( manageTeamBulkActionVo );
+
+            } catch ( InvalidInputException | SolrException exception ) {
+                manageTeamBulkActionVo.setMessage( exception.getMessage() );
+                failedItems.add( manageTeamBulkActionVo );
+            }
+        }
+        return new ManageTeamBulkResponse(successItems, failedItems);
+    }
+
+
+    @Override public ManageTeamBulkResponse assignRegionToUsers( List<Long> userIds, long adminId, long regionId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        if( userIds == null || userIds.isEmpty() ) {
+            throw new InvalidInputException( "Invalid userIds provided !!!" );
+        }
+        if(adminId <= 0l )
+            throw new InvalidInputException( "Invalid adminId : "+ adminId );
+        if(regionId <= 0l)
+            throw new InvalidInputException( "Invalid regionId : "+ regionId );
+
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+        ManageTeamBulkActionVo manageTeamBulkActionVo = null;
+
+        //get the admin details by using adminID
+        User admin = userManagementService.getUserByUserId( adminId );
+
+        for ( long userId : userIds ) {
+            try {
+                User assigneeUser = userManagementService.getUserByUserId( userId );
+                manageTeamBulkActionVo = new ManageTeamBulkActionVo();
+                manageTeamBulkActionVo.setUserId( userId );
+
+                this.assignRegionToUser( admin, regionId, assigneeUser );
+
+                manageTeamBulkActionVo.setMessage( "User has been assigned successfully to given region" );
+                successItems.add( manageTeamBulkActionVo );
+
+            } catch ( InvalidInputException | SolrException exception ) {
+                manageTeamBulkActionVo.setMessage( exception.getMessage() );
+                failedItems.add( manageTeamBulkActionVo );
+            }
+        }
+        return new ManageTeamBulkResponse(successItems, failedItems);
+    }
+
     /**
      * Save the notification details in the {@link OrganizationUnitSettings}
      * But make sure the same notification is not saved again avoiding
@@ -11379,6 +11462,255 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.debug( "Method fetchCompanyStatistics ended for company {}", companyStatistics );
         }
         return companyStatistics;
+    }
+
+
+    /**
+     * This method does the following tasks
+     * 1.assigns the user to the given branch
+     * 2.Overrides the previous branch assignments in which the user is an agents (Note: Doesnot
+     * override or remove the admin assignments of the user)
+     * 3.Updates the user with the new assignments in solr
+     * 4.Move the reviews
+     * @param adminUser
+     * @param branchId
+     * @param regionId
+     * @param assigneeUser
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    public void assignBranchToUser( User adminUser, long branchId, long regionId, User assigneeUser )
+        throws InvalidInputException, SolrException
+    {
+        if ( adminUser == null ) {
+            throw new InvalidInputException( "Invalid adminUser !!!" );
+        }
+        if ( branchId <= 0l ) {
+            throw new InvalidInputException( "Invalid branchId : " + branchId );
+        }
+        if ( regionId <= 0l ) {
+            throw new InvalidInputException( "Invalid regionId : " + regionId + " for branchId : " + branchId  );
+        }
+        if ( assigneeUser == null ) {
+            throw new InvalidInputException( "Invalid assigneeUser !!!" );
+        }
+        if(assigneeUser.getStatus() == CommonConstants.STATUS_INACTIVE){
+            throw new InvalidInputException( "User is currently inactive or the user might be deleted !!!" );
+        }
+        if(adminUser.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId())
+            throw new InvalidInputException( "Admin and user doesn't belong to the same company" );
+
+        if( LOG.isDebugEnabled() ){
+            LOG.debug( "Method assignBranchToUser called for adminUser: {},  branchId: {}, regionId : {}, assigneeUser: {} " ,
+                adminUser , branchId, regionId, assigneeUser );
+        }
+
+        if(branchDao.getCompanyIdsForBranchIds(Arrays.asList( branchId )  ).get( branchId ) != assigneeUser.getCompany().getCompanyId()){
+            throw new InvalidInputException( "Branch to which the User is being assigned to does not belong to the same company "
+                    + "as the user !!!");
+        }
+
+        List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+        if ( userProfiles == null || userProfiles.isEmpty() ) {
+            userProfiles = new ArrayList<>();
+        }
+
+        int profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+
+        UserProfile userProfileNew = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
+            assigneeUser.getEmailId(), assigneeUser.getUserId(), branchId, regionId, profileMasterId,
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
+            String.valueOf( adminUser.getUserId() ), String.valueOf( adminUser.getUserId() ) );
+
+        String branchName = null;
+        Branch branch ;
+
+        UserProfile profile;
+
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+
+            for (final Iterator iterator = userProfiles.iterator(); iterator.hasNext();) {
+                profile = (UserProfile) iterator.next();
+
+                //get the branch name using the branchId
+                if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+                    branch = branchDao.findById( Branch.class, profile.getBranchId() );
+                    branchName = branch.getBranch();
+
+                    //remove the previous assignments(agent profile) for the user except for the admin assignments
+                    if ( !branchName.equalsIgnoreCase( CommonConstants.DEFAULT_BRANCH_NAME )) {
+                        userManagementService.removeUserProfile( profile.getUserProfileId() );
+                        iterator.remove();
+                    }
+                }
+            }
+
+        }
+
+        //check if profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
+        userProfileNew.setIsPrimary( isPrimary );
+
+        //move reviews
+        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), branchId, regionId );
+        }
+
+        userProfileDao.save( userProfileNew );
+
+        if ( assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE ) {
+            assigneeUser.setIsAtleastOneUserprofileComplete( CommonConstants.STATUS_ACTIVE );
+            userDao.update( assigneeUser );
+        }
+
+        /**
+         * add newly created user profile to the list of user profiles in user object
+         */
+        userProfiles.add( userProfileNew );
+        assigneeUser.setUserProfiles( userProfiles );
+        userManagementService.setProfilesOfUser( assigneeUser );
+
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( assigneeUser.getUserId() );
+        assigneeUser.setProfileName( agentSettings.getProfileName() );
+        assigneeUser.setProfileUrl( agentSettings.getProfileUrl() );
+        solrSearchService.addUserToSolr( assigneeUser );
+
+        userManagementService.updateUserCountModificationNotification( assigneeUser.getCompany() );
+
+        if( LOG.isDebugEnabled() ) {
+            LOG.debug( "Method assignBranchToUser executed successfully" );
+        }
+    }
+
+
+    /**
+     * This method does the following
+     * 1. Assigns a user to a region
+     * 2.Remove the previous region assignments in which the user belongs to
+     * 3.Move the reviews
+     * 3.Update the user in the solr
+     * (Note: this method doesnot assign the user as an admin and
+     * doesnot remove the region assignments in which the user is an admin )
+     * @param adminUser
+     * @param regionId
+     * @param assigneeUser
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws SolrException
+     */
+    @Transactional
+    @Override
+    public void assignRegionToUser( User adminUser, long regionId, User assigneeUser )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException
+    {
+        if ( adminUser == null ) {
+            throw new InvalidInputException( "Admin user is null in assignRegionToUser" );
+        }
+        if ( regionId <= 0l ) {
+            throw new InvalidInputException( "Region id is invalid in assignRegionToUser" );
+        }
+        if ( assigneeUser == null ) {
+            throw new InvalidInputException( "assignee user is null in assignRegionToUser" );
+        }
+        if(assigneeUser.getStatus() == CommonConstants.STATUS_INACTIVE){
+            throw new InvalidInputException( "assignee user either inactive or deleted from company!!!" );
+        }
+        if(adminUser.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId())
+            throw new InvalidInputException( "Admin and user doesn't belong to the same company" );
+
+        if( LOG.isDebugEnabled() ){
+            LOG.debug( "Method to assignRegionToUser called for regionId : {}  and assigneeUser : {}" + regionId,
+                assigneeUser.getUserId() );
+        }
+
+        List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+        if ( userProfiles == null || userProfiles.isEmpty() ) {
+            userProfiles = new ArrayList<>();
+        }
+
+        int profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+
+
+        Branch defaultBranch = getDefaultBranchForRegion( regionId );
+
+        if( defaultBranch.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId() ){
+            throw new InvalidInputException( "Region to which the User is being assigned to doesnot belong to the same company "
+                + "as the user !!! ");
+        }
+
+        UserProfile userProfileNew = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
+            assigneeUser.getEmailId(), assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId,
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
+            String.valueOf( adminUser.getUserId() ), String.valueOf( adminUser.getUserId() ) );
+
+        UserProfile profile;
+        String branchName;
+        String regionName;
+
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+
+            for (final Iterator iterator = userProfiles.iterator(); iterator.hasNext();) {
+                profile = (UserProfile) iterator.next();
+
+                //get the branch name and region name using the branchId
+                if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+                    Map<String, String> regionBranchMap = branchDao.getBranchAndRegionName( profile.getRegionId(), profile.getBranchId());
+                    branchName = regionBranchMap.get( CommonConstants.BRANCH_NAME_COLUMN );
+                    regionName = regionBranchMap.get( CommonConstants.REGION_COLUMN );
+
+                    if( LOG.isDebugEnabled() ) {
+                        LOG.debug( " ProfileId : {}, Branch : {} ,RegionName : {}", profile.getProfilesMaster().getProfileId(),
+                            branchName,regionName );
+                    }
+
+                    //remove the previous assignments(agent profile) for the user except for the admin assignments
+                    if ( !regionName.equalsIgnoreCase( CommonConstants.DEFAULT_REGION_NAME )
+                        && branchName.equalsIgnoreCase( CommonConstants.DEFAULT_BRANCH_NAME ) ) {
+                        userManagementService.removeUserProfile( profile.getUserProfileId() );
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+
+        //check if new profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
+        userProfileNew.setIsPrimary( isPrimary );
+
+        //move reviews
+        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), defaultBranch.getBranchId(),
+                regionId );
+        }
+
+        userProfileDao.save( userProfileNew );
+        if ( assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE ) {
+            if( LOG.isDebugEnabled() ){
+                LOG.debug( "Updating isAtleastOneProfileComplete as active for user : " + assigneeUser.getUserId() );
+            }
+            assigneeUser.setIsAtleastOneUserprofileComplete( CommonConstants.STATUS_ACTIVE );
+            userDao.update( assigneeUser );
+        }
+
+        /**
+         * add newly created user profile to the list of user profiles in user object
+         */
+        userProfiles.add( userProfileNew );
+        assigneeUser.setUserProfiles( userProfiles );
+        userManagementService.setProfilesOfUser( assigneeUser );
+
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( assigneeUser.getUserId() );
+        assigneeUser.setProfileName( agentSettings.getProfileName() );
+        assigneeUser.setProfileUrl( agentSettings.getProfileUrl() );
+        solrSearchService.addUserToSolr( assigneeUser );
+
+        userManagementService.updateUserCountModificationNotification( assigneeUser.getCompany() );
+
+        if( LOG.isDebugEnabled() ) {
+            LOG.debug(
+                "Method to assignRegionToUser finished for regionId : " + regionId + " and userId : " + assigneeUser.getUserId() );
+        }
+
     }
 
     @Override

@@ -458,7 +458,7 @@ input#find-pro-submit{
 
 .hdr-wrapper {
     height: 60px;
-    background-color: #009FE0;
+    background-color: #2b69a9;
     z-index: 999;
     position: relative;
 }
@@ -502,7 +502,7 @@ input#find-pro-submit{
 
 .fp-container {
     height: 65px;
-    background-color: #009FE0;
+    background-color: #2b69a9;
     color: #fff;
 }
 
@@ -555,7 +555,7 @@ input#find-pro-submit{
 
 .ctnt-review-btn {
     cursor: pointer;
-    background-color: #009FE0;
+    background-color: #2b69a9;
     color: #fff;
     width: 160px;
 	line-height: 32px;
@@ -566,7 +566,7 @@ input#find-pro-submit{
 }
 
 .ctnt-item-name {
-    color: #009FE0;
+    color: #2b69a9;
 }
 
 .fp-right-item{
@@ -792,7 +792,7 @@ input#find-pro-submit{
 }
 
 .wl-import-btn {
-    background: #009FE0;
+    background: #2b69a9;
     color: #fff;
     width: 200px;
     height: 40px;
@@ -835,7 +835,7 @@ input#find-pro-submit{
 
 span.txt-highlight {
     font-size: 14px;
-    color: #3E9DCB;
+    color: #2b69a9;
     cursor: pointer;
 }
 
@@ -847,7 +847,7 @@ span.txt-highlight {
 
 .wc-icn-txt{
 	padding-left: 10px;
-	color: #3E9DCB;
+	color: #2b69a9;
 	font-size: 14px;
 }
 
@@ -873,7 +873,7 @@ span.txt-highlight {
     text-align: center;
     border-radius: 3px;
     color: #fff;
-    background: #009FE0;
+    background: #2b69a9;
     cursor: pointer;
 }
 
@@ -882,7 +882,7 @@ span.txt-highlight {
     text-align: center;
     border-radius: 3px;
     color: #fff;
-    background: #009FE0;
+    background: #2b69a9;
     cursor: pointer;
     margin-left: 15px;
 }
@@ -1065,7 +1065,7 @@ textarea.wc-about-prof-txt {
 }
 
 span.wc-highlight {
-    color: #3E9DCB;
+    color: #2b69a9;
     font-family: 'opensanssemibold';
 }
 
@@ -1075,7 +1075,7 @@ span.wc-highlight {
     margin: 10px 0 0 0px;
     padding: 0 30px;
     text-align: center;
-    background: #3E9DCB;
+    background: #2b69a9;
     color: #fff;
     border-radius: 3px;
     cursor: pointer;
@@ -1175,7 +1175,7 @@ span.wc-highlight {
     line-height: 40px;
     margin: 15px auto;
     text-align: center;
-    background: #009FE0;
+    background: #2b69a9;
     color: #fff;
     border-radius: 3px;
     cursor: pointer;
@@ -1183,7 +1183,7 @@ span.wc-highlight {
 }
 
 .privacy-policy-link {
-    color: #009FE0;
+    color: #2b69a9;
     text-align: center;
     cursor: pointer;
 }
@@ -1232,7 +1232,7 @@ table.payment-pricing th strong {
 
 .payment-acc-type-txt {
 	font-size: 15px;
-	color: #009fe0;
+	color: #2b69a9;
 	line-height: 0;
 	text-transform: uppercase;
     font-family: 'opensansbold';

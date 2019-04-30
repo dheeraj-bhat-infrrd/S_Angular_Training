@@ -371,7 +371,7 @@
     .vms-resp-submit {
     margin: 0 auto;
     border-radius: 3px;
-    background-color: #009FE0;
+    background-color: #2b69a9;
     line-height: 25px;
     width: 80px;
     text-align: center;
@@ -850,7 +850,7 @@
 	}
 	.dash-download-sel-item {
 		width: 100%;
-		border-bottom: 1px solid #009FE0;
+		border-bottom: 1px solid #2b69a9;
 	}
 	.dash-down-go-button {
 		width: 25%;

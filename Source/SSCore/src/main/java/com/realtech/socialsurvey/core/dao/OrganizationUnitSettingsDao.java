@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
@@ -527,10 +528,10 @@ public interface OrganizationUnitSettingsDao
 	 * @param queryMap
 	 * @param updateMap
 	 * @param collectionName
-	 * @throws Exception 
+	 * @throws DatabaseException
 	 */
 	public void updateOrganizationSettingsByQuery( Map<String, Object> queryMap, Map<String, Object> updateMap,
-	    String collectionName ) throws Exception;
+	    String collectionName ) throws DatabaseException;
 
 	/** 
 	 * @param collectionName
@@ -549,6 +550,16 @@ public interface OrganizationUnitSettingsDao
 	 * @return
 	 */
 	public long fetchSEOUrlCount(String collectionName, String locationType, List<Long> excludedEntityIds);
+	
+	/**
+	 * @param updateMap
+	 * @param criteriaKey
+	 * @param criteriaValue
+	 * @param collectionName
+	 */
+	public void updateOrganizationUnitSettingsByInCriteria( Map<String, Object> updateMap, String criteriaKey,
+        List<Object> criteriaValue, String collectionName );
+
 
     int removeKeyInOrganizationSettings( long companyId, String keyToUpdate, String collectionName,
         long modifiedBy );

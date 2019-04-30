@@ -340,7 +340,7 @@ public interface SolrSearchService
 
 
     public SolrDocumentList searchUsersByLoginNameOrNameUnderAdmin( String pattern, User admin, UserFromSearch adminFromSearch,
-        int startIndex, int batchSize ) throws InvalidInputException, SolrException, MalformedURLException;
+        int startIndex, int batchSize, String sortingOrder ) throws InvalidInputException, SolrException, MalformedURLException;
 
 
     public Set<Long> getUserIdsFromSolrDocumentList( SolrDocumentList userIdList ) throws InvalidInputException;
@@ -385,5 +385,8 @@ public interface SolrSearchService
 
 
     void editUsersInSolr( List<Long> userIds, String key, String value ) throws SolrException, InvalidInputException;
+
+    SolrDocumentList searchUsersByLoginNameOrNameUnderAdmin( String pattern, User admin, UserFromSearch adminFromSearch,
+        String status, String sortingOrder, String entityType, int startIndex, int batchSize ) throws InvalidInputException, SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

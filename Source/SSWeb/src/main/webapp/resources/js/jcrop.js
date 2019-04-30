@@ -34,7 +34,7 @@ function createPopupCanvasForImgFix() {
 	$('.ss-prof-img-popup-cropper').html(canvas).css('position', 'relative');
 }
 
-function initiateJcropForImgFix(profImg,forNewDashboard) {
+function initiateJcropForImgFix(profImg,forNewDashboard,forMultiSelect) {
 
 		var reader = new FileReader();
 		var myImage = new Image();
@@ -289,5 +289,146 @@ function updatePreview(c) {
 		selected_h = Math.round(c.h / ratio);
 		
 		context.drawImage(imageObj, c.x / ratio, c.y / ratio, c.w / ratio, c.h / ratio, 0, 0, canvas.width, canvas.height);
+	}
+}
+
+$(document).on('change', '#ms-prof-image', function() {
+	overlayRevert();
+	createPopupCanvasForMultiSelect();
+	initiateJcropForMultiSelect(this, false);
+});
+
+function createPopupCanvasForMultiSelect() {
+	var canvas = '<img src="" id="target" class="hide jcrop-img-upload" style="position:absoulte;"/>'
+			+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
+	$('#ms-prof-img-cropper').html(canvas).css('position', 'relative');
+	$('#ms-prof-pic-cont').show();
+	
+	$('#ms-prof-pic-cont').show();
+	$('#ms-assign-popup').show();
+	$('#ms-assign-popup-hdr').html('Bulk Profile Image Upload');
+}
+
+function initiateJcropForMultiSelect(input) {
+	if (input.files && input.files[0]) {
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			var myImage = new Image();
+			myImage.src = e.target.result;
+			
+			$('#target').attr('src', e.target.result);
+			$('#target').removeClass('hide');
+			
+			$('#target').load(function() {
+				$('#target').attr('data-original-width',myImage.width);
+				$('#target').attr('data-original-height',myImage.height);
+				
+				if (myImage.width > myImage.height && myImage.width > imageMaxWidth) {
+					// landscape image
+					$('#target').width(imageMaxWidth);
+				}
+				else if (myImage.width <= myImage.height && myImage.height > imageMaxHeight) {
+					// portrait image
+					$('#target').height(imageMaxHeight);
+				}
+				/*else {
+					$('#target').width(imageMaxWidth);
+					$('#target').height(imageMaxHeight);
+				}*/
+				
+				
+				ratio = $('#target').width() / myImage.width;
+	
+				$('#target').Jcrop({
+					aspectRatio : 1,
+					setSelect : [ 50, 50, 300, 300 ],
+					onSelect : updatePreview,
+					onChange : updatePreview,
+					trackDocument : true
+				});
+			});
+		};
+		reader.readAsDataURL(input.files[0]);
+
+		$('#ms-assign-popup-assign').off('click');
+		$('#ms-assign-popup-assign').click(function() {
+			var canvas = $('#target')[0];
+			var dataurl = canvas.src;
+			if (isNaN(selected_x)) {
+				selected_x = 50;
+			}
+			if (isNaN(selected_y)) {
+				selected_y = 50;
+			}
+			if (isNaN(selected_w)) {
+				selected_w = 100;
+			}
+			if (isNaN(selected_h)) {
+				selected_h = 100;
+			}
+			
+			var selectedUsers = $('#ms-user-data').data('selectedUsers');
+			
+			if(selectedUsers.length <= 0){
+				$('#overlay-toast').html('No Users Selected');
+				showToast();
+				return;
+			}
+			
+			$('#ms-overlay-loader').show();
+			
+			var userIdList = [];
+			for(var i=0;i<selectedUsers.length;i++){
+				userIdList.push(selectedUsers[i].userId);
+			}
+			
+			var originalWidth = $('#target').attr('data-original-width');
+			var boxWidth = $('#target').width();
+			
+			var boxToOriginalRatio = originalWidth / boxWidth;
+			
+			var manageTeamBulkRequest = {
+					selectedX : Math.round(selected_x * boxToOriginalRatio),
+					selectedY : Math.round(selected_y * boxToOriginalRatio),
+		    		selectedW : Math.round(selected_w * boxToOriginalRatio),
+		    		selectedH : Math.round(selected_h * boxToOriginalRatio),
+		    		resizeWidth : Math.round($('#target').width() * boxToOriginalRatio),
+		    		resizeHeight : Math.round($('#target').height() * boxToOriginalRatio),
+		    		imageBase64 : dataurl,
+		    		imageFileName : $('#ms-prof-image').prop("files")[0].name,
+		    		userIds : userIdList
+			}
+			
+			var action = 'profImgUpload';
+			
+			$.ajax({
+				url : "/users/uploadprofilepic.do",
+				type : "POST",
+				contentType: "application/json",
+				dataType : "json",
+				data : JSON.stringify(manageTeamBulkRequest),
+				async : false,
+				success : function(data){showMSSuccessPopup(data,action)},
+				complete : function() {
+					hideMSProfImgPopup();
+					$('#ms-overlay-loader').hide();
+					actionCompleteCallback();
+				},
+				error : function(e) {
+					if(e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					redirectErrorpage();
+					hideMSProfImgPopup();
+				}
+			});
+		});
+		
+		$(document).off('click','#ms-assign-popup-cancel');
+		$(document).on('click','#ms-assign-popup-cancel',function(e){
+			e.stopPropagation();
+			hideMSProfImgPopup();
+		});
 	}
 }

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
@@ -894,9 +895,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
         Long companyId = user.getCompany().getCompanyId();
         if ( user.getCompany() != null ) {
             document.addField( CommonConstants.COMPANY_ID_SOLR, companyId );
-            if ( organizationUnitSettingsDao
-                .fetchOrganizationUnitSettingsById( companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION )
-                .isHiddenSection() ) {
+            OrganizationUnitSettings unitSettings = organizationUnitSettingsDao
+                .fetchOrganizationUnitSettingsById( companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            if ( unitSettings != null && unitSettings.isHiddenSection() ) {
                 document.addField( CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, true );
             } else {
                 document.addField( CommonConstants.USER_IS_HIDDEN_FROM_SEARCH_SOLR, false );
@@ -936,7 +937,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         try {
             AgentSettings agentSettings = userManagementService.getUserSettings( user.getUserId() );
             //Set profileImageUrl fields if present
-            if ( agentSettings.getProfileImageUrl() != null && !( agentSettings.getProfileImageUrl().isEmpty() ) ) {
+            if ( agentSettings != null && agentSettings.getProfileImageUrl() != null && !( agentSettings.getProfileImageUrl().isEmpty() ) ) {
                 document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
                 document.addField( CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl() );
                 if ( agentSettings.getProfileImageUrlThumbnail() != null
@@ -1821,11 +1822,11 @@ public class SolrSearchServiceImpl implements SolrSearchService
                     region.getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
 
                 // update address
-                if ( regionSettings.getContact_details() != null
+                if ( regionSettings !=null && regionSettings.getContact_details() != null
                     && regionSettings.getContact_details().getAddress1() != null ) {
                     document.addField( CommonConstants.ADDRESS1_SOLR, regionSettings.getContact_details().getAddress1() );
                 }
-                if ( regionSettings.getContact_details() != null
+                if ( regionSettings != null && regionSettings.getContact_details() != null
                     && regionSettings.getContact_details().getAddress2() != null ) {
                     document.addField( CommonConstants.ADDRESS2_SOLR, regionSettings.getContact_details().getAddress2() );
                 }
@@ -1871,11 +1872,11 @@ public class SolrSearchServiceImpl implements SolrSearchService
                     branch.getBranchId(), MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
                 // update address
-                if ( branchSettings.getContact_details() != null
+                if ( branchSettings != null && branchSettings.getContact_details() != null
                     && branchSettings.getContact_details().getAddress1() != null ) {
                     document.addField( CommonConstants.ADDRESS1_SOLR, branchSettings.getContact_details().getAddress1() );
                 }
-                if ( branchSettings.getContact_details() != null
+                if ( branchSettings != null && branchSettings.getContact_details() != null
                     && branchSettings.getContact_details().getAddress2() != null ) {
                     document.addField( CommonConstants.ADDRESS2_SOLR, branchSettings.getContact_details().getAddress2() );
                 }
@@ -1963,25 +1964,26 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( user.getUserId() );
 
                 // update profileUrl
-                if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getAbout_me() != null ) {
-                    document.addField( CommonConstants.ABOUT_ME_SOLR, agentSettings.getContact_details().getAbout_me() );
-                }
-                // update profileName
-                if ( agentSettings.getProfileName() != null ) {
-                    document.addField( CommonConstants.PROFILE_NAME_SOLR, agentSettings.getProfileName() );
-                }
-                // update profileUrl
-                if ( agentSettings.getProfileUrl() != null ) {
-                    document.addField( CommonConstants.PROFILE_URL_SOLR, agentSettings.getProfileUrl() );
-                }
-                // update profileImageUrl
-                if ( agentSettings.getProfileImageUrl() != null ) {
-                    document.addField( CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl() );
-                    document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
-                }
-                if ( agentSettings.getProfileImageUrlThumbnail() != null ) {
-                    document.addField( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN,
-                        agentSettings.getProfileImageUrlThumbnail() );
+                if( agentSettings != null ) {
+                    if ( agentSettings.getContact_details() != null && agentSettings.getContact_details().getAbout_me() != null ) {
+                        document.addField( CommonConstants.ABOUT_ME_SOLR, agentSettings.getContact_details().getAbout_me() );
+                    }
+                    // update profileName
+                    if ( agentSettings.getProfileName() != null ) {
+                        document.addField( CommonConstants.PROFILE_NAME_SOLR, agentSettings.getProfileName() );
+                    }
+                    // update profileUrl
+                    if ( agentSettings.getProfileUrl() != null ) {
+                        document.addField( CommonConstants.PROFILE_URL_SOLR, agentSettings.getProfileUrl() );
+                    }
+                    // update profileImageUrl
+                    /*if ( agentSettings.getProfileImageUrl() != null ) {
+                        document.addField( CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl() );
+                        document.addField( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+                    }
+                    if ( agentSettings.getProfileImageUrlThumbnail() != null ) {
+                        document.addField( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, agentSettings.getProfileImageUrlThumbnail() );
+                    }*/
                 }
 
                 documents.add( document );
@@ -2604,7 +2606,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
 
     @Override
     public SolrDocumentList searchUsersByLoginNameOrNameUnderAdmin( String pattern, User admin, UserFromSearch adminFromSearch,
-        int startIndex, int batchSize ) throws InvalidInputException, SolrException, MalformedURLException
+        int startIndex, int batchSize, String sortingOrder ) throws InvalidInputException, SolrException, MalformedURLException
     {
 
         LOG.info( "Method searchUsersByLoginNameOrNameUnderAdmin called for pattern :" + pattern );
@@ -2661,9 +2663,14 @@ public class SolrSearchServiceImpl implements SolrSearchService
             solrQuery.addFilterQuery( CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR "
                 + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR
                 + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE );
-            solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
+            
+            if(sortingOrder.contains( "DESC" ))
+            {
+                solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.desc );
+            }else {
+                solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
+            }
             solrQuery.addField( CommonConstants.USER_ID_SOLR );
-            LOG.debug( "Querying solr for searching users" );
             if ( startIndex > -1 ) {
                 solrQuery.setStart( startIndex );
             }
@@ -2671,7 +2678,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
                 solrQuery.setRows( batchSize );
             }
 
-            LOG.info( "Running Solr query : " + solrQuery.getQuery() );
+            LOG.info( "Running Solr query {} : and fq : {} " , solrQuery.getQuery(), solrQuery.getFilterQueries() );
             response = solrServer.query( solrQuery );
             results = response.getResults();
         } catch ( SolrServerException e ) {
@@ -3036,5 +3043,123 @@ public class SolrSearchServiceImpl implements SolrSearchService
             }
         }
         LOG.info( "Added Hidden boolean for users in solr for hidden company" );
+    }
+
+    @Override
+    public SolrDocumentList searchUsersByLoginNameOrNameUnderAdmin( String pattern, User admin, UserFromSearch adminFromSearch,
+        String status, String sortingOrder, String entityType, int startIndex, int batchSize )
+        throws InvalidInputException, SolrException {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug( "Method searchUsersByLoginNameOrNameUnderAdmin called for pattern :" + pattern );
+        }
+        if ( pattern == null || StringUtils.isBlank( pattern )) {
+            throw new InvalidInputException( "Pattern is null or empty . Please enter a valid pattern !!!" );
+        }
+        if ( admin == null ) {
+            throw new InvalidInputException( "Invalid admin details provided !!!" );
+        }
+        if ( adminFromSearch == null ) {
+            throw new InvalidInputException( "adminFromSearch is null or empty while searching for Users" );
+        }
+        if( !status.equalsIgnoreCase( CommonConstants.ACTIVE ) && !status.equalsIgnoreCase( CommonConstants.VERIFIED ) &&
+            !status.equalsIgnoreCase( CommonConstants.UN_VERIFIED ) ) {
+            throw new InvalidInputException( "Invalid status {} while searching for users ", status );
+        }
+
+        SolrDocumentList results = new SolrDocumentList();
+        SolrDocumentList solrResult;
+
+        try {
+            SolrServer solrServer = new HttpSolrServer( solrUserUrl );
+            SolrQuery solrQuery = new SolrQuery();
+
+            String query = "";
+
+            //search display name
+            if ( !pattern.isEmpty() ) {
+                query = query + generateSubQueryToSearch( CommonConstants.USER_DISPLAY_NAME_SOLR, pattern );
+                query = query + " OR " + generateSubQueryToSearch( CommonConstants.USER_LOGIN_NAME_SOLR, pattern );
+            } else {
+                query = "*:*";
+            }
+
+            solrQuery.setQuery( query );
+
+            solrQuery.addFilterQuery( CommonConstants.COMPANY_ID_SOLR + ":" + adminFromSearch.getCompanyId() );
+
+            if ( !entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                    solrQuery.addFilterQuery(
+                        CommonConstants.REGIONS_SOLR + ":" + getSolrSearchArrayStr( adminFromSearch.getRegions() ) );
+                } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                    solrQuery.addFilterQuery(
+                        CommonConstants.REGIONS_SOLR + ":" + getSolrSearchArrayStr( adminFromSearch.getRegions() ) );
+                    solrQuery.addFilterQuery(
+                        CommonConstants.BRANCHES_SOLR + ":" + getSolrSearchArrayStr( adminFromSearch.getBranches() ) );
+                }
+            }
+
+            if(status.equalsIgnoreCase( CommonConstants.ACTIVE )) {
+                solrQuery.addFilterQuery(
+                    CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " +
+                        CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR
+                        + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE );
+            } else if(status.equalsIgnoreCase( CommonConstants.VERIFIED )) {
+                solrQuery.addFilterQuery( CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE );
+            } else {
+                solrQuery.addFilterQuery( CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_NOT_VERIFIED );
+            }
+            
+            if(sortingOrder.contains( "DESC" ))
+            {
+                solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.desc );
+            }else {
+                solrQuery.addSort( CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc );
+            }
+            
+            solrQuery.addField( CommonConstants.USER_ID_SOLR ).addField( CommonConstants.USER_EMAIL_ID_SOLR );
+
+
+            //if the batch size is 0 then return all the documents matching the search criteria
+            if(batchSize == 0) {
+                startIndex = 0;
+                batchSize = 50;
+
+                do{
+                    startIndex *=  batchSize;
+                    solrQuery.setRows( batchSize ).setStart( startIndex );
+                    solrResult = solrServer.query( solrQuery ).getResults();
+                    results.addAll( solrResult );
+                    ++ startIndex;
+                } while(solrResult.getNumFound() != 0 && solrResult.getStart() < solrResult.getNumFound() );
+            } else {
+
+                if ( startIndex > -1 ) {
+                    solrQuery.setStart( startIndex );
+                }
+                if ( batchSize > 0 ) {
+                    solrQuery.setRows( batchSize );
+                }
+                results = solrServer.query( solrQuery ).getResults();
+            }
+
+
+            //if(LOG.isDebugEnabled()){
+                LOG.info( "Running Solr query : {} and fq : {} and order: {} and results : {}" , solrQuery.getQuery(),
+                    solrQuery.getFilterQueries(), solrQuery.getSorts(), results.size());
+            //}
+
+        } catch ( SolrServerException e ) {
+            LOG.error( "SolrServerException while performing User search" );
+            throw new SolrException( "Exception while performing search for user. Reason : " + e.getMessage(), e );
+        }
+
+        if(LOG.isDebugEnabled()) {
+            LOG.debug(
+                "Method searchUsersByLoginNameOrNameUnderAdmin finished for pattern : {},  returning : {}" , pattern, results );
+        }
+        return results;
+
     }
 }

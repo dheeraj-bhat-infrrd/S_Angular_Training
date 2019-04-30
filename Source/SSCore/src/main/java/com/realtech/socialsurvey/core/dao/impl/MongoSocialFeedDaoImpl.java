@@ -237,7 +237,6 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     {
         LOG.debug( "Fetching All Social Feeds" );
         Query query = new Query();
-        
 
         Criteria criteria = createGetAllSocialFeedsCriteria( status, feedtype, companyId, regionIds, branchIds, agentIds, searchText, isCompanySet, fromTrustedSource, isSocMonOnLoad );
 
@@ -541,7 +540,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         Query updateQuery1 = new Query().addCriteria( updateCriteria1 );
         Update update1 = new Update();
 
-        //update fromTrustedSource 
+        //update fromTrustedSource
         update1.set( FROM_TRUSTED_SOURCE, true );
 
         WriteResult result1 = mongoTemplate.updateMulti( updateQuery1, update1, SOCIAL_FEED_COLLECTION );
@@ -554,7 +553,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
         Query updateQuery2 = new Query().addCriteria( updateCriteria2 );
         Update update2 = new Update();
-        //update fromTrustedSource 
+        //update fromTrustedSource
         update2.set( FROM_TRUSTED_SOURCE, true );
         //update status to RESOLVED
         /*update2.set( STATUS, SocialFeedStatus.RESOLVED );
@@ -578,7 +577,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             .addCriteria( Criteria.where( POST_SOURCE ).is( trustedSource ) )
             .addCriteria( Criteria.where( FROM_TRUSTED_SOURCE ).is( true ) );
         Update update = new Update();
-        //update fromTrustedSource to false 
+        //update fromTrustedSource to false
         update.set( FROM_TRUSTED_SOURCE, false );
         WriteResult result = mongoTemplate.updateMulti( updateQuery, update, SOCIAL_FEED_COLLECTION );
         return result.getN();
@@ -595,7 +594,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( mongoId ) );
         return mongoTemplate.findOne( query, SocialResponseObject.class, collectionName );
     }
-    
+
     @Override
     public long updateActionHistory( String mongoId, ActionHistory actionHistory )
     {

@@ -1127,6 +1127,7 @@ public class OrganizationUnitSettings implements Serializable
         this.socialMediaLastFetched = socialMediaLastFetched;
     }
 
+
     public String getOptoutText()
     {
         return optoutText;

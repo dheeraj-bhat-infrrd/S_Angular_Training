@@ -10,6 +10,7 @@ import com.realtech.socialsurvey.core.vo.CustomerSuccessInformation;
 import com.realtech.socialsurvey.core.vo.UserVo;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
