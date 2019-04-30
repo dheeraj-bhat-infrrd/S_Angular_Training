@@ -62,6 +62,7 @@
  $(document).ready(function() {
 	var curDate = new Date();
 	$('#ss-cc-year').html(curDate.getFullYear());
+	var profImage = "${profileImage}";
 	
 	var waitMessage = "${message}";
 	if (parseInt(waitMessage) == 1) {
@@ -76,6 +77,9 @@
 	var parentWindow;
 	if (window.opener != null && !window.opener.closed) {
 		parentWindow = window.opener;
+		if(profImage != null && profImage != undefined && profImage != ''){
+			parentWindow.showProfileImageForSurvey(profImage);
+		}
 	}
 	
 	// close on error
@@ -91,7 +95,9 @@
 		window.close();
 	}, 3000);
 });
-
+ 
+ var isFbImagePopup = "${isFbImagePopup}";
+ if(isFbImagePopup == '' || isFbImagePopup == null || isFbImagePopup == undefined){
 $(window).on('unload', function(){
 
 	var parentWindow = null;
@@ -206,5 +212,6 @@ $(window).on('unload', function(){
 		}
 	}
 });
+ }
 </script>
 

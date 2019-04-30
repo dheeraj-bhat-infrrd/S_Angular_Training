@@ -384,6 +384,7 @@ public interface CommonConstants
     public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory"; 
     public static final String OPEN_RETAKE_SURVEY_REQUEST_COLUMN = "openRetakeSurveyRequest";
     public static final String ABUSIVE_NOTIFY_COLUMN = "abusiveNotify";
+    public static final String PROFILE_IMAGE_URL = "profileImageUrl";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -592,7 +593,9 @@ public interface CommonConstants
     public static final String IMAGE_DIR = "imageupload";
     public static final String IMAGE_NAME = "image.png";
     public static final String IMAGE_FORMAT_PNG = "png";
-
+    public static final String USER_IMAGE_DIR = "userimageupload";
+    public static final String USER_IMAGE_NAME = "userimage.png";
+    
     /**
      * Amazon Details
      */
