@@ -101,7 +101,7 @@ public interface SocialManagementService
      * @throws FacebookException
      */
     public boolean updateStatusIntoFacebookPage( OrganizationUnitSettings settings, String message, String serverBaseUrl,
-        long companyId, String completeProfileUrl ) throws InvalidInputException, FacebookException;
+        long companyId, String completeProfileUrl, String surveyId ) throws InvalidInputException, FacebookException;
 
 
     /**

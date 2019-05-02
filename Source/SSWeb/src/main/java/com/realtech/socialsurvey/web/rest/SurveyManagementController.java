@@ -1060,7 +1060,7 @@ public class SurveyManagementController
 			try {
 				if (surveyHandler.canPostOnSocialMedia(agentSettings, rating)) {
 					if (!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl,
-							user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
+							user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl(), surveyDetails.get_id())) {
 						// TODO: Bad code: Remove the company id from the
 						// parameter: End
 						if (!agentSocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
@@ -1075,7 +1075,7 @@ public class SurveyManagementController
 				try {
 					if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
 						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl,
-								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
+								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl(), surveyDetails.get_id())) {
 							if (!companySocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 								companySocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
 						}
@@ -1090,7 +1090,7 @@ public class SurveyManagementController
 					OrganizationUnitSettings setting = organizationManagementService.getRegionSettings(regionMediaPostDetails.getRegionId());
 					if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
 						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl,
-								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
+								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl(), surveyDetails.get_id())) {
 							List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
 							if (!regionSocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 								regionSocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
@@ -1109,7 +1109,7 @@ public class SurveyManagementController
 
 						if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
 							if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl,
-									user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
+									user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl(), surveyDetails.get_id())) {
 								List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
 								if (!branchSocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 									branchSocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);

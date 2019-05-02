@@ -92,7 +92,7 @@ $(document).ready(function() {
 	if(isFbImagePopup == 'true'){
 		if(profImage != null && profImage != undefined && profImage != ''){
 			$('#page').text('Thank you for sharing your ' + socialNetwork + ' picture.');
-			parentWindow.showProfileImageForSurvey();
+			parentWindow.showProfileImageForSurvey(profImage);
 			setTimeout(function() {
 				window.close();
 			}, 3000);

@@ -466,14 +466,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Override
     public boolean updateStatusIntoFacebookPage( OrganizationUnitSettings settings, String message, String serverBaseUrl,
-        long companyId, String completeProfileUrl ) throws InvalidInputException, FacebookException
+        long companyId, String completeProfileUrl, String surveyId ) throws InvalidInputException, FacebookException
     {
         if ( settings == null ) {
             throw new InvalidInputException( "AgentSettings can not be null" );
         }
         LOG.info( "Updating Social Tokens information" );
         boolean facebookNotSetup = true;
-        Facebook facebook = getFacebookInstance( serverBaseUrl, facebookRedirectUri );
+        Facebook facebook = getFacebookInstance( serverBaseUrl, facebookRedirectUri ); 
+        String smImageUrl = surveyDetailsDao.getProfileImageUrl(surveyId);
+        
         if ( settings != null ) {
             if ( settings.getSocialMediaTokens() != null ) {
                 if ( settings.getSocialMediaTokens().getFacebookToken() != null
@@ -498,8 +500,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         // TODO: Hard coded bad code: DELETE: BEGIN
                         if ( companyId == Long.parseLong( customisedSocialNetworkCompanyId ) ) {
                             try {
+                            	if (smImageUrl != null && !smImageUrl.isEmpty()) {
+                            		postUpdate
+                                    .setPicture( new URL( smImageUrl ) );
+                            	}else {
                                 postUpdate
                                     .setPicture( new URL( "https://don7n2as2v6aa.cloudfront.net/remax-facebook-image.png" ) );
+                            	}
                             } catch ( MalformedURLException e ) {
                                 LOG.warn( "Could not set the URL" );
                             }
@@ -1482,7 +1489,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     }
                     updatedFacebookMessage = facebookMessage + profileUrlWithMessage;
                 }
-                if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId, profileUrl ) ) {
+                if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId, profileUrl, surveyId ) ) {
                     if ( !socialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
                         socialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                     }

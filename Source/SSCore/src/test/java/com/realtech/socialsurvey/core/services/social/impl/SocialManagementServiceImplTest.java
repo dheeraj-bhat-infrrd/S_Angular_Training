@@ -94,7 +94,7 @@ public class SocialManagementServiceImplTest
     public void testUpdateStatusIntoFacebookPageWithNullAgentSettings() throws InvalidInputException, FacebookException
     {
         socialManagementServiceImpl.updateStatusIntoFacebookPage( null, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_LONG, TestConstants.TEST_STRING );
+            TestConstants.TEST_LONG, TestConstants.TEST_STRING,TestConstants.TEST_STRING );
     }
 
 

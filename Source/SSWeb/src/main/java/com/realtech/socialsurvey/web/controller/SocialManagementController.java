@@ -1781,12 +1781,13 @@ public class SocialManagementController
             + custDisplayName + " for " + agentName + " on SocialSurvey - view at " + applicationBaseUrl
             + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
         facebookMessage = facebookMessage.replaceAll( "null", "" );
-
+        SurveyDetails surveyDetails = new SurveyDetails();
+        String surveyId = surveyDetails.get_id();
         for ( OrganizationUnitSettings setting : settings ) {
             try {
                 if ( setting != null )
                     if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
-                        requestUtils.getRequestServerName( request ), user.getCompany().getCompanyId(), agentProfileLink ) )
+                        requestUtils.getRequestServerName( request ), user.getCompany().getCompanyId(), agentProfileLink, surveyId ) )
                         facebookNotSetup = false;
             } catch ( FacebookException | InvalidInputException e ) {
                 LOG.error(

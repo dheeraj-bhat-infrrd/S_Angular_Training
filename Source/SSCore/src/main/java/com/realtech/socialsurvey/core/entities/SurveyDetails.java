@@ -108,6 +108,7 @@ public class SurveyDetails
     private int noOfRetake;
     private Date lastRetakeRequestDate;
     private List<RetakeSurveyHistory> retakeSurveyHistory;
+    private String profileImageUrl;
 
     //NPS details
     private int npsScore = -1;
@@ -1037,4 +1038,12 @@ public class SurveyDetails
     {
         this.fbRecommendationType = fbRecommendationType;
     }
+
+	public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
+	}
 }
