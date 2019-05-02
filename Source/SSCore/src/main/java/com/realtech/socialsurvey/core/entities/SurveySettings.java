@@ -41,6 +41,10 @@ public class SurveySettings {
     private double surveyCompletedMailThreshold;
 	
 	private int duplicateSurveyInterval;
+	
+	private float reviewReplyScore;
+	private boolean isReplyEnabled;
+	private boolean isReplyEnabledForCompany;
 
 	public int getDuplicateSurveyInterval()
     {
@@ -303,20 +307,53 @@ public class SurveySettings {
 		this.sadUrl = sadUrl;
 	}
 
-	@Override
-	public String toString() {
-		return "SurveySettings [auto_post_score=" + auto_post_score + ", show_survey_above_score="
-				+ show_survey_above_score + ", survey_reminder_interval_in_days=" + survey_reminder_interval_in_days
-				+ ", max_number_of_survey_reminders=" + max_number_of_survey_reminders + ", isReminderDisabled="
-				+ isReminderDisabled + ", social_post_reminder_interval_in_days="
-				+ social_post_reminder_interval_in_days + ", max_number_of_social_pos_reminders="
-				+ max_number_of_social_pos_reminders + ", isSocialPostReminderDisabled=" + isSocialPostReminderDisabled
-				+ ", autoPostEnabled=" + autoPostEnabled + ", autoPostLinkToUserSiteEnabled="
-				+ autoPostLinkToUserSiteEnabled + ", happyText=" + happyText + ", neutralText=" + neutralText
-				+ ", sadText=" + sadText + ", happyTextComplete=" + happyTextComplete + ", neutralTextComplete="
-				+ neutralTextComplete + ", sadTextComplete=" + sadTextComplete + ", complaint_res_settings="
-				+ complaint_res_settings + ", abusive_mail_settings=" + abusive_mail_settings
-				+ ", surveyCompletedMailThreshold=" + surveyCompletedMailThreshold + ", duplicateSurveyInterval="
-				+ duplicateSurveyInterval + ", happyUrl=" + happyUrl+", okUrl=" + okUrl +", sadUrl=" + sadUrl +"]";
-	}
+	public float getReviewReplyScore()
+    {
+        return reviewReplyScore;
+    }
+
+    public void setReviewReplyScore( float reviewReplyScore )
+    {
+        this.reviewReplyScore = reviewReplyScore;
+    }
+
+
+    public boolean isReplyEnabled()
+    {
+        return isReplyEnabled;
+    }
+
+    public void setReplyEnabled( boolean isReplyEnabled )
+    {
+        this.isReplyEnabled = isReplyEnabled;
+    }
+
+    public boolean isReplyEnabledForCompany()
+    {
+        return isReplyEnabledForCompany;
+    }
+
+    public void setReplyEnabledToAll( boolean isReplyEnabledForCompany )
+    {
+        this.isReplyEnabledForCompany = isReplyEnabledForCompany;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SurveySettings [auto_post_score=" + auto_post_score + ", show_survey_above_score=" + show_survey_above_score
+            + ", survey_reminder_interval_in_days=" + survey_reminder_interval_in_days + ", max_number_of_survey_reminders="
+            + max_number_of_survey_reminders + ", isReminderDisabled=" + isReminderDisabled
+            + ", social_post_reminder_interval_in_days=" + social_post_reminder_interval_in_days
+            + ", max_number_of_social_pos_reminders=" + max_number_of_social_pos_reminders + ", isSocialPostReminderDisabled="
+            + isSocialPostReminderDisabled + ", autoPostEnabled=" + autoPostEnabled + ", autoPostLinkToUserSiteEnabled="
+            + autoPostLinkToUserSiteEnabled + ", happyText=" + happyText + ", neutralText=" + neutralText + ", sadText="
+            + sadText + ", happyTextComplete=" + happyTextComplete + ", neutralTextComplete=" + neutralTextComplete
+            + ", sadTextComplete=" + sadTextComplete + ", complaint_res_settings=" + complaint_res_settings
+            + ", abusive_mail_settings=" + abusive_mail_settings + ", happyUrl=" + happyUrl + ", okUrl=" + okUrl + ", sadUrl="
+            + sadUrl + ", surveyCompletedMailThreshold=" + surveyCompletedMailThreshold + ", duplicateSurveyInterval="
+            + duplicateSurveyInterval + ", reviewReplyScore=" + reviewReplyScore + ", isReplyEnabled=" + isReplyEnabled
+            + ", isReplyEnabledForCompany=" + isReplyEnabledForCompany + "]";
+    }
+
 }

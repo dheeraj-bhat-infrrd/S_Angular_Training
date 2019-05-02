@@ -626,7 +626,7 @@ function validatePhoneNumber(elementId, isOnlyShowToast, forQuickEdits) {
 		var msg = 'Please enter phone number';
 		
 		if(forQuickEdits){
-			return false;
+			return true;
 		}else if (isOnlyShowToast) {
 			$('#overlay-toast').html(msg);
 			showToast();

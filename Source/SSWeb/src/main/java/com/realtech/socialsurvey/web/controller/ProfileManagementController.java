@@ -75,6 +75,7 @@ import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -5081,6 +5082,7 @@ public class ProfileManagementController
         LOG.info( "Method fetchReviews() called from ProfileManagementController" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
+        String currentSessionUserId = Long.toString(user.getUserId());
 
         boolean fetchAbusive = false;
         List<SurveyDetails> reviewItems = null;
@@ -5122,7 +5124,33 @@ public class ProfileManagementController
             } else {
                 throw new InvalidInputException( "Invalid profile level." );
             }
+            
+            boolean isReplyEnabledForCompany = false;
+            OrganizationUnitSettings settings = organizationManagementService
+                    .getCompanySettings( user.getCompany().getCompanyId() );
+                if ( settings != null ) {
+                    hiddenSection = settings.isHiddenSection();
+                    SurveySettings surveySetting = null;
+                    surveySetting = settings.getSurvey_settings();
+                    
+                    isReplyEnabledForCompany = surveySetting.isReplyEnabledForCompany();
+                }
+            
+            SurveySettings surveySettings = null;
+            surveySettings = unitSettings.getSurvey_settings();
+                
+            if ( surveySettings == null ) {
+                surveySettings = new SurveySettings();
+            }
 
+            boolean isReplyEnabled =false;
+            isReplyEnabled = surveySettings.isReplyEnabled();
+            
+            boolean allowReply = false;
+            if(isReplyEnabled == true && isReplyEnabledForCompany== true ) {
+                allowReply = true;
+            }
+            
             // Setting agent's profile URL in each of the review.
             profileManagementService.setAgentProfileUrlForReview( reviewItems );
             
@@ -5130,6 +5158,10 @@ public class ProfileManagementController
             model.addAttribute( "reviews", reviewItems );
             model.addAttribute( "hiddenSection", hiddenSection );
             model.addAttribute( "startIndex", startIndex );
+            model.addAttribute( "minReplyScore", surveySettings.getReviewReplyScore());
+            model.addAttribute( "allowReply", allowReply);
+            model.addAttribute( "allowReplyForCompany", isReplyEnabledForCompany);
+            model.addAttribute( "currentSessionUserId", currentSessionUserId);
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.warn( "Something went wrong while fetching reviews  {}",e  );
             throw new InternalServerException(

@@ -154,7 +154,11 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
             throw new InvalidInputException( "Invalid company id passed in getRegionIdsUnderCompany method" );
         }
         LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() started." );
-        Criteria criteria = null;
+        
+        List<Long> regionIds = new ArrayList<>();
+        regionIds = getRegionIdList(CommonConstants.COMPANY_ID_COLUMN , companyId , start , batchSize , CommonConstants.NO , true);
+        
+        /* Criteria criteria = null;
         try {
             criteria = getSession().createCriteria( Region.class );
             criteria.setProjection( Projections.property( CommonConstants.REGION_ID_COLUMN ).as(
@@ -169,9 +173,9 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
         } catch ( HibernateException e ) {
             LOG.error( "HibernateException caught in getRegionIdsUnderCompany(). Reason: " + e.getMessage(), e );
             throw new DatabaseException( "HibernateException caught in getRegionIdsUnderCompany().", e );
-        }
+        }*/
         LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() ended." );
-        return criteria.list();
+        return regionIds;
     }
     
     /**
@@ -189,7 +193,11 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
             throw new InvalidInputException( "Invalid company id passed in getRegionIdsUnderCompany method" );
         }
         LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() started." );
-        Criteria criteria = null;
+        
+        List<Long> regionIds = new ArrayList<>();
+        regionIds = getRegionIdList(CommonConstants.COMPANY_ID_COLUMN , companyId , 0 , 0 , CommonConstants.NO , true);
+        
+        /*Criteria criteria = null;
         try {
             criteria = getSession().createCriteria( Region.class );
             criteria.setProjection( Projections.property( CommonConstants.REGION_ID_COLUMN ).as(
@@ -200,9 +208,9 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
         } catch ( HibernateException e ) {
             LOG.error( "HibernateException caught in getRegionIdsUnderCompany(). Reason: " + e.getMessage(), e );
             throw new DatabaseException( "HibernateException caught in getRegionIdsUnderCompany().", e );
-        }
+        }*/
         LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() ended." );
-        return criteria.list();
+        return regionIds;
     }
     
     /**
@@ -279,5 +287,42 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
         return  (int) query.uniqueResult();
 	}
 
+    public List<Long> getRegionIdList( String entityType, long entityId )
+    {
+        return getRegionIdList(entityType , entityId , 0 , 0 , 0 , false);
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private List<Long> getRegionIdList(String entityType , long entityId , int start , int batchSize , int isDefault , boolean useDefault)
+    {
+        LOG.info( "Getting all regionIds under {}: {}", entityType, entityId );
+        Criteria criteria = null;
+        
+        try {
+            criteria = getSession().createCriteria( Region.class );
+            criteria.setProjection( Projections.property( CommonConstants.REGION_ID_COLUMN ).as(
+                CommonConstants.REGION_ID_COLUMN ) );
+            if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+                criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, entityId ) ) );
+            }
+            else {
+                return null;
+            }
+            
+            if ( start > 0 )
+                criteria.setFirstResult( start );
+            if ( batchSize > 0 )
+                criteria.setMaxResults( batchSize );
+            
+            if(useDefault) {
+                criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, isDefault ) ); 
+            }
+            
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        } catch ( HibernateException e ) {
+            throw new DatabaseException( "HibernateException caught in getRegionIdList", e );
+        }
+        return criteria.list();
+    }
 }
 // JIRA SS-42 By RM-05 EOC

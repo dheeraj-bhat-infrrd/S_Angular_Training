@@ -742,7 +742,7 @@ public class OrganizationManagementController
     @RequestMapping ( value = "/showcompanysettings", method = RequestMethod.GET)
     public String showCompanySettings( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method showCompanySettings of OrganizationManagementController called" );
+        LOG.debug( "Method showCompanySettings of OrganizationManagementController called" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
@@ -875,12 +875,14 @@ public class OrganizationManagementController
                 model.addAttribute( "autoPostEnabled", surveySettings.isAutoPostEnabled() );
                 model.addAttribute( "minpostscore", surveySettings.getAuto_post_score() );
                 model.addAttribute( "autoPostLinkToUserSite", surveySettings.isAutoPostLinkToUserSiteEnabled() );
+                model.addAttribute( "minreplyscore", surveySettings.getReviewReplyScore());
+                model.addAttribute("isReplyEnabled", surveySettings.isReplyEnabled());
             }
 
             //enocode before sending to UI
             encodeSurveySettings( unitSettings.getSurvey_settings() );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
-            LOG.info(unitSettings.getSurvey_settings().toString());
+            LOG.debug(unitSettings.getSurvey_settings().toString());
 
             //get default setting and store in model
             SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
@@ -941,13 +943,21 @@ public class OrganizationManagementController
             model.addAttribute( "allowRegionAdminToAddUser", unitSettings.getRegionAdminAllowedToAddUser() );
             model.addAttribute( "allowRegionAdminToDeleteUser", unitSettings.getRegionAdminAllowedToDeleteUser() );
             
+            SurveySettings compSurveySettings = null;
+            compSurveySettings = companySettings.getSurvey_settings();
+            boolean isReplyEnabledForCompany = false;
+            if(compSurveySettings!=null) {
+                isReplyEnabledForCompany = compSurveySettings.isReplyEnabledForCompany();
+            }
+            model.addAttribute( "isReplyEnabledForCompany", isReplyEnabledForCompany);
+            
         } catch ( InvalidInputException | NoRecordsFetchedException| ProfileNotFoundException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason : ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
-        LOG.info( "Method showCompanySettings of OrganizationManagementController completed successfully" );
+        LOG.info( "Finished fetching {} settings with iden:{}", entityType, entityId);
 
         return JspResolver.EDIT_SETTINGS;
     }
@@ -5246,6 +5256,151 @@ public class OrganizationManagementController
         LOG.info( "Method showAdminDashboard of OrganizationManagementController called" );
         return JspResolver.SHOW_ADMIN_DASHBOARD;
     }
+    
+    
+    @RequestMapping ( value = "/togglereviewreplyforcompany", method = RequestMethod.POST)
+    @ResponseBody
+    public String allowAllUsersReplyToReviews( HttpServletRequest request )
+    {
+        LOG.info( "Update reply to review feature for a company" );
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String allowReply = request.getParameter( "allowReplyForCompany" );
+        boolean isReplyEnabledForCompany = false;
+        if ( allowReply != null && !allowReply.isEmpty() ) {
+            isReplyEnabledForCompany = Boolean.parseBoolean( allowReply );
+
+            Map<String, Object> settings = new HashMap<>();
+            settings.put( OrganizationManagementService.KEY_IS_REVIEW_REPLY_ENABLED_FOR_COMPANY, isReplyEnabledForCompany );
+            
+            /*
+             * Whether we're switching the company wide setting on or off, we need to do the same for company level 
+             * hierarchy too so that it's switched on or off for CA by default. And min score should be set at min 
+             * level (1.0) so that CA can reply to all reviews
+             */
+            settings.put( OrganizationManagementService.KEY_IS_REVIEW_REPLY_ENABLED, isReplyEnabledForCompany );
+            settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 1.0 );
+            
+            try {
+                final String authorizationHeader = CommonConstants.BASIC + authHeader;
+                ssApiIntergrationBuilder.getIntegrationApi().updateSettings( CommonConstants.COMPANY_ID, entityId, 
+                    settings, authorizationHeader );
+                
+                /*
+                 * Each time the company wide setting is toggled, we reset lower hierarchy settings. We set the min score 
+                 * to 5.0, so that even after enabling replies, by default min score is at a 'safe' level of 5.0
+                 */
+                if(isReplyEnabledForCompany){
+                    settings.put( OrganizationManagementService.KEY_IS_REVIEW_REPLY_ENABLED, false );
+                }
+                
+                settings.remove( OrganizationManagementService.KEY_IS_REVIEW_REPLY_ENABLED_FOR_COMPANY );
+                settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 5.0 );
+                ssApiIntergrationBuilder.getIntegrationApi().propagateSettingsToLowerHierarchy( CommonConstants.COMPANY_ID, 
+                    entityId, settings, authorizationHeader );
+            } catch ( Exception e ) {
+                LOG.error( "Method allowAllUsersReplyToReviews has an exception in api : ", e );
+            }
+        }
+        LOG.info( "Finished updating reply to review feature for a company" );
+        return "Successfully updated reply to review feature for the company";
+    }
+    
+    @RequestMapping ( value = "/togglereviewreply", method = RequestMethod.POST)
+    @ResponseBody
+    public String allowReplyToReviews( HttpServletRequest request )
+    {
+        LOG.info( "Update reply to review for entity" );
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        String allowReply = request.getParameter( "allowReply" );
+        boolean isReplyEnabled = false;
+        if ( allowReply != null && !allowReply.isEmpty() ) {
+            isReplyEnabled = Boolean.parseBoolean( allowReply );
+
+            Map<String, Object> settings = new HashMap<>();
+            settings.put( OrganizationManagementService.KEY_IS_REVIEW_REPLY_ENABLED, isReplyEnabled );
+
+            try {
+                final String authorizationHeader = CommonConstants.BASIC + authHeader;
+                ssApiIntergrationBuilder.getIntegrationApi().updateSettings( entityType, entityId, settings, authorizationHeader );
+            } catch ( Exception e ) {
+                LOG.error( "Method allowReplyToReviews answer has an exception in api : ", e );
+            }
+        }
+        LOG.info( "Finished updating reply to review for entity" );
+        return "Successfully updated reply to review feature";
+    }
+    
+    @RequestMapping ( value = "/updatereviewreplyscore", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateReplyScore( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Update reply-to-review minimum-score for entity" );
+        HttpSession session = request.getSession();
+        String ratingCategory = request.getParameter( "ratingcategory" );
+        double minReplyRating = 1.0;
+        if ( ratingCategory != null && ratingCategory.equals( "rating-min-reply" ) ) {
+            minReplyRating = Double.parseDouble( request.getParameter( "rating-min-reply" ) );
+        }
+
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, minReplyRating );
+
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        try {
+
+            final String authorizationHeader = CommonConstants.BASIC + authHeader;
+            ssApiIntergrationBuilder.getIntegrationApi().updateSettings( entityType, entityId, settings, authorizationHeader );
+
+        } catch ( Exception e ) {
+            LOG.error( "NonFatalException while updating survey settings", e );
+        }
+
+        LOG.info( "Finished updating reply-to-review minimum-score for entity" );
+        return "Successfully updated minimum score to reply";
+    }
+    
+    @RequestMapping ( value = "/propagatesettings", method = RequestMethod.POST)
+    @ResponseBody
+    public String propagateSetting( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Propagate settings to lower hierarchy" );
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        String replyScore = request.getParameter( "reviewReplyScore" );
+        String allowReply = request.getParameter( "allowReply" );
+
+        Map<String, Object> settings = new HashMap<>();
+
+        if ( replyScore != null && !replyScore.isEmpty() ) {
+            Double reviewReplyScore = Double.parseDouble( replyScore );
+            settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, reviewReplyScore );
+
+        }
+
+        if ( allowReply != null && !allowReply.isEmpty() ) {
+            boolean isReplyEnabled = Boolean.parseBoolean( allowReply );
+            settings.put( OrganizationManagementService.KEY_IS_REVIEW_REPLY_ENABLED, isReplyEnabled );
+        }
+
+        try {
+
+            final String authorizationHeader = CommonConstants.BASIC + authHeader;
+            ssApiIntergrationBuilder.getIntegrationApi().propagateSettingsToLowerHierarchy( entityType, entityId, 
+                settings, authorizationHeader );
+
+        } catch ( Exception e ) {
+            LOG.error( "NonFatalException while propgating survey settings", e );
+        }
+
+        LOG.info( "Finished propagating settings to lower hierarchy" );
+        return "Successfully updated settings to all users";
+    }
+    
     
     /**
      * This controller is called to update Branch and Region admin access permission.

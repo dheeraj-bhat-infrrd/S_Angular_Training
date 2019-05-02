@@ -227,8 +227,7 @@
 		</div>
 	</div>
 </div> 
-	
-	
+
 	<div id="report-abuse-overlay" class="overlay-main hide">
     	<div id="report-abuse-pop-up" class="overlay-disable-wrapper">
     		<div id="overlay-header" class="ol-header">Why do you want to report the review?</div>

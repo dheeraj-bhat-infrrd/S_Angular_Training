@@ -1204,7 +1204,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         
         List<UserProfile> userProfiles = criteria.list();
         List<Long> userList = new ArrayList<>();
-        if ( userProfiles != null || !userProfiles.isEmpty() ) {
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
         	for(UserProfile userProfile : userProfiles) {
             	userList.add(userProfile.getAgentId());
             }
@@ -1212,6 +1212,64 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         
        
         LOG.debug( "Method to find userProfile list for entityType: {} entityId: {} finished.",entityType,entityId );
+        return userList;
+    }
+    
+    @Override
+    public List<Long> findBranchUserProfile(  String entityType, long entityId) 
+    {
+        LOG.debug( "Method to find BranchUserProfile list for entityType: {} entityId: {} started.",entityType,entityId );
+        Criteria criteria = getSession().createCriteria( UserProfile.class );
+        if(entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, entityId ) );
+        }else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+            criteria.createAlias(CommonConstants.COMPANY , "comp" );
+            criteria.add( Restrictions.eq( "comp.companyId", entityId ) );
+        }else {
+            //since no hierarchy is updating agent list is null
+            return null;
+        }
+        
+        criteria.add( Restrictions.eq( CommonConstants.PROFILE_MASTER_COLUMN + "." + "profileId" , CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) );
+        
+        List<UserProfile> userProfiles = criteria.list();
+        List<Long> userList = new ArrayList<>();
+        if ( userProfiles != null || !userProfiles.isEmpty() ) {
+            for(UserProfile userProfile : userProfiles) {
+                userList.add(userProfile.getBranchId());
+            }
+        }
+        
+       
+        LOG.debug( "Method to find BranchUserProfile list for entityType: {} entityId: {} finished.",entityType,entityId );
+        return userList;
+    }
+    
+    @Override
+    public List<Long> findRegionUserProfile(  String entityType, long entityId) 
+    {
+        LOG.debug( "Method to find RegionUserProfile list for entityType: {} entityId: {} started.",entityType,entityId );
+        Criteria criteria = getSession().createCriteria( UserProfile.class );
+        if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+            criteria.createAlias(CommonConstants.COMPANY , "comp" );
+            criteria.add( Restrictions.eq( "comp.companyId", entityId ) );
+        }else {
+            //since no hierarchy is updating agent list is null
+            return null;
+        }
+        
+        criteria.add( Restrictions.eq( CommonConstants.PROFILE_MASTER_COLUMN + "." + "profileId" , CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) );
+        
+        List<UserProfile> userProfiles = criteria.list();
+        List<Long> userList = new ArrayList<>();
+        if ( userProfiles != null || !userProfiles.isEmpty() ) {
+            for(UserProfile userProfile : userProfiles) {
+                userList.add(userProfile.getRegionId());
+            }
+        }
+        
+       
+        LOG.debug( "Method to find RegionUserProfile list for entityType: {} entityId: {} finished.",entityType,entityId );
         return userList;
     }
  }

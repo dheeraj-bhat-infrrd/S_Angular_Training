@@ -159,7 +159,7 @@
   border-bottom-style: solid !important;
   padding-top: 10px !important;
   padding-bottom: 10px !important;
-  max-height: 270px;
+  /* max-height: 270px; */
   border-color:  #8fbae0;
 }
  .ss-widget-rev-date {

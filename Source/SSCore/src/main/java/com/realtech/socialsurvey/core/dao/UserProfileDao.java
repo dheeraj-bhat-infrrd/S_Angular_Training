@@ -136,5 +136,10 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 	 * @param sortOrder
      * @return
 	 */
+
+    public List<Long> findBranchUserProfile( String entityType, long entityId );
+
+    public List<Long> findRegionUserProfile( String entityType, long entityId );
+
 	public List<UserFromSearch> getActiveUserFromSearchByUserIds( Set<Long> userIds, String sortOrder );
 }

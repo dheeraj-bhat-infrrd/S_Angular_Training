@@ -240,13 +240,6 @@
 			<div class="ss-prof-img-popup-cancel ss-prof-img-popup-btn">Cancel</div>
 		</div>
 	</div>
-</div>
-
-<div id="google-plus-banner" class="google-banner-outer">
-	<div id="google-banner-body" class="linkedin-api-v2-update-ribbon-body">
-		<span class="margin-left-auto">Since Google+ has gone away, you will no longer be able to use Google+ on SocialSurvey</span>
-	   <div id="google-banner-close-btn" class="linkedin-api-v2-update-ribbon-close-btn cursor-pointer">x</div>
-	</div>
 </div> 
 
 <c:set var="hideBannerAndPopup" value="true"/>

@@ -215,4 +215,20 @@ public final class EmailTemplateConstants {
     
     public static final String FTP_SUCCESSFULLY_PROCESSED_MAIL_BODY = "FtpSuccessfullyProcessedMailBody.html";
     public static final String FTP_SUCCESSFULLY_PROCESSED_MAIL_SUBJECT = "FtpSuccessfullyProcessedMailSubject.txt";
+    
+    public static final String SURVEY_REVIEWS_REPLY_MAIL_BODY = "SurveyReviewsReplyMailBody.html";
+    public static final String SURVEY_REVIEWS_REPLY_MAIL_SUBJECT = "SurveyReviewsReplyMailSubject.txt";
+    
+    public static final String SURVEY_REVIEWS_EDITED_REPLY_MAIL_BODY = "SurveyReviewsEditedReplyMailBody.html";
+    public static final String SURVEY_REVIEWS_EDITED_REPLY_MAIL_SUBJECT = "SurveyReviewsEditedReplyMailSubject.txt";
+    
+    public static final String SURVEY_REVIEWS_DELETED_REPLY_MAIL_BODY = "SurveyReviewsDeletedReplyMailBody.html";
+    public static final String SURVEY_REVIEWS_DELETED_REPLY_MAIL_SUBJECT = "SurveyReviewsDeletedReplyMailSubject.txt";
+    
+    public static final String SURVEY_REVIEWS_RETAKE_MAIL_BODY = "SurveyReviewsRetakeMailBody.html";
+    public static final String SURVEY_REVIEWS_RETAKE_MAIL_WITH_REPLY_BODY = "SurveyReviewsRetakeMailWithReplyBody.html";
+    public static final String SURVEY_REVIEWS_RETAKE_MAIL_NEW_BODY = "SurveyReviewsRetakeMailNewBody.html";
+    public static final String SURVEY_REVIEWS_RETAKE_MAIL_NEW_WITH_REPLY_BODY = "SurveyReviewsRetakeMailNewWithReplyBody.html";
+    public static final String SURVEY_REVIEWS_RETAKE_MAIL_SUBJECT = "SurveyReviewsRetakeMailSubject.txt";
+    
 }

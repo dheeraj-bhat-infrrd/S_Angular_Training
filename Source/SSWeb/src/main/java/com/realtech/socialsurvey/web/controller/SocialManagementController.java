@@ -3085,7 +3085,7 @@ public class SocialManagementController
     @RequestMapping ( value = "/getsocialmediatokenonsettingspage", method = RequestMethod.GET)
     public String getSocialMediaTokenonSettingsPage( HttpServletRequest request, Model model )
     {
-        LOG.info( "Inside getSocialMediaTokenonSettingsPage() method" );
+        LOG.debug( "Inside getSocialMediaTokenonSettingsPage() method" );
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession();
 

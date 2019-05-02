@@ -384,6 +384,7 @@ public interface CommonConstants
     public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory"; 
     public static final String OPEN_RETAKE_SURVEY_REQUEST_COLUMN = "openRetakeSurveyRequest";
     public static final String ABUSIVE_NOTIFY_COLUMN = "abusiveNotify";
+    public static final String REPLIED_MESSAGES = "repliedMessages";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -1591,6 +1592,10 @@ public interface CommonConstants
     public static final String EMAIL_TYPE_USER_DELETION_MAIL = "USER_DELETION_MAIL";
     public static final String EMAIL_TYPE_FTP_FILE_UPLOADER = "FTP_FILE_UPLOADER";
     public static final String EMAIL_TYPE_FTP_SUCCESSFULLY_PROCESSED_MAIL = "FTP_SUCCESSFULLY_PROCESSED_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_REVIEWS_REPLY_MAIL = "SURVEY_REVIEWS_REPLY_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_REVIEWS_EDITED_REPLY_MAIL = "EMAIL_TYPE_SURVEY_REVIEWS_EDITED_REPLY_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_REVIEWS_DELETED_REPLY_MAIL = "SURVEY_REVIEWS_DELETED_REPLY_MAIL";
+    public static final String EMAIL_TYPE_RETAKE_SURVEY_MAIL_TO_AGENT = "RETAKE_SURVEY_MAIL_TO_AGENT ";
     
     public static final String REDIRECT = "redirect:/";
     public static final String EVENT_CLICK = "click";

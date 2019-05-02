@@ -11,10 +11,12 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 
 
 /**
@@ -520,10 +522,27 @@ public interface EmailServices
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
      */
-    public void sendFtpSuccessMail( String CompanyName, String fileDate, String fileName, FtpSurveyResponse ftpSurveyResponse,
+    public void sendFtpSuccessMail( String companyName, String fileDate, String fileName, FtpSurveyResponse ftpSurveyResponse,
         String agentMailId, String recipientMailId ) throws InvalidInputException, UndeliveredEmailException;
 
     public void sendCustomMail( String recipientName, List<String> recipientMailIds, String subject, String body,
         List<EmailAttachment> attachments) throws InvalidInputException, UndeliveredEmailException;
+
+    public void sendMailForCreateReplyOnReview( String replyText, String surveyUrl, String agentName, String replyBy,
+        String customerName, String customerEmail )
+        throws InvalidInputException;
+
+
+    public void sendMailForEditReplyOnReview( String replyText, String surveyUrl, String agentName, String replyBy,
+        String customerName, String customerEmail )
+        throws InvalidInputException;
+
+
+    public void sendMailForDeleteReplyOnReview( String surveyUrl, String agentName, String customerName, String customerEmail ) throws InvalidInputException;
+
+
+    public void retakeSurveyComplitionMail( String agentName, String recipientName, String recipientMailId, String surveyDetail,
+        String customerName, String rating, String logoUrl, String agentProfileLink, String customerDetail, String fbShareUrl,
+        boolean isAddFbShare, String createdOn, String replyText, boolean isReplyTextAvl ) throws InvalidInputException, UndeliveredEmailException;
 
 }

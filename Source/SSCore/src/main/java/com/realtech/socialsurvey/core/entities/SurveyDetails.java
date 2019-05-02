@@ -120,6 +120,9 @@ public class SurveyDetails
 
     private String fbRecommendationType;
     
+    //replies to ss reviews
+    private List<ReviewReply> reviewReply;
+    
 	public int getParticipantType() {
 		return participantType;
 	}
@@ -1037,4 +1040,15 @@ public class SurveyDetails
     {
         this.fbRecommendationType = fbRecommendationType;
     }
+
+    public List<ReviewReply> getReviewReply()
+    {
+        return reviewReply;
+    }
+
+    public void setReviewReply( List<ReviewReply> reviewReply )
+    {
+        this.reviewReply = reviewReply;
+    }
+
 }

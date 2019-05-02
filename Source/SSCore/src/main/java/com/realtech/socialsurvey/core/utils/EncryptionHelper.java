@@ -58,7 +58,7 @@ public class EncryptionHelper {
 			throw new InvalidInputException("Null parameter passed to hexStringToByteArray of EncryptionHelper!");
 		}
 
-		LOG.info(" hexStringToByteArray() : input parameter : " + hexString);
+		LOG.debug(" hexStringToByteArray() : input parameter : " + hexString);
 
 		int len = hexString.length();
 		byte[] byteArray = new byte[len / 2];
@@ -66,7 +66,7 @@ public class EncryptionHelper {
 			byteArray[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
 		}
 
-		LOG.info(" hexStringToByteArray() : output : " + byteArray.toString());
+		LOG.debug(" hexStringToByteArray() : output : " + byteArray.toString());
 		return byteArray;
 	}
 
@@ -115,7 +115,7 @@ public class EncryptionHelper {
 			throw new InvalidInputException("Null parameter passed to generateAES256Key of EncryptionHelper!");
 		}
 
-		LOG.info("generateAES256Key() :  input parameter : " + plainTextKey);
+		LOG.debug("generateAES256Key() :  input parameter : " + plainTextKey);
 
 		byte[] key;
 		// Random salt
@@ -161,24 +161,24 @@ public class EncryptionHelper {
 			encryptBytes = cipher.doFinal(plainText);
 		}
 		catch (NoSuchAlgorithmException e) {
-			LOG.error("NoSuchAlgorithmException while encrypting: " + e.getMessage(), e);
+			LOG.error("NoSuchAlgorithmException while encrypting: {}", e.getMessage());
 			throw new FatalException("NoSuchAlgorithmException while encrypting: " + e.getMessage(), e);
 		}
 		catch (NoSuchPaddingException e) {
-			LOG.error("NoSuchPaddingException while encrypting: " + e.getMessage(), e);
+			LOG.error("NoSuchPaddingException while encrypting: {}", e.getMessage());
 			throw new FatalException("NoSuchPaddingException while encrypting: " + e.getMessage(), e);
 		}
 		catch (InvalidKeyException e) {
-			LOG.error("InvalidKeyException while encrypting: " + e.getMessage(), e);
+			LOG.error("InvalidKeyException while encrypting: {}", e.getMessage());
 			throw new FatalException("InvalidKeyException while encrypting: " + e.getMessage(), e);
 		}
 		catch (IllegalBlockSizeException e) {
-			LOG.error("IllegalBlockSizeException while encrypting: " + e.getMessage(), e);
+			LOG.error("IllegalBlockSizeException while encrypting: {}", e.getMessage());
 			throw new FatalException("IllegalBlockSizeException while encrypting: " + e.getMessage(), e);
 		}
 		catch (BadPaddingException e) {
-			LOG.error("BadPaddingException while encrypting: " + e.getMessage(), e);
-			throw new FatalException("BadPaddingException while encrypting: " + e.getMessage(), e);
+			LOG.error("BadPaddingException while encrypting: {}", e.getMessage());
+			throw new InvalidInputException("BadPaddingException while encrypting: " + e.getMessage(), e);
 		}
 		return encryptBytes;
 	}
@@ -252,10 +252,11 @@ public class EncryptionHelper {
 			LOG.error("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 		}
-		LOG.info("encryptAES() input parameters : " + plainText + " " + plainTextKey);
-
+		
+		LOG.info("Encrypt AES - input: {}, {}", plainText, plainTextKey);
 		String encryptedText = byteArrayToHexString(encryptAES256Bytes(plainText.getBytes(), generateAES256Key(plainTextKey)));
-		LOG.info("encryptAES() output : " + encryptedText);
+		LOG.info("Encrypt AES - output: {}", encryptedText);
+		
 		return encryptedText;
 	}
 
@@ -270,17 +271,18 @@ public class EncryptionHelper {
 	 */
 	public String decryptAES(String encryptedHexString, String plainTextKey) throws InvalidInputException {
 		if (encryptedHexString == null) {
-			LOG.error("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
-			throw new InvalidInputException("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
+			LOG.error("Null parameter passed as first argument to decryptAES of EncryptionHelper!");
+			throw new InvalidInputException("Null parameter passed as first argument to decryptAES of EncryptionHelper!");
 		}
 		if (plainTextKey == null) {
-			LOG.error("Null parameter passed as second argument encryptAES of EncryptionHelper!");
-			throw new InvalidInputException("Null parameter passed as second argument encryptAES of EncryptionHelper!");
+			LOG.error("Null parameter passed as second argument decryptAES of EncryptionHelper!");
+			throw new InvalidInputException("Null parameter passed as second argument decryptAES of EncryptionHelper!");
 		}
 
-		LOG.info("encryptAES() input parameters : " + encryptedHexString + " " + plainTextKey);
+		LOG.debug("Decrypt AES - input: {}, {}", encryptedHexString, plainTextKey);
 		String plainText = new String(decryptAES256Bytes(hexStringToByteArray(encryptedHexString), generateAES256Key(plainTextKey)));
-		LOG.info("decryptAES() output : " + plainText);
+		LOG.info("Finished decrypting AES - input:{}, output: {}", encryptedHexString, plainText);
+		
 		return plainText;
 	}
 

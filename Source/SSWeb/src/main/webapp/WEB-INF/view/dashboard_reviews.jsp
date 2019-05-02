@@ -91,6 +91,7 @@
 				<div class=" ppl-header-left review-sm-screen ">
 
 				<c:set value="${fn:escapeXml(feedback.review)}" var="review"></c:set>
+				<c:set value="${feedback.reviewReply}" var="reviewReply"></c:set>
 
 					<c:choose>
 					<c:when test="${ not empty feedback.surveyUpdatedDate and feedback.surveyUpdatedDate != feedback.surveyCompletedDate }">
@@ -201,7 +202,8 @@
 			<c:choose>
 				<c:when test="${fn:length(review)>250}">
 					<div class="ppl-content review-height">
-						<span class="review-complete-txt">${review}</span>
+						<span class="review-complete-txt">${review}</span><br />
+
 						<c:if test="${feedback.source=='Zillow' }">
                           <br><span><a class="view-zillow-link hide" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
 						</c:if>
@@ -213,11 +215,142 @@
 						</c:if>
 						<span class="review-less-text">${fn:substring(review, 0, 250)}</span>
 							<span class="review-more-button">read full review</span>
+
+						<!-- Reviews Reply Start -->
+						<!-- Remove the following if condition, not the inside div, to enable multiple replies -->	
+					<c:if test="${feedback.source !='Zillow' && feedback.source !='facebook' && feedback.source !='google'}">					
+						<c:if test="${ empty reviewReply}">
+						     <c:if test="${ minReplyScore <= feedback.score && allowReply}">
+								    <div><span class="show-reply-input"><b>Reply</b></span></div>
+								        <div class="review-reply-main hide">
+									    <input type="text" class="review-reply-input" placeholder="Write a reply"/>
+									    <button class="review-reply-btn cursor-pointer">Reply</button>
+								    </div>
+							 </c:if>
+							 
+							 <div class="review-reply-section hide">
+								<!-- <h5><span><b>Replies</b></span></h5> -->							
+								<div class="review-reply-container"></div>
+							</div>
+						</c:if>
+
+						<c:if test="${not empty reviewReply}">
+							<!-- Remove the following div with children to enable multiple replies -->
+							<c:if test="${ minReplyScore <= feedback.score && allowReply}">
+								    <div><span class="show-reply-input hide"><b>Reply</b></span></div>
+								        <div class="review-reply-main hide">
+									    <input type="text" class="review-reply-input" placeholder="Write a reply"/>
+									    <button class="review-reply-btn cursor-pointer">Reply</button>
+								    </div>
+							 </c:if>
+
+							<div class="review-reply-section">
+								<!-- <h5><span><b>Replies</b></span></h5> -->							
+								<div class="review-reply-container">
+									
+										<c:forEach var="reply" varStatus="loop" items="${reviewReply}">   
+											<div class="review-reply-box" data-reply-id="${reply.replyId}">
+												<div class="review-reply-box-container">
+													<span class="review-reply-owner"><b>${reply.replyByName}</b></span>
+													<span class="review-reply-text">${reply.replyText}</span>
+													<div class="review-reply-edit-box hide">
+														<input type="text" class="review-reply-edit-text" value="" />
+														<button class="save-reply-btn manage-edit-box-btn">Save</button>
+														<button class="cancel-reply-btn manage-edit-box-btn">Cancel</button>
+													</div>
+												</div>
+
+												<c:if test="${ minReplyScore <= feedback.score && allowReply }">
+													<div class="manage-review-reply-box">
+													    <c:if test ="${reply.replyById == currentSessionUserId}">
+														    <span class="edit-reply manage-review-reply cursor-pointer">Edit</span>
+														</c:if>    
+														<c:if test ="${(reply.replyById == currentSessionUserId) || (profilemasterid <= reply.profileMasterId)}">
+														    <span class="delete-reply manage-review-reply cursor-pointer">Delete</span>
+														</c:if>
+													</div>
+												</c:if>
+
+											</div>                 
+										</c:forEach>							
+								
+								</div>
+							</div>
+						</c:if>
+					</c:if>
+						<!-- Reviews Reply End -->					
+						
 					</div>
 				</c:when>
 				<c:otherwise>
 					<div class="ppl-content review-height">
-					    <span>${review}</span>
+					    <div class="">${review}</div>
+
+						<!-- Reviews Reply Start -->
+						<!-- Remove the following if condition, not the inside div, to enable multiple replies -->
+					   <c:if test="${feedback.source !='Zillow' && feedback.source !='facebook' && feedback.source !='google'}">						
+						    <c:if test="${ empty reviewReply}">
+							<c:if test="${ minReplyScore <= feedback.score && allowReply}">
+								    <div><span class="show-reply-input"><b>Reply</b></span></div>
+								        <div class="review-reply-main hide">
+									    <input type="text" class="review-reply-input" placeholder="Write a reply"/>
+									    <button class="review-reply-btn cursor-pointer">Reply</button>
+								    </div>
+							 </c:if>
+							 
+							 <div class="review-reply-section hide">
+								<!-- <h5><span><b>Replies</b></span></h5> -->							
+								<div class="review-reply-container"></div>
+							</div>							 
+						</c:if>
+						
+						<c:if test="${not empty reviewReply}">
+							<!-- Remove the following div with children to enable multiple replies -->
+							<c:if test="${ minReplyScore <= feedback.score && allowReply}">
+								    <div><span class="show-reply-input hide"><b>Reply</b></span></div>
+								        <div class="review-reply-main hide">
+									    <input type="text" class="review-reply-input" placeholder="Write a reply"/>
+									    <button class="review-reply-btn cursor-pointer">Reply</button>
+								    </div>
+							 </c:if>
+
+							<div class="review-reply-section">
+								<!-- <h5><span><b>Replies</b></span></h5> -->							
+								<div class="review-reply-container">
+									
+										<c:forEach var="reply" varStatus="loop" items="${reviewReply}">  
+											<div class="review-reply-box" data-reply-id="${reply.replyId}">
+												<div class="review-reply-box-container">
+													<span class="review-reply-owner"><b>${reply.replyByName}</b></span>
+													<span class="review-reply-text">${reply.replyText}</span>
+													<div class="review-reply-edit-box hide">
+														<input type="text" class="review-reply-edit-text" value="" />
+														<button class="save-reply-btn manage-edit-box-btn">Save</button>
+														<button class="cancel-reply-btn manage-edit-box-btn">Cancel</button>
+													</div>
+												</div>
+                                                
+												<c:if test="${ minReplyScore <= feedback.score && allowReply }">
+													<div class="manage-review-reply-box">
+													    <c:if test ="${reply.replyById == currentSessionUserId}">
+														    <span class="edit-reply manage-review-reply cursor-pointer">Edit</span>
+														</c:if>    
+														<c:if test ="${(reply.replyById == currentSessionUserId) || (profilemasterid <= reply.profileMasterId)}">
+														    <span class="delete-reply manage-review-reply cursor-pointer">Delete</span>
+														</c:if>
+													</div>
+												</c:if>
+
+											</div>                 
+										</c:forEach>							
+								
+								 </div>
+							 </div>
+						  </c:if>
+					   </c:if>
+						<!-- Reviews Reply End -->
+
+						<!-- <div class= "append-ltst-rply"></div> -->
 	                    <c:if test="${feedback.source=='Zillow' }">
 	                      <br><span><a class="view-zillow-link" href="${feedback.sourceId}"  target="_blank">View on zillow</a></span>
 	                    </c:if>
@@ -251,7 +384,7 @@
 				<c:if test="${feedback.source != 'Zillow'}">
 				<div class="float-right dash-flag-retake">
 					<div class="clearfix">
-						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
+						 <div class="icn-flag float-left report-abuse-txt cursor-pointer "
 							title="Report"></div>
 								<div class="restart-survey-mail-txt report-txt retake-icn float-left" title="Retake"></div>
 					</div>
@@ -260,8 +393,8 @@
 				<c:if test="${feedback.source == 'Zillow'}">
 				<div class="float-right dash-flag-retake" >
 					<div class="clearfix">
-						<div class="icn-flag float-left report-abuse-txt cursor-pointer "
-							title="Report"></div>
+						 <div class="icn-flag float-left report-abuse-txt cursor-pointer "
+							   title="Report"></div>
 					</div>
 				</div>
 				</c:if>

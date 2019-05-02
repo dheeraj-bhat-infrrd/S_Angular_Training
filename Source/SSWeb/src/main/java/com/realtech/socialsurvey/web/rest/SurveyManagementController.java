@@ -52,6 +52,7 @@ import com.realtech.socialsurvey.core.entities.CustomFieldsNameMapping;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.PostToSocialMedia;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.ReviewReply;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -438,13 +439,41 @@ public class SurveyManagementController
                 //get if fbShareButton should be added
                 boolean isAddFbShare = canPostOnSM && isFbShareAllowedForComapny;
                 
-                for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
-                    emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
-                        surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
-                        customerDetail, fbShareUrl, isAddFbShare );
+                // get survey originally created date
+                Date date = survey.getCreatedOn(); 
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");  
+                String createdOn = dateFormat.format(date); 
+                
+                String replyText = "";
+                boolean isReplyTextAvl = false;
+                List<ReviewReply> allReviewReply = survey.getReviewReply();
+                
+                if(allReviewReply != null){
+                    for(ReviewReply reviewReply : allReviewReply)
+                    {
+                      replyText =  reviewReply.getReplyText();
+                      isReplyTextAvl = true;
+                      break;
+                    }
                 }
                 
-
+                // re-take survey mail send to agent
+                if(survey.isRetakeSurvey()) {
+                    for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) 
+                    {
+                        emailServices.retakeSurveyComplitionMail(agentName, admin.getValue(), admin.getKey(), surveyDetail, customerName, 
+                            surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(), customerDetail, fbShareUrl, isAddFbShare, createdOn, replyText, isReplyTextAvl);
+                    }
+                }
+                // survey completion mail send to agent
+                else {
+                    for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
+                        emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
+                            surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
+                            customerDetail, fbShareUrl, isAddFbShare );
+                    }
+                }
+      
 				if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getComplaint_res_settings() != null) {
 					ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings().getComplaint_res_settings();
 

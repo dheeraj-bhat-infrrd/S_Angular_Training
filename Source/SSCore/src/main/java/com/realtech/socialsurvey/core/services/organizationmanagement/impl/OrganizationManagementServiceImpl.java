@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -31,6 +32,7 @@ import javax.annotation.Resource;
 
 import com.realtech.socialsurvey.core.commons.*;
 import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.*;
 import com.realtech.socialsurvey.core.vo.*;
@@ -129,6 +131,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
     public static final String SUCCESS_MESSAGE = "Organization Settings updated Successfully";
 
+    private static final Map<String, Object> APPROVED_SETTINGS_MAP = new HashMap<>();
+    static{
+        APPROVED_SETTINGS_MAP.put( KEY_IS_REVIEW_REPLY_ENABLED_FOR_COMPANY, Boolean.class );
+        APPROVED_SETTINGS_MAP.put( KEY_IS_REVIEW_REPLY_ENABLED, Boolean.class );
+        APPROVED_SETTINGS_MAP.put( KEY_REVIEW_REPLY_SCORE, Double.class );
+    }
+    
     @Autowired
     private MessageUtils messageUtils;
 
@@ -11735,8 +11744,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( columnName, columnValue, companySettings, CommonConstants.COMPANY_SETTINGS_COLLECTION );
         LOG.info( "Method to update company settings, OrganizationManagementServiceImpl.updateCompanySettings() finished." );
     }
-
-
+    
+    
+    /**
+     * Update the given setting in MongoDB. This method can be used for all collections. *Only one* setting can be updated at a time
+     * 
+     * @param collectionName
+     * @param entityId
+     * @param columnName
+     * @param columnValue
+     */
+    private void updateSetting( String collectionName, long entityId, String columnName, Object columnValue )
+    {
+        LOG.info( "Updating {} with iden:{} for setting:{} with value:{}", collectionName, entityId, columnName, columnValue );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( columnName, columnValue, entityId, collectionName );
+        LOG.info( "Finished updating {} with iden:{}", collectionName, entityId);
+    }
+    
+    
     /**
      * This method fetches necessary info required to show on admin dashboard from mongo
      * Calls {@link OrganizationUnitSettingsDao#fetchOrganizationUnitSettingsById(long, String, List)}
@@ -11867,10 +11892,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override public void updateCompanySettings( long companyId, String columnName, Object columnValue )
     {
-        LOG.debug( "Method to update company settings using companyId started." );
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( columnName,
-            columnValue, companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION );
-        LOG.debug( "Method to update company settings using companyId finished" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( columnName, columnValue, 
+            companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION );
     }
     
     @Override
@@ -12047,7 +12070,149 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return null;
 	}
 
-	@Override
+    /**
+     * Update settings of the given entity. This method can be used for all collections. *Multiple* settings can be updated at a time
+     */
+    @Override
+    public void updateSettings( String entityType, long entityId, Map<String, Object> settings ) throws InvalidInputException
+    {
+        String validationMessage = validateSettings(settings);
+        
+        if(validationMessage.equals( "success" )) {
+
+            //If the entity type isn't any of COMPANY or REGION or BRANCH then this method throws an IIE
+            String collectionName = getCollectionNameFromEntityType( entityType );
+            
+            //If the entityId is less than 0, throw an IIE
+            if ( entityId <= 0 ) {
+                throw new InvalidInputException( "Invalid entityId: " + entityId );
+            }
+            
+            List<Long> idenList = new ArrayList<>(1);
+            idenList.add( entityId );
+            
+            organizationUnitSettingsDao.updateSettingsForList( collectionName, settings, idenList );
+        }
+        
+        LOG.info( "Finished updating {} settings with iden:{} with setting:{}", entityType, entityId, settings );
+    }
+    
+    /**
+     * Update settings of all entities in the lower hierarchy. ONLY IN THE LOWER HIERARCHY. NOT IN THE ENTITY PASSED IN THE PARAMETER
+     * This method can be used for all hierarchies - company, region, branch, agent. *Multiple* settings can be updated at a time
+     */
+    @Override
+    public void updateSettingsForLowerHierarchy( String entityType, long entityId, Map<String, Object> settings ) 
+        throws InvalidInputException
+    {
+        String validationMessage = validateSettings(settings);
+        
+        if(validationMessage.equals( "success" )) {
+
+            //If the entity type isn't any of COMPANY or REGION or BRANCH then this method throws an IIE
+            getCollectionNameFromEntityType( entityType );
+            
+            //If the entityId is less than 0, throw an IIE
+            if ( entityId <= 0 ) {
+                throw new InvalidInputException( "Invalid entityId: " + entityId );
+            }
+            
+            /* Get the list of regions, branches and agents that need to be updated
+             * The region and branches methods quickly return a null if the hierarchy level of the entityType isn't valid
+             * so there isn't any performance hit
+             */
+            List<Long> regionUserList = regionDao.getRegionIdList( entityType, entityId );
+            List<Long> branchUserList = branchDao.getBranchIdList( entityType, entityId );
+            List<Long> agentUserList = userProfileDao.findPrimaryUserProfile( entityType, entityId );
+
+            if ( regionUserList != null && !regionUserList.isEmpty() ) {
+                organizationUnitSettingsDao.updateSettingsForList( CommonConstants.REGION_SETTINGS_COLLECTION,
+                    settings, regionUserList );
+            }
+
+            if ( branchUserList != null && !branchUserList.isEmpty() ) {
+                organizationUnitSettingsDao.updateSettingsForList( CommonConstants.BRANCH_SETTINGS_COLLECTION,
+                    settings, branchUserList );
+            }
+            
+            if ( agentUserList != null && !agentUserList.isEmpty() ) {
+                organizationUnitSettingsDao.updateSettingsForList( CommonConstants.AGENT_SETTINGS_COLLECTION, 
+                    settings, agentUserList );
+            }
+        }
+        
+        LOG.info( "Finished updating all lower hierarchy settings for {} with iden:{} with setting:{}", entityType, entityId, settings );
+    }
+    
+    /**
+     * Validate if the settings in the passed settings map 
+     * 1. Are in the 'approved settings map' and 
+     * 2. They have the exact same class type 
+     * 
+     * @param settings
+     * @return
+     * @throws InvalidInputException
+     */
+    private String validateSettings(Map<String, Object> settings) throws InvalidInputException
+    {
+        if(settings == null || settings.isEmpty()) {
+            throw new InvalidInputException("settings can not be null or empty.");
+        }
+        
+        for(Entry<String, Object> setting : settings.entrySet())
+        {
+            //Check if the setting is there in the allowed settings map
+            if(!APPROVED_SETTINGS_MAP.containsKey( setting.getKey() )){
+                StringBuilder sb = new StringBuilder("Invalid setting name: '");
+                sb.append(setting.getKey());
+                sb.append("'");
+                throw new InvalidInputException( sb.toString() );
+            }
+            
+            //Check if the setting value is the same class as the key in the allowed settings map
+            if( setting.getValue().getClass() != APPROVED_SETTINGS_MAP.get(setting.getKey()) ){
+                StringBuilder sb = new StringBuilder("Invalid setting value: '");
+                sb.append(setting.getValue());
+                sb.append("' having class: '");
+                sb.append(setting.getValue().getClass());
+                sb.append("' for setting name: '");
+                sb.append(setting.getKey());
+                sb.append("' having class: '");
+                sb.append(APPROVED_SETTINGS_MAP.get(setting.getKey()));
+                sb.append("'");
+                throw new InvalidInputException( sb.toString() );
+            }
+        }
+        return "success";
+    }
+    
+    /**
+     * Get the corresponding collection in mongoDB from the entityType
+     * 
+     * @param entityType
+     * @return
+     * @throws InvalidInputException
+     */
+    private String getCollectionNameFromEntityType(String entityType) throws InvalidInputException{
+        
+        if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+        
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+        
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+        
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+        
+        }
+        
+        throw new InvalidInputException( "Invalid entity type: '" + entityType + "'");
+    }
+    
+    @Override
     public String saveLinkedInProfileUrl( String entityType, long entityId, String linkedInprofileUrl ) throws InvalidInputException
     {
         LOG.info( "saveLinkedInProfileUrl start" );

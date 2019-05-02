@@ -85,8 +85,8 @@ public class SettingsSetterDaoImpl extends GenericDaoImpl<SettingsDetails, Long>
 
             }
 
-
         } catch ( HibernateException hibernateException ) {
+
             LOG.error( "Exception caught in getScoresById() ", hibernateException );
             throw new DatabaseException( "Exception caught in method getScoresById ", hibernateException );
         }

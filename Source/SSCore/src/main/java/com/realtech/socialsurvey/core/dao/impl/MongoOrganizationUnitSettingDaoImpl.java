@@ -38,6 +38,7 @@ import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map.Entry;
 
 /**
  * Mongo implementation of settings
@@ -251,6 +252,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_PHONE = "phone";
     public static final String KEY_LAST_CONVERSATION_DATE = "lastConversationDate";
     public static final String KEY_NOTES = "notes";
+    
+    //survey settings update
+    public static final String KEY_REVIEW_REPLY_SCORE = "survey_settings.reviewreplyScore";
     public static final String KEY_SURVEY_SETTINGS_MINIMUM_SOCIAL_POST_SCORE = "survey_settings.auto_post_score";
     public static final String KEY_SHOW_SURVEY_ABOVE_SCORE = "survey_settings.show_survey_above_score";
 
@@ -2707,5 +2711,26 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if( LOG.isDebugEnabled() ) {
             LOG.debug( "Updated OrganizationUnitSettings for the user {}", criteriaValue);
         }
+    }
+
+
+    @Override
+    public void updateSettingsForList( String collection, Map<String, Object> settings, List<Long> idenList )
+    {
+        Query query = new  Query();
+        Update update = new Update();
+        query.addCriteria(Criteria.where(KEY_IDEN).in(idenList));
+
+        //Add all the settings to be updated
+        for(Entry<String, Object> setting : settings.entrySet()) {
+            update.set( setting.getKey(), setting.getValue() );
+        }
+        
+        //update the modifiedOn field. That's important, remember?
+        update.set( KEY_MODIFIED_ON, System.currentTimeMillis() );
+        
+        mongoTemplate.updateMulti( query, update, collection );
+
+        LOG.info( "Finished updating {} with settings: {} having idens:{}", collection, settings, idenList);
     }
 }

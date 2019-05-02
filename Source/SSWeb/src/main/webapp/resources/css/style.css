@@ -1011,7 +1011,8 @@ display: inline-block;
 }
 
 .margin-top-twenty {
-	margin-top: 20px;
+    margin-top: 20px;
+    overflow: hidden;
 }
 
 .margin-bottom-twenty {

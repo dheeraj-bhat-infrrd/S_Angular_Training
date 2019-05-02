@@ -63,11 +63,74 @@
 									<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 								</div>
 							</div>
-							<div class="margin-top-twenty">
+					    <div class="margin-top-twenty">
 								<div id="atpst-chk-box" class="float-left bd-check-img"></div>
 								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
 							</div>
+
+							<!-- Reply Settings Start -->
+							<c:if test="${columnName == 'companyId' and isRealTechOrSSAdmin == true}">
+								<div class="ss-admin-comp-settings" style="margin-top:0px">	
+									<div id="allow-reply-all-chk-box" class="float-left bd-check-img"></div>
+									<input type="hidden" id="at-pst-cb" name="allowreplytoall" value="${isReplyEnabledForCompany}">
+									<div class="float-left bd-check-txt">Allow reply to reviews for company</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>	
+							</c:if>
+							<c:if test="${ (not empty companyAdminSwitchId) or isRealTechOrSSAdmin == true or user.isOwner == 1}">
+									<c:choose>
+							      <c:when test="${isReplyEnabledForCompany}">
+											<div class="manage-reply-setting-section width-three-five-zero">		
+										</c:when>		
+										<c:otherwise>
+											<div class="manage-reply-setting-section width-three-five-zero hide">		
+										</c:otherwise>
+									</c:choose>							
+
+										<div class="st-score-rt-top width-three-five-zero"><spring:message code="label.scoretoreply.min.key" /></div>
+							        
+										<c:choose>
+							      	<c:when test="${isReplyEnabled}">
+												<div class="st-score-rt-line2 clearfix">		
+											</c:when>		
+											<c:otherwise>
+												<div class="st-score-rt-line2 clearfix disable">	
+											</c:otherwise>
+										</c:choose>												
+								        <div class="st-rating-wrapper settings-rating-wrapper float-left clearfix" id="rating-min-reply-parent"></div>
+								        <div class="st-rating-txt float-left">
+									        <!-- set the min rating -->
+									        <input type="text" name="rating-min-reply" id="rating-min-reply" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${minreplyscore}">
+									        <div class="st-dd-wrapper hide" id="st-dd-wrapper-min-reply"></div>
+								        </div>
+							        </div>
+
+							        <div class="margin-top-twenty">
+								        <div id="allow-reply-chk-box" class="float-left bd-check-img"></div>
+								        <input type="hidden" id="at-pst-cb" name="allowreply" value="${isReplyEnabled}">
+								        <div class="float-left bd-check-txt">Allow user to reply to reviews</div>
+							       </div>
+							       
+							       <%-- Don't show 'Apply to all users' button to Agents --%>
+							       <c:if test="${profilemasterid != 4}">
+									 <div class="propagate-btn-section">
+										 		<button type="button" class="propagate-btn" title="Apply the reply settings to lower hierarchy">Apply to all users</button>
+									 </div>
+								   </c:if>
+								   
+								</div>
+							</c:if>	
+							<!-- Reply Settings End -->
+
+							<%-- <c:if test="${ (not empty companyAdminSwitchId or isRealTechOrSSAdmin == true or user.isOwner == 1) and columnName == 'companyId' }">
+							         <div class="margin-top-twenty">
+								        <div id="allow-reply-all-chk-box" class="float-left bd-check-img"></div>
+								        <input type="hidden" id="at-pst-cb" name="allowreplytoall" value="${isReplyEnabledForCompany}">
+								        <div class="float-left bd-check-txt">Allow all user to reply on SS reviews</div>
+							        </div>
+							</c:if> --%>						
+
 							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
 									<div class="review-sort-sel-col">
 									<div class="clearfix setting-sel-wrapper">
@@ -817,6 +880,14 @@ $(document).ready(function() {
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}
 	
+	if("${isReplyEnabled}" == "false"){
+		$('#allow-reply-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${isReplyEnabledForCompany}" == "false"){
+		$('#allow-reply-all-chk-box').addClass('bd-check-img-checked');
+	}
+	
 	if("${autoPostLinkToUserSite}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
 		$('#atpst-lnk-usr-ste-chk-box').addClass('bd-check-img-checked');
 	}
@@ -895,9 +966,32 @@ $(document).ready(function() {
 		$('#rating-min-post').on('click', function(){
 			$('#email-options').hide();
 			$('#sort-options').hide();
+			$('#st-dd-wrapper-min-reply').hide();
 			$('#st-dd-wrapper-survey-mail-thrs').hide();
-			$('#st-dd-wrapper-min-post').slideToggle(200);
+
+			if($('#st-dd-wrapper-min-post').is(':visible'))
+				$('#st-dd-wrapper-min-post').slideUp(200);
+			else
+				$('#st-dd-wrapper-min-post').slideDown(200);
+
 			$(document).mouseup(ratingMouseUp);
+		});
+		
+		autoAppendReplyRatingDropdown('#st-dd-wrapper-min-reply', "st-dd-item st-dd-item-min-reply");
+		changeRatingPattern($('#rating-min-reply').val(), $('#rating-min-reply-parent'));
+		$('#rating-min-reply').off('click');
+		$('#rating-min-reply').on('click', function(){
+			$('#email-options').hide();
+			$('#sort-options').hide();
+			$('#st-dd-wrapper-min-post').hide();
+			$('#st-dd-wrapper-survey-mail-thrs').hide();
+
+			if($('#st-dd-wrapper-min-reply').is(':visible'))
+			 $('#st-dd-wrapper-min-reply').slideUp(200);
+			else
+			 $('#st-dd-wrapper-min-reply').slideDown(200);
+
+			$(document).mouseup(replyScoreMouseUp);
 		});
 		
 		autoAppendSortOrderDropdown('#sort-options', "sort-option-item");
