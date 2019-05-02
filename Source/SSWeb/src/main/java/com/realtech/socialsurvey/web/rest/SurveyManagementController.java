@@ -447,13 +447,16 @@ public class SurveyManagementController
                 String replyText = "";
                 boolean isReplyTextAvl = false;
                 List<ReviewReply> allReviewReply = survey.getReviewReply();
-                for(ReviewReply reviewReply : allReviewReply)
-                {
-                  replyText =  reviewReply.getReplyText();
-                  isReplyTextAvl = true;
-                  break;
+                
+                if(allReviewReply != null){
+                    for(ReviewReply reviewReply : allReviewReply)
+                    {
+                      replyText =  reviewReply.getReplyText();
+                      isReplyTextAvl = true;
+                      break;
+                    }
                 }
-
+                
                 // re-take survey mail send to agent
                 if(survey.isRetakeSurvey()) {
                     for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) 
