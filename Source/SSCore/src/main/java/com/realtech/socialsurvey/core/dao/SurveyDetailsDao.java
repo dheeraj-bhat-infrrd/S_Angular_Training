@@ -26,7 +26,7 @@ public interface SurveyDetailsDao
     public void updateCustomerResponse( String surveyId, SurveyResponse surveyResponse, int stage );
 
 
-    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore, String profImageUrl  );
+    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore  );
 
 
 //    public double updateFinalScore( String surveyId );

@@ -8556,7 +8556,6 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 
 	$('#survey-dash').show();
 	$('#next-textarea-smiley').attr('data-survey-submit-disabled',true);
-	var profImageUrl = $('#survey-profile-image-url').val();
 	
 	var payload = {
 		"mood" : mood,
@@ -8571,8 +8570,7 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 		"surveyId" : surveyId,
 		"agentName" : agentName,
 		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey,
-		"agentProfileLink" : agentProfileLink,
-		"profImageUrl" : profImageUrl
+		"agentProfileLink" : agentProfileLink
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -23721,14 +23719,8 @@ function initializeQuickEditsPage(applicationBaseUrl){
 	$('#v-ed-app-base-url').html(applicationBaseUrl + 'pages/');
 }
 
-
 $(document).on('click','#google-banner-close-btn',function(e){
 	e.stopPropagation();
 	$('#google-plus-banner').hide();
 });
-
-function showProfileImageForSurvey(profileImage){
-	$('#survey-profile-image-url').val(profileImage);
-	
-}
 
