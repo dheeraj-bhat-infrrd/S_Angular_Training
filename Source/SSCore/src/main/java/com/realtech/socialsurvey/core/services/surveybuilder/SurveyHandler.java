@@ -77,7 +77,7 @@ public interface SurveyHandler
      * SURVEY_DETAILS.
      */
     public double updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
-        String agreedToShare, String profImageUrl );
+        String agreedToShare );
 
 
     public SurveyDetails storeInitialSurveyDetails( User user, SurveyPreInitiation surveyPreInitiation, String baseUrl,

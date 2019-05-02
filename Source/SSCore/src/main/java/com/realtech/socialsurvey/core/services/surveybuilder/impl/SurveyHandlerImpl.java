@@ -541,7 +541,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     public double updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
-        String agreedToShare, String profImageUrl )
+        String agreedToShare )
     {
         LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
@@ -553,7 +553,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         double score = calScore(surveyResponse);
         //get nps
         double npsScore = getNpsScore(surveyResponse);
-        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare, score, npsScore, profImageUrl );
+        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare, score, npsScore );
         LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
         return score;

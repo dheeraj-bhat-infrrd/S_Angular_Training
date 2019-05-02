@@ -1,14 +1,7 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -18,12 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
@@ -98,11 +89,11 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.vo.IdInfoVO;
+import com.realtech.socialsurvey.core.vo.SocialMediaStatusVO;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.common.TokenHandler;
@@ -172,7 +163,7 @@ public class SocialManagementController
     private String applicationBaseUrl;
 
     // Facebook
-	@Value("${FB_REDIRECT_URI}")
+    @Value ( "${FB_REDIRECT_URI}")
     private String facebookRedirectUri;
 
     @Value ( "${FB_CLIENT_ID}")
@@ -183,9 +174,6 @@ public class SocialManagementController
 
     @Value ( "${FB_URI}")
     private String facebookUri;
-    
-    @Value("${FB_REDIRECT_URI_IMAGE}")
-    private String facebookRedirectImageUri;
 
     // Instagram
     @Value ( "${IG_REDIRECT_URI}" )
@@ -248,8 +236,7 @@ public class SocialManagementController
     @Value ( "${ZILLOW_LENDER_API_ENDPOINT}")
     private String zillowLenderApiEndpoint;
     
-    @Autowired
-    private FileUploadService fileUploadService;
+    
 
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
@@ -260,11 +247,6 @@ public class SocialManagementController
     @Autowired
     private ZillowIntergrationApiBuilder zillowIntegrationApiBuilder;
 
-    @Value ( "${CDN_PATH}")
-    private String amazonEndpoint;
-
-    @Value ( "${AMAZON_IMAGE_BUCKET}")
-    private String amazonImageBucket;
 
     /**
      * Returns the social authorization page
@@ -3461,367 +3443,6 @@ public class SocialManagementController
         String surveyMongoId = request.getParameter( "surveyMongoId" );
         long entityId = Long.parseLong( request.getParameter( "entityId" ) );
         return socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
-    }
-    
-    @RequestMapping ( value = "/socialAuthImage", method = RequestMethod.GET)
-    public String getSocialAuthPageForSurvey( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Method getSocialAuthPageForSurvey() called from SocialManagementController" );
-        HttpSession session = request.getSession( false );
-        if ( session == null ) {
-            LOG.error( "Session is null!" );
-        }
-
-        // AuthUrl for diff social networks
-        String socialNetwork = request.getParameter( "social" );
-        String socialFlow = request.getParameter( "flow" );
-
-        session.removeAttribute( CommonConstants.SOCIAL_FLOW );
-        String serverBaseUrl = requestUtils.getRequestServerName( request );
-        switch ( socialNetwork ) {
-
-            // Building facebook authUrl
-            case "facebook":
-            	try {
-            	LOG.info("inside facebook");
-                Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectImageUri );
-                // Setting authUrl in model
-                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, facebook );
-                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
-                    facebook.getOAuthAuthorizationURL( serverBaseUrl + facebookRedirectImageUri ) );
-            	} catch(Exception e) {
-            		LOG.error("Error redirecting from facebook " + e + e.getMessage());
-            	}
-                break;
-
-            // Building twitter authUrl
-            case "twitter":
-                RequestToken requestToken;
-                try {
-                    requestToken = socialManagementService.getTwitterRequestTokenForAuthImage( serverBaseUrl );
-                } catch ( Exception e ) {
-                    LOG.error( "Exception while getting request token. Reason : " + e.getMessage(), e );
-                    model.addAttribute( "message", e.getMessage() );
-                    return JspResolver.ERROR_PAGE;
-                }
-
-                // We will keep the request token in session
-                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, requestToken );
-                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, requestToken.getAuthorizationURL() );
-
-                LOG.info( "Returning the twitter authorizationurl : " + requestToken.getAuthorizationURL() );
-                break;
-                
-             // Building linkedin authUrl
-            case "linkedin":
-                if ( socialFlow != null && !socialFlow.isEmpty() ) {
-                    session.setAttribute( CommonConstants.SOCIAL_FLOW, socialFlow );
-                }
-                //String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
-                
-                String linkedInAuthV2 = socialManagementService.getLinkedinAuthUrl( linkedinAuthUriV2, "81m03i2x1jywqq", serverBaseUrl + "/linkedinauthimage.do", linkedinScopeV2 );
-                
-                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuthV2 );
-
-                LOG.info( "Returning the linkedin authorizationurl : {}", linkedInAuthV2 );
-                break;
-
-            default:
-                LOG.error( "Social Network Type invalid in getSocialAuthPage" );
-        }
-
-        model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
-        model.addAttribute( "isFbImagePopup", "true" );
-        LOG.info("returning to facebook intermediate from socialAuth");
-        if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") ) {
-        	LOG.info("confirm facebook intermediate");
-            return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
-        } else {
-            return JspResolver.SOCIAL_AUTH_MESSAGE;
-        }
-    }
-    
-    @RequestMapping ( value = "/facebookauthimage", method = RequestMethod.GET)
-    public String authenticateFacebookAccessForImage( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Facebook authentication url requested" );
-        //User user = sessionHelper.getCurrentUser();
-        HttpSession session = request.getSession( false );
-        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
-        if ( session.getAttribute( "columnName" ) != null ) {
-            String columnName = (String) session.getAttribute( "columnName" );
-            String columnValue = (String) session.getAttribute( "columnValue" );
-            session.removeAttribute( "columnName" );
-            session.removeAttribute( "columnValue" );
-            model.addAttribute( "columnName", columnName );
-            model.addAttribute( "columnValue", columnValue );
-            model.addAttribute( "fromDashboard", 1 );
-        }
-        String profileImageUrl = null;
-        try {
-        	model.addAttribute( "isFbImagePopup", "true" );
-            // On auth error
-            String errorCode = request.getParameter( "error" );
-            if ( errorCode != null ) {
-                LOG.error( "Error code : {}", errorCode );
-                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
-                return JspResolver.SOCIAL_AUTH_MESSAGE;
-            }
-
-            // Getting Oauth accesstoken for facebook
-            String oauthCode = request.getParameter( "code" );
-            Facebook facebook = (Facebook) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-            String profileLink = null;
-            facebook4j.auth.AccessToken accessToken = null;
-            List<FacebookPage> facebookPages = new ArrayList<>();
-			try {
-				accessToken = facebook.getOAuthAccessToken(oauthCode,
-						requestUtils.getRequestServerName(request) + facebookRedirectImageUri);
-				facebook4j.User fbUser = facebook.getUser(facebook.getId());
-				profileLink = facebookUri + facebook.getId();
-				if (facebook.getId() != null) {
-					profileImageUrl = "http://graph.facebook.com/" + facebook.getId()
-							+ "/picture?type=large&redirect=false";
-					LOG.info("ProfilePic url " + profileImageUrl);
-
-					HttpClient httpclient = HttpClientBuilder.create().build();
-					HttpGet httpGetImage = new HttpGet(profileImageUrl);
-					// add request header
-					httpGetImage.setHeader("User-Agent", "Mozilla/5.0");
-					String result = httpclient.execute(httpGetImage, new BasicResponseHandler());
-					LOG.info("response " + result);
-					if (result != null && result.contains("url")) {
-						result = result.substring(result.indexOf("url"));
-						result = result.substring(result.indexOf("http"),result.indexOf(',')-1);
-						result = StringEscapeUtils.unescapeJava(result);
-						LOG.info("url is " + result);
-						URL url = new URL(result);
-						HttpURLConnection httpUrlConn = (HttpURLConnection) url.openConnection();
-						BufferedImage bufferedImage = ImageIO.read(httpUrlConn.getInputStream());
-						LOG.info("BufferedImage " + bufferedImage);
-						// reading image
-						File dir = new File(CommonConstants.USER_IMAGE_DIR);
-						if (!dir.exists()) {
-							dir.mkdirs();
-						}
-						String imageFileName = "FB_UserImage_" + facebook.getId() + CommonConstants.IMAGE_FORMAT_PNG;
-
-						String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR
-								+ CommonConstants.USER_IMAGE_NAME;
-						FileOutputStream fileOuputStream = new FileOutputStream(filePath);
-						ImageIO.write(bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream);
-						fileOuputStream.close();
-
-						File fileLocal = new File(filePath);
-						profileImageUrl = fileUploadService.uploadProfileImageFile(fileLocal, imageFileName, false);
-						profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
-								+ CommonConstants.FILE_SEPARATOR + profileImageUrl;
-						LOG.info("FB image path in amazon is " + profileImageUrl);
-					}
-				}
-				FacebookPage personalUserAccount = new FacebookPage();
-				personalUserAccount.setId(facebook.getId());
-				personalUserAccount.setAccessToken(accessToken.getToken());
-				personalUserAccount.setName(fbUser.getName());
-				personalUserAccount.setProfileUrl(profileLink);
-				facebookPages.add(personalUserAccount);
-			} catch ( FacebookException e ) {
-                LOG.error( "Error while creating access token for facebook: ", e );
-            }
-            // Storing token
-            facebookPages.addAll( socialManagementService.getFacebookPages( accessToken, profileLink ) );
-            
-            String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
-            model.addAttribute( "pageNames", facebookPages );
-            
-            model.addAttribute( "fbAccessToken", fbAccessTokenStr );
-        } catch ( Exception e ) {
-            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-            LOG.error( "Exception while getting facebook access token. Reason : ", e );
-            return JspResolver.SOCIAL_AUTH_MESSAGE;
-        }
-
-        // Updating attributes
-        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
-        model.addAttribute("profileImage", profileImageUrl);
-        model.addAttribute( "socialNetwork", "facebook" );
-        LOG.info( "Facebook Access tokens obtained successfully!" );
-        return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
-    }
-    
-    @RequestMapping ( value = "/linkedinauthimage", method = RequestMethod.GET)
-    public String authenticateLinkedInAccessV2Image( Model model, HttpServletRequest request )
-    {
-        //User user = sessionHelper.getCurrentUser();
-        HttpSession session = request.getSession( false );
-        model.addAttribute( "isFbImagePopup", "true" );
-        try {
-
-            // On auth error
-            String errorCode = request.getParameter( "error" );
-            if ( errorCode != null ) {
-                 LOG.error( "Error code : {}", errorCode );
-                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
-                return JspResolver.SOCIAL_AUTH_MESSAGE;
-            }
-
-            // Getting Oauth accesstoken for Linkedin
-            String oauthCode = request.getParameter( "code" );
-            List<NameValuePair> params = new ArrayList<NameValuePair>( 2 );
-            params.add( new BasicNameValuePair( "grant_type", "authorization_code" ) );
-            params.add( new BasicNameValuePair( "code", oauthCode ) );
-            params.add(
-                new BasicNameValuePair( "redirect_uri", requestUtils.getRequestServerName( request ) + "/linkedinauthimage.do" ) );
-            params.add( new BasicNameValuePair( "client_id", "81m03i2x1jywqq" ) );
-            params.add( new BasicNameValuePair( "client_secret", "Evwv7UljwOof4ic9" ) );
-
-            // fetching access token
-            HttpClient httpclient = HttpClientBuilder.create().build();
-            HttpPost httpPost = new HttpPost( linkedinAccessUriV2 );
-            httpPost.setEntity( new UrlEncodedFormEntity( params, "UTF-8" ) );
-            String accessTokenStr = httpclient.execute( httpPost, new BasicResponseHandler() );
-            Map<String, Object> map = new Gson().fromJson( accessTokenStr, new TypeToken<Map<String, String>>() {}.getType() );
-            String accessToken = (String) map.get( "access_token" );
-            String expiresInStr = (String) map.get( "expires_in" );
-            long expiresIn = 0;
-            if(StringUtils.isNotBlank( expiresInStr ))
-                expiresIn = Long.valueOf( expiresInStr ).longValue();
-
-			/*
-			 * HttpGet httpGet = new HttpGet( linkedinProfileUriV2 ); httpGet.setHeader(
-			 * HttpHeaders.AUTHORIZATION, "Bearer " + accessToken ); httpGet.setHeader(
-			 * CommonConstants.X_RESTLI_PROTOCOL_VERSION,
-			 * CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE ); String basicProfileStr =
-			 * httpclient.execute( httpGet, new BasicResponseHandler() ); IdInfoVO idInfoVO
-			 * = new Gson().fromJson( basicProfileStr, IdInfoVO.class );
-			 */
-            
-            HttpGet httpGetImage = new HttpGet( "https://api.linkedin.com/v2/me?projection=(id,profilePicture(displayImage~:playableStreams))" );
-            httpGetImage.setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + accessToken );
-            httpGetImage.setHeader( CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE );
-            String basicProfileStrResponse = httpclient.execute( httpGetImage, new BasicResponseHandler() );
-            basicProfileStrResponse = basicProfileStrResponse.substring(basicProfileStrResponse.indexOf("identifier"));
-            basicProfileStrResponse = basicProfileStrResponse.substring(basicProfileStrResponse.indexOf("http"), basicProfileStrResponse.indexOf(',')-1);
-            LOG.info("Linked in response for image is " + basicProfileStrResponse);
-            
-            URL url = new URL(basicProfileStrResponse);
-            BufferedImage bufferedImage = ImageIO.read( url );
-            // reading image
-            File dir = new File( CommonConstants.USER_IMAGE_DIR );
-            if ( !dir.exists() ) {
-                dir.mkdirs();
-            }
-            String imageFileName = "Lkdn_UserImage_" + CommonConstants.IMAGE_FORMAT_PNG;
-            
-            String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR + CommonConstants.USER_IMAGE_NAME;
-            FileOutputStream fileOuputStream = new FileOutputStream( filePath );
-            ImageIO.write( bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream );
-            fileOuputStream.close();
-            
-            File fileLocal = new File( filePath );
-            basicProfileStrResponse = fileUploadService.uploadProfileImageFile( fileLocal, imageFileName, false );
-            basicProfileStrResponse = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
-                + CommonConstants.FILE_SEPARATOR + basicProfileStrResponse;
-            LOG.info("Amazon S3 link " + basicProfileStrResponse);
-            model.addAttribute("profileImage", basicProfileStrResponse);
-            
-        } catch ( Exception e ) {
-            LOG.error( "Exception while getting linkedin access token. Reason : ", e );
-            return JspResolver.SOCIAL_AUTH_MESSAGE;
-        }
-
-        // Updating attributes
-        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
-        model.addAttribute( "socialNetwork", "linkedin" );
-        
-        LOG.info( "Method authenticateLinkedInAccess() finished from SocialManagementController" );
-        return JspResolver.SOCIAL_AUTH_MESSAGE;
-    }
-
-    /**
-     * The url that twitter send request to with the oauth verification code
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
-    @RequestMapping ( value = "/twitterauthimage", method = RequestMethod.GET)
-    public String authenticateTwitterImageAccess( Model model, HttpServletRequest request )
-    {
-        LOG.info( "Twitter authentication url requested" );
-        HttpSession session = request.getSession( false );
-        try {
-
-            // On auth error
-            String errorCode = request.getParameter( "oauth_problem" );
-            if ( errorCode != null ) {
-                LOG.error( "Error code : {}", errorCode );
-                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
-                return JspResolver.SOCIAL_AUTH_MESSAGE;
-            }
-
-            // Getting Oauth accesstoken for Twitter
-            AccessToken accessToken = null;
-            String profileLink = null;
-            String profileImage = null;
-            Twitter twitter = socialManagementService.getTwitterInstance();
-            String oauthVerifier = request.getParameter( "oauth_verifier" );
-            RequestToken requestToken = (RequestToken) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-            model.addAttribute( "isFbImagePopup", "true" );
-            try {
-                accessToken = twitter.getOAuthAccessToken( requestToken, oauthVerifier );
-                twitter4j.User twitterUser = twitter.showUser( twitter.getId() );
-                if ( twitterUser != null && twitterUser.getScreenName() != null ) {
-                    profileLink = CommonConstants.TWITTER_BASE_URL + twitterUser.getScreenName();
-                    profileImage = twitterUser.getOriginalProfileImageURL();
-                    LOG.info("Twitter profile image is " + profileImage);
-                    
-                    URL url = new URL(profileImage);
-                    BufferedImage bufferedImage = ImageIO.read( url );
-                    // reading image
-                    File dir = new File( CommonConstants.USER_IMAGE_DIR );
-                    if ( !dir.exists() ) {
-                        dir.mkdirs();
-                    }
-                    String imageFileName = "Twitter_UserImage_" + twitterUser.getId() + CommonConstants.IMAGE_FORMAT_PNG;
-                    
-                    String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR + CommonConstants.USER_IMAGE_NAME;
-                    FileOutputStream fileOuputStream = new FileOutputStream( filePath );
-                    ImageIO.write( bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream );
-                    fileOuputStream.close();
-                    
-                    File fileLocal = new File( filePath );
-                    profileImage = fileUploadService.uploadProfileImageFile( fileLocal, imageFileName, false );
-                    profileImage = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
-                        + CommonConstants.FILE_SEPARATOR + profileImage;
-                    LOG.info("Twitter user image link in s3 is " + profileImage);
-                } else {
-                	LOG.error("User doesn't exist");
-                }
-            } catch ( TwitterException te ) {
-                if ( TwitterException.UNAUTHORIZED == te.getStatusCode() ) {
-                    LOG.error( "Unable to get the access token. Reason: UNAUTHORISED" );
-                } else {
-                    LOG.error( te.getErrorMessage() );
-                }
-
-                throw new NonFatalException( "Unable to procure twitter access token" );
-            }
-            model.addAttribute("profileImage", profileImage);
-            
-        } catch ( Exception e ) {
-            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-            LOG.error( "Exception while getting twitter access token. Reason : " + e.getMessage(), e );
-            return JspResolver.SOCIAL_AUTH_MESSAGE;
-        }
-
-        // Updating attributes
-        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
-        model.addAttribute( "socialNetwork", "twitter" );
-        LOG.info( "Twitter Access tokens obtained and added to mongo successfully!" );
-        return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
 
 }
