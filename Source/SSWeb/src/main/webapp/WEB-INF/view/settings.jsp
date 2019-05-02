@@ -84,6 +84,20 @@
 							
 							<c:if test="${ columnName != 'agentId'  or isRealTechOrSSAdmin == true }">
 								<div id="customized-setting-div" class="st-score-rt-top" style="">Customized Feature Settings:</div>
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName != 'companyId' }">	
+								<div class="ss-admin-comp-settings" style="">		
+									<div id="hide-pp-chk-box" class="float-left bd-check-img clear-both"></div>	
+									<input type="hidden" id="hide-pp-cb" name="hidepublicpage" value="${hidePublicPage}">	
+									<div class="float-left customized-settings-child cust-resp-txt">Hide public page</div>	
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>	
+								</div>	
+								<div class="ss-admin-comp-settings" style="">	
+									<div id="hide-bread-crumb-chk-box" class="float-left bd-check-img clear-both"></div>	
+									<input type="hidden" id="hide-bc-cb" name="hidebreadcrumb" value="${hideFromBreadCrumb}">	
+								<div class="float-left customized-settings-child cust-resp-txt">Hide from bread crumb</div>	
+								<div class="ss-admin-only-visible">Only visible to SS-Admin</div>	
+								</div>	
+								</c:if>	
 								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 								<div class="ss-admin-comp-settings" style="">	
 									<div id="hide-pp-chk-box" class="float-left bd-check-img clear-both"></div>
