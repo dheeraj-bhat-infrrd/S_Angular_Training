@@ -23826,49 +23826,8 @@ function validateQuickEditsForm(){
 		$('#selected-user-email').parent().siblings('.v-ed-invalid-input').hide();
 	}
 	
-	if($('#selected-user-address1').val() == ''){
-		$('#selected-user-address1').parent().siblings('.v-ed-invalid-input').show();
-		isValid = false;
-	}else{
-		$('#selected-user-address1').parent().siblings('.v-ed-invalid-input').hide();
-	}
-	
-	if(($('#selected-user-country-code').val() == 'US' || $('#selected-user-country-code').val() == 'us') ){
-		if($('#selected-user-city').val() == ''){	
-			$('#selected-user-city').parent().siblings('.v-ed-invalid-input').show();
-			isValid = false;
-		}else{
-			$('#selected-user-city').parent().siblings('.v-ed-invalid-input').hide();
-		}
-		
-		if($('#selected-user-state').val() == null || $('#selected-user-state').val() == undefined || $('#selected-user-state').val() == ''){	
-			$('#selected-user-state').parent().siblings('.v-ed-invalid-input').show();
-			isValid = false;
-		}else{
-			$('#selected-user-state').parent().siblings('.v-ed-invalid-input').hide();
-		}
-	}
-	
-	if($('#selected-user-zip').val() == ''){
-		$('#selected-user-zip').parent().siblings('.v-ed-invalid-input').show();
-		isValid = false;
-	}else{
-		$('#selected-user-zip').parent().siblings('.v-ed-invalid-input').hide();
-	}
-	
-	if(!validateCountryProfileForQuickEdits($('#selected-user-country').val())){
-		$('#selected-user-country').parent().siblings('.v-ed-invalid-input').show();
-		isValid = false;
-	}else{
-		$('#selected-user-country').parent().siblings('.v-ed-invalid-input').hide();
-	}
-	
 	if(!(validatePhoneNumber('selected-user-phone',false,true))){
-		if($('#selected-user-phone').val() == ''){
-			$('#selected-user-phone').closest('.v-ed-row').find('.v-ed-invalid-input').html('* Enter a phone number!');
-		}else{
-			$('#selected-user-phone').closest('.v-ed-row').find('.v-ed-invalid-input').html('* Enter a valid phone number!');
-		}
+		$('#selected-user-phone').closest('.v-ed-row').find('.v-ed-invalid-input').html('* Enter a valid phone number!');
 		$('#selected-user-phone').closest('.v-ed-row').find('.v-ed-invalid-input').show();
 		isValid = false;
 	}else{
