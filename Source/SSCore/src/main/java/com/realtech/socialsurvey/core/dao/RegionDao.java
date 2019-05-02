@@ -37,4 +37,7 @@ public interface RegionDao extends GenericDao<Region, Long> {
 	 */
 	public long checkIfRegionIsDefault(long regionId);
 
+
+    public List<Long> getRegionIdList( String entityType, long entityId );
+
 }

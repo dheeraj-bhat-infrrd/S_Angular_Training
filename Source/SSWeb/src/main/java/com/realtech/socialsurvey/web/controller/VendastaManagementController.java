@@ -115,7 +115,7 @@ public class VendastaManagementController
     @RequestMapping ( value = "/showlistingsmanagersettings")
     public String showVendastaSettings( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method showVendastaSettings of OrganizationManagementController called" );
+        LOG.debug( "Method showVendastaSettings of OrganizationManagementController called" );
         try {
             HttpSession session = request.getSession( false );
             
@@ -135,7 +135,7 @@ public class VendastaManagementController
             model.addAttribute( "columnName", columnName );
             model.addAttribute( "columnValue", columnValue );
 
-            LOG.info( "Method showVendastaSettings of OrganizationManagementController finished" );
+            LOG.debug( "Method showVendastaSettings of OrganizationManagementController finished" );
             return JspResolver.VENDASTA_SETTINGS;
 
         } catch ( Exception error ) {
@@ -198,7 +198,7 @@ public class VendastaManagementController
     @ResponseBody
     public String isVendastaAccessible( Model model, HttpServletRequest request )
     {
-        LOG.info( "Checking if vendesta is accessible for this session" );
+        LOG.debug( "Checking if vendesta is accessible for this session" );
         HttpSession session = request.getSession( false );
 
         String vendastaAccess = null;

@@ -16,6 +16,7 @@ import retrofit.client.Response;
 import retrofit.http.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface SSApiIntegration
@@ -488,6 +489,25 @@ public interface SSApiIntegration
 
     @POST( "/v1/updateencompassalertemailids" )
     Response updateEncompassAlertEmailIds(@Body EncompassAlertMailsVO encompassAlertMailsVO);
+
+    @POST ( "/v2/surveys/{surveyId}/replies")
+    Response createReviewReply( @Path ( "surveyId") String surveyId, @Query ( "replyText") String replyText, @Query ( "replyByName") String replyByName, 
+        @Query ( "replyById") String replyById, @Query("entityType") String entityType);
+    
+    @PUT ( "/v2/surveys/{surveyId}/replies/{replyId}")
+    Response updateReviewReply( @Path ( "surveyId") String surveyId, @Path ("replyId") String replyId, @Query ( "replyText") String replyText, 
+        @Query ( "replyByName") String replyByName, @Query ( "replyById") String replyById );
+    
+    @DELETE ( "/v2/surveys/{surveyId}/replies/{replyId}")
+    Response deleteReviewReply( @Path ( "surveyId") String surveyId, @Path ("replyId") String replyId );
+    
+    @POST ("/v1/settings/{entityType}/{entityId}")
+    Response updateSettings(@Path ( "entityType") String entityType, @Path ( "entityId") long entityId, @Body Map<String,
+        Object> settings, @Header( "Authorization" ) String authorizationHeader);
+    
+    @POST ("/v1/settings/{entityType}/{entityId}/propagate")
+    Response propagateSettingsToLowerHierarchy(@Path ( "entityType") String entityType, @Path ( "entityId") long entityId,
+        @Body Map<String, Object> settings, @Header( "Authorization" ) String authorizationHeader);
     
     @POST ( "/v1/linkedin/profileurl" )
     Response saveLinkedInProfileUrl(@Query ( "entityType" ) String entityType,@Query ( "entityId") long entityId, @Query ( "linkedInProfileUrl") String linkedInProfileUrl);

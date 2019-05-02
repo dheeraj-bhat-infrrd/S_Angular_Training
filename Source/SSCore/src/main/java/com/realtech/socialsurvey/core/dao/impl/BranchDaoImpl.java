@@ -250,7 +250,9 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
             throw new InvalidInputException( "Invalid company id passed in getBranchIdsUnderCompany method" );
         }
         LOG.info( "Method to get all branch ids under company id : " + companyId + ",getBranchIdsUnderCompany() started." );
-        Criteria criteria = null;
+        List<Long> branchIds = new ArrayList<>();
+        branchIds = getBranchIdList( CommonConstants.COMPANY_ID_COLUMN , companyId , start , batchSize , CommonConstants.NO , true);
+        /*  Criteria criteria = null;
         try {
             criteria = getSession().createCriteria( Branch.class );
             criteria.setProjection( Projections.property( CommonConstants.BRANCH_ID_COLUMN ).as(
@@ -265,9 +267,9 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
         } catch ( HibernateException e ) {
             LOG.error( "HibernateException caught in getBranchIdsUnderCompany(). Reason: " + e.getMessage(), e );
             throw new DatabaseException( "HibernateException caught in getBranchIdsUnderCompany().", e );
-        }
+        }*/
         LOG.info( "Method to get all branch ids under company id : " + companyId + ",getBranchIdsUnderCompany() ended." );
-        return criteria.list();
+        return branchIds;
     }
 
 
@@ -297,7 +299,10 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
             throw new InvalidInputException( "Invalid company id passed in getBranchIdsUnderCompany method" );
         }
         LOG.info( "Method to get all branch ids under company id : " + companyId + ",getBranchIdsUnderCompany() started." );
-        Criteria criteria = null;
+        
+        List<Long> branchIds = new ArrayList<>();
+        branchIds = getBranchIdList( CommonConstants.COMPANY_ID_COLUMN , companyId , 0 , 0 , CommonConstants.NO , true);
+        /* Criteria criteria = null;
         try {
             criteria = getSession().createCriteria( Branch.class );
             criteria.setProjection( Projections.property( CommonConstants.BRANCH_ID_COLUMN ).as(
@@ -308,9 +313,9 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
         } catch ( HibernateException e ) {
             LOG.error( "HibernateException caught in getBranchIdsUnderCompany(). Reason: " + e.getMessage(), e );
             throw new DatabaseException( "HibernateException caught in getBranchIdsUnderCompany().", e );
-        }
+        }*/
         LOG.info( "Method to get all branch ids under company id : " + companyId + ",getBranchIdsUnderCompany() ended." );
-        return criteria.list();
+        return branchIds;
     }
 	
 	/**
@@ -417,13 +422,16 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
             throw new InvalidInputException( "Invalid region id passed in getBranchIdsOfRegion method" );
         }
         LOG.info( "Method to get all branch ids under region id : {},getBranchIdsOfRegion() started.", regionId );
-        Criteria criteria = null;
+        
+        List<Long> branchIds = new ArrayList<>();
+        branchIds = getBranchIdList( CommonConstants.REGION_ID_COLUMN , regionId , start , batch , isDefault , true);
+        /*Criteria criteria = null;
         try {
             criteria = getSession().createCriteria( Branch.class );
             criteria.setProjection( Projections.property( CommonConstants.BRANCH_ID_COLUMN ).as(
                 CommonConstants.BRANCH_ID_COLUMN ) );
             criteria.add( Restrictions.eq( CommonConstants.REGION_COLUMN, regionDao.findById( Region.class, regionId ) ) );
-
+        
             if( isDefault == CommonConstants.YES || isDefault == CommonConstants.NO ) {
                 criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, isDefault ) );
             }
@@ -438,9 +446,9 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
         } catch ( HibernateException e ) {
             LOG.error( "HibernateException caught in getBranchIdsOfRegion(). Reason: " + e.getMessage(), e );
             throw new DatabaseException( "HibernateException caught in getBranchIdsOfRegion().", e );
-        }
+        }*/
         LOG.info( "Method to get all branch ids under region id : {},getBranchIdsOfRegion() ended.", regionId );
-        return criteria.list();
+        return branchIds;
     }
     
     //check if branch is default 
@@ -458,6 +466,46 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
     	LOG.debug("method to get companyName for branch with branchId : {}",branchId);
     	Branch branch = findById(Branch.class, branchId);
     	return branch.getCompany().getCompany();
+    }
+    
+    @Override
+    public List<Long> getBranchIdList(String entityType , long entityId){
+        return getBranchIdList( entityType , entityId , 0 , 0 , 0 , false);
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private List<Long> getBranchIdList( String entityType , long entityId , int start , int size , int isDefault , boolean useDefault)
+    {
+        LOG.info( "Getting all branchIds under {}: {}", entityType, entityId );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( Branch.class );
+            criteria.setProjection( Projections.property( CommonConstants.BRANCH_ID_COLUMN ).as(
+                CommonConstants.BRANCH_ID_COLUMN ) );
+            if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+                criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, entityId ) ) );
+            }
+            else if(entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+                criteria.add( Restrictions.eq( CommonConstants.REGION_COLUMN, regionDao.findById( Region.class, entityId ) ) ); 
+            }
+            else {
+                return null;
+            }
+            
+            if ( start > 0 )
+                criteria.setFirstResult( start );
+            if ( size > 0 )
+                criteria.setFetchSize( size );
+            
+            if(useDefault) {
+                criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, isDefault ) ); 
+            }
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+
+        } catch ( HibernateException e ) {
+            throw new DatabaseException( "HibernateException caught in getBranchIdList", e );
+        }
+        return criteria.list();
     }
 }
 // JIRA SS-42 By RM-05 EOC

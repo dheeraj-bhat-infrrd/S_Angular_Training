@@ -86,7 +86,7 @@
 						$("#basic-widget-view").append(html);
 						$("#widget-code-area").html(body);
 					});
-	$('#ss-widget-iframe').css("border","1px");
+	$('#ss-widget-iframe').css("border","0px");
 	$('#ss-widget-iframe').css("border-color","#dcdcdc");
 	$('#ss-widget-iframe').css("border-style","solid");
 

@@ -53,4 +53,6 @@ public interface BranchDao extends GenericDao<Branch, Long> {
 	String getCompanyNameForBranchId(long branchId);
 
 
+    public List<Long> getBranchIdList( String entityType, long entityId );
+
 }

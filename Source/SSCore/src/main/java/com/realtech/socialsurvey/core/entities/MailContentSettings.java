@@ -12,6 +12,7 @@ public class MailContentSettings {
 	private MailContent survey_completion_mail;
 	private MailContent social_post_reminder_mail;
 	private MailContent survey_completion_unpleasant_mail;
+	private MailContent survey_reviews_reply_mail;
 
 	public MailContent getSocial_post_reminder_mail() {
 		return social_post_reminder_mail;
@@ -69,6 +70,16 @@ public class MailContentSettings {
     public void setSurvey_completion_unpleasant_mail( MailContent survey_completion_unpleasant_mail )
     {
         this.survey_completion_unpleasant_mail = survey_completion_unpleasant_mail;
+    }
+
+    public MailContent getSurvey_reviews_reply_mail()
+    {
+        return survey_reviews_reply_mail;
+    }
+
+    public void setSurvey_reviews_reply_mail( MailContent survey_reviews_reply_mail )
+    {
+        this.survey_reviews_reply_mail = survey_reviews_reply_mail;
     }
 	
 	

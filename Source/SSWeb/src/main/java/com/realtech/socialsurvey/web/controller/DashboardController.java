@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
@@ -41,7 +42,9 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -63,7 +66,11 @@ import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurve
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 @Controller
@@ -113,6 +120,9 @@ public class DashboardController
 
     @Autowired
     private AdminReports adminReport;
+    
+    @Autowired
+    private SSApiIntergrationBuilder sSApiIntergrationBuilder;
 
     @Value ( "${APPLICATION_SUPPORT_EMAIL}")
     private String applicationSupportEmail;
@@ -519,6 +529,8 @@ public class DashboardController
             String columnName = request.getParameter( "columnName" );
             String columnValue = request.getParameter( "columnValue" );
             long iden = 0;
+            
+            String currentSessionUserId = Long.toString(user.getUserId());
 
             if ( columnName == null || columnName.isEmpty() ) {
                 LOG.warn( "Invalid value (null/empty) passed for profile level." );
@@ -549,6 +561,7 @@ public class DashboardController
             }
 
             boolean hiddenSection = false;
+            boolean isReplyEnabledForCompany = false;
             try {
                 surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
                     null, null, "date", null, null, false );
@@ -558,16 +571,38 @@ public class DashboardController
                     .getCompanySettings( user.getCompany().getCompanyId() );
                 if ( settings != null ) {
                     hiddenSection = settings.isHiddenSection();
+                    SurveySettings surveySetting = null;
+                    surveySetting = settings.getSurvey_settings();
+                    
+                    isReplyEnabledForCompany = surveySetting.isReplyEnabledForCompany();
                 }
             } catch ( InvalidInputException e ) {
                 LOG.warn( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
                 throw e;
+            }
+            SurveySettings surveySettings = null;
+            surveySettings = unitSettings.getSurvey_settings();
+                
+            if ( surveySettings == null ) {
+                surveySettings = new SurveySettings();
+            }
+            
+            boolean isReplyEnabled =false;
+            isReplyEnabled = surveySettings.isReplyEnabled();
+            
+            boolean allowReply = false;
+            if(isReplyEnabled == true && isReplyEnabledForCompany== true ) {
+                allowReply = true;
             }
             
             model.addAttribute( "profileUrl", unitSettings.getCompleteProfileUrl() );
             model.addAttribute( "reviews", surveyDetails );
             model.addAttribute( "hiddenSection", hiddenSection );
             model.addAttribute( "startIndex", startIndex );
+            model.addAttribute( "minReplyScore", surveySettings.getReviewReplyScore());
+            model.addAttribute( "allowReply", allowReply);
+            model.addAttribute( "allowReplyForCompany", isReplyEnabledForCompany);
+            model.addAttribute( "currentSessionUserId", currentSessionUserId);
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             model.addAttribute( "message", e.getMessage() );
@@ -1926,7 +1961,7 @@ public class DashboardController
     @RequestMapping ( value = "/updatecurrentprofile")
     public String updateSelectedProfile( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method updateSelectedProfile() started." );
+        LOG.debug( "Method updateSelectedProfile() started." );
         HttpSession session = request.getSession( false );
 
         String entityIdStr = request.getParameter( "entityId" );
@@ -1943,7 +1978,7 @@ public class DashboardController
 
         String entityType = request.getParameter( "entityType" );
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
-        LOG.info( "Method updateSelectedProfile() finished." );
+        LOG.info( "Updated current profile" );
         return CommonConstants.SUCCESS_ATTRIBUTE;
     }
 
@@ -2311,6 +2346,128 @@ public class DashboardController
         }
         LOG.info( "Method to get company hierarchy report file, getCompanyHierarchyReportFile() ended." );
         return status;
+    }
+    
+
+    @ResponseBody
+    @RequestMapping ( value = "/createreviewreply")
+    public String createReviewReply( HttpServletRequest request ) throws InvalidInputException
+    {
+        Thread.currentThread().setName("Creating Reply");
+        LOG.info( "Method to create reply to a review started" );
+        
+        HttpSession session = request.getSession();
+        User user = sessionHelper.getCurrentUser();
+
+        String replyByName = user.getFirstName();
+        String replyById = Long.toString(user.getUserId());
+        Response response = null;
+        if(user.getLastName()!=null && !user.getLastName().isEmpty()) {
+            replyByName = replyByName + " " + user.getLastName();
+        }
+        
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        String replyText = request.getParameter( "replyText" );
+        String surveyId = request.getParameter( "surveyMongoId" );
+        try {
+        if ( surveyId == null || surveyId.isEmpty() ) {
+            LOG.warn( "Invalid value (Null/Empty) found for surveyMongoId." );
+            throw new InvalidInputException( "Invalid value (Null/Empty) found for surveyMongoId." );
+        }
+        
+        Thread.currentThread().setName("Creating Reply surveyId:" + surveyId);
+
+        response = sSApiIntergrationBuilder.getIntegrationApi().createReviewReply( surveyId, replyText, replyByName, replyById, entityType );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonfatalException caught in reviewsReply(). Nested exception is ", e );
+            return CommonConstants.ERROR;
+        }
+        
+        String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        
+        LOG.info( "Method to create reply to a review finished successfully" );
+        return responseString;
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/updatereviewreply" )
+    public String updateReviewReply( HttpServletRequest request ) throws InvalidInputException
+    {
+        Thread.currentThread().setName("Editing Reply");
+        
+        LOG.info( "Method to update reply to a review started" );
+        
+        User user = sessionHelper.getCurrentUser();
+        String replyByName = user.getFirstName();
+        String replyById = Long.toString(user.getUserId());
+        Response response = null;
+        if(user.getLastName()!=null && !user.getLastName().isEmpty()) {
+            replyByName = replyByName + " " + user.getLastName();
+        }
+        String replyText = request.getParameter( "replyText" );
+        String surveyId = request.getParameter( "surveyMongoId" );
+        String replyId = request.getParameter("replyId");
+        
+        try {
+        if ( surveyId == null || surveyId.isEmpty() ) {
+            LOG.error( "Invalid value (Null/Empty) found for surveyMongoId." );
+            throw new InvalidInputException( "Invalid value (Null/Empty) found for surveyMongoId." );
+        }
+        
+        if(replyId == null || replyId.isEmpty()) {
+            LOG.error( "Invalid value (Null/Empty) found for replyId." );
+            throw new InvalidInputException( "Invalid value (Null/Empty) found for replyId." );
+        }
+        
+        Thread.currentThread().setName("Creating Reply replyId:" + replyId);
+
+        response = sSApiIntergrationBuilder.getIntegrationApi().updateReviewReply( surveyId, replyId, replyText, replyByName, replyById );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonfatalException caught in reviewsReply(). Nested exception is ", e );
+            return CommonConstants.ERROR;
+        }
+        
+        String responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        
+        LOG.info( "Method to update reply to a review finished successfully" );
+        return responseString;
+    }
+    
+    
+    @ResponseBody
+    @RequestMapping ( value = "/deletereviewreply")
+    public String deleteReviewReply( HttpServletRequest request ) throws InvalidInputException
+    {
+        Thread.currentThread().setName("Deleting Reply");
+        
+        LOG.info( "Method to delete reply to a review started" );
+        
+        User user = sessionHelper.getCurrentUser();
+        String replyById = Long.toString(user.getUserId());
+        
+        String replyId = request.getParameter("replyId");
+        String surveyId = request.getParameter( "surveyMongoId" );
+        try {
+        if ( surveyId == null || surveyId.isEmpty() ) {
+            LOG.error( "Invalid value (Null/Empty) found for surveyMongoId." );
+            throw new InvalidInputException( "Invalid value (Null/Empty) found for surveyMongoId." );
+        }
+        
+        if(replyId == null || replyId.isEmpty()) {
+            LOG.error( "Invalid value (Null/Empty) found for replyId." );
+            throw new InvalidInputException( "Invalid value (Null/Empty) found for replyId." );
+        }
+        
+        Thread.currentThread().setName("Deleting Reply replyId:" + replyId);
+
+        sSApiIntergrationBuilder.getIntegrationApi().deleteReviewReply( surveyId, replyId );
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonfatalException caught in reviewsReply(). Nested exception is ", e );
+            return CommonConstants.ERROR;
+        }
+        
+        LOG.info( "Method to delete reply to a review finished successfully" );
+        return CommonConstants.SUCCESS_ATTRIBUTE;
     }
 
 }

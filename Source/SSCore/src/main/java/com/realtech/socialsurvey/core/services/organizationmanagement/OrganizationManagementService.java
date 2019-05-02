@@ -2,8 +2,10 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +76,11 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 public interface OrganizationManagementService
 {
+
+    String KEY_IS_REVIEW_REPLY_ENABLED_FOR_COMPANY = "survey_settings.isReplyEnabledForCompany";
+    String KEY_IS_REVIEW_REPLY_ENABLED = "survey_settings.isReplyEnabled";
+    String KEY_REVIEW_REPLY_SCORE = "survey_settings.reviewReplyScore";
+
 
     public User addCompanyInformation( User user, Map<String, String> organizationalDetails )
         throws SolrException, InvalidInputException;
@@ -2000,6 +2007,10 @@ public interface OrganizationManagementService
      * @throws InvalidInputException 
      */
     public String saveLinkedInProfileUrl( String entityType, long entityId, String linkedInprofileUrl ) throws InvalidInputException;
+
+    public void updateSettings( String entityType, long entityId, Map<String, Object> settings ) throws InvalidInputException;
+
+    public void updateSettingsForLowerHierarchy( String entityType, long entityId, Map<String, Object> settings ) throws InvalidInputException;
 
     /**
      * Method to delete linkedin profiel url

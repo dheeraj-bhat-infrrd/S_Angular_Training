@@ -37,6 +37,7 @@ import com.realtech.socialsurvey.api.transformers.SurveysAndReviewsV2VOTransform
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.PostToSocialMedia;
+import com.realtech.socialsurvey.core.entities.ReviewReplyVO;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -46,6 +47,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
@@ -103,6 +106,9 @@ public class SurveyApiV2Controller
 	public void setSurveyBuilder(SurveyBuilder surveyBuilder) {
 		this.surveyBuilder = surveyBuilder;
 	}
+    
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
 
     private static final String AUTH_FAILED = "AUTHORIZATION FAILED";
 
@@ -948,5 +954,87 @@ public class SurveyApiV2Controller
             return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
         }
     }
-}
     
+    /**
+     * Add a reply to a review
+     * 
+     * @param surveyId
+     * @param replyText
+     * @param replyByName
+     * @return
+     * @throws InvalidInputException
+     * @throws ProfileNotFoundException
+     */
+    @RequestMapping ( value = "/surveys/{surveyId}/replies", method = RequestMethod.POST)
+    @ApiOperation ( value = "Add a reply to the review")
+    public ResponseEntity<?> replyToReview( @PathVariable ( "surveyId") String surveyId, String replyText, String replyByName,
+        String replyById, String entityType ) throws InvalidInputException, ProfileNotFoundException {
+        String threadName = Thread.currentThread().getName(); 
+        Thread.currentThread().setName("CreateReply surveyId:" + surveyId);
+        LOGGER.info( "Method to create a reply to a review started" );
+        try {
+            ReviewReplyVO reviewReplyVO = surveyHandler.createOrUpdateReplyToReview( surveyId, replyText, replyByName, 
+                replyById, null , entityType);
+            LOGGER.info( "Method to create a reply to a review finished successfully" );
+            return new ResponseEntity<>(reviewReplyVO ,HttpStatus.OK);
+        } catch ( Exception e ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+        finally {
+            Thread.currentThread().setName( threadName );
+        }
+    }
+
+    /**
+     * Edit a specific reply to a review
+     * 
+     * @param surveyId
+     * @param replyId
+     * @param replyText
+     * @param replyByName
+     * @return
+     * @throws InvalidInputException
+     * @throws ProfileNotFoundException
+     */
+    @RequestMapping ( value = "/surveys/{surveyId}/replies/{replyId}", method = RequestMethod.PUT) 
+    @ApiOperation ( value = "Update the reply of a review")
+    public ResponseEntity<?> editReplyToReview(@PathVariable ( "surveyId") String surveyId, @PathVariable ( "replyId") String replyId,
+        String replyText, String replyByName, String replyById){
+        
+        String threadName = Thread.currentThread().getName(); 
+        Thread.currentThread().setName( "UpdateReply replyId:" + replyId );
+        LOGGER.info("Method to edit reply to a review started");
+        try {
+            ReviewReplyVO reviewReplyVO =surveyHandler.createOrUpdateReplyToReview(surveyId, replyText, replyByName, 
+                replyById, replyId , null);
+            LOGGER.info("Method to edit reply to a review finished successfully");
+            return new ResponseEntity<>(reviewReplyVO, HttpStatus.OK);
+        }
+        catch(Exception e) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+        finally {
+            Thread.currentThread().setName( threadName );
+        }
+    }
+    
+    
+    @RequestMapping ( value = "/surveys/{surveyId}/replies/{replyId}", method = RequestMethod.DELETE) 
+    @ApiOperation ( value = "Delete the reply of a review")
+    public ResponseEntity<?> deleteReplyToReview(@PathVariable ( "surveyId") String surveyId, @PathVariable ( "replyId") String replyId){
+        
+        String threadName = Thread.currentThread().getName(); 
+        Thread.currentThread().setName( "DeleteReply replyId:" + replyId );
+        LOGGER.info("Method to delete a reply to a review started");
+        try {
+            surveyHandler.deleteReviewReply( replyId, surveyId );
+            LOGGER.info( "Method to delete a reply to a review completed successfully" );
+            return new ResponseEntity<>( HttpStatus.OK );
+        } catch ( Exception e ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+        finally {
+            Thread.currentThread().setName( threadName );
+        }
+    }
+}

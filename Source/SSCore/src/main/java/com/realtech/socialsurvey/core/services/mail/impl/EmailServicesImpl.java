@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -45,10 +46,13 @@ import com.realtech.socialsurvey.core.entities.Plan;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
@@ -57,6 +61,8 @@ import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -252,6 +258,8 @@ public class EmailServicesImpl implements EmailServices
         this.userProfileDao = userProfileDao;
     }
 
+    @Autowired
+    OrganizationManagementService organizationManagementService;
 
     private void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
         FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail )
@@ -314,7 +322,7 @@ public class EmailServicesImpl implements EmailServices
 
     private void sendEmailWithBodyReplacements( EmailEntity emailEntity, String subjectFileName,
         FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail,
-        boolean sendMailToSalesLead ) throws InvalidInputException, UndeliveredEmailException
+        boolean sendMailToSalesLead ) throws InvalidInputException
     {
         LOG.debug(
             "Method sendEmailWithBodyReplacements called for emailEntity : {} subjectFileName : {} and messageBodyReplacements : {}",
@@ -387,7 +395,7 @@ public class EmailServicesImpl implements EmailServices
 
 
     private void saveEmail( EmailEntity emailEntity, boolean holdSendingMail )
-        throws InvalidInputException, UndeliveredEmailException
+        throws InvalidInputException
     {
         if ( emailEntity.getRecipients() == null || emailEntity.getRecipients().isEmpty() ) {
             throw new InvalidInputException( "No recipients to send mail" );
@@ -441,7 +449,7 @@ public class EmailServicesImpl implements EmailServices
 
     private void sendEmailWithSubjectAndBodyReplacements( EmailEntity emailEntity, FileContentReplacements subjectReplacements,
         FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail )
-        throws InvalidInputException, UndeliveredEmailException
+        throws InvalidInputException
     {
         LOG.debug(
             "Method sendEmailWithSubjectAndBodyReplacements called for emailEntity : {} subjectReplacements : {} and messageBodyReplacements : {}",
@@ -3327,6 +3335,140 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.debug( "Method sendCustomReportMail() finished." );
     }
+    
+    
+    @Override
+    public void sendMailForCreateReplyOnReview(String replyText, String surveyUrl,String agentName, String replyByName ,
+        String customerName ,  String customerEmail ) throws InvalidInputException
+    {
+        sendMailForReplyOnReview( replyText, surveyUrl, agentName, replyByName, customerName, customerEmail, 
+            CommonConstants.EMAIL_TYPE_SURVEY_REVIEWS_REPLY_MAIL , EmailTemplateConstants.SURVEY_REVIEWS_REPLY_MAIL_SUBJECT,
+            EmailTemplateConstants.SURVEY_REVIEWS_REPLY_MAIL_BODY  );
+    }
+    
+    @Override
+    public void sendMailForEditReplyOnReview(String replyText, String surveyUrl, String agentName, String replyByName ,
+        String customerName ,  String customerEmail ) throws InvalidInputException
+    {
+        
+        sendMailForReplyOnReview( replyText, surveyUrl, agentName, replyByName, customerName, customerEmail, 
+            CommonConstants.EMAIL_TYPE_SURVEY_REVIEWS_EDITED_REPLY_MAIL, EmailTemplateConstants.SURVEY_REVIEWS_EDITED_REPLY_MAIL_SUBJECT,
+            EmailTemplateConstants.SURVEY_REVIEWS_EDITED_REPLY_MAIL_BODY );
+    }
+    
+    private void sendMailForReplyOnReview(String replyText, String surveyUrl,String agentName, String replyByName ,
+        String customerName ,  String customerEmail, String mailType, String mailSubjectTemplate, String mailBodyTemplate )
+            throws InvalidInputException
+    {
+        LOG.debug( "sendMailForCreateReplyOnReview() started." );
+        
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmail );
+        emailEntity.setMailType( mailType );
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + mailSubjectTemplate;
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + mailBodyTemplate );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, agentName , replyByName, replyText, surveyUrl ) ); 
+   
+        LOG.trace( "Calling email sender to send mail" );
+        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false, false );
+        LOG.debug( "sendMailForReplyOnReview() ended." );
+
+    }
+    
+    @Override
+    public void sendMailForDeleteReplyOnReview(String surveyUrl, String agentName, String customerName, String customerEmail) throws InvalidInputException
+    {
+        LOG.debug( "sendMailForDeleteReplyOnReview() started." );
+        
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmail );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SURVEY_REVIEWS_DELETED_REPLY_MAIL );
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REVIEWS_DELETED_REPLY_MAIL_SUBJECT;
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REVIEWS_DELETED_REPLY_MAIL_BODY );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, agentName, surveyUrl ) ); 
+   
+        LOG.trace( "Calling email sender to send mail" );
+        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false, false );
+        LOG.debug( "sendMailForDeleteReplyOnReview() ended." ); 
+    }
+    
+    
+    @Override
+    public void retakeSurveyComplitionMail(String agentName, String recipientName, String recipientMailId,
+        String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
+        String customerDetail, String fbShareUrl , boolean isAddFbShare, String createdOn, String replyText, boolean isReplyTextAvl) throws InvalidInputException {
+
+        LOG.info( "method retakeSurveyComplitionMail() started " );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
+        }
+        if ( surveyDetail == null || surveyDetail.isEmpty() ) {
+            LOG.warn( "syrveyDetail parameter is empty or null for sending account upgrade mail " );
+            throw new InvalidInputException( "surveyDetail parameter is empty or null for sending retake survey completion mail " );
+        }
+
+        if ( customerDetail == null || customerDetail.isEmpty() ) {
+            LOG.warn( "customerDetail parameter is empty or null for sending survey completion mail " );
+            throw new InvalidInputException( "customerDetail parameter is empty or null for sending  retake survey completion mail " );
+        }
+
+        if( logoUrl == null || logoUrl.isEmpty() )
+            logoUrl = appLogoUrl;
+
+        LOG.debug( "Sending retake survey completion email to : {}", recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_RETAKE_SURVEY_MAIL_TO_AGENT );
+
+        FileContentReplacements subjectReplacements = new FileContentReplacements();
+        subjectReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REVIEWS_RETAKE_MAIL_SUBJECT );
+        subjectReplacements.setReplacementArgs( Arrays.asList( rating, agentName, customerName ) );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        if(isAddFbShare) {
+            if(isReplyTextAvl) {
+                messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REVIEWS_RETAKE_MAIL_NEW_WITH_REPLY_BODY );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, createdOn, fbShareUrl,
+                    customerDetail, surveyDetail, replyText, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
+                    String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
+            }
+            else {
+                messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REVIEWS_RETAKE_MAIL_NEW_BODY );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, createdOn, fbShareUrl,
+                    customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
+                    String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
+            }
+                
+        }else {
+            if(isReplyTextAvl) {
+                messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REVIEWS_RETAKE_MAIL_WITH_REPLY_BODY );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, createdOn,
+                    customerDetail, surveyDetail, replyText, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
+                    String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
+            }
+            else {
+                messageBodyReplacements.setFileName(
+                    EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REVIEWS_RETAKE_MAIL_BODY );
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, createdOn,
+                    customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
+                    String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
+            }
+        }
+
+        LOG.trace( "Calling email sender to send mail" );
+        sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectReplacements, messageBodyReplacements, false, false );
+        LOG.info( "Successfully sent retake survey completion mail" );
+
+    }
+
 
 }
 
