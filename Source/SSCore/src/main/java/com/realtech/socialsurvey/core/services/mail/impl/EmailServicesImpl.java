@@ -107,6 +107,9 @@ public class EmailServicesImpl implements EmailServices
 
     @Value ( "${SEND_MAIL}")
     private String sendMail;
+    
+    @Value ( "${MASK_EMAIL_ADDRESS}")
+    private String maskEmail;
 
     @Value ( "${DEFAULT_EMAIL_FROM_ADDRESS}")
     private String defaultFromAddress;
@@ -286,6 +289,11 @@ public class EmailServicesImpl implements EmailServices
             // and set in emailEntity
             LOG.trace( "Reading template to set the mail body" );
             emailEntity.setBody( fileOperations.replaceFileContents( messageBodyReplacements ) );
+            
+            //Apply masking if the property is set
+            if(maskEmail.equals( CommonConstants.YES_STRING )){
+                emailEntity.setRecipients( utils.maskEmailAddresses( emailEntity.getRecipients() ) );
+            }
 
             // Send the mail
             if ( queueMails ) {
@@ -339,6 +347,11 @@ public class EmailServicesImpl implements EmailServices
             // and set in emailEntity
             LOG.trace( "Reading template to set the mail body" );
             emailEntity.setBody( fileOperations.replaceFileContents( messageBodyReplacements ) );
+
+            //Apply masking if the property is set
+            if(maskEmail.equals( CommonConstants.YES_STRING )){
+                emailEntity.setRecipients( utils.maskEmailAddresses( emailEntity.getRecipients() ) );
+            }
 
             // Send the mail
             if ( queueMails ) {
@@ -467,6 +480,11 @@ public class EmailServicesImpl implements EmailServices
             LOG.trace( "Reading template to set the mail body" );
             emailEntity.setBody( fileOperations.replaceFileContents( messageBodyReplacements ) );
 
+            //Apply masking if the property is set
+            if(maskEmail.equals( CommonConstants.YES_STRING )){
+                emailEntity.setRecipients( utils.maskEmailAddresses( emailEntity.getRecipients() ) );
+            }
+
             // Send the mail
             if ( queueMails ) {
                 emailEntity.setHoldSendingMail( holdSendingMail );
@@ -505,6 +523,11 @@ public class EmailServicesImpl implements EmailServices
             LOG.trace( "Setting the mail subject and body" );
             emailEntity.setSubject( subject );
             emailEntity.setBody( mailBody );
+
+            //Apply masking if the property is set
+            if(maskEmail.equals( CommonConstants.YES_STRING )){
+                emailEntity.setRecipients( utils.maskEmailAddresses( emailEntity.getRecipients() ) );
+            }
 
             // Send the mail
             if ( queueMails ) {
