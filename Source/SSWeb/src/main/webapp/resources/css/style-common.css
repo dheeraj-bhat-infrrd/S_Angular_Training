@@ -14521,3 +14521,23 @@ body.ss-not-found-page {
 .ms-option-locked:hover {
     background-color: #e2e2e2;
 }
+
+.ms-assign-popup-count-cont {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-family: OpenSansSemiBold;
+    margin: 0 auto;
+    margin-right: 15px;
+    color: #c8c8c8;
+}
+
+.ms-assign-popup-count{
+	margin-left: 5px
+	font-size: 14px;
+	font-family: OpenSansBold;
+}
+
+#ms-confirmation-popup{
+	z-index: 10000;
+}

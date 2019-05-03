@@ -18,7 +18,29 @@
 				</div>
 				<div class="linked-in-cc-popup-btn-cont">
 					<div class="linked-in-cc-btn-cont">
-						<div id="ms-confirm-popup-continue" class="ms-confirm-btn">Ok!</div>
+						<div id="ms-confirm-popup-continue" class="ms-confirm-btn">Ok</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="ms-confirmation-popup" class="overlay-main" style="display: none;">
+		<div id="ms-confirmation-popup-body" class="ms-popup-body-cont">
+			<div class="ol-content">
+				<div id="ms-confirmation-popup-txt-cont" class="ol-txt">
+					<div class="linked-in-cc-popup-txt-body">
+					    <div id="ms-confirmation-popup-txt"class="linked-in-cc-popup-txt">
+					    	<div id="ms-confirmation-message" class="ms-popup-alert-txt">Are you sure you want to do this?</div>
+					    </div>
+					</div>
+				</div>
+				<div class="linked-in-cc-popup-btn-cont">
+					<div class="linked-in-cc-btn-cont">
+						<div id="ms-confirmation-popup-cancel" class="ms-confirm-btn">Cancel</div>
+					</div>
+					<div class="linked-in-cc-btn-cont">
+						<div id="ms-confirmation-popup-continue" class="ms-confirm-btn">Confirm</div>
 					</div>
 				</div>
 			</div>
@@ -33,7 +55,9 @@
 		<input type="hidden" id="ms-sel-region-name" value="">
 		<input type="hidden" id="ms-sel-branch-name" value="">
 		<div id="ms-assign-popup-body" class="ms-popup-body-cont">
-			<div id="ms-assign-popup-hdr" class="ms-popup-hdr">Assign to Region</div>
+			<div id="ms-assign-popup-hdr" class="ms-popup-hdr">
+				<div id="ms-assign-popup-hdr-txt" class="ms-assign-popup-hdr-txt">Assign to Region</div>
+			</div>
 			<div id="ms-assign-cont" class="ol-content" style="display: none;">
 				<div id="ms-assign-popup-txt-cont" class="ol-txt">
 					<div class="ms-popup-body">
@@ -75,6 +99,7 @@
 				
 				</div>
 			</div>
+			
 			<div class="linked-in-cc-popup-btn-cont">
 					<div id="ms-assign-popup-cancel" class="ms-assign-btn">Cancel</div>
 					<div id="ms-assign-popup-assign" class="ms-assign-btn">Assign</div>
@@ -131,15 +156,6 @@
 					<div class="ms-option ms-reinvite"><div class="ms-reinvite-icn"></div>ReInvite</div>
 					
 					<c:choose>
-						<c:when test="${canDelete}">
-							<div class="ms-option ms-delete"><div class="ms-delete-icn"></div>Delete</div>		
-						</c:when>
-						<c:otherwise>
-							<div class="ms-option ms-option-locked" title="No permissions to delete user."><div class="ms-delete-icn"></div>Delete</div>		
-						</c:otherwise>
-					</c:choose>
-					
-					<c:choose>
 						<c:when test="${canAssignRegion}">
 							<div class="ms-option ms-assign-reg"><div class="ms-region-icn"></div>Assign to Region</div>
 						</c:when>
@@ -167,6 +183,15 @@
 						</c:when>
 						<c:otherwise>
 							<div class="ms-option ms-option-locked" title="Logo is locked by admin."><div class="ms-logo-img-icn"></div>Upload Logo</div>			
+						</c:otherwise>
+					</c:choose>
+					
+					<c:choose>
+						<c:when test="${canDelete}">
+							<div class="ms-option ms-delete"><div class="ms-delete-icn"></div>Delete</div>		
+						</c:when>
+						<c:otherwise>
+							<div class="ms-option ms-option-locked" title="No permissions to delete user."><div class="ms-delete-icn"></div>Delete</div>		
 						</c:otherwise>
 					</c:choose>
 				</div>
