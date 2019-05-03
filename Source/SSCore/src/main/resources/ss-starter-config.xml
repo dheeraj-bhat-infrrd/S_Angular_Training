@@ -933,7 +933,7 @@
 				<ref bean="emailreaderjobdetail" />
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
-				<!-- <ref bean="updatelocationjobdetail" /> -->
+				<ref bean="updatelocationjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
 				<!-- <ref bean="socialfeedingesterjobdetail" /> -->
 				<!-- <ref bean="socialpostsimportjobdetail" /> -->
@@ -981,7 +981,7 @@
 				<ref bean="emailreadercron" />
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
-				<!-- <ref bean = "updatelocationcron" /> -->
+				<ref bean = "updatelocationcron" />
 				<ref bean="updatesubscriptionpricecron" />
 				<!-- <ref bean="socialfeedingestercron" /> -->
 				<!-- <ref bean="socialpostimportcron" /> -->

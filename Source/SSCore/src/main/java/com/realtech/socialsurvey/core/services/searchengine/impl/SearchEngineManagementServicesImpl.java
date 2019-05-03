@@ -287,6 +287,10 @@ public class SearchEngineManagementServicesImpl implements SearchEngineManagemen
 			appendAddress = appendAddress.concat(addGeoLoc.getAddress2()).concat(",");
 		if (addGeoLoc.getCity() != null)
 			appendAddress = appendAddress.concat(addGeoLoc.getCity()).concat(",");
+		if (addGeoLoc.getZipcode() != null)
+			appendAddress = appendAddress.concat(addGeoLoc.getZipcode()).concat(",");
+		if (addGeoLoc.getState() != null)
+			appendAddress = appendAddress.concat(addGeoLoc.getState()).concat(",");
 		if (addGeoLoc.getCountry() != null)
 			appendAddress = appendAddress.concat(addGeoLoc.getCountry());
 		return appendAddress;
