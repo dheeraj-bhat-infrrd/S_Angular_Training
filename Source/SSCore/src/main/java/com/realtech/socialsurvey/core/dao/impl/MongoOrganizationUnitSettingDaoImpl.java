@@ -428,6 +428,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.IDEN ).in( userIdList ) );
         Update update = new Update().set( MongoOrganizationUnitSettingDaoImpl.KEY_IS_LOGIN_PREVENTED, isLoginPrevented );
+        update.set(MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON,System.currentTimeMillis());
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
     }
 
