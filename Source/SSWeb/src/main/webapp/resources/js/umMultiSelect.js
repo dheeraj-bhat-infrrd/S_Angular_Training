@@ -22,21 +22,21 @@ $(document).on('click', '.ms-ba-dropdown', function (e) {
 		$(this).closest('.ms-ba-dropdown').find('.ms-ba-chevron-up').toggle();
 
 		if ($(this).hasClass('ms-reinvite')) {
-			selectMultiSelectAction('ms-reinvite');
+			showConfirmationPopupForMS('ms-reinvite');
 		} else if ($(this).hasClass('ms-delete')) {
-			selectMultiSelectAction('ms-delete');
+			showConfirmationPopupForMS('ms-delete');
 		} else if ($(this).hasClass('ms-smadmin')) {
-			selectMultiSelectAction('ms-smadmin');
+			showConfirmationPopupForMS('ms-smadmin');
 		} else if ($(this).hasClass('ms-assign-reg')) {
-			selectMultiSelectAction('ms-assign-reg');
+			showConfirmationPopupForMS('ms-assign-reg');
 		} else if ($(this).hasClass('ms-assign-bra')) {
-			selectMultiSelectAction('ms-assign-bra');
+			showConfirmationPopupForMS('ms-assign-bra');
 		} else if ($(this).hasClass('ms-auto-post-score')) {
-			selectMultiSelectAction('ms-auto-post-score');
+			showConfirmationPopupForMS('ms-auto-post-score');
 		} else if ($(this).hasClass('ms-prof-image')) {
-			selectMultiSelectAction('ms-prof-image');
+			showConfirmationPopupForMS('ms-prof-image');
 		} else if ($(this).hasClass('ms-logo-image')) {
-			selectMultiSelectAction('ms-logo-image');
+			showConfirmationPopupForMS('ms-logo-image');
 		}
 	});
 });
@@ -301,6 +301,264 @@ function inSelecteedUsers(selectedUserId, userlist) {
 		}
 	}
 	return -1;
+}
+
+function showConfirmationPopupForMS(action){
+
+	var selectedUsers = $('#ms-user-data').data('selectedUsers');
+
+	if (selectedUsers.length <= 0) {
+		$('#overlay-toast').html('No users selected');
+		showToast();
+		return;
+	}
+	
+	var usersStr = 'Users';
+	if(selectedUsers.length == 1){
+		usersStr = 'User'
+	}
+	
+	switch (action) {
+		case 'ms-reinvite': $('#ms-confirmation-message').html('Are you sure you want to reinvite the ' + selectedUsers.length + ' selected '+ usersStr +'?');
+			bindConfirmationPopupButtons(action);
+			break;
+	
+		case 'ms-delete': $('#ms-confirmation-message').html('Are you sure you want to delete the ' + selectedUsers.length + ' selected '+ usersStr +'?');
+			bindConfirmationPopupButtons(action);
+			break;
+	
+		case 'ms-smadmin': $('#ms-confirmation-message').html('Are you sure you want to add the ' + selectedUsers.length + ' selected '+ usersStr +' as Social Monitor Admin?');
+			bindConfirmationPopupButtons(action);
+			break;
+			
+		case 'ms-logo-image': $('#ms-confirmation-message').html('Are you sure you want to update logo of the ' + selectedUsers.length + ' selected '+ usersStr +'?');
+			bindConfirmationPopupButtons(action);
+			break;
+		
+		default: selectMultiSelectAction(action);
+	}
+}
+
+function bindConfirmationPopupButtons(action, data){
+	
+	$(document).off('click','#ms-confirmation-popup-continue');
+	$(document).on('click','#ms-confirmation-popup-continue',function(e){
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		hideConfirmationPopupforMS();
+		
+		switch(action){
+			case 'ms-assign-reg' : msAssignToRegionConfirmAction();
+								break;
+			case 'ms-assign-bra' : msAssignToBranchConfirmAction();
+								break;
+			case 'ms-auto-post-score' : msAutoPostConfirmAction();
+								break;
+			case 'ms-prof-image': multiSelectUploadProfImgConfirmAction(data);
+								break;
+			default : selectMultiSelectAction(action);
+		}
+		
+	});
+	
+	$(document).off('click','#ms-confirmation-popup-cancel');
+	$(document).on('click','#ms-confirmation-popup-cancel',function(e){
+		e.stopImmediatePropagation();
+		e.preventDefault();
+		
+		hideConfirmationPopupforMS();
+	});
+	
+	$('#ms-confirmation-popup').show();
+}
+
+
+function msAssignToRegionConfirmAction(){
+	$('#ms-overlay-loader').show();
+
+	var url = './users/assigntoregion.do';
+
+	var selectedUsers = $('#ms-user-data').data('selectedUsers');
+	
+	if(selectedUsers.length <= 0){
+		$('#overlay-toast').html('No Users Selected');
+		showToast();
+		return;
+	}
+	
+	var userIdList = [];
+	for (var i = 0; i < selectedUsers.length; i++) {
+		userIdList.push(selectedUsers[i].userId);
+	}
+
+	var action = 'assignToRegion';
+
+	var regionId = parseInt($('#ms-sel-region-id').val());
+
+	var manageTeamBulkRequest = {
+		"userIds": userIdList,
+		"regionId": regionId
+	}
+
+	$('#ms-confirm-popup-txt-hdr').html('Bulk Assign to Region');
+	$.ajax({
+		url: url,
+		type: "POST",
+		contentType: "application/json",
+		dataType: "json",
+		data: JSON.stringify(manageTeamBulkRequest),
+		async: false,
+		success: function (data) { showMSSuccessPopup(data, action) },
+		complete: function () {
+			hideMSAssignPopup();
+			actionCompleteCallbackAndRefresh();
+			enableBodyScroll();
+		},
+		error: function (e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			hideMSAssignPopup();
+		}
+	});
+}
+
+function msAssignToBranchConfirmAction(){
+	$('#ms-overlay-loader').show();
+
+	var url = './users/assigntobranch.do';
+
+	var selectedUsers = $('#ms-user-data').data('selectedUsers');
+	
+	if(selectedUsers.length <= 0){
+		$('#overlay-toast').html('No Users Selected');
+		showToast();
+		return;
+	}
+	
+	var userIdList = [];
+	for (var i = 0; i < selectedUsers.length; i++) {
+		userIdList.push(selectedUsers[i].userId);
+	}
+
+	var action = 'assignToBranch';
+
+	var regionId = parseInt($('#ms-sel-region-id').val());
+	var branchId = parseInt($('#ms-sel-branch-id').val());
+
+	var manageTeamBulkRequest = {
+		"userIds": userIdList,
+		"regionId": regionId,
+		"branchId": branchId
+	}
+
+	$('#ms-confirm-popup-txt-hdr').html('Bulk Assign to Branch');
+	$.ajax({
+		url: url,
+		type: "POST",
+		contentType: "application/json",
+		dataType: "json",
+		data: JSON.stringify(manageTeamBulkRequest),
+		async: false,
+		success: function (data) { showMSSuccessPopup(data, action) },
+		complete: function () {
+			hideMSAssignPopup();
+			actionCompleteCallbackAndRefresh();
+			enableBodyScroll();
+		},
+		error: function (e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			hideMSAssignPopup();
+		}
+	});
+}
+
+function msAutoPostConfirmAction(){
+	$('#ms-overlay-loader').show();
+
+	var selectedUsers = $('#ms-user-data').data('selectedUsers');
+	
+	if(selectedUsers.length <= 0){
+		$('#overlay-toast').html('No Users Selected');
+		showToast();
+		return;
+	}
+	
+	var userIdList = [];
+	for (var i = 0; i < selectedUsers.length; i++) {
+		userIdList.push(selectedUsers[i].userId);
+	}
+
+	var autoPostScore = $('#ms-autopost').val();
+
+	var manageTeamBulkRequest = {
+		userIds: userIdList,
+		minimumSocialPostScore: autoPostScore
+	}
+
+	var url = './users/autopostscore.do';
+
+	var action = 'autopostscore';
+
+	$.ajax({
+		url: url,
+		type: "POST",
+		contentType: "application/json",
+		dataType: "json",
+		data: JSON.stringify(manageTeamBulkRequest),
+		async: false,
+		success: function (data) { showMSSuccessPopup(data, action) },
+		complete: function () {
+			hideMSAutoPostPopup();
+			actionCompleteCallback();
+		},
+		error: function (e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			hideMSAutoPostPopup();
+		}
+	});
+}
+
+function multiSelectUploadProfImgConfirmAction(manageTeamBulkRequest){
+	$('#ms-overlay-loader').show();
+	
+	$.ajax({
+		url : "/users/uploadprofilepic.do",
+		type : "POST",
+		contentType: "application/json",
+		dataType : "json",
+		data : JSON.stringify(manageTeamBulkRequest),
+		async : false,
+		success : function(data){showMSSuccessPopup(data,'profImgUpload')},
+		complete : function() {
+			hideMSProfImgPopup();
+			$('#ms-overlay-loader').hide();
+			actionCompleteCallback();
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+			hideMSProfImgPopup();
+		}
+	});
+}
+
+function hideConfirmationPopupforMS(){
+	
+	$(document).off('click','#ms-confirmation-popup-continue');
+	$(document).off('click','#ms-confirmation-popup-cancel');
+	$('#ms-confirmation-popup').hide();
 }
 
 function selectMultiSelectAction(id) {
@@ -1467,7 +1725,7 @@ function multiSelectAssignRegion() {
 
 	$('#ms-assign-cont').show();
 	$('#ms-assign-popup').show();
-	$('#ms-assign-popup-hdr').html('Bulk Assign to Region');
+	$('#ms-assign-popup-hdr-txt').html('Bulk Assign to Region');
 	$('.ms-assign-popup-label').html('Select Region: ');
 
 	$('#ms-assign-popup-inp-reg').show();
@@ -1488,47 +1746,15 @@ function multiSelectAssignRegion() {
 			showToast();
 			return;
 		}
-
-		$('#ms-overlay-loader').show();
-
-		var url = './users/assigntoregion.do';
-
-		var userIdList = [];
-		for (var i = 0; i < selectedUsers.length; i++) {
-			userIdList.push(selectedUsers[i].userId);
+		
+		var usersStr = 'Users';
+		if(selectedUsers.length == 1){
+			usersStr = 'User'
 		}
-
-		var action = 'assignToRegion';
-
-		var regionId = parseInt($('#ms-sel-region-id').val());
-
-		var manageTeamBulkRequest = {
-			"userIds": userIdList,
-			"regionId": regionId
-		}
-
-		$('#ms-confirm-popup-txt-hdr').html('Bulk Assign to Region');
-		$.ajax({
-			url: url,
-			type: "POST",
-			contentType: "application/json",
-			dataType: "json",
-			data: JSON.stringify(manageTeamBulkRequest),
-			async: false,
-			success: function (data) { showMSSuccessPopup(data, action) },
-			complete: function () {
-				hideMSAssignPopup();
-				actionCompleteCallbackAndRefresh();
-				enableBodyScroll();
-			},
-			error: function (e) {
-				if (e.status == 504) {
-					redirectToLoginPageOnSessionTimeOut(e.status);
-					return;
-				}
-				hideMSAssignPopup();
-			}
-		});
+		
+		var action = 'ms-assign-reg';
+		$('#ms-confirmation-message').html('Are you sure you want to assign the ' + selectedUsers.length + ' selected '+ usersStr +' to '+ $('#ms-sel-region-name').val() +' region?');
+		bindConfirmationPopupButtons(action);
 	});
 
 	$(document).off('click', '#ms-assign-popup-cancel');
@@ -1550,7 +1776,7 @@ function multiSelectAssignBranch() {
 
 	$('#ms-assign-cont').show();
 	$('#ms-assign-popup').show();
-	$('#ms-assign-popup-hdr').html('Bulk Assign to Branch');
+	$('#ms-assign-popup-hdr-txt').html('Bulk Assign to Branch');
 	$('.ms-assign-popup-label').html('Select Office: ');
 
 	$('#ms-assign-popup-inp-bra').show();
@@ -1571,49 +1797,16 @@ function multiSelectAssignBranch() {
 			showToast();
 			return;
 		}
-
-		$('#ms-overlay-loader').show();
-
-		var url = './users/assigntobranch.do';
-
-		var userIdList = [];
-		for (var i = 0; i < selectedUsers.length; i++) {
-			userIdList.push(selectedUsers[i].userId);
+		
+		var usersStr = 'Users';
+		if(selectedUsers.length == 1){
+			usersStr = 'User'
 		}
-
-		var action = 'assignToBranch';
-
-		var regionId = parseInt($('#ms-sel-region-id').val());
-		var branchId = parseInt($('#ms-sel-branch-id').val());
-
-		var manageTeamBulkRequest = {
-			"userIds": userIdList,
-			"regionId": regionId,
-			"branchId": branchId
-		}
-
-		$('#ms-confirm-popup-txt-hdr').html('Bulk Assign to Branch');
-		$.ajax({
-			url: url,
-			type: "POST",
-			contentType: "application/json",
-			dataType: "json",
-			data: JSON.stringify(manageTeamBulkRequest),
-			async: false,
-			success: function (data) { showMSSuccessPopup(data, action) },
-			complete: function () {
-				hideMSAssignPopup();
-				actionCompleteCallbackAndRefresh();
-				enableBodyScroll();
-			},
-			error: function (e) {
-				if (e.status == 504) {
-					redirectToLoginPageOnSessionTimeOut(e.status);
-					return;
-				}
-				hideMSAssignPopup();
-			}
-		});
+		
+		var action = 'ms-assign-bra';		
+		$('#ms-confirmation-message').html('Are you sure you want to assign the ' + selectedUsers.length + ' selected '+ usersStr +' to '+ $('#ms-sel-branch-name').val() +' region?');
+		bindConfirmationPopupButtons(action);
+		
 	});
 
 	$(document).off('click', '#ms-assign-popup-cancel');
@@ -1625,7 +1818,7 @@ function multiSelectAssignBranch() {
 
 function hideMSAssignPopup() {
 
-	$('#ms-assign-popup-hdr').html('');
+	$('#ms-assign-popup-hdr-txt').html('');
 	$('.ms-assign-popup-lable').html('');
 
 	$("#ms-assign-popup-inp-reg").val('');
@@ -1648,45 +1841,15 @@ function multiAutoPostScore() {
 		showToast();
 		return;
 	}
-
-	$('#ms-overlay-loader').show();
-
-	var userIdList = [];
-	for (var i = 0; i < selectedUsers.length; i++) {
-		userIdList.push(selectedUsers[i].userId);
+	
+	var usersStr = 'Users';
+	if(selectedUsers.length == 1){
+		usersStr = 'User'
 	}
-
-	var autoPostScore = $('#ms-autopost').val();
-
-	var manageTeamBulkRequest = {
-		userIds: userIdList,
-		minimumSocialPostScore: autoPostScore
-	}
-
-	var url = './users/autopostscore.do';
-
-	var action = 'autopostscore';
-
-	$.ajax({
-		url: url,
-		type: "POST",
-		contentType: "application/json",
-		dataType: "json",
-		data: JSON.stringify(manageTeamBulkRequest),
-		async: false,
-		success: function (data) { showMSSuccessPopup(data, action) },
-		complete: function () {
-			hideMSAutoPostPopup();
-			actionCompleteCallback();
-		},
-		error: function (e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			hideMSAutoPostPopup();
-		}
-	});
+	
+	var action = 'ms-auto-post-score';
+	$('#ms-confirmation-message').html('Are you sure you want to change the auto post score of the ' + selectedUsers.length + ' selected '+ usersStr +'?');
+	bindConfirmationPopupButtons(action);
 }
 
 function mSBindAutoPostEvents() {
@@ -1700,7 +1863,7 @@ function mSBindAutoPostEvents() {
 
 	$('#ms-autopost-cont').show();
 	$('#ms-assign-popup').show();
-	$('#ms-assign-popup-hdr').html('Minimum score to post on social networks');
+	$('#ms-assign-popup-hdr-txt').html('Minimum score to post on social networks');
 
 	$('#ms-autopost').val(0.5);
 	var rating = 0.5;
@@ -1752,7 +1915,7 @@ function hideMSAutoPostPopup() {
 	mSChangeRatingPattern(rating, ratingParent);
 
 	$('#ms-autopost-cont').hide();
-	$('#ms-assign-popup-hdr').html('');
+	$('#ms-assign-popup-hdr-txt').html('');
 	$('#ms-assign-popup').hide();
 
 }
@@ -1779,7 +1942,7 @@ function hideMSProfImgPopup() {
 	$('#ms-prof-image').val('');
 	$('#ms-prof-pic-cont').hide();
 	$('#ms-assign-popup').hide();
-	$('#ms-assign-popup-hdr').html('');
+	$('#ms-assign-popup-hdr-txt').html('');
 }
 
 function multiSelectUploadProfImg() {
@@ -1833,6 +1996,7 @@ function multiSelectUploadLogoImg() {
 				hideOverlay();
 				callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo, true);
 				showMSSuccessPopup(d, action);
+				actionCompleteCallback();
 			},
 			error: function (e) {
 				hideOverlay();

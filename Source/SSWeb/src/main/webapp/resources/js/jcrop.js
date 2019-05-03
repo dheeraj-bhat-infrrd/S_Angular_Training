@@ -306,7 +306,7 @@ function createPopupCanvasForMultiSelect() {
 	
 	$('#ms-prof-pic-cont').show();
 	$('#ms-assign-popup').show();
-	$('#ms-assign-popup-hdr').html('Bulk Profile Image Upload');
+	$('#ms-assign-popup-hdr-txt').html('Bulk Profile Image Upload');
 }
 
 function initiateJcropForMultiSelect(input) {
@@ -375,8 +375,6 @@ function initiateJcropForMultiSelect(input) {
 				return;
 			}
 			
-			$('#ms-overlay-loader').show();
-			
 			var userIdList = [];
 			for(var i=0;i<selectedUsers.length;i++){
 				userIdList.push(selectedUsers[i].userId);
@@ -399,30 +397,16 @@ function initiateJcropForMultiSelect(input) {
 		    		userIds : userIdList
 			}
 			
-			var action = 'profImgUpload';
+			var action = 'ms-prof-image';
 			
-			$.ajax({
-				url : "/users/uploadprofilepic.do",
-				type : "POST",
-				contentType: "application/json",
-				dataType : "json",
-				data : JSON.stringify(manageTeamBulkRequest),
-				async : false,
-				success : function(data){showMSSuccessPopup(data,action)},
-				complete : function() {
-					hideMSProfImgPopup();
-					$('#ms-overlay-loader').hide();
-					actionCompleteCallback();
-				},
-				error : function(e) {
-					if(e.status == 504) {
-						redirectToLoginPageOnSessionTimeOut(e.status);
-						return;
-					}
-					redirectErrorpage();
-					hideMSProfImgPopup();
-				}
-			});
+			if(selectedUsers.length == 1){
+				$('#ms-confirmation-message').html('Are you sure you want to update the profile image for the ' + selectedUsers.length + ' selected User?');
+			}else{
+				$('#ms-confirmation-message').html('Are you sure you want to upload the profile image for the ' + selectedUsers.length + ' selected Users?');
+			}
+			
+			bindConfirmationPopupButtons(action, manageTeamBulkRequest);
+						
 		});
 		
 		$(document).off('click','#ms-assign-popup-cancel');
