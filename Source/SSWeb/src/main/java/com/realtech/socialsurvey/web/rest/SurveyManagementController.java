@@ -1060,7 +1060,7 @@ public class SurveyManagementController
 			try {
 				if (surveyHandler.canPostOnSocialMedia(agentSettings, rating)) {
 					if (!socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage, serverBaseUrl,
-							user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl(), surveyDetails.get_id())) {
+							user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
 						// TODO: Bad code: Remove the company id from the
 						// parameter: End
 						if (!agentSocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
@@ -1075,7 +1075,7 @@ public class SurveyManagementController
 				try {
 					if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
 						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl,
-								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl(), surveyDetails.get_id())) {
+								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
 							if (!companySocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 								companySocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
 						}
@@ -1090,7 +1090,7 @@ public class SurveyManagementController
 					OrganizationUnitSettings setting = organizationManagementService.getRegionSettings(regionMediaPostDetails.getRegionId());
 					if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
 						if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl,
-								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl(), surveyDetails.get_id())) {
+								user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
 							List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
 							if (!regionSocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 								regionSocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
@@ -1109,7 +1109,7 @@ public class SurveyManagementController
 
 						if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
 							if (!socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage, serverBaseUrl,
-									user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl(), surveyDetails.get_id())) {
+									user.getCompany().getCompanyId(), agentSettings.getCompleteProfileUrl())) {
 								List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
 								if (!branchSocialList.contains(CommonConstants.FACEBOOK_SOCIAL_SITE))
 									branchSocialList.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
@@ -1148,7 +1148,6 @@ public class SurveyManagementController
 			String agentIdStr = twitterDetails.get("agentId");
 			String ratingStr = twitterDetails.get("rating");
 			String customerEmail = twitterDetails.get("customerEmail");
-
 			String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail(custFirstName, custLastName);
 			long agentId = 0;
 			double rating = 0;
@@ -1167,6 +1166,7 @@ public class SurveyManagementController
 			List<OrganizationUnitSettings> branchSettings = settingsMap.get(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(agentId, customerEmail, custFirstName, custLastName);
+			String profileImage = surveyDetails.getProfileImageUrl();
 			SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey(surveyDetails, companySettings.get(0),
 					regionSettings, branchSettings);
 
@@ -1203,7 +1203,7 @@ public class SurveyManagementController
 			User user = userManagementService.getUserObjByUserId(agentId);
 			try {
 				if (surveyHandler.canPostOnSocialMedia(agentSettings, rating)) {
-					if (!socialManagementService.tweet(agentSettings, twitterMessage, user.getCompany().getCompanyId())) {
+					if (!socialManagementService.tweet(agentSettings, twitterMessage, user.getCompany().getCompanyId(), profileImage)) {
 						if (!agentSocialList.contains(CommonConstants.TWITTER_SOCIAL_SITE))
 							agentSocialList.add(CommonConstants.TWITTER_SOCIAL_SITE);
 					}
@@ -1215,7 +1215,7 @@ public class SurveyManagementController
 			for (OrganizationUnitSettings setting : companySettings) {
 				try {
 					if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
-						if (!socialManagementService.tweet(setting, twitterMessage, user.getCompany().getCompanyId())) {
+						if (!socialManagementService.tweet(setting, twitterMessage, user.getCompany().getCompanyId(), profileImage)) {
 							if (!companySocialList.contains(CommonConstants.TWITTER_SOCIAL_SITE))
 								companySocialList.add(CommonConstants.TWITTER_SOCIAL_SITE);
 						}
@@ -1230,7 +1230,7 @@ public class SurveyManagementController
 
 					OrganizationUnitSettings setting = organizationManagementService.getRegionSettings(regionMediaPostDetails.getRegionId());
 					if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
-						if (!socialManagementService.tweet(setting, twitterMessage, user.getCompany().getCompanyId())) {
+						if (!socialManagementService.tweet(setting, twitterMessage, user.getCompany().getCompanyId(), profileImage)) {
 							List<String> regionSocialList = regionMediaPostDetails.getSharedOn();
 							if (!regionSocialList.contains(CommonConstants.TWITTER_SOCIAL_SITE))
 								regionSocialList.add(CommonConstants.TWITTER_SOCIAL_SITE);
@@ -1248,7 +1248,7 @@ public class SurveyManagementController
 					if (setting != null) {
 
 						if (surveyHandler.canPostOnSocialMedia(setting, rating)) {
-							if (!socialManagementService.tweet(setting, twitterMessage, user.getCompany().getCompanyId())) {
+							if (!socialManagementService.tweet(setting, twitterMessage, user.getCompany().getCompanyId(), profileImage)) {
 								List<String> branchSocialList = branchMediaPostDetails.getSharedOn();
 								if (!branchSocialList.contains(CommonConstants.TWITTER_SOCIAL_SITE))
 									branchSocialList.add(CommonConstants.TWITTER_SOCIAL_SITE);

@@ -50,8 +50,21 @@
 		<div data-agentid="${reviewItem.agentId}" survey-mongo-id="${reviewItem._id}"
 			data-review="${fn:escapeXml(reviewItem.review)}" data-score="${reviewItem.score}" 
 			 class="ppl-review-item dsh-review-cont hide">
+			<c:choose>
+				<c:when test="${ not empty reviewItem.profileImageUrl }">
+					<div class="ss-widget-prof-pic-cont">
+					<img class="ss-widget-prof-pic" src="${reviewItem.profileImageUrl }">
+				</div>
+				</c:when>
+				<c:otherwise>
+					<div class="ss-widget-prof-pic-cont">
+					<img class="ss-widget-prof-pic" src="${initParam.resourcesPath}/widget/images/person.png">
+				</div>
+				</c:otherwise>
+			</c:choose>
 
-			<div class="ppl-header-wrapper clearfix">
+
+			<div class="ppl-header-wrapper clearfix review-details">
 			<div class="float-left ppl-header-right">
 					<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-modified="false" 
 						data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
@@ -143,6 +156,9 @@
 								</c:if></span>
 							</c:if>
 						</c:if>
+						<c:if test="${ not empty reviewItem.summary }">
+								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
+							</c:if>
 						<c:choose>
 							<c:when test="${ not empty reviewItem.summary }">
 								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
@@ -188,7 +204,6 @@
 					</div>
 				</div>
 			</div>
-			
 			<c:choose>
 				<c:when test="${fn:length(review)>250}">
 					<div class="ppl-content review-height">
@@ -221,6 +236,7 @@
 					</div>
 				</c:otherwise>
 			</c:choose>
+			
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
 				<div class="float-left clearfix ppl-share-social ">
 				<c:if test="${not empty reviewItem.agentName}">

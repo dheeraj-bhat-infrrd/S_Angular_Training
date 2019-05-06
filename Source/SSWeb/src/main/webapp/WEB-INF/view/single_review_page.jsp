@@ -80,6 +80,18 @@
 			</div>
 			<div class="single-review-popup-body-wrapper clearfix">
 				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 sr-review-details">
+				<c:choose>
+				<c:when test="${ not empty singleReviewItem.profileImageUrl }">
+					<div class="ss-reviewer-prof-pic-cont">
+					<img class="ss-reviewer-prof-pic" src="${singleReviewItem.profileImageUrl }">
+				</div>
+				</c:when>
+				<c:otherwise>
+					<div class="ss-reviewer-prof-pic-cont">
+					<img class="ss-reviewer-prof-pic" src="${initParam.resourcesPath}/widget/images/person.png">
+				</div>
+				</c:otherwise>
+			</c:choose>
 					<span class="sr-reviewed-by">Reviewed by ${customerDisplayName}.</span>
 					<div class="sr-margin-bottom-50">
 						<span>Posted on </span> 
@@ -114,6 +126,11 @@
 							</c:otherwise>
                         </c:choose>
 					</div>
+					<%-- <c:if test="${ not empty singleReviewItem.profileImageUrl}">
+				<div class="profilePic">
+					<img src="${singleReviewItem.profileImageUrl }">
+				</div>
+			</c:if> --%>
 					<div>Share this Review</div>
 					<div class="ppl-share-wrapper clearfix share-plus-height sr-share-wrapper" >
 						<!-- social media share links populated from java script -->

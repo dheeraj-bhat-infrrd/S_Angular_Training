@@ -416,7 +416,4 @@ public interface SurveyDetailsDao
 
 	SurveyDetails getLatestCompletedSurveyForEntity(String entityType, long entityId);
 
-
-	String getProfileImageUrl(String surveyId);
-
 }

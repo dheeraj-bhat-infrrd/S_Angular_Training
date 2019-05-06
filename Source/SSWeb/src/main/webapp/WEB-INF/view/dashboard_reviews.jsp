@@ -44,8 +44,20 @@
 				<c:set value="${ nameArray[0] }" var="customerDisplayName"></c:set>
 			</c:otherwise>
 		</c:choose>
-		<div data-agentid="${feedback.agentId}" data-review="${fn:escapeXml(feedback.review)}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide">
-			<div class="ppl-header-wrapper clearfix">
+		<div data-agentid="${feedback.agentId}" data-review="${fn:escapeXml(feedback.review)}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide review-attr">
+			<c:choose>
+				<c:when test="${ not empty feedback.profileImageUrl }">
+					<div class="ss-widget-prof-pic-cont">
+					<img class="ss-widget-prof-pic" src="${feedback.profileImageUrl }">
+				</div>
+				</c:when>
+				<c:otherwise>
+					<div class="ss-widget-prof-pic-cont">
+					<img class="ss-widget-prof-pic" src="${initParam.resourcesPath}/widget/images/person.png">
+				</div>
+				</c:otherwise>
+			</c:choose>
+			<div class="ppl-header-wrapper clearfix review-details">
 			<div class="float-left ppl-header-right">
 					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
 					</div>
@@ -198,6 +210,7 @@
 				</div>
 			</div>
 			</div>
+
 			<c:choose>
 				<c:when test="${fn:length(review)>250}">
 					<div class="ppl-content review-height">

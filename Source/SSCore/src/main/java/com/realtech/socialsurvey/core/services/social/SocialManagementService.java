@@ -101,7 +101,7 @@ public interface SocialManagementService
      * @throws FacebookException
      */
     public boolean updateStatusIntoFacebookPage( OrganizationUnitSettings settings, String message, String serverBaseUrl,
-        long companyId, String completeProfileUrl, String surveyId ) throws InvalidInputException, FacebookException;
+        long companyId, String completeProfileUrl) throws InvalidInputException, FacebookException;
 
 
     /**
@@ -113,7 +113,7 @@ public interface SocialManagementService
      * @throws InvalidInputException
      * @throws TwitterException
      */
-    public boolean tweet( OrganizationUnitSettings agentSettings, String message, long companyId )
+    public boolean tweet( OrganizationUnitSettings agentSettings, String message, long companyId, String profileImageUrl)
         throws InvalidInputException, TwitterException;
 
 
@@ -188,7 +188,7 @@ public interface SocialManagementService
 
     void postToTwitterForHierarchy( String twitterMessage, double rating, String serverBaseUrl, int accountMasterId,
         SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails,
-        boolean isAgentsHidden ) throws InvalidInputException, NoRecordsFetchedException;
+        boolean isAgentsHidden, String profileImageUrl ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     public Map<String, List<OrganizationUnitSettings>> getSettingsForBranchesRegionsAndCompanyInAgentsHierarchy( long agentId )

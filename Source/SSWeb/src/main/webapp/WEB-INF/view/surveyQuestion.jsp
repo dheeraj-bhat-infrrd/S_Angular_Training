@@ -336,12 +336,19 @@
 							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
 -							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
 							<div class="float-left bd-check-txt survey-authorize-font-size"><spring:message code="label.survey.authorize.key"/></div>
-							<div class="reg_form_row clearfix">
+							<%-- <div class="reg_form_row clearfix">
 					       <div class="reg_btn" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
 					       <div class="reg_btn" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
 					       <div class="reg_btn" id="import-Twitter" onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
-				          </div>
+				          </div> --%>
 						</div>
+						 <div id="pst-profile-div" class="pst-srvy">
+							<div id="shr-post-profile-chk-box"
+								class="float-left v-ed-checkbox-unchecked v-ed-checkbox-checked"
+								style="margin-top: 18px; width: 29px;"></div>
+							<div class="float-left bd-check-txt survey-authorize-font-size">Post my Profile Picture with review</div>
+						</div>
+						
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>
 							<div id="next-textarea-smiley" class="float-left sq-np-item sq-np-item-next btn-com" data-survey-submit-disabled=false><spring:message code="label.nxt.btn.key"/></div>
@@ -397,6 +404,46 @@
 			<div class="sq-star sq-full-star hide"></div>
 		</div>
 	</div>
+
+
+		<div id="profile-new-popup-main" class="mismatch-new-popup-main hide">
+			<div id="profile-popup-new" class="mismatch-popup-new" style="width:43%">
+				<div
+					class="mismatch-popup-new-header col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div id="social-media-profile"
+						class="mis-new-mail-id mismatch-new-mail col-lg-12 col-md-12 col-sm-12 col-xs-12">
+						Import Profile Pic from Social Media</div>
+				</div>
+				<div
+					class="mismatch-popup-new-body col-lg-12 col-md-12 col-sm-12 col-xs-12" style="height:220px;">
+					<div
+						class="mismatch-popup-body-right col-lg-12 col-md-12 col-sm-12 col-xs-12"
+						style="padding: 0">
+						<div id="import-options"
+							class="mismatch-new-body-options col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-align">
+							<div class="dsh-btn-complete rep-dash-btn btn-align"
+								id="import-facebook"
+								onclick="openAuthPageForSurvey(event,'facebook', ${isAutoLogin}, this);"
+								data-link="${facebookLink}">
+								facebook</div>
+							<div class="dsh-btn-complete rep-dash-btn btn-align" id="import-linkedIn"
+								onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);"
+								data-link="${facebookLink}">
+								Linkedin</div>
+							<div class="dsh-btn-complete rep-dash-btn btn-align " id="import-Twitter"
+								onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);"
+								data-link="${facebookLink}">
+								Twitter</div>
+						</div>
+					</div>
+				</div>
+				<div class="mismatch-popup-new-footer col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div id="profile-new-back" class="mismatch-new-back float-left cursor-pointer">Back</div>
+			<div id="profile-new-delete" class="mismatch-new-back mismatch-new-confirm float-right cursor-pointer">Delete</div>
+		</div>
+			</div>
+		</div>
+		
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <!-- <script src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script> -->
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>

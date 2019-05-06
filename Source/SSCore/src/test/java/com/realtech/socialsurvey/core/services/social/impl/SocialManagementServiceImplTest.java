@@ -94,14 +94,14 @@ public class SocialManagementServiceImplTest
     public void testUpdateStatusIntoFacebookPageWithNullAgentSettings() throws InvalidInputException, FacebookException
     {
         socialManagementServiceImpl.updateStatusIntoFacebookPage( null, TestConstants.TEST_STRING, TestConstants.TEST_STRING,
-            TestConstants.TEST_LONG, TestConstants.TEST_STRING,TestConstants.TEST_STRING );
+            TestConstants.TEST_LONG, TestConstants.TEST_STRING );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testTweetNullAgentSettings() throws InvalidInputException, TwitterException
     {
-        socialManagementServiceImpl.tweet( null, TestConstants.TEST_STRING, TestConstants.TEST_LONG );
+        socialManagementServiceImpl.tweet( null, TestConstants.TEST_STRING, TestConstants.TEST_LONG, TestConstants.TEST_STRING );
     }
 
 
@@ -333,13 +333,13 @@ public class SocialManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testPostToTwitterForHierarchyForNullSMPRD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails() , false);
+        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, null, new SocialMediaPostResponseDetails() , false, "1234");
     }
     
     @Test ( expected = InvalidInputException.class)
     public void testPostToTwitterForHierarchyForNullSMPD() throws InvalidInputException, NoRecordsFetchedException
     {
-        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null , false);
+        socialManagementServiceImpl.postToTwitterForHierarchy( "test", 5.0, "test2", 2, new SocialMediaPostDetails() , null , false, "1234");
     }
     
     

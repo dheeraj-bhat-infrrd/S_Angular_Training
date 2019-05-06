@@ -3915,19 +3915,4 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	LOG.debug( "Method updateSurveyDetailsFields() to update participantType and surveySentDate finished." );
     	return 0;
     }
-    
-    @Override
-    public String getProfileImageUrl(String surveyId) {
-        LOG.info("getProfileImageUrl::started");
-        try {
-            Query query = new Query();
-            query.addCriteria(Criteria.where(CommonConstants.SURVEY_PREINITIATION_ID_COLUMN).is(surveyId));
-            query.fields().include(CommonConstants.PROFILE_IMAGE_URL);
-            SurveyDetails surveyDetails = mongoTemplate.findOne(query, SurveyDetails.class);
-            return surveyDetails.getProfileImageUrl();
-        } catch (Exception e) {
-            LOG.error("error while fetching social media image from survey details " + e.getMessage());
-        }
-        return null;
-    }
 }
