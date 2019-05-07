@@ -492,6 +492,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         postUpdate.setCaption( completeProfileUrl );
                         try {
                             postUpdate.setLink( new URL( completeProfileUrl ) );
+                            String smImageUrl = "https://s3-us-west-1.amazonaws.com/agent-survey/dev/userprofilepics/d-8490fba7c87d95b53899ebe55605de848561f3367b7eac6e0032f42c0e14a45da5dc8ee2740d2ec016fe0ba12343311e7d124e9df3c90ffda82ae00664872c00";
+                            if (smImageUrl != null && !smImageUrl.isEmpty()) {
+                                try {
+                                	LOG.info("setting sm image " + smImageUrl);
+                                    postUpdate.setPicture(new URL(smImageUrl));
+                                } catch (MalformedURLException e) {
+                                    LOG.error("Exception caught while attaching social media image to FB post "+ e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            }
                         } catch ( MalformedURLException e1 ) {
                             // TODO Auto-generated catch block
                             e1.printStackTrace();
@@ -548,15 +558,23 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             message = message.replaceAll( "null", "" );
                         }
                         StatusUpdate statusUpdate = new StatusUpdate( message );
+                        try {
+                        	if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+								statusUpdate.setMedia("Picture", new URL(profileImageUrl).openStream());
+                        	}
+							
+                        } catch ( MalformedURLException e ) {
+                            LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
+                        } catch ( IOException e ) {
+                            LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
+                        }
+                        
                         if ( companyId == Long.parseLong( customisedSocialNetworkCompanyId ) ) {
 							try {
-								if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-									statusUpdate.setMedia("Picture", new URL(profileImageUrl).openStream());
-								} else {
 									statusUpdate.setMedia("Picture", new URL(
 											"https://don7n2as2v6aa.cloudfront.net/remax-twitter-image.jpg?imgmax=800")
 													.openStream());
-								}
+								
                             } catch ( MalformedURLException e ) {
                                 LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
                             } catch ( IOException e ) {

@@ -23494,24 +23494,14 @@ function showProfileImageForSurvey(profileImage){
 }
 
 $(document).on('click','#shr-post-profile-chk-box',function(e){
-	$('#shr-post-profile-chk-box').addClass('v-ed-checkbox-checked');
-	$('#profile-new-popup-main').removeClass('hide');
+	if($(this).hasClass('v-ed-checkbox-unchecked')){
+		$(this).addClass('v-ed-checkbox-checked');
+		$(this).removeClass('v-ed-checkbox-unchecked');
+	}else{
+		$(this).removeClass('v-ed-checkbox-checked');
+		$(this).addClass('v-ed-checkbox-unchecked');
+	}
+	
 });
 
-$(document).on('click','#profile-new-back',function(e){
-	$('#profile-new-popup-main').addClass('hide');
-});
 
-$(document).on('click','#import-Twitter',function(e){
-	$('#import-linkedIn').attr('disabled', true);
-	$('#import-linkedIn').addClass('btn-disabled');
-	$('#import-facebook').prop('disabled', true);
-	$('#import-facebook').addClass('btn-disabled');
-});
-
-$(document).on('click','#profile-new-delete',function(e){
-	$('#import-linkedIn').attr('disabled', false);
-	$('#import-facebook').prop('disabled', false);
-	$('#import-facebook').removeClass('btn-disabled');
-	$('#import-linkedIn').removeClass('btn-disabled');
-});
