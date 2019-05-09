@@ -182,8 +182,30 @@
 							</c:otherwise>
 						</c:choose>
 					</div>
+					<c:set value="${singleReviewItem.reviewReply}" var="reviewReply"></c:set>
 					<div class="ppl-content sr-ppl-content" >
 						${singleReview}
+
+						<!-- Reviews Reply Start -->
+						<c:if test="${not empty reviewReply}">
+							<div class="review-reply-section">
+								<!-- <h5><span><b>Replies</b></span></h5> -->								
+								<div class="review-reply-container" style="height: 200px; overflow:auto">
+									
+									<c:forEach var="reply" varStatus="loop" items="${reviewReply}">   
+										<div class="review-reply-box" data-reply-id="${reply.replyId}">
+											<div class="review-reply-box-container">
+												<span class="review-reply-owner"><b>${reply.replyByName}</b></span>
+												<span class="review-reply-text">${reply.replyText}</span>
+											</div>
+										</div>                 
+									</c:forEach>							
+								
+								</div>
+							</div>
+						</c:if>
+						<!-- Reviews Reply End -->
+
 						<c:if test="${singleReviewItem.source=='Zillow' }">
                               <br><span><a class="view-zillow-link" href="${singleReviewItem.sourceId}"  target="_blank">View on zillow</a></span>
                         </c:if>

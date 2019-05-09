@@ -614,7 +614,7 @@ public class SolrSearchServiceImplTest
     public void testSearchUsersByLoginNameOrNameUnderAdminForNullPattern() throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        solrSearchServiceImpl.searchUsersByLoginNameOrNameUnderAdmin( null, new User(), new UserFromSearch(), 0, 5 );
+        solrSearchServiceImpl.searchUsersByLoginNameOrNameUnderAdmin( null, new User(), new UserFromSearch(), 0, 5,"default" );
     }
 
 
@@ -622,7 +622,7 @@ public class SolrSearchServiceImplTest
     public void testSearchUsersByLoginNameOrNameUnderAdminForNullUser() throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        solrSearchServiceImpl.searchUsersByLoginNameOrNameUnderAdmin( "test", null, new UserFromSearch(), 0, 5 );
+        solrSearchServiceImpl.searchUsersByLoginNameOrNameUnderAdmin( "test", null, new UserFromSearch(), 0, 5,"default" );
     }
 
 
@@ -630,7 +630,7 @@ public class SolrSearchServiceImplTest
     public void testSearchUsersByLoginNameOrNameUnderAdminForNullUserFromSearch() throws InvalidInputException, SolrException,
         MalformedURLException
     {
-        solrSearchServiceImpl.searchUsersByLoginNameOrNameUnderAdmin( "test", new User(), null, 0, 5 );
+        solrSearchServiceImpl.searchUsersByLoginNameOrNameUnderAdmin( "test", new User(), null, 0, 5,"default" );
     }
 
 

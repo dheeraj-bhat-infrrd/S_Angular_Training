@@ -99,7 +99,7 @@
 </div>
 
 <div id="no-data"
-	style="width: 120px; margin: auto; color: #009FE0; font-size: 30px;"
+	style="width: 120px; margin: auto; color: #2b69a9; font-size: 30px;"
 	class="hide">No Changes Made</div>
 
 <div id="lastUploadRun" class="last-run-info hide"></div>

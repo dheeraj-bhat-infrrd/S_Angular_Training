@@ -76,12 +76,14 @@
 					</c:otherwise>
 				</c:choose>
 				<input type="hidden" id="qe-profile-exists" value="${qeProfileUrlExists}">
+
 				<input type="hidden" id="originalUrl" data-value="${profileUrl}" value="${profileUrl}"/>
 				<div class="v-ed-lbl col-lg-2 col-md-2 col-sm-2 col-xs-2"><spring:message code='label.um.profileurl.key'/></div>
 				<div id="v-ed-app-base-url" class="v-ed-prof-url-txt">${applicationBaseUrl}pages/</div>
 				<div class="v-ed-prof-url-inp-cont">
 					<input class="v-ed-txt-item" autocomplete="off" id="selected-user-profileurl" name="selectedUserProfileUrl" data-editable="true" placeholder="<spring:message code='label.um.profileurl.key'/>" data-value="${profileUrl}" value="${profileUrl}" >
 				</div>
+				<div class="v-ed-invalid-input">* Enter a Profile url!</div>
 				<div id="v-ed-profurl-open" class="v-ed-openlink-icn"></div>
 			</div>
 			<div class="v-ed-row">

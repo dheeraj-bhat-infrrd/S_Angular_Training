@@ -18,7 +18,9 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -29,6 +31,7 @@ import org.mockito.Spy;
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -56,6 +59,10 @@ import static org.junit.Assert.*;
 import junit.framework.Assert;
 
 
+/**
+ * @author user
+ *
+ */
 public class OrganizationManagementServiceImplTest
 {
     @Spy
@@ -109,6 +116,9 @@ public class OrganizationManagementServiceImplTest
     
     @Mock
     private SurveyDetailsDao surveyDetailsDao;
+    
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
     
     @Mock
     private List<String> keyList = null;
@@ -308,7 +318,52 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.updateSurveySettings( null, new SurveySettings() );
     }
-
+    
+    @Test
+    public void testUpdateSecondaryWorkflow() throws InvalidInputException
+    {
+        assertTrue( organizationManagementServiceImpl.updateSecondaryWorkflow( "", new OrganizationUnitSettings(), new SurveySettings() ) );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSecondaryWorkflowExcpectException() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.updateSecondaryWorkflow( "", null, new SurveySettings() );
+    }
+    
+    @Test
+    public void testUpdateSecondaryWorkflowExcpectExceptionMessage() throws InvalidInputException
+    {
+        thrown.expect(InvalidInputException.class);
+        thrown.expectMessage("Settings cannot be null.");
+        organizationManagementServiceImpl.updateSecondaryWorkflow( "", null, new SurveySettings() );
+    }
+    
+    @Test
+    public void testUpdateEntitySettings() {
+        
+        String entityType = CommonConstants.COMPANY_ID_COLUMN;
+        long entityId = 0l;
+        String flagToBeUpdated = MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW;
+        String status = "false";
+        OrganizationUnitSettings unitSettings = new OrganizationUnitSettings();
+        Mockito.when( organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( entityId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ).thenReturn( unitSettings );
+        
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, Boolean.FALSE, entityId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        
+        assertTrue( organizationManagementServiceImpl.updateEntitySettings( entityType, entityId, flagToBeUpdated, status ) );
+    }
+    
+    @Test
+    public void testUpdateEntitySettingsInvalidInputType() {
+        
+        String entityType = null;
+        long entityId = 0l;
+        String flagToBeUpdated = MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW;
+        String status = "false";
+        
+        assertFalse( organizationManagementServiceImpl.updateEntitySettings( entityType, entityId, flagToBeUpdated, status ) );
+    }
 
     @Test ( expected = InvalidInputException.class)
     public void testUpdateScoreForSurveyWithNullUnitSettings() throws InvalidInputException
@@ -2610,4 +2665,201 @@ public class OrganizationManagementServiceImplTest
     	Mockito.doNothing().when(organizationUnitSettingsDao).updateParticularKeyOrganizationUnitSettings("isIncompleteSurveyDeleteEnabled",false,unitSettings,"COMPANY_SETTINGS");
     	Assert.assertEquals(true, organizationManagementServiceImpl.enableIncompleteSurveyDeleteToggle(5, false));
     }
+    
+    // test cases for update single level settings
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForEntityIdLessThanZero() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 3.0 );
+        organizationManagementServiceImpl.updateSettings( "companyId", -1 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForInvalidEntityType() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 3.0 );
+        organizationManagementServiceImpl.updateSettings( "invalidId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForInvalidSettingName() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( "InvalidSettingname", 3.0 );
+        organizationManagementServiceImpl.updateSettings( "companyId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForInvalidTypeSettingValue() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, "3.0" );
+        organizationManagementServiceImpl.updateSettings( "companyId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForInvalidTypeSettingValue2() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 3 );
+        organizationManagementServiceImpl.updateSettings( "companyId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForInvalidTypeSettingValue3() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( "OrganizationManagementService.KEY_REVIEW_REPLY_SCORE", true );
+        organizationManagementServiceImpl.updateSettings( "companyId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForNullSettings() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        organizationManagementServiceImpl.updateSettings( "companyId", 3 , settings );
+    }
+    
+    @Test
+    public void testUpdateSettings() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 3.0 );
+        organizationManagementServiceImpl.updateSettings( "companyId", 3 , settings );
+    }
+    
+    // test cases for update settings in lower hierarchy
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForLowerHierarchyForEntityIdLessThanZero() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 3.0 );
+        organizationManagementServiceImpl.updateSettingsForLowerHierarchy( "companyId", -1 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testupdateSettingsForLowerHierarchyForInvalidEntityType() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 3.0 );
+        organizationManagementServiceImpl.updateSettingsForLowerHierarchy( "invalidId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForLowerHierarchyForInvalidSettingName() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( "InvalidSettingname", 3.0 );
+        organizationManagementServiceImpl.updateSettingsForLowerHierarchy( "companyId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForLowerHierarchyForInvalidTypeSettingValue() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, "3.0" );
+        organizationManagementServiceImpl.updateSettingsForLowerHierarchy( "companyId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForLowerHierarchyForInvalidTypeSettingValue2() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 3 );
+        organizationManagementServiceImpl.updateSettingsForLowerHierarchy( "companyId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForLowerHierarchyForInvalidTypeSettingValue3() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, true );
+        organizationManagementServiceImpl.updateSettingsForLowerHierarchy( "companyId", 3 , settings );
+    }
+    
+    @Test ( expected = InvalidInputException.class )
+    public void testUpdateSettingsForLowerHierarchyForNullSettings() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        organizationManagementServiceImpl.updateSettingsForLowerHierarchy( "companyId", 3 , settings );
+    }
+    
+    @Test
+    public void testUpdateSettingsForLowerHierarchy() throws InvalidInputException
+    {
+        Map<String, Object> settings = new HashMap<>();
+        settings.put( OrganizationManagementService.KEY_REVIEW_REPLY_SCORE, 3.0 );
+        organizationManagementServiceImpl.updateSettingsForLowerHierarchy( "companyId", 3 , settings );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToBranchWithInvalidUserIds() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.assignBranchToUsers( null, 1 ,1 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToBranchWithInvalidBranchId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.assignBranchToUsers( Arrays.asList( 1l ), 1, 0 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToBranchWithInvalidAdminId() throws InvalidInputException
+    {
+        organizationManagementServiceImpl.assignBranchToUsers( Arrays.asList( 1l ), 0, 1 );
+    }
+
+    @Test
+    public void testAssignUsersToBranch() throws InvalidInputException, SolrException
+    {
+        User admin = new User();
+        User assigneeUser = new User();
+
+        Mockito.doReturn( admin ).when( userManagementService ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doReturn( assigneeUser ).when( userManagementService ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doReturn( 1l ).when( branchDao ).getRegionIdByBranchId( Mockito.anyLong() );
+        Mockito.doNothing().when( organizationManagementServiceImpl ).assignBranchToUser(Mockito.any( User.class ),
+            Mockito.anyLong(), Mockito.anyLong(), Mockito.any( User.class ));
+
+        assertTrue( !organizationManagementServiceImpl.assignBranchToUsers( Arrays.asList( 1l ), 1, 1 ).getSuccessItems().isEmpty() );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToRegionWithInvalidUserIds() throws InvalidInputException, NoRecordsFetchedException
+    {
+        organizationManagementServiceImpl.assignRegionToUsers( null, 1 ,1 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToRegionWithInvalidBranchId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        organizationManagementServiceImpl.assignRegionToUsers( Arrays.asList( 1l ), 1, 0 );
+    }
+
+    @Test ( expected = InvalidInputException.class )
+    public void testAssignUsersToRegionWithInvalidAdminId() throws InvalidInputException, NoRecordsFetchedException
+    {
+        organizationManagementServiceImpl.assignRegionToUsers( Arrays.asList( 1l ), 0, 1 );
+    }
+
+    @Test
+    public void testAssignUsersToRegion() throws InvalidInputException, SolrException, NoRecordsFetchedException
+    {
+        User admin = new User();
+        User assigneeUser = new User();
+
+        Mockito.doReturn( admin ).when( userManagementService ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doReturn( assigneeUser ).when( userManagementService ).getUserByUserId( Mockito.anyLong() );
+        Mockito.doNothing().when( organizationManagementServiceImpl ).assignRegionToUser( Mockito.any( User.class ),
+            Mockito.anyLong(), Mockito.any( User.class ) );
+
+        assertTrue( !organizationManagementServiceImpl.assignRegionToUsers( Arrays.asList( 1l ), 1, 1 )
+            .getSuccessItems().isEmpty() );
+    }
+
 }

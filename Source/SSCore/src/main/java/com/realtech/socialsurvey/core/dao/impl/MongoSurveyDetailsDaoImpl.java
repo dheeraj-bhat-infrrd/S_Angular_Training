@@ -8,6 +8,8 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -33,6 +35,7 @@ import com.realtech.socialsurvey.core.entities.AbuseReporterDetails;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.ReporterDetail;
+import com.realtech.socialsurvey.core.entities.ReviewReply;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -53,6 +56,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public static final String ABS_REPORTER_DETAILS_COLLECTION = "ABUSE_REPORTER_DETAILS";
     public static final String ZILLOW_CALL_COUNT = "ZILLOW_CALL_COUNT";
     public static final String API_REQUEST_DETAILS = "API_REQUEST_DETAILS";
+    public static final String REVIEW_REPLY = "reviewReply";
+    public static final String REVIEW_REPLY_DELETED = "reviewReplyDeleted";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -220,7 +225,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * collection.
      */
     @Override
-    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore, String profImageUrl )
+    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore )
     {
         LOG.info( "Method updateGatewayAnswer() to update review provided by customer started." );
         Query query = new Query();
@@ -232,7 +237,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( "review", review );
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, isAbusive );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
-        update.set( CommonConstants.PROFILE_IMAGE_URL, profImageUrl);
         SurveyDetails details = getSurveyBySurveyMongoId( surveyId );
         if ( details != null && details.getSurveyCompletedDate() != null ) {
             update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, new Date() );
@@ -3914,5 +3918,72 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	}
     	LOG.debug( "Method updateSurveyDetailsFields() to update participantType and surveySentDate finished." );
     	return 0;
+    }
+    
+    
+    @Override
+    public void upsertReviewReply( ReviewReply reviewReply, String surveyId ) {
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId));
+        Update update = new Update();
+        
+        //Update modified_on for the survey detail document
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        
+        //Remove the existing reply from the replies array in the survey detail document
+        update.pull( REVIEW_REPLY, new BasicDBObject( "replyId", reviewReply.getReplyId() ) );   
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        
+        //Add back the updated reply to the replies array
+        mongoTemplate.updateMulti( query, new Update().push( REVIEW_REPLY, reviewReply), SURVEY_DETAILS_COLLECTION );
+        
+        LOG.info( "Successfully created/updated reply {}", reviewReply);
+    }
+
+
+    @Override
+    public void deleteReviewReply( String replyId, String surveyId )
+    {
+        //Get the reply
+        ReviewReply reply = getReviewReply( replyId, surveyId );
+        reply.setModifiedOn( new Date() );
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId));
+        Update update = new Update();
+        
+        //Update modified_on for the survey detail document
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        
+        //Remove the existing reply from the replies array in the survey detail document
+        update.pull( REVIEW_REPLY, new BasicDBObject( "replyId", replyId ) );   
+        mongoTemplate.updateFirst( query, update, SURVEY_DETAILS_COLLECTION );
+        
+        //Add the deleted reply to the deleted replies array
+        mongoTemplate.updateFirst( query, new Update().push( REVIEW_REPLY_DELETED, reply), SURVEY_DETAILS_COLLECTION );
+        
+        LOG.info( "Successfully deleted reply {}", reply );
+    }
+    
+    
+    @Override
+    public ReviewReply getReviewReply( String replyId, String surveyId ){
+        ReviewReply reply = new ReviewReply();
+        
+        SurveyDetails survey = getSurveyBySurveyMongoId( surveyId );
+        
+        List<ReviewReply> allReviewReplies = survey.getReviewReply();
+        
+        //Iterate over all replies to get the reply we want
+        for(ReviewReply tempReply : allReviewReplies)
+        {
+            if ( ( tempReply.getReplyId() != null ) && ( tempReply.getReplyId().equals( replyId ) ) )
+            {
+                reply = tempReply;
+                break;
+            }
+        }
+        
+        return reply;
     }
 }

@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.services.social;
 
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -370,21 +369,6 @@ public interface SocialManagementService
 
 
     public void updateLinkedinV2Token( String collectionName, long iden, LinkedInToken linkedInToken );
-
-
-	/*
-	 * public String saveProfilePicForReviewer(URL profileImageUrl);
-	 */
-
-	public RequestToken getTwitterRequestTokenForReviewer(String serverBaseUrl)throws TwitterException;
-
-
-	/**
-	 * @param serverBaseUrl
-	 * @return
-	 * @throws TwitterException
-	 */
-	public RequestToken getTwitterRequestTokenForAuthImage(String serverBaseUrl) throws TwitterException;
 
 }
 // JIRA SS-34 BY RM02 BOC

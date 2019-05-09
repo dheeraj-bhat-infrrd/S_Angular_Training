@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 
 public interface SurveyDetailsDao
@@ -26,10 +27,7 @@ public interface SurveyDetailsDao
     public void updateCustomerResponse( String surveyId, SurveyResponse surveyResponse, int stage );
 
 
-    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore, String profImageUrl  );
-
-
-//    public double updateFinalScore( String surveyId );
+    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore  );
 
 
     public void updateSurveyAsClicked( String surveyMongoId );
@@ -92,7 +90,7 @@ public interface SurveyDetailsDao
         Timestamp endDate, boolean filterAbusive, boolean filterZillowReviews ) throws InvalidInputException;
 
 
-    long get3rdPartyImportCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
+    public long get3rdPartyImportCount( String organizationUnitColumn, long organizationUnitColumnValue, Timestamp startDate,
         Timestamp endDate, boolean filterAbusive ) throws InvalidInputException;
 
 
@@ -168,24 +166,25 @@ public interface SurveyDetailsDao
     public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
 
 
-    void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName, String reportReason  );
+    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName, String reportReason  );
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int start, int rows );
 
 
-    void removeExistingZillowSurveysByEntity( String entityType, long entityId, String source );
+    public void removeExistingZillowSurveysByEntity( String entityType, long entityId, String source );
 
+    
     public long getSurveysReporetedAsAbusiveCount();
 
 
-    void updateZillowCallCount();
+    public void updateZillowCallCount();
 
 
-    int fetchZillowCallCount();
+    public int fetchZillowCallCount();
 
 
-    void resetZillowCallCount();
+    public void resetZillowCallCount();
 
 
     public void updateSurveyDetails( SurveyDetails surveyDetails );
@@ -200,6 +199,7 @@ public interface SurveyDetailsDao
 
     public void updateSurveyAsUnderResolution( String surveyId );
     
+    
     public void updateSurveyAsAbusiveNotify( String surveyId );
 
 
@@ -212,7 +212,7 @@ public interface SurveyDetailsDao
     public List<SurveyDetails> getSurveysUnderResolution( long companyId, int start, int rows );
 
 
-    long getSurveysReporetedAsAbusiveCount( long companyId );
+    public long getSurveysReporetedAsAbusiveCount( long companyId );
 
 
     public Map<Long, Integer> getSurveyCountForAgents( List<Long> agentIdList, boolean fetchAbusive ) throws ParseException;
@@ -262,17 +262,17 @@ public interface SurveyDetailsDao
     public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails );
 
 
-    Map<Long, Date> getLatestCompletedSurveyDateForAgents( long companyId );
+    public Map<Long, Date> getLatestCompletedSurveyDateForAgents( long companyId );
 
 
-    SurveyDetails getSurveyByAgentIdAndCustomerEmailAndNoOfDays( long agentId, String customerEmail, String firstName,
+    public SurveyDetails getSurveyByAgentIdAndCustomerEmailAndNoOfDays( long agentId, String customerEmail, String firstName,
         String lastName, int noOfDays );
 
 
-    SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
+    public SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
 
 
-    void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
+    public void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
 
 
     public void updateModifiedDateForSurvey( String surveyId, Date date );
@@ -287,6 +287,7 @@ public interface SurveyDetailsDao
      */
     public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId , String mood , Long startSurveyID , Date startReviewDate , Date startTransactionDate , List<Long> userIds,  boolean isRetaken );
 
+    
     /**
      * 
      * @param companyId
@@ -295,7 +296,7 @@ public interface SurveyDetailsDao
      */
     public Long getFilteredSurveyCount( long companyId , String mood ,  Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds, boolean isRetaken );
 
-
+    
     public Map<Long, Long> getTotalReviewsCountForAllUsersOfCompany( long companyId );
 
 
@@ -317,16 +318,16 @@ public interface SurveyDetailsDao
     public void updateSurveySourceIdInMongo( SurveyDetails survey );
 
 
-    void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails );
+    public void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails );
 
 
-    void updateTransactionDateInExistingSurveyDetails( SurveyDetails surveyDetails );
+    public void updateTransactionDateInExistingSurveyDetails( SurveyDetails surveyDetails );
 
 
-    void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails );
+    public void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails );
 
 
-    void updateBranchIdRegionIdForAllSurveysOfAgent( long agentId, long branchId, long regionId );
+    public void updateBranchIdRegionIdForAllSurveysOfAgent( long agentId, long branchId, long regionId );
     
     
     public List<SurveyDetails> getSurveyDetailsForUser( long userId );
@@ -338,32 +339,35 @@ public interface SurveyDetailsDao
     public List<SurveyDetails> getSurveyDetailsForBranchOnly( long branchId );
 
 
-    void moveSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId );
+    public void moveSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId );
 
 
-    void updateAgentIdInSurveyDetail( SurveyDetails surveyDetails );
+    public void updateAgentIdInSurveyDetail( SurveyDetails surveyDetails );
 
 
-    void disconnectSurveysFromWithUser( long agentId );
+    public void disconnectSurveysFromWithUser( long agentId );
 
 
-    void updateRegionIdForAllSurveysOfBranch( long branchId, long regionId );
+    public void updateRegionIdForAllSurveysOfBranch( long branchId, long regionId );
 
 
-    void updateSurveyDetailsForRetake( SurveyDetails surveyDetails );
+    public void updateSurveyDetailsForRetake( SurveyDetails surveyDetails );
 
+    
     public Float getFilteredSurveyAvgScore( long companyId, String mood, Long startSurveyID, Date startReviewDate,
         Date startTransactionDate, List<Long> userIds, boolean isRetaken );
     
+    
     public List<SurveyDetails> getSurveyDetailsForCompanyAndQuestion(long companyId, String question);
 
-	void updateCustomerResponse(String surveyId, SurveyResponse surveyResponse);
+    
+    public void updateCustomerResponse(String surveyId, SurveyResponse surveyResponse);
 
 
 	public void updateSurveyNPSScore(SurveyDetails surveyDetails);
 
 
-	void updateSourceDetailInExistingSurveyDetails(SurveyDetails surveyDetails);
+	public void updateSourceDetailInExistingSurveyDetails(SurveyDetails surveyDetails);
 
 
     public void updateAgentInfoInSurveyBySPI( long surveyPreInitiationId, User toUser, UserProfile toUserProfile )
@@ -379,12 +383,14 @@ public interface SurveyDetailsDao
 
     public List<String> getDistinctValues( String queryKey, Object value, String field );
 
+    
     /**
      * Method to update the existing reviews
      * @param existingReviews
      */
-    int bulkUpdateReviews( List<SurveyDetails> existingReviews );
+    public int bulkUpdateReviews( List<SurveyDetails> existingReviews );
 
+    
     public SurveyDetails fetchSurveyWithConditions( Map<String, Object> queryMap );
 
 
@@ -401,19 +407,29 @@ public interface SurveyDetailsDao
 	public List<SurveyResponse> getSurveyRatingResponse(String surveyId);
 
 
-    List<SurveyDetails> getSurveyBySourceSourceIdAndMongoCollection( long iden, String collectionName );
+	public List<SurveyDetails> getSurveyBySourceSourceIdAndMongoCollection( long iden, String collectionName );
 
 
-    List<SurveyDetails> fetchSurveyForParticularHierarchyAndSource( long entityId, String entityType, String source );
+	public List<SurveyDetails> fetchSurveyForParticularHierarchyAndSource( long entityId, String entityType, String source );
+	
 	
 	public int updateSurveyDetailsFields( long surveyPreIntitiationId, int participantType, Date surveySentDate);
 
+	
 	public Map<String, Long> getSurveyCountForGatewayResponses(String entityType, long entityId);
 
 
-	double getAvgScoreForEntity(String entityType, long entityId);
+	public double getAvgScoreForEntity(String entityType, long entityId);
 
 
-	SurveyDetails getLatestCompletedSurveyForEntity(String entityType, long entityId);
+	public SurveyDetails getLatestCompletedSurveyForEntity(String entityType, long entityId);
+	
+	
+	public void upsertReviewReply( ReviewReply reviewReply, String surveyId );
+	
+	
+	public void deleteReviewReply( String replyId, String surveyId);
 
+	
+	public ReviewReply getReviewReply(String replyId, String surveyId);
 }

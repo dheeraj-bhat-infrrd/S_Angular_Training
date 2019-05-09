@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.api.exceptions.BadRequestException;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.models.request.FailedStormMessage;
 import com.realtech.socialsurvey.api.utils.RestUtils;
@@ -839,6 +840,44 @@ public class OrganizationManagementApiController
         } catch ( NonFatalException e ) {
             LOGGER.error( "UpdatingNotes for companyId {} failed with exception {}", notes.getCompanyId(), e.getMessage() );
             throw new SSApiException( e.getMessage() );
+        }
+    }
+    
+    @RequestMapping ( value = "/settings/{entityType}/{entityId}", method = RequestMethod.POST) 
+    @ApiOperation ( value = "Update settings for entity ")
+    public ResponseEntity<?> updateSettings(@PathVariable("entityType") String entityType, @PathVariable("entityId") long entityId,
+        @RequestBody Map<String, Object> settings, @RequestHeader ( "Authorization") String authorizationHeader) throws AuthorizationException {
+        try {
+            LOGGER.info("Update settings of {} with iden: {} with settings: {}", entityType, entityId, settings);
+            
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            
+            organizationManagementService.updateSettings(entityType, entityId, settings);
+            
+            LOGGER.info("Finished updating settings of entity");
+            
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch ( InvalidInputException e ) {
+            throw new BadRequestException( e.getMessage(), null );
+        }
+    }
+    
+    @RequestMapping ( value = "/settings/{entityType}/{entityId}/propagate", method = RequestMethod.POST) 
+    @ApiOperation ( value = "Update the settings for all lower hierarchies")
+    public ResponseEntity<?> propagateSettingsToLowerHierarchy(@PathVariable("entityType") String entityType, @PathVariable("entityId") long entityId,
+        @RequestBody Map<String, Object> settings, @RequestHeader ( "Authorization") String authorizationHeader) throws AuthorizationException{
+        try {
+            LOGGER.info("Propagate settings in lower hierarchy of {} with iden: {} with settings: {}", entityType, entityId, settings);
+            
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            
+            organizationManagementService.updateSettingsForLowerHierarchy(entityType, entityId, settings);
+            
+            LOGGER.info("Finished propagating settings in lower hierarchy");
+            
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch ( InvalidInputException e ) {
+            throw new BadRequestException( e.getMessage(), null );
         }
     }
 }

@@ -95,6 +95,9 @@
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
 				<spring:message code="label.header.dashboard.key" />
 			</div>
+			<c:if test='${lastSuccessfulRun != "" && lastSuccessfulRun != null && lastSuccessfulRun !=undefined}'>
+				<span class="rep-disc-span last-run-time-text-span">Refreshed on ${lastSuccessfulRun}</span>
+			</c:if>
 			<!-- Add user assignment dropdown -->
 			<%@ include file="user_assignment_dropdown.jsp" %>
 		</div>
@@ -187,19 +190,19 @@
 	</c:if>
 </c:if>
 
-<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background:#2f69aa">
+<%-- <div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background:#2f69aa">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<c:if test='${lastSuccessfulRun != "" && lastSuccessfulRun != null && lastSuccessfulRun !=undefined}'>
 				<div class="float-left last-run-time-div">
 					<div class="align-center">
-						<span class="incomplete-trans-span rep-disc-span last-run-time-span">Last time data refresh run: ${lastSuccessfulRun}</span>
+						<span class="rep-disc-span last-run-time-text-span">Last time data refresh run: ${lastSuccessfulRun}</span>
 					</div>
 				</div>
 			</c:if>		
 		</div>
 	</div>
-</div>
+</div> --%>
 
 <%--  <div id="fb-policy-banner" class="hm-header-main-wrapper hm-hdr-bord-bot fb-policy-change-hdr">
 	<div class="container">
@@ -236,13 +239,6 @@
 			<div class="ss-prof-img-popup-confirm ss-prof-img-popup-btn">Confirm</div>
 			<div class="ss-prof-img-popup-cancel ss-prof-img-popup-btn">Cancel</div>
 		</div>
-	</div>
-</div>
-
-<div id="google-plus-banner" class="google-banner-outer">
-	<div id="google-banner-body" class="linkedin-api-v2-update-ribbon-body">
-		<span class="margin-left-auto">Since Google+ has gone away, you will no longer be able to use Google+ on SocialSurvey</span>
-	   <div id="google-banner-close-btn" class="linkedin-api-v2-update-ribbon-close-btn cursor-pointer">x</div>
 	</div>
 </div> 
 

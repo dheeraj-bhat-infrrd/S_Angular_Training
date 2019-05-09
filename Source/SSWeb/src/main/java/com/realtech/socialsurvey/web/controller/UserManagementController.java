@@ -1,29 +1,22 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.*;
-import com.realtech.socialsurvey.core.vo.SocialMediaVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
@@ -42,8 +35,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -77,7 +68,6 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-import sun.misc.BASE64Decoder;
 
 
 // JIRA SS-37 BY RM02 BOC
@@ -168,6 +158,39 @@ public class UserManagementController
                 throw new NonFatalException( "MalformedURLException while fetching users count", e );
             }
             model.addAttribute( "canAdd", userManagementService.canAddAndDeleteUser(entityType,user.getCompany().getCompanyId(), true));
+            
+            model.addAttribute( "canDelete", userManagementService.canAddAndDeleteUser(entityType,user.getCompany().getCompanyId(), false));
+            
+            boolean canAssignBranch = false;
+            if(user.isCompanyAdmin() || user.isRegionAdmin() || user.isBranchAdmin()) {
+                canAssignBranch = true;
+            }
+            
+            boolean canAssignRegion = false;
+            if(user.isCompanyAdmin() || user.isRegionAdmin()) {
+                canAssignRegion = true;
+            }
+            
+            model.addAttribute( "canAssignBranch", canAssignBranch);
+            model.addAttribute( "canAssignRegion", canAssignRegion);
+            
+            LockSettings parentLock = null;
+            long branchIdForLocks = 0;
+            long regionIdForLocks = 0;
+            long companyIdForLocks = 0;
+            String entityTypeForLocks = CommonConstants.AGENT_ID_COLUMN;
+            
+            Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityTypeForLocks, user.getUserId() );
+            if ( hierarchyDetails == null ) {
+                LOG.warn( "Unable to fetch primary profile for this user " );
+                throw new FatalException( "Unable to fetch primary profile for type : " + entityType + " and ID : " + user.getUserId() );
+            }
+            branchIdForLocks = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
+            regionIdForLocks = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
+            companyIdForLocks = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
+            parentLock = profileManagementService.fetchHierarchyLockSettings( companyIdForLocks, branchIdForLocks, regionIdForLocks, entityTypeForLocks );
+            
+            model.addAttribute( "parentLock", parentLock);
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException in while inviting new user", nonFatalException );
             model.addAttribute( "message",
@@ -332,14 +355,18 @@ public class UserManagementController
     {
         LOG.info( "Method to fetch user by company, findUsersForCompany() started." );
         HttpSession session = request.getSession( false );
-        int startIndex = 0;
-        int batchSize = 0;
+        int startIndex;
+        int batchSize;
         
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-
+        String userStatus;
         try {
             String startIndexStr = request.getParameter( "startIndex" );
             String batchSizeStr = request.getParameter( "batchSize" );
+
+            String sortingOrderStr = request.getParameter( CommonConstants.SORT_ORDER );
+            
+            userStatus = request.getParameter( "userStatus" );
             
             try {
                 if ( startIndexStr == null || startIndexStr.isEmpty() ) {
@@ -350,6 +377,13 @@ public class UserManagementController
                     LOG.warn( "Invalid value found in batchSizeStr. It cannot be null or empty." );
                     batchSize = SOLR_BATCH_SIZE;
                 }
+                if(sortingOrderStr == null ) {
+                    sortingOrderStr = "default";
+                }
+                
+                if(userStatus == null || userStatus.isEmpty()) {
+                    userStatus = "all";
+                }
 
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
@@ -358,6 +392,10 @@ public class UserManagementController
                 throw new NonFatalException( "NumberFormatException while searching for user id", e );
             }
 
+            if(userStatus.equalsIgnoreCase( "all" ) || userStatus.equalsIgnoreCase( "none" ) || userStatus.equalsIgnoreCase( "default" )) {
+                userStatus = "active";
+            }
+            
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
                 LOG.warn( "No user found in session" );
@@ -378,21 +416,21 @@ public class UserManagementController
             List<UserFromSearch> usersList = null;
             if ( admin.isCompanyAdmin() ) {
                 usersList = userManagementService.getUsersUnderCompanyAdmin( admin, startIndex,
-                    batchSize );
+                    batchSize, sortingOrderStr, userStatus);
 
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
 
-                model.addAttribute( "numFound", userManagementService.getUsersUnderCompanyAdminCount( admin ) );
+                model.addAttribute( "numFound", userManagementService.getUsersUnderCompanyAdminCount( admin, userStatus ) );
             } else if ( admin.isRegionAdmin() ) {
-                usersList = userManagementService.getUsersUnderRegionAdmin( admin, startIndex, batchSize );
+                usersList = userManagementService.getUsersUnderRegionAdmin( admin, startIndex, batchSize, sortingOrderStr, userStatus );
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
 
-                model.addAttribute( "numFound", userManagementService.getUsersUnderRegionAdminCount( admin ) );
+                model.addAttribute( "numFound", userManagementService.getUsersUnderRegionAdminCount( admin, userStatus ) );
             } else if ( admin.isBranchAdmin() ) {
-                usersList = userManagementService.getUsersUnderBranchAdmin( admin, startIndex, batchSize );
+                usersList = userManagementService.getUsersUnderBranchAdmin( admin, startIndex, batchSize, sortingOrderStr, userStatus );
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
 
-                model.addAttribute( "numFound", userManagementService.getUsersUnderBranchAdminCount( admin ) );
+                model.addAttribute( "numFound", userManagementService.getUsersUnderBranchAdminCount( admin, userStatus ) );
             }
             usersList = userManagementService.getUserSocialMediaList( usersList );
             usersList = this.addAgentDetailsToUserList( usersList);
@@ -506,9 +544,7 @@ public class UserManagementController
             usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
 
             model.addAttribute( "userslist", usersList );
-        } catch (
-
-        NonFatalException e ) {
+        } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException in findusers. Reason : ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -530,7 +566,8 @@ public class UserManagementController
         int batchSize = 0;
         HttpSession session = request.getSession( false );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
-    
+        SolrDocumentList userIdList;
+
         try {
             //            String users = findUserByEmail( model, request );
 
@@ -555,10 +592,17 @@ public class UserManagementController
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
 
+            String sortingOrderStr = request.getParameter( "sortingOrder" );
+            if(sortingOrderStr == null ) {
+                sortingOrderStr = "ASC";
+            }
+
+            String userStatus = request.getParameter( "userStatus" );
+
             /**
              * fetching admin details
              */
-            UserFromSearch adminUser = null;
+            UserFromSearch adminUser;
             try {
                 String adminUserDoc = JSONUtil.toJSON( solrSearchService.getUserByUniqueId( admin.getUserId() ) );
                 Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
@@ -568,14 +612,22 @@ public class UserManagementController
                 throw new NonFatalException( "SolrException while searching for user id.Reason:" + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
-            SolrDocumentList userIdList = solrSearchService.searchUsersByLoginNameOrNameUnderAdmin( searchKey, admin, adminUser,
-                startIndex, batchSize );
+
+            if(userStatus!= null && (userStatus.equalsIgnoreCase( "verified" ) || userStatus.equalsIgnoreCase( "unverified" ))){
+                userIdList = solrSearchService.searchUsersByLoginNameOrNameUnderAdmin( searchKey, admin, adminUser, userStatus,
+                    sortingOrderStr, entityType, startIndex, batchSize );
+            } else {
+                userIdList = solrSearchService.searchUsersByLoginNameOrNameUnderAdmin( searchKey, admin, adminUser,
+                    startIndex, batchSize,sortingOrderStr );
+            }
+
             if ( userIdList != null && userIdList.size() != 0 ) {
                 Set<Long> userIds = solrSearchService.getUserIdsFromSolrDocumentList( userIdList );
-                List<UserFromSearch> usersList = userManagementService.getActiveUsersByUserIds( userIds );
+                List<UserFromSearch> usersList = userManagementService.getActiveUsersByUserIds( userIds, sortingOrderStr );
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
                 model.addAttribute( "numFound", userIdList.getNumFound() );
                 usersList = userManagementService.getUserSocialMediaList( usersList );
+                LOG.info( "Users list : {}", usersList );
                 model.addAttribute( "userslist", usersList );
             } else {
                 LOG.warn( "No users found under the admin id : " + admin.getUserId() );
@@ -637,7 +689,7 @@ public class UserManagementController
             }
 
             try {
-                if ( checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
+                if ( userManagementService.checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
                     userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove,
                         CommonConstants.STATUS_INACTIVE, false, ( adminId != null && adminId > 0 ) ? true : false );
                 } else {
@@ -675,23 +727,6 @@ public class UserManagementController
             LOG.warn( "Exception caught ", ie );
         }
         return user;
-    }
-
-
-    private boolean checkIfTheUserCanBeDeleted( User loggedInUser, User userToRemove )
-    {
-        boolean canBeDeleted = true;
-        if ( userToRemove == null ) {
-            canBeDeleted = false;
-        } else {
-            if ( loggedInUser.getUserId() == userToRemove.getUserId() ) {
-                canBeDeleted = false;
-            } else if ( userToRemove.isCompanyAdmin() ) {
-                canBeDeleted = false;
-            }
-        }
-        return canBeDeleted;
-
     }
 
 
@@ -1654,6 +1689,7 @@ public class UserManagementController
             Map<Long, String> branchesMap = new LinkedHashMap<>();
             Company company = user.getCompany();
             List<Region> regions = organizationManagementService.getAllRegionsForCompanyWithProjections( company );
+
             if ( regions != null && !regions.isEmpty() ) {
                 for ( Region region : regions ) {
                     regionsMap.put( region.getRegionId(), region.getRegion() );
@@ -1662,6 +1698,7 @@ public class UserManagementController
 
             // Fetch branches data for company
             List<Branch> branches = organizationManagementService.getAllBranchesForCompanyWithProjections( company );
+
             if ( branches != null && !branches.isEmpty() ) {
                 for ( Branch branch : branches ) {
                     branchesMap.put( branch.getBranchId(), branch.getBranch() );

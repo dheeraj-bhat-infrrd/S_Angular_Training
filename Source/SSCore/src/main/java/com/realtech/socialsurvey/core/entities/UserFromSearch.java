@@ -303,10 +303,18 @@ public class UserFromSearch {
 		this.licenses = licenses;
 	}
 
+
 	@Override public String toString()
 	{
-		return "UserFromSearch{" + "userId=" + userId + ", emailId='" + emailId + '\'' + ", displayName='" + displayName + '\''
-			+ ", status=" + status + ", isRegionAdmin=" + isRegionAdmin + ", isBranchAdmin=" + isBranchAdmin + ", isAgent="
-			+ isAgent + ", canEdit=" + canEdit + ", socialMediaVOs=" + socialMediaVOs + '}';
+		return "UserFromSearch{" + "userId=" + userId + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\''
+			+ ", emailId='" + emailId + '\'' + ", loginName='" + loginName + '\'' + ", isOwner=" + isOwner + ", displayName='"
+			+ displayName + '\'' + ", companyId=" + companyId + ", status=" + status + ", isRegionAdmin=" + isRegionAdmin
+			+ ", isBranchAdmin=" + isBranchAdmin + ", isAgent=" + isAgent + ", regions=" + regions + ", branches=" + branches
+			+ ", canEdit=" + canEdit + ", title='" + title + '\'' + ", aboutMe='" + aboutMe + '\'' + ", profileUrl='"
+			+ profileUrl + '\'' + ", profileName='" + profileName + '\'' + ", profileImageUrl='" + profileImageUrl + '\''
+			+ ", profileImageThumbnail='" + profileImageThumbnail + '\'' + ", agentIds=" + agentIds + ", reviewCount="
+			+ reviewCount + ", isProfileImageSet=" + isProfileImageSet + ", socialMediaVOs=" + socialMediaVOs + ", address='"
+			+ address + '\'' + ", contactNumber='" + contactNumber + '\'' + ", disclaimer='" + disclaimer + '\'' + ", webUrl='"
+			+ webUrl + '\'' + ", licenses=" + licenses + '}';
 	}
 }

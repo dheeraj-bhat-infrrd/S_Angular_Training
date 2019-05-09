@@ -136,7 +136,10 @@ public interface CommonConstants
     public static final int STATUS_DELETE = 3;
     public static final int STATUS_VIEW = 5;    
 
+    // Mysql table name constants
 
+    public static final String USER_PROFILE_TABLE = "USER_PROFILE";
+    public static final String SURVEY_DETAILS_TABLE = "SURVEY_DETAILS";
     
 
     public static final int IS_PRIMARY_FALSE = 0;
@@ -381,7 +384,7 @@ public interface CommonConstants
     public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory"; 
     public static final String OPEN_RETAKE_SURVEY_REQUEST_COLUMN = "openRetakeSurveyRequest";
     public static final String ABUSIVE_NOTIFY_COLUMN = "abusiveNotify";
-    public static final String PROFILE_IMAGE_URL = "profileImageUrl";
+    public static final String REPLIED_MESSAGES = "repliedMessages";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -590,9 +593,7 @@ public interface CommonConstants
     public static final String IMAGE_DIR = "imageupload";
     public static final String IMAGE_NAME = "image.png";
     public static final String IMAGE_FORMAT_PNG = "png";
-    public static final String USER_IMAGE_DIR = "userimageupload";
-    public static final String USER_IMAGE_NAME = "userimage.png";
-    
+
     /**
      * Amazon Details
      */
@@ -1591,6 +1592,10 @@ public interface CommonConstants
     public static final String EMAIL_TYPE_USER_DELETION_MAIL = "USER_DELETION_MAIL";
     public static final String EMAIL_TYPE_FTP_FILE_UPLOADER = "FTP_FILE_UPLOADER";
     public static final String EMAIL_TYPE_FTP_SUCCESSFULLY_PROCESSED_MAIL = "FTP_SUCCESSFULLY_PROCESSED_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_REVIEWS_REPLY_MAIL = "SURVEY_REVIEWS_REPLY_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_REVIEWS_EDITED_REPLY_MAIL = "EMAIL_TYPE_SURVEY_REVIEWS_EDITED_REPLY_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_REVIEWS_DELETED_REPLY_MAIL = "SURVEY_REVIEWS_DELETED_REPLY_MAIL";
+    public static final String EMAIL_TYPE_RETAKE_SURVEY_MAIL_TO_AGENT = "RETAKE_SURVEY_MAIL_TO_AGENT ";
     
     public static final String REDIRECT = "redirect:/";
     public static final String EVENT_CLICK = "click";
@@ -1811,7 +1816,10 @@ public interface CommonConstants
 
     public static final String HAS_REGION = "hasRegion";
     public static final String HAS_BRANCH = "hasBranch";
-    
+
+    String USER_DELETION_SUCCESS = "User deletion successfull";
+
+
     //Constants for top 10 LO search ranking
     public static final String SEARCH_ENGINE_SORT_BY_BEST_MATCH = "Best Match";
     public static final String SEARCH_ENGINE_SORT_BY_RATING = "Highest Rated";
@@ -1855,6 +1863,9 @@ public interface CommonConstants
     String ACTIVE = "ACTIVE";
     String INACTIVE = "INACTIVE";
     String ACCOUNT_STATUS = "accountStatus";
-    String PROFILE_MASTER_ID_COLUMN = "PROFILE_MASTER_ID_COLUMN";
+    String PROFILES_MASTER_ID_COLUMN = "profilesMasterId";
+    String VERIFIED = "VERIFIED";
+    String UN_VERIFIED = "UNVERIFIED";
+    String SORT_ORDER = "sortingOrder";
 }
 

@@ -601,6 +601,19 @@
 		<property name="durability" value="true" />
 	</bean>
 
+	<!--solr data importer-->
+	<bean id="solrImport"
+		  class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+				  value="com.realtech.socialsurvey.core.starter.SolrDataGenerator" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="solrDataImporterHandler" value-ref="solrDataImporterHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
 		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -904,6 +917,13 @@
 		<property name="cronExpression" value="0 0/5 * * * ?" />
 	</bean>
 
+	<bean id="solrImportCron"
+		  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="solrImport" />
+		<property name="startDelay" value="20000" />
+		<property name="repeatCount" value="0" />
+	</bean>
+
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -913,10 +933,10 @@
 				<ref bean="emailreaderjobdetail" />
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
-				<!--<ref bean="updatelocationjobdetail" /> -->
+				<!-- <ref bean="updatelocationjobdetail" /> -->
 				<ref bean="updatesubscriptionpricejobdetail" />
-				<!--<ref bean="socialfeedingesterjobdetail" />-->
-				<!--<ref bean="socialpostsimportjobdetail" />-->
+				<!-- <ref bean="socialfeedingesterjobdetail" /> -->
+				<!-- <ref bean="socialpostsimportjobdetail" /> -->
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="imageloaderjobdetail" />
@@ -924,7 +944,7 @@
 				<ref bean="billingreportjobdetail" />
 				<ref bean="dotloopjobdetail" />
 				<ref bean="lonewolfjobdetail" />
-				<!-- <ref bean="socialMediaTokenExpiryJobDetail" />  -->
+				<!-- <ref bean="socialMediaTokenExpiryJobDetail" /> --> 
 				<ref bean="surveyfileuploadjobdetail" />
 				<ref bean="solrreviewcounterupdaterjobdetail" />
 				<!-- <ref bean="setcompanyidsinsocialpostsjobdetail" /> -->
@@ -935,10 +955,10 @@
 				<ref bean="surveyimporterjobdetail" />
 				<ref bean="socialfeedretryjobdetail" />
 				<ref bean="surveyprocessorretryjobdetail" />
-				<!-- <ref bean="deleteUsedVendastaTickets" />-->
+				<!-- <ref bean="deleteUsedVendastaTickets" /> -->
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
 				<!-- <ref bean="updateExistingCompanyPrice" /> -->
-				<!-- <ref bean="hideUsersFromSearch" />	-->
+				<!-- <ref bean="hideUsersFromSearch" /> -->	
 				<!-- <ref bean="surveysourceidupdater" /> -->
 				<!-- <ref bean="surveyquestionupdater" /> -->
 				<ref bean="monthlydigeststarter" />
@@ -950,7 +970,8 @@
 				<ref bean="archiveSocialFeedCollectionJob" />
 				<ref bean="ftpfileuploader" />
 				<!-- <ref bean="updatesurveyjobdetail"/> -->
-				<ref bean="losearchsitemapjobdetail" />
+				 <ref bean="losearchsitemapjobdetail" />
+				<!-- <ref bean="solrImport" /> -->
 			</list>
 		</property>
 
@@ -962,8 +983,8 @@
 				<ref bean="incompletesurveycron" />
 				<!-- <ref bean = "updatelocationcron" /> -->
 				<ref bean="updatesubscriptionpricecron" />
-				<!--<ref bean="socialfeedingestercron" />-->
-				<!--<ref bean="socialpostimportcron" />-->
+				<!-- <ref bean="socialfeedingestercron" /> -->
+				<!-- <ref bean="socialpostimportcron" /> -->
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
@@ -986,7 +1007,7 @@
 				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
 				<!-- <ref bean="updateExistingCompanyPricecron" /> -->
 				<!-- <ref bean="hideUsersFromSearchcron" /> -->
-				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->
+				<!-- <ref bean="deleteUsedVendastaTicketscron" /> -->
 				<!-- <ref bean="surveysourceidupdatercron" /> -->
 				<!-- <ref bean="surveyquestionupdatercron" /> -->
 				<ref bean="monthlydigeststartercron" />
@@ -998,7 +1019,8 @@
 				<ref bean="archiveSocialFeedCollectionCronTrigger" />
 				<ref bean="ftpfileuploadercron" />
 				<!-- <ref bean="updatesurveydetailcron"/> -->
-				<ref bean="losearchsitemapgeneratorcron" />
+				 <ref bean="losearchsitemapgeneratorcron" />
+				<!-- <ref bean="solrImportCron" /> -->
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -1095,12 +1117,12 @@
 		  class="com.realtech.socialsurvey.core.integration.lonewolf.LoneWolfIntergrationApiBuilder">
 		<property name="loneWolfEndpoint" value="${LONEWOLF_ENDPOINT}" />
 	</bean>
-	<bean id="regionsFullImport"
+	<!--<bean id="regionsFullImport"
 		  class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
 	<bean id="branchesFullImport"
 		  class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
 	<bean id="usersFullImport"
-		  class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
+		  class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />-->
 	<bean id="fileOperations" class="com.realtech.socialsurvey.core.utils.FileOperations" />
 
 	<!-- Posts to wall -->
@@ -1152,5 +1174,8 @@
 		class="com.realtech.socialsurvey.core.services.ftpmanagement.impl.FTPManagementImpl" />
 	<bean id="seositeMapService"
 		class="com.realtech.socialsurvey.core.services.generator.impl.SEOSiteMapServiceImpl" />
+
+	<bean id="solrDataImporterHandler"
+		  class="com.realtech.socialsurvey.core.handler.SolrDataImporterHandler" />
 
 </beans>

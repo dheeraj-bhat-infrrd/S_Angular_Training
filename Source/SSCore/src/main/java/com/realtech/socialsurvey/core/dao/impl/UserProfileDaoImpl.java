@@ -13,26 +13,20 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.xmlbeans.impl.xb.xsdschema.RestrictionDocument.Restriction;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.JobLogDetails;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -47,11 +41,76 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( UserProfileDaoImpl.class );
-    private final String regionUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME ASC";
-    private final String branchUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, BRANCH_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.BRANCH_ID = UP.BRANCH_ID and subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID  and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME ASC";
-    private final String companyUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ? ) AS subQuery_UP ON subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME ASC";
+    public static final String regionUserSearchQuery = "SELECT US.USER_ID as userId, US.FIRST_NAME as firstName, US.LAST_NAME as lastName, "
+        + "US.EMAIL_ID as emailId, US.LOGIN_NAME as loginName, US.IS_OWNER as isOwner, US.COMPANY_ID as companyId, US.STATUS as staus, "
+        + "group_concat(UP.BRANCH_ID) as branchId, group_concat(UP.REGION_ID) as regionId, group_concat(UP.PROFILES_MASTER_ID) as profilesMasterId,"
+        + " CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as displayName FROM  USER_PROFILE AS UP "
+        + " JOIN (SELECT USER_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = :userId and PROFILES_MASTER_ID = :profilesMasterId "
+        + " and COMPANY_ID = :companyId) AS subQuery_UP ON subQuery_UP.REGION_ID = UP.REGION_ID and "
+        + " subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != :status JOIN USERS AS US ON US.USER_ID = UP.USER_ID "
+        + " GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY displayName ";
+
+    public static final String branchUserSearchQuery = "SELECT US.USER_ID as userId, US.FIRST_NAME as firstName, US.LAST_NAME as lastName,"
+        + " US.EMAIL_ID as emailId, US.LOGIN_NAME as loginName, US.IS_OWNER as isOwner, US.COMPANY_ID as companyId, US.STATUS as status,"
+        + " group_concat(UP.BRANCH_ID) as branchId, group_concat(UP.REGION_ID) as regionId, "
+        + " group_concat(UP.PROFILES_MASTER_ID) as profilesMasterId, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN "
+        + " CONCAT (' ', US.LAST_NAME) ELSE '' END)) as displayName FROM  USER_PROFILE AS UP "
+        + " JOIN (SELECT USER_ID, BRANCH_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = :userId and "
+        + " PROFILES_MASTER_ID = :profilesMasterId and COMPANY_ID = :companyId) AS subQuery_UP ON subQuery_UP.BRANCH_ID = UP.BRANCH_ID "
+        + " and subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID  and UP.STATUS != :status "
+        + " JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, "
+        + " US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY displayName ";
+
+    public static final String companyUserSearchQuery = "SELECT US.USER_ID as userId, US.FIRST_NAME as firstName, US.LAST_NAME as lastName"
+        + ", US.EMAIL_ID as emailId, US.LOGIN_NAME as loginName, US.IS_OWNER as isOwner, US.COMPANY_ID as companyId, US.STATUS as status,"
+        + " group_concat(UP.BRANCH_ID) as branchId, group_concat(UP.REGION_ID) as regionId, group_concat(UP.PROFILES_MASTER_ID) as profilesMasterId, "
+        + " CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as displayName FROM  USER_PROFILE AS UP "
+        + " JOIN (SELECT USER_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = :userId and PROFILES_MASTER_ID = :profilesMasterId and COMPANY_ID = :companyId ) "
+        + " AS subQuery_UP ON subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != :status "
+        + " JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, "
+        + " US.COMPANY_ID, US.STATUS ORDER BY displayName ";
+
     private final String userProfileListExcludingDefaults = "select GROUP_CONCAT(UP.USER_ID ORDER BY UP.BRANCH_ID,UP.REGION_ID,UP.USER_ID) as USER_IDS , UP.COMPANY_ID, if(R.IS_DEFAULT_BY_SYSTEM = 0,R.REGION_ID,0) as REGION_ID , if(B.IS_DEFAULT_BY_SYSTEM = 0,B.BRANCH_ID ,0) as BRANCH_ID from USER_PROFILE UP INNER JOIN REGION R ON R.REGION_ID = UP.REGION_ID INNER JOIN BRANCH B ON B.BRANCH_ID = UP.BRANCH_ID where UP.PROFILES_MASTER_ID = 4 and UP.IS_PRIMARY = 1  AND UP.COMPANY_ID =? AND UP.STATUS !=0 GROUP BY BRANCH_ID,REGION_ID ";
 
+    public static final String companyUserSearchQueryByStatus = "SELECT US.USER_ID as userId, US.FIRST_NAME as firstName, US.LAST_NAME as lastName,"
+        + "       US.EMAIL_ID as emailId, US.LOGIN_NAME as loginName, US.IS_OWNER as isOwner, US.COMPANY_ID as companyId, US.STATUS as status,"
+        + "       group_concat(UP.BRANCH_ID) as branchId, group_concat(UP.REGION_ID) as regionId,"
+        + "       group_concat(UP.PROFILES_MASTER_ID) as profilesMasterId, CONCAT(US.FIRST_NAME,"
+        + "       (CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as displayName"
+        + "       FROM   USER_PROFILE AS UP JOIN "
+        + "       (SELECT USER_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = :userId and PROFILES_MASTER_ID = :profilesMasterId"
+        + "       and COMPANY_ID = :companyId ) AS subQuery_UP  ON subQuery_UP.COMPANY_ID = UP.COMPANY_ID"
+        + "       and UP.STATUS !=0 JOIN USERS AS US  ON US.USER_ID = UP.USER_ID"
+        + "       WHERE US.STATUS = :status  GROUP BY US.USER_ID, US.FIRST_NAME,"
+        + "       US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME,"
+        + "       US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY displayName ";
+
+    public static final String branchUserSearchQueryByStatus = "SELECT US.USER_ID as userId, US.FIRST_NAME as firstName, US.LAST_NAME as lastName, "
+        + "   US.EMAIL_ID as emailId, US.LOGIN_NAME as loginName, US.IS_OWNER as isOwner, US.COMPANY_ID as companyId, US.STATUS as status,"
+        + "   group_concat(UP.BRANCH_ID) as branchId," + "    group_concat(UP.REGION_ID) as regionId,"
+        + "   group_concat(UP.PROFILES_MASTER_ID) as profilesMasterId, CONCAT(US.FIRST_NAME,"
+        + "   ( CASE WHEN US.LAST_NAME IS NOT NULL THEN" + "   CONCAT (' ', US.LAST_NAME) ELSE '' END)) as displayName"
+        + "   FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, BRANCH_ID, REGION_ID, COMPANY_ID"
+        + "   FROM USER_PROFILE where USER_ID = :userId and PROFILES_MASTER_ID = :profilesMasterId and COMPANY_ID = :companyId) AS subQuery_UP"
+        + "   ON subQuery_UP.BRANCH_ID = UP.BRANCH_ID and subQuery_UP.REGION_ID = UP.REGION_ID"
+        + "    and subQuery_UP.COMPANY_ID = UP.COMPANY_ID  and UP.STATUS != 0 JOIN USERS AS US ON"
+        + "    US.USER_ID = UP.USER_ID  where US.STATUS = :status"
+        + "    GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID,"
+        + "    US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY displayName ";
+
+    public static final String regionUserSearchQueryByStatus = "SELECT US.USER_ID as userId, US.FIRST_NAME as firstName, US.LAST_NAME as lastName, "
+        + "   US.EMAIL_ID as emailId, US.LOGIN_NAME as loginName, US.IS_OWNER as isOwner, US.COMPANY_ID as companyId , US.STATUS as status ,"
+        + "   group_concat(UP.BRANCH_ID) as branchId, group_concat(UP.REGION_ID) as regionId,"
+        + "   group_concat(UP.PROFILES_MASTER_ID) as profilesMasterId,"
+        + "   CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL"
+        + "   THEN CONCAT(' ', US.LAST_NAME) ELSE '' END)) as displayName FROM USER_PROFILE AS UP JOIN"
+        + "        (SELECT USER_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE"
+        + "        where USER_ID = :userId and PROFILES_MASTER_ID = :profilesMasterId and COMPANY_ID = :companyId) AS subQuery_UP"
+        + "   ON subQuery_UP.REGION_ID = UP.REGION_ID and   subQuery_UP.COMPANY_ID = UP.COMPANY_ID and"
+        + "   UP.STATUS != 0   JOIN     USERS AS US  ON US.USER_ID = UP.USER_ID  WHERE US.STATUS = :status"
+        + "   GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME,"
+        + "   US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY displayName ";
+    
     private static final String getUserProfileByUserIdsQuery = "select UP.USER_PROFILE_ID , UP.STATUS  , UP.AGENT_ID , UP.BRANCH_ID , UP.REGION_ID ,  "
         + " UP.PROFILES_MASTER_ID , B.BRANCH , R.REGION from " + "USER_PROFILE UP JOIN BRANCH B ON UP.BRANCH_ID = B.BRANCH_ID JOIN REGION R ON UP.REGION_ID = R.REGION_ID where UP.AGENT_ID IN (:userIds)";
 
@@ -312,14 +371,32 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
     @Override
     @Transactional
-    public int getUsersUnderBranchAdminCount( User user )
+    public int getUsersUnderBranchAdminCount( User user, String status )
     {
         LOG.debug( "Method call started for getUsersUnderBranchAdminCount for branch admin id : {}", user.getUserId() );
-        Query query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + branchUserSearchQuery + " ) as subQuery" );
-        query.setParameter( 0, user.getUserId() );
-        query.setParameter( 1, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
-        query.setParameter( 2, user.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
+
+        Query query = null;
+        
+        if(status.equalsIgnoreCase( "unverified" )) {
+            
+            query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + branchUserSearchQueryByStatus + " ) as subQuery" );
+            
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED);
+        }else if(status.equalsIgnoreCase( "verified" )) {
+           
+            query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + branchUserSearchQueryByStatus + " ) as subQuery" );
+            
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+        }else {
+                      
+            query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + branchUserSearchQuery + " ) as subQuery" ); 
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE );
+        }
+
+        query.setParameter( CommonConstants.USER_ID, user.getUserId() );
+        query.setParameter( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
+        query.setParameter( CommonConstants.COMPANY_ID, user.getCompany().getCompanyId() );
 
         LOG.debug( "Method call ended for getUsersUnderBranchAdminCount for branch admin id : {}", user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
@@ -328,14 +405,32 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
     @Override
     @Transactional
-    public int getUsersUnderRegionAdminCount( User user )
+    public int getUsersUnderRegionAdminCount( User user, String status  )
     {
         LOG.debug( "Method call started for getUsersUnderRegionAdminCount for region admin id : {}" , user.getUserId() );
-        Query query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + regionUserSearchQuery + " ) as subQuery" );
-        query.setParameter( 0, user.getUserId() );
-        query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
-        query.setParameter( 2, user.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
+
+        Query query = null;
+        
+        if(status.equalsIgnoreCase( "unverified" )) {
+            
+            query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + regionUserSearchQueryByStatus + " ) as subQuery" );
+            
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED);
+        }else if(status.equalsIgnoreCase( "verified" )) {
+           
+            query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + regionUserSearchQueryByStatus + " ) as subQuery" );
+            
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+        }else {
+                      
+            query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + regionUserSearchQuery + " ) as subQuery" ); 
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE );
+        }
+        
+        query.setParameter( CommonConstants.USER_ID, user.getUserId() );
+        query.setParameter( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+        query.setParameter( CommonConstants.COMPANY_ID, user.getCompany().getCompanyId() );
 
         LOG.debug( "Method call ended for getUsersUnderRegionAdminCount for region admin id : {}" , user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
@@ -344,14 +439,32 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
     @Override
     @Transactional
-    public int getUsersUnderCompanyAdminCount( User user )
+    public int getUsersUnderCompanyAdminCount( User user, String status )
     {
         LOG.debug( "Method call started for getUsersUnderCompanyAdminCount for company admin id : {}", user.getUserId() );
-        Query query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + companyUserSearchQuery + " ) as subQuery" );
-        query.setParameter( 0, user.getUserId() );
-        query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
-        query.setParameter( 2, user.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
+
+        Query query = null;
+        
+        if(status.equalsIgnoreCase( "unverified" )) {
+           
+            query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + companyUserSearchQueryByStatus + " ) as subQuery" );
+            
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED);
+        }else if(status.equalsIgnoreCase( "verified" )) {
+           
+            query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + companyUserSearchQueryByStatus + " ) as subQuery" );
+            
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+        }else {
+                      
+            query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + companyUserSearchQuery + " ) as subQuery" ); 
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE );
+        }
+        
+        query.setParameter( CommonConstants.USER_ID, user.getUserId() );
+        query.setParameter( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+        query.setParameter( CommonConstants.COMPANY_ID, user.getCompany().getCompanyId() );
 
         LOG.debug( "Method call ended for getUsersUnderCompanyAdminCount for company admin id : {}",  user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
@@ -360,15 +473,53 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
     @Override
     @Transactional
-    public List<UserFromSearch> findUsersUnderBranchAdmin( User user, int startIndex, int batchSize )
+    public List<UserFromSearch> findUsersUnderBranchAdmin( User user, int startIndex, int batchSize, String sortingOrder, String userStatus )
     {
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
         LOG.debug( "Method call started for findUsersUnderBranchAdmin for branch admin id : {}", user.getUserId() );
-        Query query = getSession().createSQLQuery( branchUserSearchQuery );
-        query.setParameter( 0, user.getUserId() );
-        query.setParameter( 1, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
-        query.setParameter( 2, user.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
+        Query query = null;
+        
+        if(userStatus.equalsIgnoreCase( "unverified" )) {
+            if(sortingOrder.contains( "DESC" ))
+            {
+                query = getSession().createSQLQuery( branchUserSearchQueryByStatus + "DESC" );
+            }
+            else
+            {
+                query = getSession().createSQLQuery( branchUserSearchQueryByStatus );
+            }
+            
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED);
+        }else if(userStatus.equalsIgnoreCase( "verified" )) {
+            if(sortingOrder.contains( "DESC" ))
+            {
+                query = getSession().createSQLQuery( branchUserSearchQueryByStatus + "DESC" );
+            }
+            else
+            {
+                query = getSession().createSQLQuery( branchUserSearchQueryByStatus );
+            }
+            
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+        }else {
+            if(sortingOrder.contains( "DESC" ))
+            {
+                query = getSession().createSQLQuery( branchUserSearchQuery + "DESC" );
+            }
+            else
+            {
+                query = getSession().createSQLQuery( branchUserSearchQuery );
+            }        
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE );
+        }
+        
+        query.setParameter( CommonConstants.USER_ID, user.getUserId() );
+        query.setParameter( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
+        query.setParameter( CommonConstants.COMPANY_ID, user.getCompany().getCompanyId() );
+        
         if ( startIndex > -1 ) {
             query.setFirstResult( startIndex );
         }
@@ -387,16 +538,55 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
     @Override
     @Transactional
-    public List<UserFromSearch> findUsersUnderRegionAdmin( User admin, int startIndex, int batchSize )
+    public List<UserFromSearch> findUsersUnderRegionAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus )
     {
-        List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
-        LOG.debug( "Method call started for findUsersUnderRegionAdmin for region admin id : {}", admin.getUserId() );
-        Query query = getSession().createSQLQuery( regionUserSearchQuery );
+        List<UserFromSearch> userList = new ArrayList<>();
 
-        query.setParameter( 0, admin.getUserId() );
-        query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
-        query.setParameter( 2, admin.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
+        if(LOG.isDebugEnabled())
+            LOG.debug( "Method call started for findUsersUnderRegionAdmin for region admin id : {}", admin.getUserId() );
+
+        Query query;
+        
+        if(userStatus.equalsIgnoreCase( "unverified" )) {
+            if(sortingOrder.contains( "DESC" ))
+            {
+                query = getSession().createSQLQuery( regionUserSearchQueryByStatus + "DESC" );
+            }
+            else
+            {
+                query = getSession().createSQLQuery( regionUserSearchQueryByStatus );
+            }
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED );
+        }else if(userStatus.equalsIgnoreCase( "verified" )) {
+            if(sortingOrder.contains( "DESC" ))
+            {
+                query = getSession().createSQLQuery( regionUserSearchQueryByStatus + "DESC" );
+            }
+            else
+            {
+                query = getSession().createSQLQuery( regionUserSearchQueryByStatus );
+            }
+            
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        }else {
+            if(sortingOrder.contains( "DESC" ))
+            {
+                query = getSession().createSQLQuery( regionUserSearchQuery + "DESC" );
+            }
+            else
+            {
+                query = getSession().createSQLQuery( regionUserSearchQuery );
+            }
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE );
+        }
+        
+        query.setParameter( CommonConstants.USER_ID, admin.getUserId() );
+        query.setParameter( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+        query.setParameter( CommonConstants.COMPANY_ID, admin.getCompany().getCompanyId() );
+        
         if ( startIndex > -1 ) {
             query.setFirstResult( startIndex );
         }
@@ -408,23 +598,64 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
         userList = buildUserFromSearch( rows );
 
-        LOG.debug( "Method call ended for findUsersUnderRegionAdmin for region admin id : {}", admin.getUserId() );
+        if(LOG.isDebugEnabled())
+            LOG.debug( "Method call ended for findUsersUnderRegionAdmin for region admin id : {}", admin.getUserId() );
+
         return userList;
     }
 
 
     @Override
     @Transactional
-    public List<UserFromSearch> findUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize )
+    public List<UserFromSearch> findUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus )
     {
-        List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
-        LOG.debug( "Method call started for findUsersUnderCompanyAdmin for company admin id : {}" , admin.getUserId() );
-        Query query = getSession().createSQLQuery( companyUserSearchQuery );
+        List<UserFromSearch> userList = new ArrayList<>();
 
-        query.setParameter( 0, admin.getUserId() );
-        query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
-        query.setParameter( 2, admin.getCompany().getCompanyId() );
-        query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
+        if(LOG.isDebugEnabled())
+            LOG.debug( "Method call started for findUsersUnderCompanyAdmin for company admin id : {}" , admin.getUserId() );
+
+        Query query;
+        
+        if(userStatus.equalsIgnoreCase( "unverified" )) {
+            if(sortingOrder.contains( "DESC" ))
+            {
+                query = getSession().createSQLQuery( companyUserSearchQueryByStatus + "DESC" );
+            }
+            else
+            {
+                query = getSession().createSQLQuery( companyUserSearchQueryByStatus );
+            }            
+            
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED );
+        }else if(userStatus.equalsIgnoreCase( "verified" )) {
+            if(sortingOrder.contains( "DESC" ))
+            {
+                query = getSession().createSQLQuery( companyUserSearchQueryByStatus + "DESC" );
+            }
+            else
+            {
+                query = getSession().createSQLQuery( companyUserSearchQueryByStatus );
+            }            
+            
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        }else {
+            if(sortingOrder.contains( "DESC" ))
+            {
+                query = getSession().createSQLQuery( companyUserSearchQuery + "DESC" );
+            }
+            else
+            {
+                query = getSession().createSQLQuery( companyUserSearchQuery );
+            }
+            
+
+            query.setParameter( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INACTIVE);
+        }
+        
+        query.setParameter( CommonConstants.USER_ID, admin.getUserId() );
+        query.setParameter( CommonConstants.PROFILES_MASTER_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
+        query.setParameter( CommonConstants.COMPANY_ID, admin.getCompany().getCompanyId() );
+        
         if ( startIndex > -1 ) {
             query.setFirstResult( startIndex );
         }
@@ -435,7 +666,10 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         List<Object[]> rows = (List<Object[]>) query.list();
 
         userList = buildUserFromSearch( rows );
-        LOG.debug( "Method call ended for findUsersUnderCompanyAdmin for company admin id : {}", admin.getUserId() );
+
+        if(LOG.isDebugEnabled())
+            LOG.debug( "Method call ended for findUsersUnderCompanyAdmin for company admin id : {}", admin.getUserId() );
+
         return userList;
     }
 
@@ -456,17 +690,28 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         return userList;
     }
     
-    public List<UserFromSearch> getActiveUserFromSearchByUserIds( Set<Long> userIds )
+    public List<UserFromSearch> getActiveUserFromSearchByUserIds( Set<Long> userIds, String sortOrder )
     {
-        LOG.debug( "Method call started for getActiveUserFromSearchByUserIds for user ids : " + userIds );
-        String queryStr = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM USER_PROFILE UP JOIN USERS US ON US.USER_ID = UP.USER_ID WHERE UP.USER_ID IN ( :userIds ) AND UP.STATUS NOT IN ( :status ) GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME";
+        if(LOG.isDebugEnabled())
+            LOG.debug( "Method call started for getActiveUserFromSearchByUserIds for user ids : {} ", userIds );
+
+        String queryStr = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, "
+            + "US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, "
+            + "group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, "
+            + "( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME "
+            + "FROM USER_PROFILE UP JOIN USERS US ON US.USER_ID = UP.USER_ID WHERE UP.USER_ID IN ( :userIds ) "
+            + "AND UP.STATUS NOT IN ( :status ) GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, "
+            + "US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME " + sortOrder;
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameterList( "userIds", userIds );
         query.setParameter("status", CommonConstants.STATUS_INACTIVE);
         List<Object[]> rows = (List<Object[]>) query.list();
 
         List<UserFromSearch>  userList = buildUserFromSearch( rows );
-        LOG.debug( "Method call ended for getActiveUserFromSearchByUserIds for user ids : " + userIds );
+
+        if(LOG.isDebugEnabled())
+            LOG.debug( "Method call ended for getActiveUserFromSearchByUserIds for user ids : " + userIds );
+
         return userList;
     }
 
@@ -959,7 +1204,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         
         List<UserProfile> userProfiles = criteria.list();
         List<Long> userList = new ArrayList<>();
-        if ( userProfiles != null || !userProfiles.isEmpty() ) {
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
         	for(UserProfile userProfile : userProfiles) {
             	userList.add(userProfile.getAgentId());
             }
@@ -967,6 +1212,64 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         
        
         LOG.debug( "Method to find userProfile list for entityType: {} entityId: {} finished.",entityType,entityId );
+        return userList;
+    }
+    
+    @Override
+    public List<Long> findBranchUserProfile(  String entityType, long entityId) 
+    {
+        LOG.debug( "Method to find BranchUserProfile list for entityType: {} entityId: {} started.",entityType,entityId );
+        Criteria criteria = getSession().createCriteria( UserProfile.class );
+        if(entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
+            criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, entityId ) );
+        }else if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+            criteria.createAlias(CommonConstants.COMPANY , "comp" );
+            criteria.add( Restrictions.eq( "comp.companyId", entityId ) );
+        }else {
+            //since no hierarchy is updating agent list is null
+            return null;
+        }
+        
+        criteria.add( Restrictions.eq( CommonConstants.PROFILE_MASTER_COLUMN + "." + "profileId" , CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) );
+        
+        List<UserProfile> userProfiles = criteria.list();
+        List<Long> userList = new ArrayList<>();
+        if ( userProfiles != null || !userProfiles.isEmpty() ) {
+            for(UserProfile userProfile : userProfiles) {
+                userList.add(userProfile.getBranchId());
+            }
+        }
+        
+       
+        LOG.debug( "Method to find BranchUserProfile list for entityType: {} entityId: {} finished.",entityType,entityId );
+        return userList;
+    }
+    
+    @Override
+    public List<Long> findRegionUserProfile(  String entityType, long entityId) 
+    {
+        LOG.debug( "Method to find RegionUserProfile list for entityType: {} entityId: {} started.",entityType,entityId );
+        Criteria criteria = getSession().createCriteria( UserProfile.class );
+        if(entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+            criteria.createAlias(CommonConstants.COMPANY , "comp" );
+            criteria.add( Restrictions.eq( "comp.companyId", entityId ) );
+        }else {
+            //since no hierarchy is updating agent list is null
+            return null;
+        }
+        
+        criteria.add( Restrictions.eq( CommonConstants.PROFILE_MASTER_COLUMN + "." + "profileId" , CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) );
+        
+        List<UserProfile> userProfiles = criteria.list();
+        List<Long> userList = new ArrayList<>();
+        if ( userProfiles != null || !userProfiles.isEmpty() ) {
+            for(UserProfile userProfile : userProfiles) {
+                userList.add(userProfile.getRegionId());
+            }
+        }
+        
+       
+        LOG.debug( "Method to find RegionUserProfile list for entityType: {} entityId: {} finished.",entityType,entityId );
         return userList;
     }
  }

@@ -5837,6 +5837,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         AgentSettings individualProfile = (AgentSettings) profileHierarchyMap.get( CommonConstants.PROFILE_LEVEL_INDIVIDUAL );
         OrganizationUnitSettings profileUnderConcern = profileHierarchyMap.get( profileAggregate.getProfileLevel() );
 
+        if( profileAggregate.getProfileLevel().equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL )) {
+            profileAggregate.setHiddenSection( individualProfile.isHiddenSection() );
+        }
+
         // redirection checks while agent profile 
         checkForProfileRedirection( profileAggregate );
 
@@ -6795,6 +6799,5 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         return surveyDetailsDao.getDistinctValues( idenColumnName, iden, CommonConstants.SURVEY_SOURCE_COLUMN );
     }
-
     
 }

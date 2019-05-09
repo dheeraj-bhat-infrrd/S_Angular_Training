@@ -121,6 +121,9 @@ public class SurveyDetails
 
     private String fbRecommendationType;
     
+    //replies to ss reviews
+    private List<ReviewReply> reviewReply;
+    
 	public int getParticipantType() {
 		return participantType;
 	}
@@ -1039,6 +1042,7 @@ public class SurveyDetails
         this.fbRecommendationType = fbRecommendationType;
     }
 
+
 	public String getProfileImageUrl() {
 		return profileImageUrl;
 	}
@@ -1046,4 +1050,15 @@ public class SurveyDetails
 	public void setProfileImageUrl(String profileImageUrl) {
 		this.profileImageUrl = profileImageUrl;
 	}
+
+    public List<ReviewReply> getReviewReply()
+    {
+        return reviewReply;
+    }
+
+    public void setReviewReply( List<ReviewReply> reviewReply )
+    {
+        this.reviewReply = reviewReply;
+    }
+
 }

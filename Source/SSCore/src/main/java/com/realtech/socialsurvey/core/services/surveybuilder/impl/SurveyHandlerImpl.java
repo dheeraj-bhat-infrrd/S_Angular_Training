@@ -24,8 +24,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import com.mongodb.BulkWriteError;
 import com.realtech.socialsurvey.core.entities.*;
@@ -67,32 +70,6 @@ import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
-import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
-import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
-import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.FileContentReplacements;
-import com.realtech.socialsurvey.core.entities.MailContent;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.RetakeSurveyHistory;
-import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.SurveyImportVO;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveyProcessData;
-import com.realtech.socialsurvey.core.entities.SurveyResponse;
-import com.realtech.socialsurvey.core.entities.SurveySettings;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
@@ -106,6 +83,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.EmailUnsubscribeService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.DeleteDataTrackerService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
@@ -266,9 +244,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
-    
-    @Autowired
-    private GenericDao<DeleteDataTracker, Long> deleteDataTrackerDao;
 
     @Autowired
     private CsvUtils csvUtils;
@@ -288,9 +263,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     
     @Autowired
     private RegionDao regionDao;
-    
+
     @Autowired
     private GenericDao<SurveyPreInitiationTemp, Long> surveyPreinitiationTempDao;
+
+    @Autowired
+    private DeleteDataTrackerService deleteDataTrackerService;
 
     private static final int USER_EMAIL_ID_INDEX = 3;
     private static final int SURVEY_SOURCE_ID_INDEX = 2;
@@ -540,7 +518,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     public double updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
-        String agreedToShare, String profImageUrl )
+        String agreedToShare )
     {
         LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
@@ -552,7 +530,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         double score = calScore(surveyResponse);
         //get nps
         double npsScore = getNpsScore(surveyResponse);
-        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare, score, npsScore, profImageUrl );
+        surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare, score, npsScore );
         LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
         return score;
@@ -2632,23 +2610,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<SurveyDetails> documentsToBeDeleted = surveyDetailsDao.fetchSurveyForParticularHierarchyAndSource( entityId,
             entityType, source );
         surveyDetailsDao.removeExistingZillowSurveysByEntity( entityType, entityId, source );
-        writeToDeleteTracker(documentsToBeDeleted);
+        deleteDataTrackerService.writeToDeleteTrackerForSurveyDetails(documentsToBeDeleted);
         LOG.debug( "Method deleteExistingSurveysByEntity() finished" );
-    }
-    
-    private void writeToDeleteTracker( List<SurveyDetails> documentsToBeDeleted )
-    {
-        List<DeleteDataTracker> trackerList = new ArrayList<>();
-        for(SurveyDetails surveyDetails : documentsToBeDeleted) {
-            DeleteDataTracker tracker = new DeleteDataTracker();
-            tracker.setEntityId( surveyDetails.get_id() );
-            tracker.setEntityType( "SURVEY_DETAILS" );
-            tracker.setIsDeleted( 0 );
-            tracker.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-            tracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-            trackerList.add( tracker );
-        }
-        deleteDataTrackerDao.saveAll( trackerList );
     }
 
 
@@ -5606,5 +5569,113 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     	
     }
 
-}
+    @Override
+    public ReviewReplyVO createOrUpdateReplyToReview( String surveyId, String replyText, String replyByName, String replyById, String replyId, String entityType )
+        throws InvalidInputException
+    {
+        ReviewReply reviewReply = new ReviewReply();
+        boolean isUpdateReply = false;
+        int profileMasterId = 0;
+        SurveyDetails surveyDetails = getSurveyDetails(surveyId);
+        
+        OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsById( surveyDetails.getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        String surveyUrl = organizationUnitSettings.getCompleteProfileUrl()+"/"+surveyId;
+        
+        if(replyId != null && !replyId.isEmpty()){
+            
+            //If we have a replyId, that means we're doing an update reply
+            
+            isUpdateReply = true;
+            
+            List<ReviewReply> allReviewReplies = surveyDetails.getReviewReply();
+            
+            //Iterate over all replies to get the reply we want to update
+            for(ReviewReply tempReply : allReviewReplies)
+            {
+                if ( ( tempReply.getReplyId() != null ) && ( tempReply.getReplyId().equals( replyId ) ) )
+                {
+                    reviewReply = tempReply;
+                    
+                    //Update the reply with the new replyText
+                    reviewReply.setReplyText( replyText );
+                    break;
+                }
+            }
+        }
+        else{
+            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+                profileMasterId = CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+                profileMasterId = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+                profileMasterId = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+                profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+            } else {
+                throw new InvalidInputException( "Invalid Collection Type" );
+            }
+            
+            //If we don't have a replyId, we're doing a create reply
+            
+            reviewReply.setReplyId( UUID.randomUUID().toString() );
+            reviewReply.setReplyText( replyText );
+            reviewReply.setCreatedOn( new Date() );
+            reviewReply.setReplyByName( replyByName );
+            reviewReply.setReplyById( replyById );
+            reviewReply.setProfileMasterId( profileMasterId );
+               
+        }
+        
+        //Setting modified_on is common for both flows
+        reviewReply.setModifiedOn( new Date() );
 
+        surveyDetailsDao.upsertReviewReply( reviewReply, surveyId );
+        
+        //transform it to the VO to return as a response 
+        ReviewReplyVO reviewReplyVO = ReviewReplyVO.transformToVO( reviewReply );
+        reviewReplyVO.setSurveyId( surveyId );
+        
+        //notify the customer that he's got a reply to his review
+        String customerName = surveyDetails.getCustomerFirstName();
+        if ( surveyDetails.getCustomerLastName() != null && !surveyDetails.getCustomerLastName().isEmpty() ) {
+            customerName = surveyDetails.getCustomerFirstName() + " " + surveyDetails.getCustomerLastName();
+        }
+        String agentName = surveyDetails.getAgentName();
+        
+        String customerEmail = surveyDetails.getCustomerEmail();
+        
+        if(isUpdateReply){
+            emailServices.sendMailForEditReplyOnReview(replyText, surveyUrl, agentName, replyByName , customerName,  customerEmail );
+        }else {
+            emailServices.sendMailForCreateReplyOnReview(replyText, surveyUrl, agentName, replyByName , customerName,  customerEmail );
+        }
+
+        LOG.debug( "method saveReplyToReviews() ended" );
+  
+        return reviewReplyVO;
+    }
+
+
+    @Override
+    public void deleteReviewReply( String replyId, String surveyId ) throws InvalidInputException
+    {
+        surveyDetailsDao.deleteReviewReply( replyId, surveyId );
+        SurveyDetails surveyDetails = getSurveyDetails(surveyId);
+        
+        OrganizationUnitSettings organizationUnitSettings = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsById( surveyDetails.getCompanyId(), MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        String surveyUrl = organizationUnitSettings.getCompleteProfileUrl()+"/"+surveyId;
+        
+        String customerName = surveyDetails.getCustomerFirstName();
+        if ( surveyDetails.getCustomerLastName() != null && !surveyDetails.getCustomerLastName().isEmpty() ) {
+            customerName = surveyDetails.getCustomerFirstName() + " " + surveyDetails.getCustomerLastName();
+        }
+        String agentName = surveyDetails.getAgentName();
+        
+        String customerEmail = surveyDetails.getCustomerEmail();
+        
+        emailServices.sendMailForDeleteReplyOnReview(surveyUrl, agentName, customerName,  customerEmail);
+    }
+    
+}

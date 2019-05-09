@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -31,9 +32,13 @@ import javax.annotation.Resource;
 
 import com.realtech.socialsurvey.core.commons.*;
 import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.*;
 import com.realtech.socialsurvey.core.vo.*;
+import com.realtech.socialsurvey.core.vo.BranchVO;
+import com.realtech.socialsurvey.core.vo.ManageTeamBulkActionVo;
+import com.realtech.socialsurvey.core.vo.ManageTeamBulkResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -55,6 +60,27 @@ import org.springframework.util.CollectionUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.FilterKeywordsComparator;
+import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
+import com.realtech.socialsurvey.core.commons.TrustedSourceComparator;
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.MongoApplicationSettingsDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RedisDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.RemovedUserDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
+import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import static com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl.*;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -105,6 +131,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
     public static final String SUCCESS_MESSAGE = "Organization Settings updated Successfully";
 
+    private static final Map<String, Object> APPROVED_SETTINGS_MAP = new HashMap<>();
+    static{
+        APPROVED_SETTINGS_MAP.put( KEY_IS_REVIEW_REPLY_ENABLED_FOR_COMPANY, Boolean.class );
+        APPROVED_SETTINGS_MAP.put( KEY_IS_REVIEW_REPLY_ENABLED, Boolean.class );
+        APPROVED_SETTINGS_MAP.put( KEY_REVIEW_REPLY_SCORE, Double.class );
+    }
+    
     @Autowired
     private MessageUtils messageUtils;
 
@@ -332,6 +365,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     @Autowired
     private SearchEngineManagementServices searchEngineManagementServices;
+    
+    @Autowired
+    private MongoApplicationSettingsDao mongoApplicationSettingsDao;
     
     @Autowired
     private DashboardService dashboardServiceImpl;
@@ -1509,6 +1545,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Updating comapnySettings: " + companySettings + " with surveySettings: " + surveySettings );
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
             KEY_SURVEY_SETTINGS, surveySettings, companySettings, COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Updated the record successfully" );
+
+        return true;
+    }
+    
+    @Override
+    public boolean updateSecondaryWorkflow( String entityType, OrganizationUnitSettings unitSettings, SurveySettings surveySettings )
+        throws InvalidInputException
+    {
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Settings cannot be null." );
+        }
+
+        LOG.debug( "Updating " + entityType + " with surveySettings: " + surveySettings );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, unitSettings,
+            entityType );
         LOG.debug( "Updated the record successfully" );
 
         return true;
@@ -5924,6 +5977,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
        
         return surveySettings;
     }
+    
+    @Override
+    public SurveySettings retrieveDefaultSecondaryWorkflowValues() {
+        
+        SurveySettings surveySettings = new SurveySettings();
+        ApplicationSettings applicationSettings = mongoApplicationSettingsDao.getApplicationSettings();
+        surveySettings.setHappyTextPartner( applicationSettings.getDefaultHappyTextPartner() );
+        surveySettings.setNeutralTextPartner( applicationSettings.getDefaultNeutralTextPartner() );
+        surveySettings.setSadTextPartner( applicationSettings.getDefaultSadTextPartner() );
+        surveySettings.setHappyTextCompletePartner( applicationSettings.getDefaultHappyTextCompletePartner() );
+        surveySettings.setNeutralTextCompletePartner( applicationSettings.getDefaultNeutralTextCompletePartner() );
+        surveySettings.setSadTextCompletePartner( applicationSettings.getDefaultSadTextCompletePartner() );
+        return surveySettings;
+    }
 
 
     @Override
@@ -5947,7 +6014,34 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else if ( mood.equalsIgnoreCase( "sadComplete" ) ) {
             surveySettings.setSadTextComplete( sadTextComplete );
             return sadTextComplete;
-        }  else {
+        } else if(mood.contains( "Partner" )) {
+            
+            SurveySettings defaultSurveySettingsForPartner = this.retrieveDefaultSecondaryWorkflowValues();
+            
+            if ( mood.equalsIgnoreCase( "happyPartner" ) ) {
+                surveySettings.setHappyTextPartner( defaultSurveySettingsForPartner.getHappyTextPartner() );
+                return defaultSurveySettingsForPartner.getHappyTextPartner();
+            } else if ( mood.equalsIgnoreCase( "neutralPartner" ) ) {
+                surveySettings.setNeutralTextPartner( defaultSurveySettingsForPartner.getNeutralTextPartner() );
+                return defaultSurveySettingsForPartner.getNeutralTextPartner();
+            } else if ( mood.equalsIgnoreCase( "sadPartner" ) ) {
+                surveySettings.setSadTextPartner( defaultSurveySettingsForPartner.getSadTextPartner() );
+                return defaultSurveySettingsForPartner.getSadTextPartner();
+            } else if ( mood.equalsIgnoreCase( "happyCompletePartner" ) ) {
+                surveySettings.setHappyTextCompletePartner( defaultSurveySettingsForPartner.getHappyTextCompletePartner() );
+                return defaultSurveySettingsForPartner.getHappyTextCompletePartner();
+            } else if ( mood.equalsIgnoreCase( "neutralCompletePartner" ) ) {
+                surveySettings.setNeutralTextCompletePartner( defaultSurveySettingsForPartner.getNeutralTextCompletePartner() );
+                return defaultSurveySettingsForPartner.getNeutralTextCompletePartner();
+            } else if ( mood.equalsIgnoreCase( "sadCompletePartner" ) ) {
+                surveySettings.setSadTextCompletePartner( defaultSurveySettingsForPartner.getSadTextCompletePartner() );
+                return defaultSurveySettingsForPartner.getSadTextCompletePartner();
+            }
+            else {                
+                return "";
+            }
+        }
+        else {
             return "";
         }
     }
@@ -9014,7 +9108,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.info( "Updated the AllowPartnerSurvey for users successfully" );
     }
+    
+    @Override
+    public void updateKeyForAllUsersOfCollection( List<Long> userIds, String field, boolean value, String collectionType)
+        throws InvalidInputException
+    {
+        if ( userIds == null || userIds.isEmpty() ) {
+            return;
+        }
 
+        LOG.info( "Updating {} for users with value {} ", field, value );
+        List<Object> userIdList = new ArrayList<Object>();
+        userIdList.addAll( userIds );
+
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(field, value,
+            MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, userIdList,
+            collectionType );
+
+        LOG.info( "Updated {} for users with value {} ", field, value );
+    }
 
     @Override
     public void updatellowPartnerSurveyForUser( AgentSettings agentSettings, boolean allowPartnerSurvey )
@@ -10421,12 +10533,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     "No settings found for entityType " + entityType + "and entityId " + entityId );
             }
             
-            if ( flagToBeUpdated.equals( KEY_HIDE_PUBLIC_PAGE )
-                || flagToBeUpdated.equals( KEY_HIDDEN_SECTION )
-                || flagToBeUpdated.equals( KEY_SEND_EMAIL_FROM_COMPANY )
-                || flagToBeUpdated.equals( KEY_HIDE_FROM_BREAD_CRUMB )
-                || flagToBeUpdated.equals( KEY_INCLUDE_FOR_TRANSACTION_MONITOR )
-                || flagToBeUpdated.equals( KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA ) ) {
+            if ( flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDDEN_SECTION )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_SEND_EMAIL_FROM_COMPANY )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_FROM_BREAD_CRUMB )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW )) {
+            	
                 boolean flag = Boolean.parseBoolean( status );
                 organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, flag,
                     unitSettings.getIden(), collection );
@@ -11158,6 +11272,86 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return true;
     }
 
+    @Override public ManageTeamBulkResponse assignBranchToUsers( List<Long> userIds, long adminId, long branchId )
+        throws InvalidInputException
+    {
+        if( userIds == null || userIds.isEmpty() ) {
+            throw new InvalidInputException( "Invalid userIds provided !!!" );
+        }
+        if(adminId <= 0l )
+            throw new InvalidInputException( "Invalid adminId : "+ adminId );
+        if(branchId <= 0l)
+            throw new InvalidInputException( "Invalid branchId : "+ branchId );
+
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+        ManageTeamBulkActionVo manageTeamBulkActionVo = null;
+
+        //get the admin details by using adminID
+        User admin = userManagementService.getUserByUserId( adminId );
+
+        //get the regionId by quering from branch
+        long regionId = branchDao.getRegionIdByBranchId( branchId );
+
+        for ( long userId : userIds ) {
+            try {
+                User assigneeUser = userManagementService.getUserByUserId( userId );
+                manageTeamBulkActionVo = new ManageTeamBulkActionVo();
+                manageTeamBulkActionVo.setUserId( userId );
+
+                this.assignBranchToUser( admin, branchId, regionId, assigneeUser );
+
+                manageTeamBulkActionVo.setMessage( "User has been assigned successfully to given branch" );
+                successItems.add( manageTeamBulkActionVo );
+
+            } catch ( InvalidInputException | SolrException exception ) {
+                manageTeamBulkActionVo.setMessage( exception.getMessage() );
+                failedItems.add( manageTeamBulkActionVo );
+            }
+        }
+        return new ManageTeamBulkResponse(successItems, failedItems);
+    }
+
+
+    @Override public ManageTeamBulkResponse assignRegionToUsers( List<Long> userIds, long adminId, long regionId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        if( userIds == null || userIds.isEmpty() ) {
+            throw new InvalidInputException( "Invalid userIds provided !!!" );
+        }
+        if(adminId <= 0l )
+            throw new InvalidInputException( "Invalid adminId : "+ adminId );
+        if(regionId <= 0l)
+            throw new InvalidInputException( "Invalid regionId : "+ regionId );
+
+
+        List<ManageTeamBulkActionVo> successItems = new ArrayList<>();
+        List<ManageTeamBulkActionVo> failedItems = new ArrayList<>();
+        ManageTeamBulkActionVo manageTeamBulkActionVo = null;
+
+        //get the admin details by using adminID
+        User admin = userManagementService.getUserByUserId( adminId );
+
+        for ( long userId : userIds ) {
+            try {
+                User assigneeUser = userManagementService.getUserByUserId( userId );
+                manageTeamBulkActionVo = new ManageTeamBulkActionVo();
+                manageTeamBulkActionVo.setUserId( userId );
+
+                this.assignRegionToUser( admin, regionId, assigneeUser );
+
+                manageTeamBulkActionVo.setMessage( "User has been assigned successfully to given region" );
+                successItems.add( manageTeamBulkActionVo );
+
+            } catch ( InvalidInputException | SolrException exception ) {
+                manageTeamBulkActionVo.setMessage( exception.getMessage() );
+                failedItems.add( manageTeamBulkActionVo );
+            }
+        }
+        return new ManageTeamBulkResponse(successItems, failedItems);
+    }
+
     /**
      * Save the notification details in the {@link OrganizationUnitSettings}
      * But make sure the same notification is not saved again avoiding
@@ -11197,6 +11391,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(KEY_ALLOW_PARTNER_SURVEY,
             allowPartnerSurvey, unitSettings, COMPANY_SETTINGS_COLLECTION);
+    }
+    
+    @Override
+    public void updateAllowPartnerSurveyForCollection( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey, String collectionType ) {
+        
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
+            allowPartnerSurvey, unitSettings, collectionType);
     }
     
     /**
@@ -11272,6 +11473,255 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return companyStatistics;
     }
 
+
+    /**
+     * This method does the following tasks
+     * 1.assigns the user to the given branch
+     * 2.Overrides the previous branch assignments in which the user is an agents (Note: Doesnot
+     * override or remove the admin assignments of the user)
+     * 3.Updates the user with the new assignments in solr
+     * 4.Move the reviews
+     * @param adminUser
+     * @param branchId
+     * @param regionId
+     * @param assigneeUser
+     * @throws InvalidInputException
+     * @throws SolrException
+     */
+    public void assignBranchToUser( User adminUser, long branchId, long regionId, User assigneeUser )
+        throws InvalidInputException, SolrException
+    {
+        if ( adminUser == null ) {
+            throw new InvalidInputException( "Invalid adminUser !!!" );
+        }
+        if ( branchId <= 0l ) {
+            throw new InvalidInputException( "Invalid branchId : " + branchId );
+        }
+        if ( regionId <= 0l ) {
+            throw new InvalidInputException( "Invalid regionId : " + regionId + " for branchId : " + branchId  );
+        }
+        if ( assigneeUser == null ) {
+            throw new InvalidInputException( "Invalid assigneeUser !!!" );
+        }
+        if(assigneeUser.getStatus() == CommonConstants.STATUS_INACTIVE){
+            throw new InvalidInputException( "User is currently inactive or the user might be deleted !!!" );
+        }
+        if(adminUser.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId())
+            throw new InvalidInputException( "Admin and user doesn't belong to the same company" );
+
+        if( LOG.isDebugEnabled() ){
+            LOG.debug( "Method assignBranchToUser called for adminUser: {},  branchId: {}, regionId : {}, assigneeUser: {} " ,
+                adminUser , branchId, regionId, assigneeUser );
+        }
+
+        if(branchDao.getCompanyIdsForBranchIds(Arrays.asList( branchId )  ).get( branchId ) != assigneeUser.getCompany().getCompanyId()){
+            throw new InvalidInputException( "Branch to which the User is being assigned to does not belong to the same company "
+                    + "as the user !!!");
+        }
+
+        List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+        if ( userProfiles == null || userProfiles.isEmpty() ) {
+            userProfiles = new ArrayList<>();
+        }
+
+        int profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+
+        UserProfile userProfileNew = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
+            assigneeUser.getEmailId(), assigneeUser.getUserId(), branchId, regionId, profileMasterId,
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
+            String.valueOf( adminUser.getUserId() ), String.valueOf( adminUser.getUserId() ) );
+
+        String branchName = null;
+        Branch branch ;
+
+        UserProfile profile;
+
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+
+            for (final Iterator iterator = userProfiles.iterator(); iterator.hasNext();) {
+                profile = (UserProfile) iterator.next();
+
+                //get the branch name using the branchId
+                if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+                    branch = branchDao.findById( Branch.class, profile.getBranchId() );
+                    branchName = branch.getBranch();
+
+                    //remove the previous assignments(agent profile) for the user except for the admin assignments
+                    if ( !branchName.equalsIgnoreCase( CommonConstants.DEFAULT_BRANCH_NAME )) {
+                        userManagementService.removeUserProfile( profile.getUserProfileId() );
+                        iterator.remove();
+                    }
+                }
+            }
+
+        }
+
+        //check if profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
+        userProfileNew.setIsPrimary( isPrimary );
+
+        //move reviews
+        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), branchId, regionId );
+        }
+
+        userProfileDao.save( userProfileNew );
+
+        if ( assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE ) {
+            assigneeUser.setIsAtleastOneUserprofileComplete( CommonConstants.STATUS_ACTIVE );
+            userDao.update( assigneeUser );
+        }
+
+        /**
+         * add newly created user profile to the list of user profiles in user object
+         */
+        userProfiles.add( userProfileNew );
+        assigneeUser.setUserProfiles( userProfiles );
+        userManagementService.setProfilesOfUser( assigneeUser );
+
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( assigneeUser.getUserId() );
+        assigneeUser.setProfileName( agentSettings.getProfileName() );
+        assigneeUser.setProfileUrl( agentSettings.getProfileUrl() );
+        solrSearchService.addUserToSolr( assigneeUser );
+
+        userManagementService.updateUserCountModificationNotification( assigneeUser.getCompany() );
+
+        if( LOG.isDebugEnabled() ) {
+            LOG.debug( "Method assignBranchToUser executed successfully" );
+        }
+    }
+
+
+    /**
+     * This method does the following
+     * 1. Assigns a user to a region
+     * 2.Remove the previous region assignments in which the user belongs to
+     * 3.Move the reviews
+     * 3.Update the user in the solr
+     * (Note: this method doesnot assign the user as an admin and
+     * doesnot remove the region assignments in which the user is an admin )
+     * @param adminUser
+     * @param regionId
+     * @param assigneeUser
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     * @throws SolrException
+     */
+    @Transactional
+    @Override
+    public void assignRegionToUser( User adminUser, long regionId, User assigneeUser )
+        throws InvalidInputException, SolrException, NoRecordsFetchedException
+    {
+        if ( adminUser == null ) {
+            throw new InvalidInputException( "Admin user is null in assignRegionToUser" );
+        }
+        if ( regionId <= 0l ) {
+            throw new InvalidInputException( "Region id is invalid in assignRegionToUser" );
+        }
+        if ( assigneeUser == null ) {
+            throw new InvalidInputException( "assignee user is null in assignRegionToUser" );
+        }
+        if(assigneeUser.getStatus() == CommonConstants.STATUS_INACTIVE){
+            throw new InvalidInputException( "assignee user either inactive or deleted from company!!!" );
+        }
+        if(adminUser.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId())
+            throw new InvalidInputException( "Admin and user doesn't belong to the same company" );
+
+        if( LOG.isDebugEnabled() ){
+            LOG.debug( "Method to assignRegionToUser called for regionId : {}  and assigneeUser : {}" + regionId,
+                assigneeUser.getUserId() );
+        }
+
+        List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+        if ( userProfiles == null || userProfiles.isEmpty() ) {
+            userProfiles = new ArrayList<>();
+        }
+
+        int profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+
+
+        Branch defaultBranch = getDefaultBranchForRegion( regionId );
+
+        if( defaultBranch.getCompany().getCompanyId() != assigneeUser.getCompany().getCompanyId() ){
+            throw new InvalidInputException( "Region to which the User is being assigned to doesnot belong to the same company "
+                + "as the user !!! ");
+        }
+
+        UserProfile userProfileNew = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
+            assigneeUser.getEmailId(), assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId,
+            CommonConstants.IS_PRIMARY_FALSE, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
+            String.valueOf( adminUser.getUserId() ), String.valueOf( adminUser.getUserId() ) );
+
+        UserProfile profile;
+        String branchName;
+        String regionName;
+
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+
+            for (final Iterator iterator = userProfiles.iterator(); iterator.hasNext();) {
+                profile = (UserProfile) iterator.next();
+
+                //get the branch name and region name using the branchId
+                if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+                    Map<String, String> regionBranchMap = branchDao.getBranchAndRegionName( profile.getRegionId(), profile.getBranchId());
+                    branchName = regionBranchMap.get( CommonConstants.BRANCH_NAME_COLUMN );
+                    regionName = regionBranchMap.get( CommonConstants.REGION_COLUMN );
+
+                    if( LOG.isDebugEnabled() ) {
+                        LOG.debug( " ProfileId : {}, Branch : {} ,RegionName : {}", profile.getProfilesMaster().getProfileId(),
+                            branchName,regionName );
+                    }
+
+                    //remove the previous assignments(agent profile) for the user except for the admin assignments
+                    if ( !regionName.equalsIgnoreCase( CommonConstants.DEFAULT_REGION_NAME )
+                        && branchName.equalsIgnoreCase( CommonConstants.DEFAULT_BRANCH_NAME ) ) {
+                        userManagementService.removeUserProfile( profile.getUserProfileId() );
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+
+        //check if new profile will be primary or not
+        int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
+        userProfileNew.setIsPrimary( isPrimary );
+
+        //move reviews
+        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), defaultBranch.getBranchId(),
+                regionId );
+        }
+
+        userProfileDao.save( userProfileNew );
+        if ( assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE ) {
+            if( LOG.isDebugEnabled() ){
+                LOG.debug( "Updating isAtleastOneProfileComplete as active for user : " + assigneeUser.getUserId() );
+            }
+            assigneeUser.setIsAtleastOneUserprofileComplete( CommonConstants.STATUS_ACTIVE );
+            userDao.update( assigneeUser );
+        }
+
+        /**
+         * add newly created user profile to the list of user profiles in user object
+         */
+        userProfiles.add( userProfileNew );
+        assigneeUser.setUserProfiles( userProfiles );
+        userManagementService.setProfilesOfUser( assigneeUser );
+
+        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( assigneeUser.getUserId() );
+        assigneeUser.setProfileName( agentSettings.getProfileName() );
+        assigneeUser.setProfileUrl( agentSettings.getProfileUrl() );
+        solrSearchService.addUserToSolr( assigneeUser );
+
+        userManagementService.updateUserCountModificationNotification( assigneeUser.getCompany() );
+
+        if( LOG.isDebugEnabled() ) {
+            LOG.debug(
+                "Method to assignRegionToUser finished for regionId : " + regionId + " and userId : " + assigneeUser.getUserId() );
+        }
+
+    }
+
     @Override
     @Transactional
     public long getCompanyByProfileName( String profileName )
@@ -11294,8 +11744,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( columnName, columnValue, companySettings, CommonConstants.COMPANY_SETTINGS_COLLECTION );
         LOG.info( "Method to update company settings, OrganizationManagementServiceImpl.updateCompanySettings() finished." );
     }
-
-
+    
+    
+    /**
+     * Update the given setting in MongoDB. This method can be used for all collections. *Only one* setting can be updated at a time
+     * 
+     * @param collectionName
+     * @param entityId
+     * @param columnName
+     * @param columnValue
+     */
+    private void updateSetting( String collectionName, long entityId, String columnName, Object columnValue )
+    {
+        LOG.info( "Updating {} with iden:{} for setting:{} with value:{}", collectionName, entityId, columnName, columnValue );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( columnName, columnValue, entityId, collectionName );
+        LOG.info( "Finished updating {} with iden:{}", collectionName, entityId);
+    }
+    
+    
     /**
      * This method fetches necessary info required to show on admin dashboard from mongo
      * Calls {@link OrganizationUnitSettingsDao#fetchOrganizationUnitSettingsById(long, String, List)}
@@ -11426,10 +11892,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Override public void updateCompanySettings( long companyId, String columnName, Object columnValue )
     {
-        LOG.debug( "Method to update company settings using companyId started." );
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( columnName,
-            columnValue, companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION );
-        LOG.debug( "Method to update company settings using companyId finished" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( columnName, columnValue, 
+            companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION );
     }
     
     @Override
@@ -11606,7 +12070,149 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return null;
 	}
 
-	@Override
+    /**
+     * Update settings of the given entity. This method can be used for all collections. *Multiple* settings can be updated at a time
+     */
+    @Override
+    public void updateSettings( String entityType, long entityId, Map<String, Object> settings ) throws InvalidInputException
+    {
+        String validationMessage = validateSettings(settings);
+        
+        if(validationMessage.equals( "success" )) {
+
+            //If the entity type isn't any of COMPANY or REGION or BRANCH then this method throws an IIE
+            String collectionName = getCollectionNameFromEntityType( entityType );
+            
+            //If the entityId is less than 0, throw an IIE
+            if ( entityId <= 0 ) {
+                throw new InvalidInputException( "Invalid entityId: " + entityId );
+            }
+            
+            List<Long> idenList = new ArrayList<>(1);
+            idenList.add( entityId );
+            
+            organizationUnitSettingsDao.updateSettingsForList( collectionName, settings, idenList );
+        }
+        
+        LOG.info( "Finished updating {} settings with iden:{} with setting:{}", entityType, entityId, settings );
+    }
+    
+    /**
+     * Update settings of all entities in the lower hierarchy. ONLY IN THE LOWER HIERARCHY. NOT IN THE ENTITY PASSED IN THE PARAMETER
+     * This method can be used for all hierarchies - company, region, branch, agent. *Multiple* settings can be updated at a time
+     */
+    @Override
+    public void updateSettingsForLowerHierarchy( String entityType, long entityId, Map<String, Object> settings ) 
+        throws InvalidInputException
+    {
+        String validationMessage = validateSettings(settings);
+        
+        if(validationMessage.equals( "success" )) {
+
+            //If the entity type isn't any of COMPANY or REGION or BRANCH then this method throws an IIE
+            getCollectionNameFromEntityType( entityType );
+            
+            //If the entityId is less than 0, throw an IIE
+            if ( entityId <= 0 ) {
+                throw new InvalidInputException( "Invalid entityId: " + entityId );
+            }
+            
+            /* Get the list of regions, branches and agents that need to be updated
+             * The region and branches methods quickly return a null if the hierarchy level of the entityType isn't valid
+             * so there isn't any performance hit
+             */
+            List<Long> regionUserList = regionDao.getRegionIdList( entityType, entityId );
+            List<Long> branchUserList = branchDao.getBranchIdList( entityType, entityId );
+            List<Long> agentUserList = userProfileDao.findPrimaryUserProfile( entityType, entityId );
+
+            if ( regionUserList != null && !regionUserList.isEmpty() ) {
+                organizationUnitSettingsDao.updateSettingsForList( CommonConstants.REGION_SETTINGS_COLLECTION,
+                    settings, regionUserList );
+            }
+
+            if ( branchUserList != null && !branchUserList.isEmpty() ) {
+                organizationUnitSettingsDao.updateSettingsForList( CommonConstants.BRANCH_SETTINGS_COLLECTION,
+                    settings, branchUserList );
+            }
+            
+            if ( agentUserList != null && !agentUserList.isEmpty() ) {
+                organizationUnitSettingsDao.updateSettingsForList( CommonConstants.AGENT_SETTINGS_COLLECTION, 
+                    settings, agentUserList );
+            }
+        }
+        
+        LOG.info( "Finished updating all lower hierarchy settings for {} with iden:{} with setting:{}", entityType, entityId, settings );
+    }
+    
+    /**
+     * Validate if the settings in the passed settings map 
+     * 1. Are in the 'approved settings map' and 
+     * 2. They have the exact same class type 
+     * 
+     * @param settings
+     * @return
+     * @throws InvalidInputException
+     */
+    private String validateSettings(Map<String, Object> settings) throws InvalidInputException
+    {
+        if(settings == null || settings.isEmpty()) {
+            throw new InvalidInputException("settings can not be null or empty.");
+        }
+        
+        for(Entry<String, Object> setting : settings.entrySet())
+        {
+            //Check if the setting is there in the allowed settings map
+            if(!APPROVED_SETTINGS_MAP.containsKey( setting.getKey() )){
+                StringBuilder sb = new StringBuilder("Invalid setting name: '");
+                sb.append(setting.getKey());
+                sb.append("'");
+                throw new InvalidInputException( sb.toString() );
+            }
+            
+            //Check if the setting value is the same class as the key in the allowed settings map
+            if( setting.getValue().getClass() != APPROVED_SETTINGS_MAP.get(setting.getKey()) ){
+                StringBuilder sb = new StringBuilder("Invalid setting value: '");
+                sb.append(setting.getValue());
+                sb.append("' having class: '");
+                sb.append(setting.getValue().getClass());
+                sb.append("' for setting name: '");
+                sb.append(setting.getKey());
+                sb.append("' having class: '");
+                sb.append(APPROVED_SETTINGS_MAP.get(setting.getKey()));
+                sb.append("'");
+                throw new InvalidInputException( sb.toString() );
+            }
+        }
+        return "success";
+    }
+    
+    /**
+     * Get the corresponding collection in mongoDB from the entityType
+     * 
+     * @param entityType
+     * @return
+     * @throws InvalidInputException
+     */
+    private String getCollectionNameFromEntityType(String entityType) throws InvalidInputException{
+        
+        if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+        
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+        
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+        
+        } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+        
+        }
+        
+        throw new InvalidInputException( "Invalid entity type: '" + entityType + "'");
+    }
+    
+    @Override
     public String saveLinkedInProfileUrl( String entityType, long entityId, String linkedInprofileUrl ) throws InvalidInputException
     {
         LOG.info( "saveLinkedInProfileUrl start" );

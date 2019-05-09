@@ -1,10 +1,15 @@
 package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -16,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.stubbing.OngoingStubbing;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -28,6 +34,8 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.ReviewReply;
+import com.realtech.socialsurvey.core.entities.ReviewReplyVO;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -509,5 +517,5 @@ public class SurveyHandlerImplTest
         Mockito.when( userDao.getUsersForUserIds( Mockito.anyListOf( Long.class ) ) ).thenReturn(
             Arrays.asList( new User[] { fromUser, toUser } ) );
         surveyHandlerImpl.moveSurveysToAnotherUser( 1l, 1l );
-    }
+    } 
 }

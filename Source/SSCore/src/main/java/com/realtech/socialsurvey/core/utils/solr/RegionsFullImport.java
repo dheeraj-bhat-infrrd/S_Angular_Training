@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.dao.SolrImportDao;
@@ -20,6 +21,8 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 @Component
+@Resource(name = "regionsFullImport")
+@EnableTransactionManagement(proxyTargetClass = true)
 public class RegionsFullImport implements Runnable {
 
 	public static final Logger LOG = LoggerFactory.getLogger(RegionsFullImport.class);

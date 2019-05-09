@@ -7,7 +7,6 @@ package com.realtech.socialsurvey.core.utils;
  */
 public final class DisplayMessageConstants
 {
-
     private DisplayMessageConstants()
     {}
 
@@ -171,6 +170,7 @@ public final class DisplayMessageConstants
 
     public static final String SURVEY_AUTO_POST_SCORE_UPDATE_SUCCESSFUL = "SURVEY_AUTO_POST_SCORE_UPDATE_SUCCESSFUL";
     public static final String SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL = "SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL";
+    public static final String SURVEY_MIN_REPLY_SCORE_UPDATE_SUCCESSFUL = "SURVEY_MIN_REPLY_SCORE_UPDATE_SUCCESSFUL";
     public static final String SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL = "SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL";
     public static final String SURVEY_REMINDER_COUNT_UPDATE_SUCCESSFUL = "SURVEY_REMINDER_COUNT_UPDATE_SUCCESSFUL";
     public static final String SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL = "SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL";
@@ -286,7 +286,9 @@ public final class DisplayMessageConstants
     
     public static final String UPDATE_POST_SUCCESSFUL = "SUCCESSFULLY UPDATED POST";
     public static final String UPDATE_POST_UNSUCCESSFUL = "UNABLE TO UPDATE POST";
-    
+
+    public static final String UNAUTHORISED_USER_ACCESS = "UNAUTHORISED_USER_ACCESS";
+
     // Logo image delete 
     public static final String LOGO_IMAGE_DELETE_SUCCESSFUL = "LOGO_IMAGE_DELETE_SUCCESSFUL";
     public static final String LOGO_IMAGE_DELETE_UNSUCCESSFUL = "LOGO_IMAGE_DELETE_UNSUCCESSFUL";

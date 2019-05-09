@@ -11,10 +11,12 @@ import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.Payment;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
+
 import retrofit.client.Response;
 import retrofit.http.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface SSApiIntegration
@@ -261,7 +263,7 @@ public interface SSApiIntegration
     @POST ( "/v2/surveys/{surveyId}/score")
     Response updateScore( @Path ( "surveyId") String surveyId, @Query ( "mood") String mood,
         @Query ( "feedback") String feedback, @Query ( "isAbusive") boolean isAbusive,
-        @Query ( "agreedToShare") String agreedToShare, @Query("profImageUrl") String profImageUrl );
+        @Query ( "agreedToShare") String agreedToShare );
 
 
     @GET ( "/v2/swearwords")
@@ -487,6 +489,25 @@ public interface SSApiIntegration
 
     @POST( "/v1/updateencompassalertemailids" )
     Response updateEncompassAlertEmailIds(@Body EncompassAlertMailsVO encompassAlertMailsVO);
+
+    @POST ( "/v2/surveys/{surveyId}/replies")
+    Response createReviewReply( @Path ( "surveyId") String surveyId, @Query ( "replyText") String replyText, @Query ( "replyByName") String replyByName, 
+        @Query ( "replyById") String replyById, @Query("entityType") String entityType);
+    
+    @PUT ( "/v2/surveys/{surveyId}/replies/{replyId}")
+    Response updateReviewReply( @Path ( "surveyId") String surveyId, @Path ("replyId") String replyId, @Query ( "replyText") String replyText, 
+        @Query ( "replyByName") String replyByName, @Query ( "replyById") String replyById );
+    
+    @DELETE ( "/v2/surveys/{surveyId}/replies/{replyId}")
+    Response deleteReviewReply( @Path ( "surveyId") String surveyId, @Path ("replyId") String replyId );
+    
+    @POST ("/v1/settings/{entityType}/{entityId}")
+    Response updateSettings(@Path ( "entityType") String entityType, @Path ( "entityId") long entityId, @Body Map<String,
+        Object> settings, @Header( "Authorization" ) String authorizationHeader);
+    
+    @POST ("/v1/settings/{entityType}/{entityId}/propagate")
+    Response propagateSettingsToLowerHierarchy(@Path ( "entityType") String entityType, @Path ( "entityId") long entityId,
+        @Body Map<String, Object> settings, @Header( "Authorization" ) String authorizationHeader);
     
     @POST ( "/v1/linkedin/profileurl" )
     Response saveLinkedInProfileUrl(@Query ( "entityType" ) String entityType,@Query ( "entityId") long entityId, @Query ( "linkedInProfileUrl") String linkedInProfileUrl);
@@ -514,4 +535,59 @@ public interface SSApiIntegration
     @GET( "/v1/fetchnotes/{companyId}/startIndex/{startIndex}/limit/{limit}" )
     List<Notes> fetchSSAdminNotes( @Path("companyId") long companyId, @Path( "startIndex" ) long startIndex,
         @Path( "limit" ) long limit, @Header( "authorizationHeader" ) String authorizationHeader );
+
+    @POST( "/v1/users/reinvite" )
+    ManageTeamBulkResponse reInviteUsers(@Body List<String> emailIds,
+        @Header( "authorizationHeader" ) String authorizationHeader );
+
+    @POST( "/v1/users/delete" )
+    ManageTeamBulkResponse deleteUsers(@Body ManageTeamBulkRequest manageTeamBulkRequest,
+        @Header( "authorizationHeader" ) String authorizationHeader );
+
+    @POST( "/v1/users/assigntobranch" )
+    ManageTeamBulkResponse assignUsersToBranch(@Body ManageTeamBulkRequest manageTeamBulkRequest,
+        @Header( "authorizationHeader" ) String authorizationHeader );
+
+    @POST( "/v1/users/assigntoregion" )
+    ManageTeamBulkResponse assignUsersToRegion(@Body ManageTeamBulkRequest manageTeamBulkRequest,
+        @Header( "authorizationHeader" ) String authorizationHeader );
+
+    @POST( "/v1/users/assignassocialmonitoradmin" )
+    ManageTeamBulkResponse assignUsersAsSocialMonitorAdmin(@Body ManageTeamBulkRequest manageTeamBulkRequest,
+        @Header( "authorizationHeader" ) String authorizationHeader );
+
+    @POST( "/v1/users/autopostscore")
+    ManageTeamBulkResponse updateAutoPostScore( @Body ManageTeamBulkRequest manageTeamBulkRequest,
+        @Header( "authorizationHeader" ) String authorizationHeader );
+
+    @POST( "/v1/users/uploadprofilepic")
+    ManageTeamBulkResponse bulkUploadProfilePicToAgents( @Body ManageTeamBulkRequest manageTeamBulkRequest,
+        @Header( "authorizationHeader" ) String authorizationHeader );
+
+    @GET( "/v1/users/active" )
+    List<UserVo> getAllActiveUsersInHierarchy( @Query ("companyId") long companyId, @Query ("entityType") String entityType,
+        @Query( "adminId" ) long userId, @Header ("authorizationHeader") String authorizationHeader );
+
+    @GET( "/v1/users/unverified" )
+    List<UserVo> getAllUnverifiedUsersInHierarchy( @Query ("companyId") long companyId, @Query ("entityType") String entityType,
+        @Query( "adminId" ) long userId, @Header ("authorizationHeader") String authorizationHeader );
+
+    @GET( "/v1/users/verified")
+    List<UserVo> getAllVerifiedUsersInHierarchy( @Query ("companyId") long companyId, @Query ("entityType") String entityType,
+        @Query( "adminId" ) long userId, @Header ("authorizationHeader") String authorizationHeader );
+
+    @GET( "/v1/users/active/{namePattern}" )
+    List<UserVo> getAllActiveUsersInHierarchy( @Path ("namePattern") String searchKey, @Query ("companyId") long companyId,
+        @Query ("adminId") long userId, @Query ("sort") String sortingOrder, @Query( "entityType" ) String entityType,
+        @Header ("authorizationHeader") String authorizationHeader );
+
+    @GET( "/v1/users/verified/{namePattern}" )
+    List<UserVo> getAllVerifiedUsersInHierarchy( @Path ("namePattern") String searchKey, @Query ("companyId") long companyId,
+        @Query ("adminId") long userId, @Query ("sort") String sortingOrder, @Query( "entityType" ) String entityType,
+        @Header ("authorizationHeader") String authorizationHeader );
+
+    @GET( "/v1/users/unverified/{namePattern}" )
+    List<UserVo> getAllUnverifiedUsersInHierarchy( @Path ("namePattern") String searchKey, @Query ("companyId") long companyId,
+        @Query ("adminId") long userId, @Query ("sort") String sortingOrder, @Query( "entityType" ) String entityType,
+        @Header ("authorizationHeader") String authorizationHeader  );
 }

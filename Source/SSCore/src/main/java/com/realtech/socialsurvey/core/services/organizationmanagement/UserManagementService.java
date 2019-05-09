@@ -4,22 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProListUser;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.SettingsDetails;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserApiKey;
-import com.realtech.socialsurvey.core.entities.UserEmailMapping;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserSettings;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.HierarchyAlreadyExistsException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -28,7 +16,10 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.vo.ManageTeamBulkRequest;
+import com.realtech.socialsurvey.core.vo.ManageTeamBulkResponse;
 import com.realtech.socialsurvey.core.vo.UserList;
+import com.realtech.socialsurvey.core.vo.UserVo;
 
 
 // JIRA SS-34 BY RM02 BOC
@@ -269,7 +260,8 @@ public interface UserManagementService
     // JIRA SS-42 by RM-06:BOC
 
     public List<UserProfile> getAllUserProfilesForUser( User user ) throws InvalidInputException;
-
+    
+    public List<UserProfile> getAllUserProfilesForRegionOrBranch( long regionId, String columnName ) throws InvalidInputException;
 
     public boolean userExists( String userName ) throws InvalidInputException;
 
@@ -477,22 +469,22 @@ public interface UserManagementService
     void updateUserInSolr( User user ) throws InvalidInputException, SolrException;
 
 
-    public int getUsersUnderBranchAdminCount( User admin );
+    public int getUsersUnderBranchAdminCount( User admin, String status );
 
 
-    public int getUsersUnderRegionAdminCount( User admin );
+    public int getUsersUnderRegionAdminCount( User admin, String status );
 
 
-    public int getUsersUnderCompanyAdminCount( User admin );
+    public int getUsersUnderCompanyAdminCount( User admin, String status );
 
 
-    public List<UserFromSearch> getUsersUnderBranchAdmin( User admin, int startIndex, int batchSize );
+    public List<UserFromSearch> getUsersUnderBranchAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus  );
 
 
-    public List<UserFromSearch> getUsersUnderRegionAdmin( User admin, int startIndex, int batchSize );
+    public List<UserFromSearch> getUsersUnderRegionAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus  );
 
 
-    public List<UserFromSearch> getUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize );
+    public List<UserFromSearch> getUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus );
 
 
     public List<UserFromSearch> getUsersByUserIds( Set<Long> userIds ) throws InvalidInputException;
@@ -627,7 +619,16 @@ public interface UserManagementService
 
 
     public Set<Long> getUserIdsUnderAdmin( User adminUser ) throws InvalidInputException;
-
+    
+    public List<Long> getBranchIdsUnderCompany( long companyId ) throws InvalidInputException;
+    
+    public List<Long> getRegionIdsUnderCompany( long companyId ) throws InvalidInputException;
+    
+    public List<Long> getBranchIdsUnderRegion( long regionId ) throws InvalidInputException;
+    
+    public Set<Long> getUserIdsUnderRegion( long regionId ) throws InvalidInputException;
+    
+    public Set<Long> getUserIdsUnderBranch( long regionId ) throws InvalidInputException;
 
     public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId , String createdAndModifiedBy)
             throws InvalidInputException, NoRecordsFetchedException;
@@ -682,10 +683,11 @@ public interface UserManagementService
 	/**
 	 * Method to get all active roles for userIds
 	 * @param userIds
-	 * @return
+	 * @param sortOrder
+     * @return
 	 * @throws InvalidInputException
 	 */
-	public List<UserFromSearch> getActiveUsersByUserIds( Set<Long> userIds ) throws InvalidInputException;
+	public List<UserFromSearch> getActiveUsersByUserIds( Set<Long> userIds, String sortOrder ) throws InvalidInputException;
 
 	
 	/**
@@ -698,9 +700,81 @@ public interface UserManagementService
 	 */
 	public boolean canAddAndDeleteUser(String entityType, long companyId, boolean addOrDeleteFlag) throws InvalidInputException;
 
+    boolean checkIfTheUserCanBeDeleted( User loggedInUser, User userToRemove );
+
+    ManageTeamBulkResponse removeExistingUsers( List<Long> userIds, long userIden ) throws InvalidInputException;
+
+    ManageTeamBulkResponse removeExistingUsersByEmail( List<String> userEmailIds, String userEmailId )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+    @Transactional ManageTeamBulkResponse reInviteUsers( List<String> emailIds ) throws InvalidInputException;
+
+    ManageTeamBulkResponse assignUsersAsSocialMonitorAdmin( List<Long> userIds, long adminId )
+        throws InvalidInputException;
+
+    void assignUserAsSocialMonitorAdmin( User admin, User assigneeUser )
+        throws InvalidInputException, NoRecordsFetchedException;
 
     /**
-     * Enables deletion of an agent's logo image.
+     * Method to update auto-post-score for the given list of agent ids.
+     * @param userIds
+     * @param minimumPostScore
+     * @return
+     * @throws InvalidInputException
+     */
+    ManageTeamBulkResponse bulkUpdateSocialPostScoreForAgents(List<Long> userIds, double minimumPostScore) throws InvalidInputException;
+
+
+    /**
+     * Method to update logo for the given list of agent ids.
+     * @param userIds
+     * @param logoFileName
+     * @param fileLocal 
+     * @return
+     * @throws InvalidInputException
+     */
+    ManageTeamBulkResponse bulkUpdateLogoForAgents( List<Long> userIds, String logoFileName, MultipartFile fileLocal ) throws InvalidInputException;
+
+    ManageTeamBulkResponse uploadProfilePicToAgents( ManageTeamBulkRequest manageTeamBulkRequest ) throws NonFatalException;
+
+    /**
+     * Method to get all the active users under the queried hierarchy
+     *
+     * @param entityType
+     * @param adminId
+     * @param companyId
+     * @return
+     */
+    public List<UserVo> getActiveUsersInHierarchy( String entityType, long adminId, long companyId )
+        throws InvalidInputException;
+
+
+    /**
+     * Method to get all the unverified users under the queried hierarchy
+     * @param companyId
+     * @param entityType
+     * @param adminid
+     * @return
+     */
+    public List<UserVo> getUnverifiedUsersInHierarchy( long companyId, String entityType, long adminid )
+        throws InvalidInputException;
+
+
+    /**
+     * Method to get all the verified users under the queried hierarchy
+     * @param companyId
+     * @param entityType
+     * @param adminId
+     * @return
+     */
+    public List<UserVo> getVerifiedUsersInHierarchy( long companyId, String entityType, long adminId )
+        throws InvalidInputException;
+
+    List<UserVo> getActiveUsersInHierarchy( String pattern, long adminId, long companyId, String status, String sortingOrder,
+        String entityType )
+        throws InvalidInputException, SolrException;
+
+    /** Enables deletion of an agent's logo image.
      * @param collection Collection name in Mongo
      * @param unitSettings Representing organization settings. 
      * @throws InvalidInputException

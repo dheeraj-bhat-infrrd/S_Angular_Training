@@ -6,8 +6,9 @@
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:set var="accountTypeId" value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" />
 
-<table class="v-um-tbl">
-	<tr id="u-tbl-header" class="u-tbl-header" data-num-found="${numFound}">
+<table class="v-um-tbl ms-tbl-margin">
+	<tr id="u-tbl-header" class="u-tbl-header ms-hdr-bg ms-tbl-hdr" data-num-found="${numFound}">
+		<td id="ms-checkbox-main" class="ms-checkbox float-left ms-checkbox-unchecked"></td>
 		<td class="v-tbl-uname mng-tbl-name"><spring:message code="label.usermanagement.username.key" /></td>
 		<td class="v-tbl-email mng-tbl-email"><spring:message code="label.emailid.key" /></td>
 		<td class="v-tbl-email mng-tbl-soc-conn">Social Connections</td>
@@ -39,7 +40,7 @@
 	</tr>
 	<c:choose>
 		<c:when test="${not empty userslist}">
-			<c:forEach var="userfromsearch" items="${userslist}">
+			<c:forEach var="userfromsearch" items="${userslist}" varStatus="loop">
 				<c:set var="title" value="${userfromsearch.title}" />
 				<c:set var="aboutMe" value="${userfromsearch.aboutMe}" />
 				<c:set var="profileUrl" value="${userfromsearch.profileUrl}" />
@@ -55,7 +56,7 @@
 						<c:set var="companyadmintickclass" value="v-icn-tick" />
 					</c:if>
 				</c:if>
-				
+
 				<!-- For Region admin -->
 				<c:if test="${accountTypeId == 4}">
 					<c:set var="regionadmintickclass" value="" />
@@ -109,7 +110,9 @@
 				</c:choose>
 
 				<tr class="u-tbl-row user-row" id="user-row-${userfromsearch.userId}" data-editable="${userfromsearch.canEdit}">
-				
+
+					<td id="ms-checkbox-${loop.index}" class="ms-checkbox float-left ms-checkbox-unchecked" data-userId="${userfromsearch.userId}" data-status="${userfromsearch.status}" data-emailId="${userfromsearch.emailId }"></td>
+
 					<td class="v-tbl-uname fetch-name mng-tbl-name" data-first-name="${userfromsearch.firstName}" data-last-name="${userfromsearch.lastName}"
 						data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
 					<td class="v-tbl-email fetch-email mng-tbl-email"><div class="mng-tbl-email-div" title="${userfromsearch.emailId}">${userfromsearch.emailId}</div></td>
@@ -320,7 +323,7 @@
 				   </td>
 				</tr>
 				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="8">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="9">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>
@@ -333,5 +336,9 @@
 	</c:choose>
 </table>
 <script>
+$(document).ready(function(){
+	
+	initializeMultiSelect();
+});
 	bindAppUserLoginEvent();
 </script>

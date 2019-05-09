@@ -110,6 +110,28 @@
 					<div class="review-author">${author}</div>
 					<div class="review-date"><fmt:formatDate value="${reviewItem.surveyUpdatedDate}" pattern="MMMM d, yyyy"/></div>
 					<div class="review-body review-widget" id="review-${ loop.index }">${reviewItem.review}</div>
+					
+					<!-- Reviews Reply Start -->
+					<c:set value="${reviewItem.reviewReply}" var="reviewReply"></c:set>
+					<c:if test="${not empty reviewReply}">
+						<div class="review-reply-section">
+							<!-- <h5><span><b>Replies</b></span></h5> -->								
+							<div class="review-reply-container">
+								
+								<c:forEach var="reply" varStatus="loop" items="${reviewReply}">   
+									<div class="review-reply-box" data-reply-id="${reply.replyId}">
+										<div class="review-reply-box-container">
+											<span class="review-reply-owner"><b>${reply.replyByName}</b></span>
+											<span class="review-reply-text">${reply.replyText}</span>
+										</div>
+									</div>                 
+								</c:forEach>							
+							
+							</div>
+						</div>
+					</c:if>
+					<!-- Reviews Reply End -->
+
 				</div>
 			</c:forEach>
 		</div>
@@ -126,7 +148,7 @@
 		        document.body.scrollHeight
 		        // set target domain
 		        ,"*"
-		    )
+			)
 		};
 		
 		function changeWidgetRatingPattern(rating, ratingParent) {

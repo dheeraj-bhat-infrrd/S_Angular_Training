@@ -47,22 +47,22 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
     public Set<Long> findUserIdsByRegion( long regionId );
 
 
-    public int getUsersUnderBranchAdminCount( User admin );
+    public int getUsersUnderBranchAdminCount( User admin, String status );
 
 
-    public int getUsersUnderRegionAdminCount( User admin );
+    public int getUsersUnderRegionAdminCount( User admin, String status );
 
 
-    public int getUsersUnderCompanyAdminCount( User admin );
+    public int getUsersUnderCompanyAdminCount( User admin, String status );
 
 
-    public List<UserFromSearch> findUsersUnderBranchAdmin( User admin, int startIndex, int batchSize );
+    public List<UserFromSearch> findUsersUnderBranchAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus );
 
 
-    public List<UserFromSearch> findUsersUnderRegionAdmin( User admin, int startIndex, int batchSize );
+    public List<UserFromSearch> findUsersUnderRegionAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus );
 
 
-    public List<UserFromSearch> findUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize );
+    public List<UserFromSearch> findUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize, String sortingOrder, String userStatus );
 
 
     public List<UserFromSearch> getUserFromSearchByUserIds( Set<Long> userIds );
@@ -133,7 +133,13 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 	/**
 	 * Method to get all the active roles for userIds
 	 * @param userIds
-	 * @return
+	 * @param sortOrder
+     * @return
 	 */
-	public List<UserFromSearch> getActiveUserFromSearchByUserIds( Set<Long> userIds );
+
+    public List<Long> findBranchUserProfile( String entityType, long entityId );
+
+    public List<Long> findRegionUserProfile( String entityType, long entityId );
+
+	public List<UserFromSearch> getActiveUserFromSearchByUserIds( Set<Long> userIds, String sortOrder );
 }

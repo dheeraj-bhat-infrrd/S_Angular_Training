@@ -15,4 +15,6 @@ public interface JobLogDetailsManagement
 	public long insertJobLog(long entityId, String entityType, String jobName, String status) throws InvalidInputException;
 
 	public void recalEtl(long companyId, long jobLogId) throws InvalidInputException;
+
+    String convertDateToTimeZoneForLastEtlTime( long date, String toTimeZone );
 }

@@ -17,10 +17,10 @@ import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.ReviewReplyVO;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
-import com.realtech.socialsurvey.core.entities.SurveyPreInitiationTemp;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -44,21 +44,6 @@ public interface SurveyHandler
 {
 
     /**
-     * Method to store question and answer format into mongo.
-     * 
-     * @param agentId
-     * @throws InvalidInputException
-     * @throws SolrServerException
-     * @throws NoRecordsFetchedException
-     * @throws SolrException
-     */
-    /*
-     * public void storeInitialSurveyDetails(long agentId, long companyId, long regionId, long
-     * branchId, String customerEmail, int reminderCount) throws InvalidInputException,
-     * SolrException, NoRecordsFetchedException, SolrServerException;
-     */
-
-    /**
      * @param surveyId
      * @param question
      * @param questionType
@@ -69,7 +54,7 @@ public interface SurveyHandler
      * @param questionId
      * @param considerForScore
      */
-    void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage,
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage,
         boolean isUserRankingQuestion, boolean isNpsQuestion, int questionId, boolean considerForScore );
 
     /*
@@ -77,7 +62,7 @@ public interface SurveyHandler
      * SURVEY_DETAILS.
      */
     public double updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
-        String agreedToShare, String profImageUrl );
+        String agreedToShare );
 
 
     public SurveyDetails storeInitialSurveyDetails( User user, SurveyPreInitiation surveyPreInitiation, String baseUrl,
@@ -105,7 +90,8 @@ public interface SurveyHandler
     public Map<String, Map<String, String>> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException;
 
 
-    public List<SurveyPreInitiation> getIncompleteSurveyForReminderEmail( Company company, Date minLastReminderDate , Date maxLastReminderDate, int maxReminderCount );
+    public List<SurveyPreInitiation> getIncompleteSurveyForReminderEmail( Company company, Date minLastReminderDate , 
+        Date maxLastReminderDate, int maxReminderCount );
 
 
     public void updateReminderCount( List<Long> agents, List<String> customers );
@@ -170,13 +156,13 @@ public interface SurveyHandler
     public Map<String, Object> getReminderInformationForCompany( long companyId );
     
 
-    void insertSurveyDetails( SurveyDetails surveyDetails );
+    public void insertSurveyDetails( SurveyDetails surveyDetails );
 
 
-    SurveyDetails getSurveyDetailsBySourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
+    public SurveyDetails getSurveyDetailsBySourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
 
 
-    SurveyPreInitiation getPreInitiatedSurveyById( long surveyPreInitiationId ) throws NoRecordsFetchedException;
+    public SurveyPreInitiation getPreInitiatedSurveyById( long surveyPreInitiationId ) throws NoRecordsFetchedException;
 
 
     /**
@@ -185,7 +171,7 @@ public interface SurveyHandler
     public SurveyPreInitiation saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
-    void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName, String reportReason );
+    public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName, String reportReason );
 
 
     /**
@@ -209,25 +195,18 @@ public interface SurveyHandler
         ProfileNotFoundException;
 
 
-    //    Commented as Zillow surveys are not stored in database, SS-1276
-    //    void deleteZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
-
-    //  Commented as Zillow surveys are not stored in database, SS-1276
-    //    void deleteExcessZillowSurveysByEntity( String entityType, long entityId ) throws InvalidInputException;
-
-
     public List<AbusiveSurveyReportWrapper> getSurveysReportedAsAbusive( int startIndex, int numOfRows );
 
 
-    void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
+    public void sendSurveyCompletionMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 
-    void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
+    public void sendSurveyCompletionUnpleasantMail( String custEmail, String custFirstName, String custLastName, User user )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 
-    void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
+    public void sendSocialPostReminderMail( String custEmail, String custFirstName, String custLastName, User user, String links )
         throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 
@@ -236,7 +215,7 @@ public interface SurveyHandler
         List<OrganizationUnitSettings> branchUnitSettings );
 
 
-    void updateSurveyDetails( SurveyDetails surveyDetails );
+    public void updateSurveyDetails( SurveyDetails surveyDetails );
 
 
     public List<SurveyDetails> getSurveyDetailsByAgentAndCompany( long companyId );
@@ -260,7 +239,7 @@ public interface SurveyHandler
     public List<BulkSurveyDetail> processBulkSurvey( List<BulkSurveyDetail> bulkSurveyDetailList, long companyId );
 
 
-    void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException;
+    public void updateModifiedOnColumnForAgentHierachy( long agentId ) throws InvalidInputException;
 
 
     public void updateSurveyAsUnderResolution( String surveyId );
@@ -310,16 +289,17 @@ public interface SurveyHandler
     public void updateZillowSummaryInExistingSurveyDetails( SurveyDetails surveyDetails );
 
 
-    SurveyPreInitiation preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
+    public SurveyPreInitiation preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
         String custRelationWithAgent, String source );
 
 
-    void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
+    public void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
 
 
     public boolean hasCustomerAlreadySurveyed( long currentAgentId, String customerEmailId );
 
-    void begin3rdPartySurveyImport();
+
+    public void begin3rdPartySurveyImport();
 
     public String replaceGatewayQuestionText( String questionText, OrganizationUnitSettings agentSettings, User user,
         OrganizationUnitSettings companySettings, SurveyDetails survey, String logoUrl,
@@ -355,41 +335,47 @@ public interface SurveyHandler
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage );
 
 
-    SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
+    public SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
 
 
-    SurveysAndReviewsVO getSurveysByFilterCriteria( String mood , Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds , boolean isRetaken,  int startIndex, int count , long companyId);
+    public SurveysAndReviewsVO getSurveysByFilterCriteria( String mood , Long startSurveyID, Date startReviewDate , Date startTransactionDate , 
+        List<Long> userIds , boolean isRetaken,  int startIndex, int count , long companyId);
 
 
-    public void prepareAndSendInvitationMail( SurveyPreInitiation survey ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
+    public void prepareAndSendInvitationMail( SurveyPreInitiation survey ) 
+        throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
 
 
-    void sendSurveyReminderEmail( SurveyPreInitiation survey ) throws InvalidInputException, ProfileNotFoundException;
+    public void sendSurveyReminderEmail( SurveyPreInitiation survey ) throws InvalidInputException, ProfileNotFoundException;
+    
     
     public void updateSurveyTransactionDateInMongo();
 
 
-    void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails );
+    public void updateZillowSourceIdInExistingSurveyDetails( SurveyDetails surveyDetails );
 
 
-    void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails );
+    public void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails );
 
 
     public List<SurveyPreInitiation> getSurveyListToSendInvitationMail( Company company, Date epochDate );
 
 
-    Map<String, Date> getMinMaxLastSurveyReminderTime( long systemTime, int reminderInterval );
+    public Map<String, Date> getMinMaxLastSurveyReminderTime( long systemTime, int reminderInterval );
 
-    void moveAllSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId ) throws InvalidInputException;
-
-
-    void copyAllSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId ) throws InvalidInputException;
+    
+    public void moveAllSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId ) throws InvalidInputException;
 
 
-    void disconnectAllSurveysFromWithUser( long agentId ) throws InvalidInputException;
+    public void copyAllSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId ) throws InvalidInputException;
 
 
-    List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations , long companyId ) throws InvalidInputException;
+    public void disconnectAllSurveysFromWithUser( long agentId ) throws InvalidInputException;
+
+
+    public List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations , long companyId ) 
+        throws InvalidInputException;
+    
     
     /**
      * method to build survey completion threshold Map
@@ -403,7 +389,6 @@ public interface SurveyHandler
 
     public Map<String, String> buildPreferredAdminEmailListForSurvey( SurveyDetails survey, double companyThreshold,
         double regionThreshold, double branchThreshold ) throws InvalidInputException;
-
 
 
     public boolean createEntryForSurveyUploadWithCsv( String hierarchyType, MultipartFile tempFile, String fileName, long hierarchyId,
@@ -427,15 +412,20 @@ public interface SurveyHandler
     public SurveysAndReviewsVO getIncompelteSurveysByFilterCriteria( Long startSurveyID, Date startTransactionDate,
         List<Long> userIds, int startIndex, int count, long companyId );
 
-	public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey, int duplicateSurveyInterval,
+	
+    public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey, int duplicateSurveyInterval,
         boolean allowPartnerSurveyForCompany ) throws InvalidInputException;
 
+	
 	public void updateSurveyAsAbusiveNotify(String get_id);
+	
 	
 	public String[] fetchSwearWords( String entityType, long entityId ) throws InvalidInputException;
 
-    void updateSwearWords( String entityType, long entityId, String[] swearWords ) throws InvalidInputException;
+	
+	public void updateSwearWords( String entityType, long entityId, String[] swearWords ) throws InvalidInputException;
 
+    
     public void moveSurveyBetweenUsers( long surveyPreinitiationId, long toUserId )
         throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
@@ -445,24 +435,33 @@ public interface SurveyHandler
      * Saves or updates the survey details in bulk
      * @param surveyDetails
      */
-    List<BulkWriteErrorVO> saveOrUpdateReviews( List<SurveyDetailsVO> surveyDetails ) throws InvalidInputException,ParseException;
+	public List<BulkWriteErrorVO> saveOrUpdateReviews( List<SurveyDetailsVO> surveyDetails ) throws InvalidInputException,ParseException;
+	
+	
 	/**
 	 * @param surveyResponse
 	 * @return
 	 */
-	double calScore(List<SurveyResponse> surveyResponse);
+    public double calScore(List<SurveyResponse> surveyResponse);
 
-	/**
+	
+    /**
 	 * @param surveyResponse
 	 * @return
 	 */
-	double getNpsScore(List<SurveyResponse> surveyResponse);
+	public double getNpsScore(List<SurveyResponse> surveyResponse);
 
 
 	public void streamSurveyProcessRequest(SurveyDetails surveyDetails);
 
 
-	SurveyPreInitiation saveSurveyPreInitiationTempObject(SurveyPreInitiation surveyPreInitiation)
+	public SurveyPreInitiation saveSurveyPreInitiationTempObject(SurveyPreInitiation surveyPreInitiation)
 			throws InvalidInputException;
-
+	
+	
+	public ReviewReplyVO createOrUpdateReplyToReview( String surveyId, String replyText, String replyByName, String replyById, String replyId, String entityType )
+        throws InvalidInputException;
+	
+	
+	public void deleteReviewReply(String replyId, String surveyId) throws InvalidInputException;
 }

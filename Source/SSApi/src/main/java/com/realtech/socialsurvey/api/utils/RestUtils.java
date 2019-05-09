@@ -20,7 +20,8 @@ import org.springframework.stereotype.Component;
 public class RestUtils {
 
 	
-	public ResponseEntity<Map<String , Object>> getRestResponseEntity(HttpStatus httpStatus , String responseMsg, String dataKey , Object dataObject , HttpServletRequest request , long companyId ){
+	public ResponseEntity<Map<String , Object>> getRestResponseEntity(HttpStatus httpStatus , String responseMsg, 
+	    String dataKey , Object dataObject , HttpServletRequest request , long companyId ){
 		
 		Map<String,Object> responseMap = new LinkedHashMap<String, Object>();
 		

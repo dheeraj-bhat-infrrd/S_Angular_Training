@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -42,9 +43,8 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<Map<String, Object>> handleValidationException( ValidationException validationException )
     {
-    	LOG.warn("Validation Exception occurred", validationException);
-        Map<String, Object> result = createErrorResponse( validationException.getErrors() );
-        return new ResponseEntity<Map<String, Object>>( result, HttpStatus.OK );
+    	Map<String, Object> result = createErrorResponse( validationException.getErrors() );
+        return handleAnyKnownException( validationException, result );
     }
 
 
@@ -52,9 +52,13 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<Map<String, Object>> handleBadRequestException( BadRequestException badRequestException )
     {
-    	LOG.warn("Bad Request Exception occurred", badRequestException);
-        Map<String, Object> result = createErrorResponse( badRequestException.getErrors() );
-        return new ResponseEntity<Map<String, Object>>( result, HttpStatus.BAD_REQUEST );
+    	Map<String, Object> result = null;
+        
+        if(badRequestException.getErrors() != null){
+            result = createErrorResponse( badRequestException.getErrors() );
+        }
+        
+        return handleAnyKnownException( badRequestException, result );
     }
 
 
@@ -62,17 +66,21 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<?> handleSSApiException( SSApiException ssapiException, HttpServletRequest request )
     {
-    	LOG.error("SSAPI Exception occurred", ssapiException);
-        long companyId = 0;
-		return restUtils.getRestResponseEntity( HttpStatus.INTERNAL_SERVER_ERROR, ssapiException.getMessage(), null, null,
-                request, companyId );
+    	return handleAnyUnknownException( ssapiException, request );
+    }
+    
+    @ExceptionHandler (ServletRequestBindingException.class)
+    @ResponseBody
+    public ResponseEntity<?> handleMissingParametersException( ServletRequestBindingException bindingException, HttpServletRequest request )
+    {
+        return handleAnyKnownException( bindingException, null );
     }
     
     @ExceptionHandler ( AuthorizationException.class)
     @ResponseBody
     public ResponseEntity<?> handleAuthorizationException( AuthorizationException authorizationException, HttpServletRequest request )
     {
-        LOG.error("Authorization Exception ", authorizationException);
+        LOG.error("Authorization failed for the request");
         long companyId = 0;
         return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, authorizationException.getMessage(), null, null,
                 request, companyId );
@@ -83,15 +91,24 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<?> handleNumberFormatException( NumberFormatException nfe, HttpServletRequest request )
     {
-    	LOG.error("NumberFormatException occurred", nfe);
-        long companyId = 0;
-		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, nfe.getMessage(), null, null,
-                request, companyId );
+    	return handleAnyKnownException( nfe, null );
+    }
+    
+    private ResponseEntity<Map<String, Object>> handleAnyKnownException( Exception e, Map<String, Object> result)
+    {
+        LOG.error("Exception occurred", e);
+        
+        if(result == null){
+            result = new HashMap<>();
+            result.put( ERRORS, e.getMessage() );
+        }
+        
+        return new ResponseEntity<Map<String, Object>>( result, HttpStatus.BAD_REQUEST );
     }
     
     @ExceptionHandler ( Throwable.class)
     @ResponseBody
-    public ResponseEntity<?> handleAnyException( Throwable e , HttpServletRequest request)
+    public ResponseEntity<?> handleAnyUnknownException( Throwable e , HttpServletRequest request)
     {
     	LOG.error("Uncaught Exception occurred", e);
     	long companyId = 0;

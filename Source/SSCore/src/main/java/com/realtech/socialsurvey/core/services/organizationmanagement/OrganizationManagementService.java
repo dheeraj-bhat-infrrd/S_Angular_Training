@@ -2,8 +2,10 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,48 @@ import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.vo.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.realtech.socialsurvey.core.vo.ManageTeamBulkResponse;
+
+import com.realtech.socialsurvey.core.vo.BranchVO;
+
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
+import com.realtech.socialsurvey.core.entities.CompanyView;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.DisabledAccount;
+import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
+import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.Keyword;
+import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
+import com.realtech.socialsurvey.core.entities.StateLookup;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -32,6 +76,11 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 public interface OrganizationManagementService
 {
+
+    String KEY_IS_REVIEW_REPLY_ENABLED_FOR_COMPANY = "survey_settings.isReplyEnabledForCompany";
+    String KEY_IS_REVIEW_REPLY_ENABLED = "survey_settings.isReplyEnabled";
+    String KEY_REVIEW_REPLY_SCORE = "survey_settings.reviewReplyScore";
+
 
     public User addCompanyInformation( User user, Map<String, String> organizationalDetails )
         throws SolrException, InvalidInputException;
@@ -151,7 +200,18 @@ public interface OrganizationManagementService
      */
     public boolean updateSurveySettings( OrganizationUnitSettings companySettings, SurveySettings surveySettings )
         throws InvalidInputException;
-
+    
+    /**
+     * 
+     * Updates the SurveySettings
+     * @param entityType
+     * @param unitSettings
+     * @param surveySettings
+     * @return
+     * @throws InvalidInputException
+     */
+    public boolean updateSecondaryWorkflow(String entityType, OrganizationUnitSettings unitSettings, SurveySettings surveySettings )
+        throws InvalidInputException;
 
     /**
      * Updates the LocationEnbling in the settings
@@ -949,6 +1009,11 @@ public interface OrganizationManagementService
      * @return
      */
     public SurveySettings retrieveDefaultSurveyProperties();
+    
+    /**
+     * @return
+     */
+    public SurveySettings retrieveDefaultSecondaryWorkflowValues();
 
 
     /**
@@ -1444,7 +1509,8 @@ public interface OrganizationManagementService
 
 
     void updateAllowPartnerSurveyForAllUsers( Set<Long> userIds, boolean allowPartnerSurvey ) throws InvalidInputException;
-
+    
+    public void updateKeyForAllUsersOfCollection( List<Long> userIds, String field, boolean value, String collectionType) throws InvalidInputException;
 
     void updatellowPartnerSurveyForUser( AgentSettings agentSettings, boolean allowPartnerSurvey );
 
@@ -1787,6 +1853,12 @@ public interface OrganizationManagementService
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser, boolean holdSendingMail,
         boolean sendMail, boolean isAddedByRealtechOrSSAdmin, String firstName, String lastName ) throws InvalidInputException;
 
+    public ManageTeamBulkResponse assignBranchToUsers(List<Long> userIds, long adminId, long branchId)
+        throws InvalidInputException, NoRecordsFetchedException;
+
+    ManageTeamBulkResponse assignRegionToUsers( List<Long> userIds, long adminId, long regionId )
+        throws InvalidInputException, NoRecordsFetchedException;
+
     void saveNotification( long companyId, String errorMessage, long receivedOn, @RequestBody String jsonString )
         throws InvalidInputException;
 
@@ -1815,8 +1887,19 @@ public interface OrganizationManagementService
      * @param allowPartnerSurvey
      */
     void updateAllowPartnerSurvey( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey );
+    
+    /**
+     * Updates the allowPartner survey field for given unit settings
+     * @param unitSettings
+     * @param allowPartnerSurvey
+     * @param collectionType
+     */
+    void updateAllowPartnerSurveyForCollection( OrganizationUnitSettings unitSettings, boolean allowPartnerSurvey, String collectionType );
 
     CompanyStatistics fetchCompanyStatistics( long companyId ) throws NoRecordsFetchedException, InvalidInputException;
+
+    void assignRegionToUser( User adminUser, long regionId, User assigneeUser )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
     void disableNotification( long companyId );
 
@@ -1869,7 +1952,7 @@ public interface OrganizationManagementService
     CustomerSuccessInformation fetchCustomerSuccessInformation( long companyId ) throws InvalidInputException, NoRecordsFetchedException;;
 
     void updateCompanySettings( long companyId, String columnName, Object columnValue );
-    
+
     /**
      * Method will return all social survey admins
      * @return Map<String, String>
@@ -1925,6 +2008,9 @@ public interface OrganizationManagementService
      */
     public String saveLinkedInProfileUrl( String entityType, long entityId, String linkedInprofileUrl ) throws InvalidInputException;
 
+    public void updateSettings( String entityType, long entityId, Map<String, Object> settings ) throws InvalidInputException;
+
+    public void updateSettingsForLowerHierarchy( String entityType, long entityId, Map<String, Object> settings ) throws InvalidInputException;
 
     /**
      * Method to delete linkedin profiel url

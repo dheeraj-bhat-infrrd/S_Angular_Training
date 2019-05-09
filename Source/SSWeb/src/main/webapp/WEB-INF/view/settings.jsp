@@ -5,9 +5,11 @@
 
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
 <c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
+<c:set value="${user.userId}" var="userId"/>
 <c:if test="${not empty accountSettings && not empty accountSettings.survey_settings}">
 	<c:set value="${accountSettings.survey_settings}" var="surveysettings"></c:set>
 </c:if>
+<c:set var="highestrole" value="${highestrole}"></c:set>
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
@@ -61,11 +63,74 @@
 									<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 								</div>
 							</div>
-							<div class="margin-top-twenty">
+					    <div class="margin-top-twenty">
 								<div id="atpst-chk-box" class="float-left bd-check-img"></div>
 								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
-							</div>							
+							</div>
+
+							<!-- Reply Settings Start -->
+							<c:if test="${columnName == 'companyId' and isRealTechOrSSAdmin == true}">
+								<div class="ss-admin-comp-settings" style="margin-top:0px">	
+									<div id="allow-reply-all-chk-box" class="float-left bd-check-img"></div>
+									<input type="hidden" id="at-pst-cb" name="allowreplytoall" value="${isReplyEnabledForCompany}">
+									<div class="float-left bd-check-txt">Allow reply to reviews for company</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>	
+							</c:if>
+							<c:if test="${ (not empty companyAdminSwitchId) or isRealTechOrSSAdmin == true or user.isOwner == 1}">
+									<c:choose>
+							      <c:when test="${isReplyEnabledForCompany}">
+											<div class="manage-reply-setting-section width-three-five-zero">		
+										</c:when>		
+										<c:otherwise>
+											<div class="manage-reply-setting-section width-three-five-zero hide">		
+										</c:otherwise>
+									</c:choose>							
+
+										<div class="st-score-rt-top width-three-five-zero"><spring:message code="label.scoretoreply.min.key" /></div>
+							        
+										<c:choose>
+							      	<c:when test="${isReplyEnabled}">
+												<div class="st-score-rt-line2 clearfix">		
+											</c:when>		
+											<c:otherwise>
+												<div class="st-score-rt-line2 clearfix disable">	
+											</c:otherwise>
+										</c:choose>												
+								        <div class="st-rating-wrapper settings-rating-wrapper float-left clearfix" id="rating-min-reply-parent"></div>
+								        <div class="st-rating-txt float-left">
+									        <!-- set the min rating -->
+									        <input type="text" name="rating-min-reply" id="rating-min-reply" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${minreplyscore}">
+									        <div class="st-dd-wrapper hide" id="st-dd-wrapper-min-reply"></div>
+								        </div>
+							        </div>
+
+							        <div class="margin-top-twenty">
+								        <div id="allow-reply-chk-box" class="float-left bd-check-img"></div>
+								        <input type="hidden" id="at-pst-cb" name="allowreply" value="${isReplyEnabled}">
+								        <div class="float-left bd-check-txt">Allow user to reply to reviews</div>
+							       </div>
+							       
+							       <%-- Don't show 'Apply to all users' button to Agents --%>
+							       <c:if test="${profilemasterid != 4}">
+									 <div class="propagate-btn-section">
+										 		<button type="button" class="propagate-btn" title="Apply the reply settings to lower hierarchy">Apply to all users</button>
+									 </div>
+								   </c:if>
+								   
+								</div>
+							</c:if>	
+							<!-- Reply Settings End -->
+
+							<%-- <c:if test="${ (not empty companyAdminSwitchId or isRealTechOrSSAdmin == true or user.isOwner == 1) and columnName == 'companyId' }">
+							         <div class="margin-top-twenty">
+								        <div id="allow-reply-all-chk-box" class="float-left bd-check-img"></div>
+								        <input type="hidden" id="at-pst-cb" name="allowreplytoall" value="${isReplyEnabledForCompany}">
+								        <div class="float-left bd-check-txt">Allow all user to reply on SS reviews</div>
+							        </div>
+							</c:if> --%>						
+
 							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
 									<div class="review-sort-sel-col">
 									<div class="clearfix setting-sel-wrapper">
@@ -82,19 +147,19 @@
 							
 							<c:if test="${ columnName != 'agentId'  or isRealTechOrSSAdmin == true }">
 								<div id="customized-setting-div" class="st-score-rt-top" style="">Customized Feature Settings:</div>
-								<c:if test="${ isRealTechOrSSAdmin == true and columnName != 'companyId' }">
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName != 'companyId' }">	
+								<div class="ss-admin-comp-settings" style="">		
+									<div id="hide-pp-chk-box" class="float-left bd-check-img clear-both"></div>	
+									<input type="hidden" id="hide-pp-cb" name="hidepublicpage" value="${hidePublicPage}">	
+									<div class="float-left customized-settings-child cust-resp-txt">Hide public page</div>	
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>	
+								</div>	
 								<div class="ss-admin-comp-settings" style="">	
-									<div id="hide-pp-chk-box" class="float-left bd-check-img clear-both"></div>
-									<input type="hidden" id="hide-pp-cb" name="hidepublicpage" value="${hidePublicPage}">
-									<div class="float-left customized-settings-child cust-resp-txt">Hide public page</div>
-									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
-								</div>
-								<div class="ss-admin-comp-settings" style="">
-									<div id="hide-bread-crumb-chk-box" class="float-left bd-check-img clear-both"></div>
-									<input type="hidden" id="hide-bc-cb" name="hidebreadcrumb" value="${hideFromBreadCrumb}">
-								<div class="float-left customized-settings-child cust-resp-txt">Hide from bread crumb</div>
-								<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
-								</div>
+									<div id="hide-bread-crumb-chk-box" class="float-left bd-check-img clear-both"></div>	
+									<input type="hidden" id="hide-bc-cb" name="hidebreadcrumb" value="${hideFromBreadCrumb}">	
+								<div class="float-left customized-settings-child cust-resp-txt">Hide from bread crumb</div>	
+								<div class="ss-admin-only-visible">Only visible to SS-Admin</div>	
+								</div>	
 								</c:if>	
 								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 								<div class="ss-admin-comp-settings" style="">	
@@ -138,13 +203,26 @@
 								</c:if>
 								
 								<!-- partner survey settings -->
-								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
-								<div class="ss-admin-comp-settings" style="">
-									<div id="alw-ptnr-srvy-chk-box" class="float-left bd-check-img clear-both"></div>
-									<input type="hidden" id="alw-ptnr-srvy-cb" name="allowpartnersurvey" value="${allowPartnerSurvey}">
-									<div class="float-left customized-settings-child cust-resp-txt">Allow partner survey</div>
-									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
-								</div>
+								<c:if test="${ (isRealTechOrSSAdmin == true and columnName == 'companyId') || (not empty companyAdminSwitchId && (columnName == 'regionId' || columnName == 'branchId' ) ) }">
+									<c:choose>
+										<c:when test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+											<div class="ss-admin-comp-settings" style="">
+												<div id="alw-ptnr-srvy-chk-box" class="float-left bd-check-img clear-both"></div>
+												<input type="hidden" id="alw-ptnr-srvy-cb" name="allowpartnersurvey" value="${allowPartnerSurvey}">
+												<div class="float-left customized-settings-child cust-resp-txt">Allow partner survey</div>
+												<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+											</div>
+										</c:when>
+										<c:otherwise>
+											<c:if test="${ partnerSurveyAllowedAtCompany == true }">
+												<div class="ss-comp-settings" style="">
+													<div id="alw-ptnr-srvy-chk-box" class="float-left bd-check-img clear-both"></div>
+													<input type="hidden" id="alw-ptnr-srvy-cb" name="allowpartnersurvey" value="${allowPartnerSurvey}">
+													<div class="float-left customized-settings-child cust-resp-txt">Allow partner survey</div>
+												</div>
+											</c:if>
+										</c:otherwise>
+									</c:choose>
 								</c:if>
 								
 								<!-- transaction monitor settings -->
@@ -254,6 +332,13 @@
 								</div>
 							</div>
 							</c:if>
+							<c:if test="${ ( not empty companyAdminSwitchId || highestrole == 1 ) && ( columnName == 'agentId' || columnName == 'branchId' || columnName == 'regionId' ) }">
+								<div class="margin-top-twenty">
+									<div id="conf-sec-flow-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="conf-sec-flow-cb" name="confsecworkflow" value="${allowToConfigSecondaryWorkflow}">
+									<div class="float-left listing-access-txt cust-resp-txt">Allow to configure secondary workflow</div>
+								</div>
+							</c:if>
 			
 							<c:if test="${ columnName == 'companyId' }">
 							<div class="ss-comp-settings" style="">
@@ -290,7 +375,7 @@
 		
 		<%-- Starting code for Social Authentication --%>
 		
-		<c:if test="${profilemasterid == 1}">
+		<c:if test="${profilemasterid == 1 || ( ( (columnName == 'agentId' || columnName == 'branchId' || columnName == 'regionId') &&  not empty companyAdminSwitchId ) && allowToConfigSecondaryWorkflow == true) }">
 			<c:set var="containerclass" value="um-top-container"/>
 		</c:if>
 		<div class="${containerclass}">
@@ -309,143 +394,381 @@
 			</div>
 		</div>
 		
-		<!-- Starting code for Text for Happy/Neutral/Sad flow -->
+		<!-- URL Redirection Upon Submit Changes -->
 		<c:if test="${profilemasterid == 1 || accountMasterId == 1}">
 			<div class="um-top-container">
-				<div class="um-header  margin-top-25"><spring:message code="label.flow.text.key" /></div>
-			<div class="um-header-detail"><spring:message code="label.flow.desc.text.key" /></div>
-				<div class="clearfix um-panel-content">
-					<div class="bd-mcq-row clearfix txtareaRow">
-						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.happy.label.text" /></div>
-						<textarea id="happy-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
-						<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
-					</div>
-					
-					<div class="bd-mcq-row clearfix txtareaRow">
-						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.ok.label.text" /></div>
-						<textarea id="neutral-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
-						<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
-					</div>
-					
-					<div class="bd-mcq-row clearfix txtareaRow">
-						<div class="float-left cs-gq-lbl"><spring:message code="label.flow.sad.label.text" /></div>
-						<textarea id="sad-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
-						<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
-					</div>
+				<div class="um-header-detail">
+					<spring:message code="label.complete.desc.url.key" />
 				</div>
-				<div class="um-gateway-cont">
-					<div class="um-header-detail"><spring:message code="label.complete.desc.text.key" /></div>
+				<div class="clearfix um-panel-content">
+					<ul class="accordion"
+						style="padding-left: 0px; margin: 0 10px 10px 10px; width: 75%">
+						<li class="col-lg-13 col-md-12 col-sm-6 col-xs-6 "><a href="#"
+							class="email-category">Redirect URL Parameters</a>
+							<div class="email-content" style="">
+								<div
+									class="col-lg-7 col-md-6 col-sm-12 col-xs-12 float-left legend-height"
+									style="height: 300px">
+									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 float-left">
+										<div class="legend-header">Field</div>
+										<div class="legend-wrapper">
+											<span class="legend">[SURVEY_SOURCE_ID] </span>
+										</div>
+										<div class="legend-wrapper">
+											<span class="legend">[PARTICIPANT_TYPE] </span>
+										</div>
+										<div class="legend-wrapper">
+											<span class="legend">[TRANSACTION_TYPE] </span>
+										</div>
+										<div class="legend-wrapper">
+											<span class="legend">[STATE] </span>
+										</div>
+										<div class="legend-wrapper">
+											<span class="legend">[CITY]</span>
+										</div>
+										<div class="legend-wrapper">
+											<span class="legend">[CUSTOM_FIELD_ONE] </span>
+										</div>
+										<div class="legend-wrapper">
+											<span class="legend">[CUSTOM_FIELD_TWO] </span>
+										</div>
+										<div class="legend-wrapper">
+											<span class="legend">[CUSTOM_FIELD_THREE]</span>
+										</div>
+										<div class="legend-wrapper">
+											<span class="legend">[CUSTOM_FIELD_FOUR]</span>
+										</div>
+										<div class="legend-wrapper">
+											<span class="legend">[CUSTOM_FIELD_FIVE] </span>
+										</div>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<div class="legend-header">Description</div>
+										<div class="legend-wrapper" title="Survey Source ID">Survey
+											Source ID</div>
+										<div class="legend-wrapper" title="Participant Type">Survey
+											Participant Type</div>
+										<div class="legend-wrapper" title="Transaction Type">Type
+											of transaction</div>
+										<div class="legend-wrapper" title="State">Customer State</div>
+										<div class="legend-wrapper" title="City">Customer City</div>
+										<div class="legend-wrapper" title="Custom Field One">Custom
+											Field One</div>
+										<div class="legend-wrapper" title="Custom Field Two">Custom
+											Field Two</div>
+										<div class="legend-wrapper" title="Custom Field Three">Custom
+											Field Three</div>
+										<div class="legend-wrapper" title="Custom Field Four">Custom
+											Field Four</div>
+										<div class="legend-wrapper" title="Custom Field five">Custom
+											Field Five</div>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+					<br> <br>
 					<div class="clearfix um-panel-content">
 						<div class="bd-mcq-row clearfix txtareaRow">
-							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.happy.label.text" /></div>
-							<textarea id="happy-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
-							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
+							<div class="float-left cs-gq-lbl">
+								<spring:message code="label.complete.happy.url" />
+							</div>
+							<textarea id="happy-complete-url"
+								class="float-left textarea-bd-mcq-txt" style=""
+								placeholder='<spring:message code="label.redirect.url.placeholder.key" />'></textarea>
+	
 						</div>
-						
 						<div class="bd-mcq-row clearfix txtareaRow">
-							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.ok.label.text" /></div>
-							<textarea id="neutral-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
-							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
+							<div class="float-left cs-gq-lbl">
+								<spring:message code="label.complete.ok.url" />
+							</div>
+							<textarea id="ok-complete-url"
+								class="float-left textarea-bd-mcq-txt" style=""
+								placeholder='<spring:message code="label.redirect.url.placeholder.key" />'></textarea>
+	
 						</div>
-						
 						<div class="bd-mcq-row clearfix txtareaRow">
-							<div class="float-left cs-gq-lbl"><spring:message code="label.complete.sad.label.text" /></div>
-							<textarea id="sad-text-complete" class="float-left textarea-bd-mcq-txt" style=""></textarea>
-							<div class="float-left reset-icon cursor-pointer"><spring:message code="label.reset.key" /></div>
+							<div class="float-left cs-gq-lbl">
+								<spring:message code="label.complete.sad.url" />
+							</div>
+							<textarea id="sad-complete-url"
+								class="float-left textarea-bd-mcq-txt" style=""
+								placeholder='<spring:message code="label.redirect.url.placeholder.key" />'></textarea>
+	
 						</div>
 					</div>
-</div>
-				
-						<!-- URL Redirection Upon Submit Changes -->
-
-				
-					<div class="um-header-detail"><spring:message code="label.complete.desc.url.key" /></div>
-							
-					<ul class="accordion" style="padding-left:0px;margin: 0 10px 10px 10px;width:75%">
-					<li class="col-lg-13 col-md-12 col-sm-6 col-xs-6 "><a href="#" class="email-category">Redirect URL Parameters</a>
-						<div class="email-content" style="">
-							<div class="col-lg-7 col-md-6 col-sm-12 col-xs-12 float-left legend-height" style="height:300px">
-								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 float-left">
-									<div class="legend-header">Field</div>
-									<div class="legend-wrapper">
-										<span class="legend">[SURVEY_SOURCE_ID] </span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[PARTICIPANT_TYPE] </span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[TRANSACTION_TYPE] </span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[STATE] </span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[CITY]</span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[CUSTOM_FIELD_ONE] </span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[CUSTOM_FIELD_TWO] </span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[CUSTOM_FIELD_THREE]</span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[CUSTOM_FIELD_FOUR]</span>
-									</div>
-									<div class="legend-wrapper">
-										<span class="legend">[CUSTOM_FIELD_FIVE] </span>
-									</div>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-									<div class="legend-header" >Description</div>
-									<div class="legend-wrapper" title="Survey Source ID">Survey Source ID</div>
-									<div class="legend-wrapper" title="Participant Type">Survey Participant Type</div>
-									<div class="legend-wrapper" title="Transaction Type">Type of transaction</div>
-									<div class="legend-wrapper" title="State">Customer State</div>
-									<div class="legend-wrapper" title="City">Customer City</div>
-									<div class="legend-wrapper" title="Custom Field One">Custom Field One</div>
-									<div class="legend-wrapper" title="Custom Field Two">Custom Field Two</div>
-									<div class="legend-wrapper" title="Custom Field Three">Custom Field Three</div>
-									<div class="legend-wrapper" title="Custom Field Four">Custom Field Four</div>
-									<div class="legend-wrapper" title="Custom Field five">Custom Field Five</div>
-								</div>
-							</div>				
-			</div></li></ul>
-			<br><br>
-			<div class="clearfix um-panel-content">
-					<div class="bd-mcq-row clearfix txtareaRow">
-						<div class="float-left cs-gq-lbl">
-							<spring:message code="label.complete.happy.url" />
-						</div>
-						<textarea id="happy-complete-url"
-							class="float-left textarea-bd-mcq-txt" style="" placeholder='<spring:message code="label.redirect.url.placeholder.key" />'></textarea>
-						
-					</div>
-					<div class="bd-mcq-row clearfix txtareaRow">
-						<div class="float-left cs-gq-lbl">
-							<spring:message code="label.complete.ok.url" />
-						</div>
-						<textarea id="ok-complete-url"
-							class="float-left textarea-bd-mcq-txt" style="" placeholder='<spring:message code="label.redirect.url.placeholder.key" />'></textarea>
+				</div>
+			</div>
+		</c:if>
 		
-					</div>
-					<div class="bd-mcq-row clearfix txtareaRow">
-						<div class="float-left cs-gq-lbl">
-							<spring:message code="label.complete.sad.url" />
+		<!-- Starting code for Text for Happy/Neutral/Sad flow -->
+		<c:if
+			test="${profilemasterid == 1 || accountMasterId == 1 || ( ( columnName == 'agentId' || columnName == 'branchId' || columnName == 'regionId' ) && allowToConfigSecondaryWorkflow == true )}">
+			<c:choose>
+				<c:when
+					test="${ allowPartnerSurvey == true && ( columnName == 'companyId'  || ( ( columnName == 'agentId' || columnName == 'branchId' || columnName == 'regionId' ) && ( allowToConfigSecondaryWorkflow == true ) ) ) }">
+					<div style="padding-bottom: 20px;">
+						<div class="um-header  margin-top-25">
+							<spring:message code="label.flow.text.key" />
 						</div>
-						<textarea id="sad-complete-url"
-							class="float-left textarea-bd-mcq-txt" style="" placeholder='<spring:message code="label.redirect.url.placeholder.key" />'></textarea>
-				
-				</div>
-				</div>
-				
+						<ul class="nav nav-tabs" role="tablist">
+							<li class="active"><a id="customer-tab-id"
+								href="#customer-tab" role="tab" data-toggle="tab" data-iden="1">
+									Customer Setting </a></li>
+							<li><a id="partner-tab-id" href="#partner-tab" role="tab"
+								data-toggle="tab" data-iden="2"> Partner Setting </a></li>
+						</ul>
+						<div class="tab-content" style="border: #d2dedf 1px solid;">
+							<div id="customer-survey-panel-id-1"
+								class="clearfix um-panel-content" style="margin-left: 10px;">
+								<div class="um-header-detail">
+									<spring:message code="label.flow.desc.text.key" />
+								</div>
+								<div class="bd-mcq-row clearfix txtareaRow">
+									<div class="float-left cs-gq-lbl">
+										<spring:message code="label.flow.happy.label.text" />
+									</div>
+									<textarea id="happy-text"
+										class="float-left textarea-bd-mcq-txt" style=""></textarea>
+									<div class="float-left reset-icon cursor-pointer">
+										<spring:message code="label.reset.key" />
+									</div>
+								</div>
 
-				
-				
-				</div>
-				</c:if>
+								<div class="bd-mcq-row clearfix txtareaRow">
+									<div class="float-left cs-gq-lbl">
+										<spring:message code="label.flow.ok.label.text" />
+									</div>
+									<textarea id="neutral-text"
+										class="float-left textarea-bd-mcq-txt" style=""></textarea>
+									<div class="float-left reset-icon cursor-pointer">
+										<spring:message code="label.reset.key" />
+									</div>
+								</div>
+
+								<div class="bd-mcq-row clearfix txtareaRow">
+									<div class="float-left cs-gq-lbl">
+										<spring:message code="label.flow.sad.label.text" />
+									</div>
+									<textarea id="sad-text" class="float-left textarea-bd-mcq-txt"
+										style=""></textarea>
+									<div class="float-left reset-icon cursor-pointer">
+										<spring:message code="label.reset.key" />
+									</div>
+								</div>
+							</div>
+							<div id="customer-survey-panel-id-2" class="um-gateway-cont"
+								style="margin-left: 10px;">
+								<div class="um-header-detail" style="margin-left: 15px;">
+									<spring:message code="label.complete.desc.text.key" />
+								</div>
+								<div class="clearfix um-panel-content">
+									<div class="bd-mcq-row clearfix txtareaRow">
+										<div class="float-left cs-gq-lbl">
+											<spring:message code="label.complete.happy.label.text" />
+										</div>
+										<textarea id="happy-text-complete"
+											class="float-left textarea-bd-mcq-txt" style=""></textarea>
+										<div class="float-left reset-icon cursor-pointer">
+											<spring:message code="label.reset.key" />
+										</div>
+									</div>
+
+									<div class="bd-mcq-row clearfix txtareaRow">
+										<div class="float-left cs-gq-lbl">
+											<spring:message code="label.complete.ok.label.text" />
+										</div>
+										<textarea id="neutral-text-complete"
+											class="float-left textarea-bd-mcq-txt" style=""></textarea>
+										<div class="float-left reset-icon cursor-pointer">
+											<spring:message code="label.reset.key" />
+										</div>
+									</div>
+
+									<div class="bd-mcq-row clearfix txtareaRow">
+										<div class="float-left cs-gq-lbl">
+											<spring:message code="label.complete.sad.label.text" />
+										</div>
+										<textarea id="sad-text-complete"
+											class="float-left textarea-bd-mcq-txt" style=""></textarea>
+										<div class="float-left reset-icon cursor-pointer">
+											<spring:message code="label.reset.key" />
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- partner survey setting -->
+							<div id="partner-survey-panel-id-1"
+								class="clearfix um-panel-content"
+								style="margin-left: 10px; display: none;">
+								<div class="um-header-detail">
+									<spring:message code="label.partner.flow.desc.text.key" />
+								</div>
+								<div class="bd-mcq-row clearfix txtareaRow">
+									<div class="float-left cs-gq-lbl">
+										<spring:message code="label.flow.happy.label.text" />
+									</div>
+									<textarea id="happy-text-partner"
+										class="float-left textarea-bd-mcq-txt" style=""></textarea>
+									<div class="float-left reset-icon cursor-pointer">
+										<spring:message code="label.reset.key" />
+									</div>
+								</div>
+
+								<div class="bd-mcq-row clearfix txtareaRow">
+									<div class="float-left cs-gq-lbl">
+										<spring:message code="label.flow.ok.label.text" />
+									</div>
+									<textarea id="neutral-text-partner"
+										class="float-left textarea-bd-mcq-txt" style=""></textarea>
+									<div class="float-left reset-icon cursor-pointer">
+										<spring:message code="label.reset.key" />
+									</div>
+								</div>
+
+								<div class="bd-mcq-row clearfix txtareaRow">
+									<div class="float-left cs-gq-lbl">
+										<spring:message code="label.flow.sad.label.text" />
+									</div>
+									<textarea id="sad-text-partner"
+										class="float-left textarea-bd-mcq-txt" style=""></textarea>
+									<div class="float-left reset-icon cursor-pointer">
+										<spring:message code="label.reset.key" />
+									</div>
+								</div>
+							</div>
+							<div id="partner-survey-panel-id-2" class="um-gateway-cont"
+								style="margin-left: 10px; display: none;">
+								<div class="um-header-detail" style="margin-left: 15px;">
+									<spring:message code="label.partner.complete.desc.text.key" />
+								</div>
+								<div class="clearfix um-panel-content">
+									<div class="bd-mcq-row clearfix txtareaRow">
+										<div class="float-left cs-gq-lbl">
+											<spring:message code="label.complete.happy.label.text" />
+										</div>
+										<textarea id="happy-text-complete-partner"
+											class="float-left textarea-bd-mcq-txt" style=""></textarea>
+										<div class="float-left reset-icon cursor-pointer">
+											<spring:message code="label.reset.key" />
+										</div>
+									</div>
+
+									<div class="bd-mcq-row clearfix txtareaRow">
+										<div class="float-left cs-gq-lbl">
+											<spring:message code="label.complete.ok.label.text" />
+										</div>
+										<textarea id="neutral-text-complete-partner"
+											class="float-left textarea-bd-mcq-txt" style=""></textarea>
+										<div class="float-left reset-icon cursor-pointer">
+											<spring:message code="label.reset.key" />
+										</div>
+									</div>
+
+									<div class="bd-mcq-row clearfix txtareaRow">
+										<div class="float-left cs-gq-lbl">
+											<spring:message code="label.complete.sad.label.text" />
+										</div>
+										<textarea id="sad-text-complete-partner"
+											class="float-left textarea-bd-mcq-txt" style=""></textarea>
+										<div class="float-left reset-icon cursor-pointer">
+											<spring:message code="label.reset.key" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</c:when>
+			</c:choose>
+			<c:choose>
+				<c:when
+					test="${ allowPartnerSurvey != true && ( columnName == 'companyId'  || ( ( columnName == 'agentId' || columnName == 'branchId' || columnName == 'regionId' ) && ( not empty companyAdminSwitchId || allowToConfigSecondaryWorkflow == true ) ) ) }">
+					<div class = "um-top-container" style="padding-bottom: 20px;">
+						<div class="um-header  margin-top-25">
+							<spring:message code="label.flow.text.key" />
+						</div>
+						<div class="clearfix um-panel-content">
+							<div class="um-header-detail">
+								<spring:message code="label.flow.desc.text.key" />
+							</div>
+							<div class="bd-mcq-row clearfix txtareaRow">
+								<div class="float-left cs-gq-lbl">
+									<spring:message code="label.flow.happy.label.text" />
+								</div>
+								<textarea id="happy-text-customer"
+									class="float-left textarea-bd-mcq-txt" style=""></textarea>
+								<div class="float-left reset-icon cursor-pointer">
+									<spring:message code="label.reset.key" />
+								</div>
+							</div>
+
+							<div class="bd-mcq-row clearfix txtareaRow">
+								<div class="float-left cs-gq-lbl">
+									<spring:message code="label.flow.ok.label.text" />
+								</div>
+								<textarea id="neutral-text-customer"
+									class="float-left textarea-bd-mcq-txt" style=""></textarea>
+								<div class="float-left reset-icon cursor-pointer">
+									<spring:message code="label.reset.key" />
+								</div>
+							</div>
+
+							<div class="bd-mcq-row clearfix txtareaRow">
+								<div class="float-left cs-gq-lbl">
+									<spring:message code="label.flow.sad.label.text" />
+								</div>
+								<textarea id="sad-text-customer"
+									class="float-left textarea-bd-mcq-txt" style=""></textarea>
+								<div class="float-left reset-icon cursor-pointer">
+									<spring:message code="label.reset.key" />
+								</div>
+							</div>
+						</div>
+						<div class="um-gateway-cont">
+							<div class="um-header-detail">
+								<spring:message code="label.complete.desc.text.key" />
+							</div>
+							<div class="clearfix um-panel-content">
+								<div class="bd-mcq-row clearfix txtareaRow">
+									<div class="float-left cs-gq-lbl">
+										<spring:message code="label.complete.happy.label.text" />
+									</div>
+									<textarea id="happy-text-complete-customer"
+										class="float-left textarea-bd-mcq-txt" style=""></textarea>
+									<div class="float-left reset-icon cursor-pointer">
+										<spring:message code="label.reset.key" />
+									</div>
+								</div>
+
+								<div class="bd-mcq-row clearfix txtareaRow">
+									<div class="float-left cs-gq-lbl">
+										<spring:message code="label.complete.ok.label.text" />
+									</div>
+									<textarea id="neutral-text-complete-customer"
+										class="float-left textarea-bd-mcq-txt" style=""></textarea>
+									<div class="float-left reset-icon cursor-pointer">
+										<spring:message code="label.reset.key" />
+									</div>
+								</div>
+
+								<div class="bd-mcq-row clearfix txtareaRow">
+									<div class="float-left cs-gq-lbl">
+										<spring:message code="label.complete.sad.label.text" />
+									</div>
+									<textarea id="sad-text-complete-customer"
+										class="float-left textarea-bd-mcq-txt" style=""></textarea>
+									<div class="float-left reset-icon cursor-pointer">
+										<spring:message code="label.reset.key" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</c:when>
+			</c:choose>
+		</c:if>
 		
 		<!-- Starting code for configuring opt-out text -->
 		<!-- <c:if test="${profilemasterid == 1 || accountMasterId == 1}">
@@ -539,6 +862,15 @@ $(document).ready(function() {
 			$('#enable-login-chk-box').removeClass('bd-check-img-checked');
 		}
 	}*/
+	if( "${companyAdminSwitchId}" != undefined ){
+
+		if("${allowToConfigSecondaryWorkflow}" != undefined && "${allowToConfigSecondaryWorkflow}" == "true"){
+			$('#conf-sec-flow-chk-box').removeClass('bd-check-img-checked');
+		}
+		else {
+			$('#conf-sec-flow-chk-box').addClass('bd-check-img-checked');
+		}
+	}
 	
 	if( "${columnName}" != "agentId" && "${columnName}" != "companyId" ){
 		$('#customized-setting-div').addClass('margin-top-hundred');
@@ -562,6 +894,14 @@ $(document).ready(function() {
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}
 	
+	if("${isReplyEnabled}" == "false"){
+		$('#allow-reply-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${isReplyEnabledForCompany}" == "false"){
+		$('#allow-reply-all-chk-box').addClass('bd-check-img-checked');
+	}
+	
 	if("${autoPostLinkToUserSite}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
 		$('#atpst-lnk-usr-ste-chk-box').addClass('bd-check-img-checked');
 	}
@@ -570,7 +910,7 @@ $(document).ready(function() {
 		$('#vndsta-access-chk-box').addClass('bd-check-img-checked');
 	}
 
-	if("${allowPartnerSurvey}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
+	if("${allowPartnerSurvey}" == "false" && ( "${isRealTechOrSSAdmin}" == "true" || "${companyAdminSwitchId}" != undefined ) ){
 		$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
 	}
 	
@@ -640,9 +980,32 @@ $(document).ready(function() {
 		$('#rating-min-post').on('click', function(){
 			$('#email-options').hide();
 			$('#sort-options').hide();
+			$('#st-dd-wrapper-min-reply').hide();
 			$('#st-dd-wrapper-survey-mail-thrs').hide();
-			$('#st-dd-wrapper-min-post').slideToggle(200);
+
+			if($('#st-dd-wrapper-min-post').is(':visible'))
+				$('#st-dd-wrapper-min-post').slideUp(200);
+			else
+				$('#st-dd-wrapper-min-post').slideDown(200);
+
 			$(document).mouseup(ratingMouseUp);
+		});
+		
+		autoAppendReplyRatingDropdown('#st-dd-wrapper-min-reply', "st-dd-item st-dd-item-min-reply");
+		changeRatingPattern($('#rating-min-reply').val(), $('#rating-min-reply-parent'));
+		$('#rating-min-reply').off('click');
+		$('#rating-min-reply').on('click', function(){
+			$('#email-options').hide();
+			$('#sort-options').hide();
+			$('#st-dd-wrapper-min-post').hide();
+			$('#st-dd-wrapper-survey-mail-thrs').hide();
+
+			if($('#st-dd-wrapper-min-reply').is(':visible'))
+			 $('#st-dd-wrapper-min-reply').slideUp(200);
+			else
+			 $('#st-dd-wrapper-min-reply').slideDown(200);
+
+			$(document).mouseup(replyScoreMouseUp);
 		});
 		
 		autoAppendSortOrderDropdown('#sort-options', "sort-option-item");
@@ -691,7 +1054,6 @@ $(document).ready(function() {
 		if(nuTxt == ""){
 			nuTxt = "${defaultSurveyProperties.neutralText}";
 		}
-		
 		var sadTxt="${surveysettings.sadText}";
 		if(sadTxt == ""){
 			sadTxt = "${defaultSurveyProperties.sadText}";
@@ -709,11 +1071,41 @@ $(document).ready(function() {
 			sadTxtComplete = "${defaultSurveyProperties.sadTextComplete}";
 		}
 		
+		var happyTxtPartner = "${surveysettings.happyTextPartner}";
+		if(happyTxtPartner == ""){
+			happyTxtPartner = '${defaultSurveyPropertiesForPartner.happyTextPartner}';
+		}
+		var nuTxtPartner = "${surveysettings.neutralTextPartner}";
+		if(nuTxtPartner == ""){
+			nuTxtPartner = "${defaultSurveyPropertiesForPartner.neutralTextPartner}";
+		}
+		var sadTxtPartner = "${surveysettings.sadTextPartner}";
+		if(sadTxtPartner == ""){
+			sadTxtPartner = "${defaultSurveyPropertiesForPartner.sadTextPartner}";
+		}
+		var happyTxtCompletePartner = "${surveysettings.happyTextCompletePartner}";
+		if(happyTxtCompletePartner == ""){
+			happyTxtCompletePartner = "${defaultSurveyPropertiesForPartner.happyTextCompletePartner}";
+		}
+		var nuTxtCompletePartner = "${surveysettings.neutralTextCompletePartner}";
+		if(nuTxtCompletePartner == ""){
+			nuTxtCompletePartner = "${defaultSurveyPropertiesForPartner.neutralTextCompletePartner}";
+		}
+		var sadTxtCompletePartner = "${surveysettings.sadTextCompletePartner}";
+		if(sadTxtCompletePartner == ""){
+			sadTxtCompletePartner = "${defaultSurveyPropertiesForPartner.sadTextCompletePartner}";
+		}
 		var happyUrl="${surveysettings.happyUrl}";
 		var okUrl="${surveysettings.okUrl}";
 		var sadUrl="${surveysettings.sadUrl}";
 		
-		paintTextForMood(happyTxt, nuTxt,sadTxt,happyTxtComplete, nuTxtComplete,sadTxtComplete,happyUrl,okUrl,sadUrl);		
+		if("${allowPartnerSurvey}" == "true") {
+			paintTextForMood(happyTxt, nuTxt, sadTxt, happyTxtComplete, nuTxtComplete, sadTxtComplete, happyUrl, okUrl, sadUrl);
+			paintTextForMoodPartner(happyTxtPartner, nuTxtPartner, sadTxtPartner, happyTxtCompletePartner, nuTxtCompletePartner, sadTxtCompletePartner);
+		}
+		else {
+			paintTextForMoodCustomer(happyTxt, nuTxt, sadTxt, happyTxtComplete, nuTxtComplete, sadTxtComplete, happyUrl, okUrl, sadUrl);
+		}
 	}
 	
 });

@@ -1,7 +1,11 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.*;
+import java.util.regex.Pattern;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+
 import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
@@ -34,8 +38,7 @@ import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.Map.Entry;
 
 /**
  * Mongo implementation of settings
@@ -133,6 +136,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SEND_EMAIL_FROM_COMPANY = "sendEmailFromCompany";
     public static final String KEY_HIDE_FROM_BREAD_CRUMB = "hideFromBreadCrumb";
     public static final String KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA = "allowOverrideForSocialMedia";
+    public static final String KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW = "allowConfigureSecondaryWorkflow";
 
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
@@ -223,7 +227,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String NOTIFICATION_ISDISABLED = "notification.isDisabled";
 
     public static final String KEY_ALERT_EMAIL = "crm_info.alertEmail";
-    
     public static final String KEY_CUSTOMER_SUCCESS_ID = "customerSuccessId";
     public static final String KEY_CUSTOMER_SUCCESS_NAME = "customerSuccessName";
     public static final String KEY_CUSTOMER_SUCCESS_OWNER = "customerSuccessOwner";
@@ -249,6 +252,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_PHONE = "phone";
     public static final String KEY_LAST_CONVERSATION_DATE = "lastConversationDate";
     public static final String KEY_NOTES = "notes";
+    
+    //survey settings update
+    public static final String KEY_REVIEW_REPLY_SCORE = "survey_settings.reviewreplyScore";
+    public static final String KEY_SURVEY_SETTINGS_MINIMUM_SOCIAL_POST_SCORE = "survey_settings.auto_post_score";
+    public static final String KEY_SHOW_SURVEY_ABOVE_SCORE = "survey_settings.show_survey_above_score";
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -420,6 +428,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.IDEN ).in( userIdList ) );
         Update update = new Update().set( MongoOrganizationUnitSettingDaoImpl.KEY_IS_LOGIN_PREVENTED, isLoginPrevented );
+        update.set(MongoOrganizationUnitSettingDaoImpl.KEY_MODIFIED_ON,System.currentTimeMillis());
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
     }
 
@@ -2627,7 +2636,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     
     @Override
     public void updateOrganizationSettingsByQuery( Map<String, Object> queryMap, Map<String, Object> updateMap,
-        String collectionName ) throws Exception
+        String collectionName ) 
     {
         LOG.debug( "updateOrganizationSettingsByQuery started" );
         Query query = new Query();
@@ -2679,6 +2688,50 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria(Criteria.where(KEY_IDEN).in(entityIds));
         query.fields().exclude( ID ).include(PROFILE_IMAGE_URL).include(KEY_IDEN);
         return mongoTemplate.find( query, ProfileImageUrlEntity.class, collectionName );
+    }
 
+    @Override
+    public void updateOrganizationUnitSettingsByInCriteria( Map<String, Object> updateMap, String criteriaKey,
+        List<Object> criteriaValue, String collection) {
+
+        if( LOG.isDebugEnabled() ) {
+            LOG.debug( "Updating minimumSocialPostScore for the user {}", criteriaValue);
+        }
+        Query query = new Query();
+        Update update = new Update();
+        query.addCriteria( Criteria.where( criteriaKey ).in( criteriaValue ) );
+
+        for ( Map.Entry<String,Object> entry : updateMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            update.set( key, value );
+        }
+        update.set( KEY_MODIFIED_ON, System.currentTimeMillis() );
+        mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collection);
+
+        if( LOG.isDebugEnabled() ) {
+            LOG.debug( "Updated OrganizationUnitSettings for the user {}", criteriaValue);
+        }
+    }
+
+
+    @Override
+    public void updateSettingsForList( String collection, Map<String, Object> settings, List<Long> idenList )
+    {
+        Query query = new  Query();
+        Update update = new Update();
+        query.addCriteria(Criteria.where(KEY_IDEN).in(idenList));
+
+        //Add all the settings to be updated
+        for(Entry<String, Object> setting : settings.entrySet()) {
+            update.set( setting.getKey(), setting.getValue() );
+        }
+        
+        //update the modifiedOn field. That's important, remember?
+        update.set( KEY_MODIFIED_ON, System.currentTimeMillis() );
+        
+        mongoTemplate.updateMulti( query, update, collection );
+
+        LOG.info( "Finished updating {} with settings: {} having idens:{}", collection, settings, idenList);
     }
 }
