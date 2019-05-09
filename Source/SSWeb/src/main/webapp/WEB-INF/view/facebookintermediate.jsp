@@ -87,6 +87,7 @@ $(document).ready(function() {
 	var columnValue = "${columnValue}";
 	var socialNetwork = "${socialNetwork}";
 	var isFbImagePopup = "${isFbImagePopup}";
+	var profImage = "${profileImage}";
 
 	if(isFbImagePopup == 'true'){
 		if(profImage != null && profImage != undefined && profImage != ''){
@@ -96,7 +97,6 @@ $(document).ready(function() {
 				closeSMPopup(closeSMParam);
 				window.close();
 			}, 3000);
-			
 		}
 	} else {
 		if(isFixSocialMedia ==  1){

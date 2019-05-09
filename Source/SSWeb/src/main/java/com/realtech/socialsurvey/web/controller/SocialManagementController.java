@@ -1,6 +1,12 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,10 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
@@ -90,6 +98,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -239,7 +248,8 @@ public class SocialManagementController
     @Value ( "${ZILLOW_LENDER_API_ENDPOINT}")
     private String zillowLenderApiEndpoint;
     
-    
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
@@ -250,6 +260,11 @@ public class SocialManagementController
     @Autowired
     private ZillowIntergrationApiBuilder zillowIntegrationApiBuilder;
 
+    @Value ( "${CDN_PATH}")
+    private String amazonEndpoint;
+
+    @Value ( "${AMAZON_IMAGE_BUCKET}")
+    private String amazonImageBucket;
 
     /**
      * Returns the social authorization page
@@ -3516,10 +3531,12 @@ public class SocialManagementController
         model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
         model.addAttribute( "isFbImagePopup", "true" );
         LOG.info("returning to facebook intermediate from socialAuth");
-        if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") )
+        if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") ) {
+        	LOG.info("confirm facebook intermediate");
             return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
-        else
+        } else {
             return JspResolver.SOCIAL_AUTH_MESSAGE;
+        }
     }
     
     @RequestMapping ( value = "/facebookauthimage", method = RequestMethod.GET)
@@ -3556,20 +3573,58 @@ public class SocialManagementController
             facebook4j.auth.AccessToken accessToken = null;
             SocialMediaTokens mediaTokens = null;
             List<FacebookPage> facebookPages = new ArrayList<>();
-            try {
-                accessToken = facebook.getOAuthAccessToken( oauthCode,
-                    requestUtils.getRequestServerName( request ) + facebookRedirectImageUri );
-                facebook4j.User fbUser = facebook.getUser( facebook.getId() );
-                profileLink = facebookUri + facebook.getId();
-                profileImageUrl = "http://graph.facebook.com/"+facebook.getId()+"/picture?type=large";
-                LOG.info("ProfilePic url " + profileImageUrl);
-                FacebookPage personalUserAccount = new FacebookPage();
-                personalUserAccount.setId( facebook.getId() );
-                personalUserAccount.setAccessToken( accessToken.getToken() );
-                personalUserAccount.setName( fbUser.getName() );
-                personalUserAccount.setProfileUrl( profileLink );
-                facebookPages.add( personalUserAccount );
-            } catch ( FacebookException e ) {
+			try {
+				accessToken = facebook.getOAuthAccessToken(oauthCode,
+						requestUtils.getRequestServerName(request) + facebookRedirectImageUri);
+				facebook4j.User fbUser = facebook.getUser(facebook.getId());
+				profileLink = facebookUri + facebook.getId();
+				if (facebook.getId() != null) {
+					profileImageUrl = "http://graph.facebook.com/" + facebook.getId()
+							+ "/picture?type=large&redirect=false";
+					LOG.info("ProfilePic url " + profileImageUrl);
+
+					HttpClient httpclient = HttpClientBuilder.create().build();
+					HttpGet httpGetImage = new HttpGet(profileImageUrl);
+					// add request header
+					httpGetImage.setHeader("User-Agent", "Mozilla/5.0");
+					String result = httpclient.execute(httpGetImage, new BasicResponseHandler());
+					LOG.info("response " + result);
+					if (result != null && result.contains("url")) {
+						result = result.substring(result.indexOf("url"));
+						result = result.substring(result.indexOf("http"),result.indexOf(',')-1);
+						result = StringEscapeUtils.unescapeJava(result);
+						LOG.info("url is " + result);
+						URL url = new URL(result);
+						HttpURLConnection httpUrlConn = (HttpURLConnection) url.openConnection();
+						BufferedImage bufferedImage = ImageIO.read(httpUrlConn.getInputStream());
+						LOG.info("BufferedImage " + bufferedImage);
+						// reading image
+						File dir = new File(CommonConstants.USER_IMAGE_DIR);
+						if (!dir.exists()) {
+							dir.mkdirs();
+						}
+						String imageFileName = "FB_UserImage_" + facebook.getId() + CommonConstants.IMAGE_FORMAT_PNG;
+
+						String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR
+								+ CommonConstants.USER_IMAGE_NAME;
+						FileOutputStream fileOuputStream = new FileOutputStream(filePath);
+						ImageIO.write(bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream);
+						fileOuputStream.close();
+
+						File fileLocal = new File(filePath);
+						profileImageUrl = fileUploadService.uploadProfileImageFile(fileLocal, imageFileName, false);
+						profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
+								+ CommonConstants.FILE_SEPARATOR + profileImageUrl;
+						LOG.info("FB image path in amazon is " + profileImageUrl);
+					}
+				}
+				FacebookPage personalUserAccount = new FacebookPage();
+				personalUserAccount.setId(facebook.getId());
+				personalUserAccount.setAccessToken(accessToken.getToken());
+				personalUserAccount.setName(fbUser.getName());
+				personalUserAccount.setProfileUrl(profileLink);
+				facebookPages.add(personalUserAccount);
+			} catch ( FacebookException e ) {
                 LOG.error( "Error while creating access token for facebook: ", e );
             }
             
@@ -3606,7 +3661,7 @@ public class SocialManagementController
             // On auth error
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
-                LOG.error( "Error code : {}", errorCode );
+                 LOG.error( "Error code : {}", errorCode );
                 model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                 return JspResolver.SOCIAL_AUTH_MESSAGE;
             }
@@ -3646,6 +3701,26 @@ public class SocialManagementController
             basicProfileStrResponse = basicProfileStrResponse.substring(basicProfileStrResponse.indexOf("identifier"));
             basicProfileStrResponse = basicProfileStrResponse.substring(basicProfileStrResponse.indexOf("http"), basicProfileStrResponse.indexOf(',')-1);
             LOG.info("Linked in response for image is " + basicProfileStrResponse);
+            
+            URL url = new URL(basicProfileStrResponse);
+            BufferedImage bufferedImage = ImageIO.read( url );
+            // reading image
+            File dir = new File( CommonConstants.USER_IMAGE_DIR );
+            if ( !dir.exists() ) {
+                dir.mkdirs();
+            }
+            String imageFileName = "Lkdn_UserImage_" + CommonConstants.IMAGE_FORMAT_PNG;
+            
+            String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR + CommonConstants.USER_IMAGE_NAME;
+            FileOutputStream fileOuputStream = new FileOutputStream( filePath );
+            ImageIO.write( bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream );
+            fileOuputStream.close();
+            
+            File fileLocal = new File( filePath );
+            basicProfileStrResponse = fileUploadService.uploadProfileImageFile( fileLocal, imageFileName, false );
+            basicProfileStrResponse = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
+                + CommonConstants.FILE_SEPARATOR + basicProfileStrResponse;
+            LOG.info("Amazon S3 link " + basicProfileStrResponse);
             model.addAttribute("profileImage", basicProfileStrResponse);
             
         } catch ( Exception e ) {
@@ -3697,8 +3772,27 @@ public class SocialManagementController
                 if ( twitterUser != null && twitterUser.getScreenName() != null ) {
                     profileLink = CommonConstants.TWITTER_BASE_URL + twitterUser.getScreenName();
                     profileImage = twitterUser.getOriginalProfileImageURL();
-                    model.addAttribute("profileImage", profileImage);
                     LOG.info("Twitter profile image is " + profileImage);
+                    
+                    URL url = new URL(profileImage);
+                    BufferedImage bufferedImage = ImageIO.read( url );
+                    // reading image
+                    File dir = new File( CommonConstants.USER_IMAGE_DIR );
+                    if ( !dir.exists() ) {
+                        dir.mkdirs();
+                    }
+                    String imageFileName = "Twitter_UserImage_" + twitterUser.getId() + CommonConstants.IMAGE_FORMAT_PNG;
+                    
+                    String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR + CommonConstants.USER_IMAGE_NAME;
+                    FileOutputStream fileOuputStream = new FileOutputStream( filePath );
+                    ImageIO.write( bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream );
+                    fileOuputStream.close();
+                    
+                    File fileLocal = new File( filePath );
+                    profileImage = fileUploadService.uploadProfileImageFile( fileLocal, imageFileName, false );
+                    profileImage = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
+                        + CommonConstants.FILE_SEPARATOR + profileImage;
+                    LOG.info("Twitter user image link in s3 is " + profileImage);
                 } else {
                 	LOG.error("User doesn't exist");
                 }
@@ -3711,7 +3805,7 @@ public class SocialManagementController
 
                 throw new NonFatalException( "Unable to procure twitter access token" );
             }
-           
+            model.addAttribute("profileImage", profileImage);
             
         } catch ( Exception e ) {
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );

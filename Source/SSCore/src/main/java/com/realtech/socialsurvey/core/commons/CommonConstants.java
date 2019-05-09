@@ -594,7 +594,9 @@ public interface CommonConstants
     public static final String IMAGE_DIR = "imageupload";
     public static final String IMAGE_NAME = "image.png";
     public static final String IMAGE_FORMAT_PNG = "png";
-
+    public static final String USER_IMAGE_DIR = "userimageupload";
+    public static final String USER_IMAGE_NAME = "userimage.png";
+    
     /**
      * Amazon Details
      */
