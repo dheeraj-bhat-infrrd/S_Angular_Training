@@ -103,9 +103,19 @@
 <meta http-equiv="cache-control" content="max-age=0" />
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />
-<meta property="og:image" content="${profile.profileImageUrlThumbnail}" />
+<meta property="twitter:description" content="${descriptionTag}" />
 <meta property="og:description" content="${descriptionTag}" />
 <meta property="og:profileLevel" content="${profileLevel}" />
+<c:choose>
+	<c:when test="${isOgImageChange == 'TRUE'}">
+		<meta property="twitter:image" content="${smImage}"/>
+		<meta property="og:image" content="${smImage}" />
+	</c:when>
+	<c:otherwise>
+		<meta property="twitter:image" content="${profile.profileImageUrlThumbnail}"/>
+		<meta property="og:image" content="${profile.profileImageUrlThumbnail}" />		
+	</c:otherwise>
+</c:choose>
 <c:choose>
 	<c:when test="${not empty profName}">
 		<c:choose>
@@ -113,19 +123,24 @@
 				<c:choose>
 					<c:when test="${companyName == companyNameForTitle}">
 						<meta property="og:title" content="${profName} ${title} ${companyNameForTitle} ${vertical} Professional Reviews" />
+						<meta property="twitter:title" content="${profName} ${title} ${companyNameForTitle} ${vertical} Professional Reviews" />
 					</c:when>
 					<c:otherwise>
 						<meta property="og:title" content="${profName} ${title} ${companyName} ${companyNameForTitle} ${vertical} Professional Reviews" />
+						<meta property="twitter:title" content="${profName} ${title} ${companyName} ${companyNameForTitle} ${vertical} Professional Reviews" />
 					</c:otherwise>
 				</c:choose>
 			</c:when>
 			<c:otherwise>
 				<meta property="og:title" content="${profName} ${vertical} Reviews" />
+				<meta property="twitter:title" content="${profName} ${vertical} Reviews" />
 			</c:otherwise>
 		</c:choose>
 	</c:when>
 	<c:otherwise>
 		<meta property="og:title" content="<spring:message code="label.profile.title.key" />" />
+		<meta property="twitter:title" content="<spring:message code="label.profile.title.key" />" />
+		<title></title>
 		<title></title>
 	</c:otherwise>
 </c:choose>
@@ -950,12 +965,6 @@
 		var pageUrl = "${pageUrl}";
 		var showAllReviews = false;
 		var avgRating = '${floatingAverageRating}';
-		var isOgImageChange = '${isOgImageChange}';
-		var smImage = '${smImage}';
-		
-		if(isOgImageChange == "true" && smImage != null && smImage != '' && smImage != undefined){
-			document.querySelector('meta[property="og:image"]').setAttribute("content", smImage);
-		}
 		
 		$(document).ready(function() {
 						

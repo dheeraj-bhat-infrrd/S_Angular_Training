@@ -408,7 +408,7 @@ public class ProfileViewController
             String smImage = profileManagementService.getSMImageOfReviewer(surveyId);
             
             if(smImage != null && !smImage.isEmpty()) {
-            	model.addAttribute( "isOgImageChange", "true" );
+            	model.addAttribute( "isOgImageChange", "TRUE" );
             	model.addAttribute( "smImage", smImage);
             }
 

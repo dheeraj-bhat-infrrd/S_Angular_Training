@@ -96,8 +96,8 @@
 	}, 3000);
 });
  
- var isFbImagePopup = "${isFbImagePopup}";
- if(isFbImagePopup == '' || isFbImagePopup == null || isFbImagePopup == undefined){
+ var isImagePopup = "${isImagePopup}";
+ if(isImagePopup == '' || isImagePopup == null || isImagePopup == undefined){
 $(window).on('unload', function(){
 
 	var parentWindow = null;

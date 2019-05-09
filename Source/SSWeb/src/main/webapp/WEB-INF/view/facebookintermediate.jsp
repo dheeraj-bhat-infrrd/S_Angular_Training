@@ -86,18 +86,16 @@ $(document).ready(function() {
 	var columnName = "${columnName}";
 	var columnValue = "${columnValue}";
 	var socialNetwork = "${socialNetwork}";
-	var isFbImagePopup = "${isFbImagePopup}";
+	var isImagePopup = "${isImagePopup}";
 	var profImage = "${profileImage}";
-
-	if(isFbImagePopup == 'true'){
+	if(isImagePopup == 'true'){
 		if(profImage != null && profImage != undefined && profImage != ''){
-			$('#page').text('Thank you for sharing your ' + socialNetwork + ' picture.');
 			parentWindow.showProfileImageForSurvey(profImage);
-			setTimeout(function() {
-				closeSMPopup(closeSMParam);
-				window.close();
-			}, 3000);
 		}
+		$('#page').text('Thank You for authorizing SocialSurvey to access your Social profile!');
+		setTimeout(function() {
+			window.close();
+		}, 3000);
 	} else {
 		if(isFixSocialMedia ==  1){
 			if(isNewUser==true || isNewUser=="true"){
@@ -143,11 +141,13 @@ $(document).ready(function() {
 					"checkIfFacebookSet":checkIfFacebookSet
 				};
 				
-	
 				setTimeout(function() {
 					closeSMPopup(closeSMParam);
 					window.close();
+					
+					
 				}, 3000);
+				
 			}
 		}else{
 			
@@ -233,9 +233,7 @@ $(document).ready(function() {
 		}		
 	}
 });
-
 function disable(disableEle) {
-
 	if (disableEle) {
 		$(disableEle).data('requestRunning', true);
 		disableIcon = true;
@@ -247,7 +245,6 @@ function enable(disableEle) {
 		disableIcon = false;
 	}
 }
-
 </script>
 
 </body>
