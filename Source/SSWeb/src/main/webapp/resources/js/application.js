@@ -9195,6 +9195,7 @@ $('.sq-np-item-next').click(function () {
 // Code to be executed on click of previous for star and smile questions.
 $('.sq-np-item-prev').click(function () {
 	$("#pst-srvy-div").hide();
+	$("#pst-profile-div").hide();
 	if (qno == 0) {
 		return;
 	}
@@ -24082,3 +24083,26 @@ function initializeQuickEditsPage(applicationBaseUrl){
 	
 	$('#v-ed-app-base-url').html(applicationBaseUrl + 'pages/');
 }
+
+
+$(document).on('click','#google-banner-close-btn',function(e){
+	e.stopPropagation();
+	$('#google-plus-banner').hide();
+});
+
+function showProfileImageForSurvey(profileImage){
+	$('#survey-profile-image-url').val(profileImage);
+	
+}
+
+$(document).on('click','#shr-post-profile-chk-box',function(e){
+	if($(this).hasClass('v-ed-checkbox-unchecked')){
+		$(this).addClass('v-ed-checkbox-checked');
+		$(this).removeClass('v-ed-checkbox-unchecked');
+	}else{
+		$(this).removeClass('v-ed-checkbox-checked');
+		$(this).addClass('v-ed-checkbox-unchecked');
+	}
+	
+});
+

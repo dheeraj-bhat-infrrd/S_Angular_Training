@@ -87,6 +87,11 @@ $(document).ready(function() {
 	var columnValue = "${columnValue}";
 	var socialNetwork = "${socialNetwork}";
 
+	if(isFbImagePopup == 'true'){
+		if(profImage != null && profImage != undefined && profImage != ''){
+			$('#page').text('Thank you for sharing your ' + socialNetwork + ' picture.');
+			parentWindow.showProfileImageForSurvey(profImage);
+
 	if(isFixSocialMedia ==  1){
 		if(isNewUser==true || isNewUser=="true"){
 			
@@ -131,6 +136,7 @@ $(document).ready(function() {
 				"checkIfFacebookSet":checkIfFacebookSet
 			};
 			
+
 			setTimeout(function() {
 				closeSMPopup(closeSMParam);
 				window.close();

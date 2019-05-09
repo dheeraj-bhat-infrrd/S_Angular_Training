@@ -461,7 +461,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
         LOG.info( "Updating Social Tokens information" );
         boolean facebookNotSetup = true;
-        Facebook facebook = getFacebookInstance( serverBaseUrl, facebookRedirectUri );
+        Facebook facebook = getFacebookInstance( serverBaseUrl, facebookRedirectUri ); 
+        
         if ( settings != null ) {
             if ( settings.getSocialMediaTokens() != null ) {
                 if ( settings.getSocialMediaTokens().getFacebookToken() != null
@@ -479,13 +480,23 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         postUpdate.setCaption( completeProfileUrl );
                         try {
                             postUpdate.setLink( new URL( completeProfileUrl ) );
+                            String smImageUrl = "https://s3-us-west-1.amazonaws.com/agent-survey/dev/userprofilepics/d-8490fba7c87d95b53899ebe55605de848561f3367b7eac6e0032f42c0e14a45da5dc8ee2740d2ec016fe0ba12343311e7d124e9df3c90ffda82ae00664872c00";
+                            if (smImageUrl != null && !smImageUrl.isEmpty()) {
+                                try {
+                                	LOG.info("setting sm image " + smImageUrl);
+                                    postUpdate.setPicture(new URL(smImageUrl));
+                                } catch (MalformedURLException e) {
+                                    LOG.error("Exception caught while attaching social media image to FB post "+ e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            }
                         } catch ( MalformedURLException e1 ) {
                             // TODO Auto-generated catch block
                             e1.printStackTrace();
                         }
                         // TODO: Hard coded bad code: DELETE: BEGIN
                         if ( companyId == Long.parseLong( customisedSocialNetworkCompanyId ) ) {
-                            try {
+                        	try {
                                 postUpdate
                                     .setPicture( new URL( "https://don7n2as2v6aa.cloudfront.net/remax-facebook-image.png" ) );
                             } catch ( MalformedURLException e ) {
@@ -508,7 +519,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
-    public boolean tweet( OrganizationUnitSettings agentSettings, String message, long companyId )
+    public boolean tweet( OrganizationUnitSettings agentSettings, String message, long companyId, String profileImageUrl )
         throws InvalidInputException, TwitterException
     {
         if ( agentSettings == null ) {
@@ -516,6 +527,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
         LOG.info( "Getting Social Tokens information" );
         boolean twitterNotSetup = true;
+        //String smImageUrl = surveyDetailsDao.getProfileImageUrl(surveyId);
         if ( agentSettings != null ) {
             if ( agentSettings.getSocialMediaTokens() != null ) {
                 if ( agentSettings.getSocialMediaTokens().getTwitterToken() != null
@@ -534,11 +546,23 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             message = message.replaceAll( "null", "" );
                         }
                         StatusUpdate statusUpdate = new StatusUpdate( message );
+                        try {
+                        	if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+								statusUpdate.setMedia("Picture", new URL(profileImageUrl).openStream());
+                        	}
+							
+                        } catch ( MalformedURLException e ) {
+                            LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
+                        } catch ( IOException e ) {
+                            LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
+                        }
+                        
                         if ( companyId == Long.parseLong( customisedSocialNetworkCompanyId ) ) {
-                            try {
-                                statusUpdate.setMedia( "Picture",
-                                    new URL( "https://don7n2as2v6aa.cloudfront.net/remax-twitter-image.jpg?imgmax=800" )
-                                        .openStream() );
+							try {
+									statusUpdate.setMedia("Picture", new URL(
+											"https://don7n2as2v6aa.cloudfront.net/remax-twitter-image.jpg?imgmax=800")
+													.openStream());
+								
                             } catch ( MalformedURLException e ) {
                                 LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
                             } catch ( IOException e ) {
@@ -1346,13 +1370,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         // get profile url
         String profileurl = agentSettings.getCompleteProfileUrl() + ( StringUtils.isNotEmpty( surveyId ) ? "/" + surveyId : "" );
+        
         // if company is hidden than show the url of the entity where user is
         // assigned
         if ( isAgentsHidden ) {
             String priamryProfileUrl = getProfileUrlOfPrimaryEntityOfAgent(
                 socialMediaPostDetails.getAgentMediaPostDetails().getAgentId() );
             if ( !StringUtils.isBlank( priamryProfileUrl ) )
-                profileurl = priamryProfileUrl + ( StringUtils.isNotEmpty( surveyId ) ? "/" + surveyId : "" );
+            	profileurl = priamryProfileUrl + ( StringUtils.isNotEmpty( surveyId ) ? "/" + surveyId : "" );
         }
 
         // Post for agent
@@ -1470,7 +1495,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     }
                     updatedFacebookMessage = facebookMessage + profileUrlWithMessage;
                 }
-                if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId, profileUrl ) ) {
+                
+                if ( !updateStatusIntoFacebookPage( setting, updatedFacebookMessage, serverBaseUrl, companyId, profileUrl) ) {
                     if ( !socialList.contains( CommonConstants.FACEBOOK_SOCIAL_SITE ) ) {
                         socialList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                     }
@@ -1711,7 +1737,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Override
     public void postToTwitterForHierarchy( String twitterMessage, double rating, String serverBaseUrl, int accountMasterId,
         SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails,
-        boolean isAgentsHidden ) throws InvalidInputException, NoRecordsFetchedException
+        boolean isAgentsHidden, String profileImageUrl ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Method postToTwitterForHierarchy() started" );
         if ( socialMediaPostDetails == null ) {
@@ -1742,7 +1768,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
                     if ( agent != null && agent.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                         postToTwitterForAHierarchy( agentSettings, rating, companyId, twitterMessage,
-                            socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails );
+                            socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails, profileImageUrl );
                     }
                 }
             }
@@ -1758,7 +1784,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     Company company = userManagementService.getCompanyById( companySetting.getIden() );
                     if ( company != null && company.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                         postToTwitterForAHierarchy( companySetting, rating, companyId, twitterMessage,
-                            socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails );
+                            socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails, profileImageUrl );
                     }
                 }
             }
@@ -1774,7 +1800,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         Region region = userManagementService.getRegionById( setting.getIden() );
                         if ( region != null && region.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                             postToTwitterForAHierarchy( setting, rating, companyId, twitterMessage, regionMediaPostDetails,
-                                regionMediaPostResponseDetails );
+                                regionMediaPostResponseDetails, profileImageUrl );
                         }
                     }
 
@@ -1793,7 +1819,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         Branch branch = userManagementService.getBranchById( setting.getIden() );
                         if ( branch != null && branch.getStatus() != CommonConstants.STATUS_INACTIVE ) {
                             postToTwitterForAHierarchy( setting, rating, companyId, twitterMessage, branchMediaPostDetails,
-                                branchMediaPostResponseDetails );
+                                branchMediaPostResponseDetails, profileImageUrl );
                         }
                     }
 
@@ -1807,12 +1833,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     public void postToTwitterForAHierarchy( OrganizationUnitSettings setting, Double rating, long companyId,
-        String twitterMessage, MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails )
+        String twitterMessage, MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails, String profileImageUrl )
         throws InvalidInputException
     {
         try {
             if ( surveyHandler.canPostOnSocialMedia( setting, rating ) ) {
-                if ( !tweet( setting, twitterMessage, companyId ) ) {
+                if ( !tweet( setting, twitterMessage, companyId, profileImageUrl ) ) {
                     List<String> socialList = mediaPostDetails.getSharedOn();
                     if ( !socialList.contains( CommonConstants.TWITTER_SOCIAL_SITE ) )
                         socialList.add( CommonConstants.TWITTER_SOCIAL_SITE );
@@ -1901,6 +1927,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyId );
             SocialMediaPostDetails socialMediaPostDetails = surveyHandler.getSocialMediaPostDetailsBySurvey( surveyDetails,
                 companySettings.get( 0 ), regionSettings, branchSettings );
+            String profileImageUrl= surveyDetails.getProfileImageUrl();
 
             // create socialMediaPostResponseDetails object
             SocialMediaPostResponseDetails socialMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails();
@@ -2022,7 +2049,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     facebookMessage = buildFacebookAutoPostMessage( customerDisplayName, agentName, rating, feedback,
                         agentProfileLink, isZillow );
                 }
-
                 postToFacebookForHierarchy( facebookMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
                     socialMediaPostResponseDetails, isZillow, isCompanyAgentHidden, surveyId );
 
@@ -2062,7 +2088,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 String twitterMessage = buildTwitterAutoPostMessage( customerDisplayName, agentName, rating, feedback,
                     profileUrlWithMessage, isZillow );
                 postToTwitterForHierarchy( twitterMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
-                    socialMediaPostResponseDetails, isCompanyAgentHidden );
+                    socialMediaPostResponseDetails, isCompanyAgentHidden, profileImageUrl );
 
             }
 

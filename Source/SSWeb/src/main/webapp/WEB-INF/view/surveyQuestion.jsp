@@ -326,7 +326,15 @@
 							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
 -							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
 							<div class="float-left bd-check-txt survey-authorize-font-size"><spring:message code="label.survey.authorize.key"/></div>
+
+							<div class="reg_form_row clearfix">
+					       <div class="reg-btn" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', ${isAutoLogin}, this);" data-link="${facebookLink}">Import from facebook</div>
+					       <div class="reg-btn" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);" data-link="${facebookLink}">Import from LinkedIn</div>
+					       <div class="reg-btn" id="import-Twitter" onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);" data-link="${facebookLink}">Import from Twitter</div>
+				          </div>
+
 						</div>
+						
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>
 							<div id="next-textarea-smiley" class="float-left sq-np-item sq-np-item-next btn-com" data-survey-submit-disabled=false><spring:message code="label.nxt.btn.key"/></div>
@@ -382,6 +390,7 @@
 			<div class="sq-star sq-full-star hide"></div>
 		</div>
 	</div>
+		
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <!-- <script src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script> -->
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>

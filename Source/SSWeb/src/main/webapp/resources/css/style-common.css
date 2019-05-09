@@ -14541,3 +14541,27 @@ body.ss-not-found-page {
 #ms-confirmation-popup{
 	z-index: 10000;
 }
+
+.review-details{
+	margin-left:60px!important;
+	line-height:16px!important;
+	margin-top:-50px;
+}
+.ss-reviewer-prof-pic-cont {
+  width: 50px !important;
+  height: 50px !important;
+}
+ .ss-reviewer-prof-pic {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 50% !important;
+  margin: 0 !important;
+}
+.profile-align{
+	width:43%;
+	margin-left:214px;
+}
+.btn-align{
+	margin-left:20px;
+	margin-top:20px;
+}

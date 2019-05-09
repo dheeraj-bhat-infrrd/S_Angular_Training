@@ -1763,12 +1763,11 @@ public class SocialManagementController
             + custDisplayName + " for " + agentName + " on SocialSurvey - view at " + applicationBaseUrl
             + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
         facebookMessage = facebookMessage.replaceAll( "null", "" );
-
         for ( OrganizationUnitSettings setting : settings ) {
             try {
                 if ( setting != null )
                     if ( !socialManagementService.updateStatusIntoFacebookPage( setting, facebookMessage,
-                        requestUtils.getRequestServerName( request ), user.getCompany().getCompanyId(), agentProfileLink ) )
+                        requestUtils.getRequestServerName( request ), user.getCompany().getCompanyId(), agentProfileLink) )
                         facebookNotSetup = false;
             } catch ( FacebookException | InvalidInputException e ) {
                 LOG.error(
@@ -1826,11 +1825,10 @@ public class SocialManagementController
                 surveyHandler.getFormattedSurveyScore( rating ), custDisplayName, agentName, "@SocialSurveyMe" )
                 + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
             twitterMessage = twitterMessage.replaceAll( "null", "" );
-
             for ( OrganizationUnitSettings setting : settings ) {
                 try {
                     if ( setting != null )
-                        if ( !socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() ) )
+                        if ( !socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId(), null ) )
                             twitterNotSetup = false;
                 } catch ( TwitterException e ) {
                     LOG.warn(
