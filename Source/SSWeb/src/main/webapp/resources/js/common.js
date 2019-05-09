@@ -1424,6 +1424,7 @@ function openAuthPageForSurvey(event,socialNetwork, isAutoLogin, element) {
 	}
 	
 	var dataLink = $(element).attr('data-link');
-	
-		window.open("./rest/survey/socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	//confirmSocialAuth(socialNetwork, function() {
+		window.open("../../socialAuthImage.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	//}, dataLink);
 }

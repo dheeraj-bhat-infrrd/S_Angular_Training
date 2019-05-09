@@ -86,154 +86,154 @@ $(document).ready(function() {
 	var columnName = "${columnName}";
 	var columnValue = "${columnValue}";
 	var socialNetwork = "${socialNetwork}";
-
-	if(isFbImagePopup == 'true'){
+	var isImagePopup = "${isImagePopup}";
+	var profImage = "${profileImage}";
+	if(isImagePopup == 'true'){
 		if(profImage != null && profImage != undefined && profImage != ''){
-			$('#page').text('Thank you for sharing your ' + socialNetwork + ' picture.');
 			parentWindow.showProfileImageForSurvey(profImage);
-
-	if(isFixSocialMedia ==  1){
-		if(isNewUser==true || isNewUser=="true"){
-			
-			var closeSMParam = {
-				"fromDashboard":fromDashboard,
-				"restful":restful,
-				"flow":flow,
-				"isFixSocialMedia":isFixSocialMedia,
-				"isManual":isManual,
-				"columnName":columnName,
-				"columnValue":columnValue,
-				"socialNetwork":socialNetwork,
-				"checkIfFacebookSet":checkIfFacebookSet
-			};
-			
-			var errorPopupDiv = $("<div style='display:grid'>");
-			errorPopupDiv.append('<span>Invalid Credentials.</span>');
-			errorPopupDiv.append('<span style="font-size:15px; margin: 15px auto;" >Please disconnect older account, to link a new Facebook Account</span>');
-			$('#page').append(errorPopupDiv);
-			var okButton= $("<div class='reg_btn'>OK</div>");
-			$('#page').append(okButton);
-			
-			okButton.click(function(){
-				window.close();
-			});
-			
-		}else if(isNewUser==false || isNewUser=="false"){
-			
-			parentWindow.loadSocialMediaUrlInSettingsPage();
-			parentWindow.loadSocialMediaUrlInPopup();
-			checkIfFacebookSet = true;
-			
-			var closeSMParam = {
-				"fromDashboard":fromDashboard,
-				"restful":restful,
-				"flow":flow,
-				"isFixSocialMedia":isFixSocialMedia,
-				"isManual":isManual,
-				"columnName":columnName,
-				"columnValue":columnValue,
-				"socialNetwork":socialNetwork,
-				"checkIfFacebookSet":checkIfFacebookSet
-			};
-			
-
-			setTimeout(function() {
-				closeSMPopup(closeSMParam);
-				window.close();
-				
-				
-			}, 3000);
-			
+			$('#page').text('Thank You for authorizing SocialSurvey to access your Social profile!');
 		}
-	}else{
-		
-		var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;max-height: 220px;overflow: auto;'>")
-		<c:forEach var="page" items="${pageNames}" varStatus="loop">
-			radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${fn:escapeXml(page.name)}"+" <br/>");
-		</c:forEach>
-		$("#page").append(radioButtonDiv);
-
-		var saveButton= $("<div class='reg_btn'>save</div>");
-		
-		<c:if test="${not empty pageNames}">
-			$("#page").append(saveButton);
-		</c:if>
-
-	    <c:if test="${isPageListEmpty}">
-			$("#page").append("<div>No connected instagram accounts</div>");
-		</c:if>
-		
-		saveButton.click(function() {
-			
-			if ( $(this).data('requestRunning') ) {
-				return;
-		    }
-			disable(this);
-			var selectedPage=$('input:radio[name=pageselection]:checked').val();
-			if(selectedPage == undefined){
-				$('#overlay-toast').html("Please select an account");
-				showToast();
-				enable(this);
-				return;
-			}
-			var selectedAccessFacebookToken;
-			var selectedProfileUrl;
-			var selectedProfileId;
-			<c:forEach var="page" items="${pageNames}"  varStatus="loop">
-			  if("${loop.index}" == selectedPage){
-				  selectedProfileUrl= "${page.profileUrl}";
-				  selectedAccessFacebookToken= "${page.accessToken}";
-				  selectedProfileId = "${page.id}";
-			  }
-			</c:forEach>
-			var facebookToken = {
-				'selectedAccessFacebookToken' : selectedAccessFacebookToken,
-				'selectedProfileUrl' :  selectedProfileUrl,
-				'fbAccessToken' : fbAccessToken,
-				'selectedProfileId' : selectedProfileId
-			};
-			$.ajax({
-				url : "${callback}",
-				type : "GET",
-				cache : false,
-				data : facebookToken,
-				async : false,
-				complete :function(e){
-					enable(this);
-					parentWindow.loadSocialMediaUrlInSettingsPage();
-					parentWindow.loadSocialMediaUrlInPopup();
-					parentWindow.fetchSocialProfileUrl("facebook", function(data){
-						if(data.status == 200) {
-							var responseObj = JSON.parse(data.responseText);
-							var profileUrlLink = responseObj.url;
-							if(responseObj.connected){
-								parentWindow.showProfileLinkInEditProfilePage("facebook", profileUrlLink);
-							} else {
-								parentWindow.removeProfileLinkInEditProfilePage("facebook");
-								parentWindow.showProfileImageForSurvey("${profileImage}");
-							}
-						}
-					});
-					checkIfFacebookSet = true;
-					setTimeout(function() {
-						window.close();
-					}, 3000);
+		setTimeout(function() {
+			window.close();
+		}, 3000);
+	} else {
+		if(isFixSocialMedia ==  1){
+			if(isNewUser==true || isNewUser=="true"){
+				
+				var closeSMParam = {
+					"fromDashboard":fromDashboard,
+					"restful":restful,
+					"flow":flow,
+					"isFixSocialMedia":isFixSocialMedia,
+					"isManual":isManual,
+					"columnName":columnName,
+					"columnValue":columnValue,
+					"socialNetwork":socialNetwork,
+					"checkIfFacebookSet":checkIfFacebookSet
+				};
+				
+				var errorPopupDiv = $("<div style='display:grid'>");
+				errorPopupDiv.append('<span>Invalid Credentials.</span>');
+				errorPopupDiv.append('<span style="font-size:15px; margin: 15px auto;" >Please disconnect older account, to link a new Facebook Account</span>');
+				$('#page').append(errorPopupDiv);
+				var okButton= $("<div class='reg_btn'>OK</div>");
+				$('#page').append(okButton);
+				
+				okButton.click(function(){
+					window.close();
+				});
+				
+			}else if(isNewUser==false || isNewUser=="false"){
+				
+				parentWindow.loadSocialMediaUrlInSettingsPage();
+				parentWindow.loadSocialMediaUrlInPopup();
+				checkIfFacebookSet = true;
+				
+				var closeSMParam = {
+					"fromDashboard":fromDashboard,
+					"restful":restful,
+					"flow":flow,
+					"isFixSocialMedia":isFixSocialMedia,
+					"isManual":isManual,
+					"columnName":columnName,
+					"columnValue":columnValue,
+					"socialNetwork":socialNetwork,
+					"checkIfFacebookSet":checkIfFacebookSet
+				};
+				
+				setTimeout(function() {
+					closeSMPopup(closeSMParam);
+					window.close();
 					
-				},
-				error : function(e) {
-					if(e.status == 504) {
-						redirectToLoginPageOnSessionTimeOut(e.status);
-						return;
-					}
-					redirectErrorpage();
+					
+				}, 3000);
+				
+			}
+		}else{
+			
+			var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;max-height: 220px;overflow: auto;'>")
+			<c:forEach var="page" items="${pageNames}" varStatus="loop">
+				radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${fn:escapeXml(page.name)}"+" <br/>");
+			</c:forEach>
+			$("#page").append(radioButtonDiv);
+			var saveButton= $("<div class='reg_btn'>save</div>");
+			
+			<c:if test="${not empty pageNames}">
+				$("#page").append(saveButton);
+			</c:if>
+		    <c:if test="${isPageListEmpty}">
+				$("#page").append("<div>No connected instagram accounts</div>");
+			</c:if>
+			
+			saveButton.click(function() {
+				
+				if ( $(this).data('requestRunning') ) {
+					return;
+			    }
+				disable(this);
+				var selectedPage=$('input:radio[name=pageselection]:checked').val();
+				if(selectedPage == undefined){
+					$('#overlay-toast').html("Please select an account");
+					showToast();
+					enable(this);
+					return;
 				}
-			});
-	    });
+				var selectedAccessFacebookToken;
+				var selectedProfileUrl;
+				var selectedProfileId;
+				<c:forEach var="page" items="${pageNames}"  varStatus="loop">
+				  if("${loop.index}" == selectedPage){
+					  selectedProfileUrl= "${page.profileUrl}";
+					  selectedAccessFacebookToken= "${page.accessToken}";
+					  selectedProfileId = "${page.id}";
+				  }
+				</c:forEach>
+				var facebookToken = {
+					'selectedAccessFacebookToken' : selectedAccessFacebookToken,
+					'selectedProfileUrl' :  selectedProfileUrl,
+					'fbAccessToken' : fbAccessToken,
+					'selectedProfileId' : selectedProfileId
+				};
+				$.ajax({
+					url : "${callback}",
+					type : "GET",
+					cache : false,
+					data : facebookToken,
+					async : false,
+					complete :function(e){
+						enable(this);
+						parentWindow.loadSocialMediaUrlInSettingsPage();
+						parentWindow.loadSocialMediaUrlInPopup();
+						parentWindow.fetchSocialProfileUrl("facebook", function(data){
+							if(data.status == 200) {
+								var responseObj = JSON.parse(data.responseText);
+								var profileUrlLink = responseObj.url;
+								if(responseObj.connected){
+									parentWindow.showProfileLinkInEditProfilePage("facebook", profileUrlLink);
+								} else {
+									parentWindow.removeProfileLinkInEditProfilePage("facebook");
+								}
+							}
+						});
+						checkIfFacebookSet = true;
+						setTimeout(function() {
+							window.close();
+						}, 3000);
+						
+					},
+					error : function(e) {
+						if(e.status == 504) {
+							redirectToLoginPageOnSessionTimeOut(e.status);
+							return;
+						}
+						redirectErrorpage();
+					}
+				});
+		    });
+		}		
 	}
 });
-
 function disable(disableEle) {
-
 	if (disableEle) {
 		$(disableEle).data('requestRunning', true);
 		disableIcon = true;
@@ -245,7 +245,6 @@ function enable(disableEle) {
 		disableIcon = false;
 	}
 }
-
 </script>
 
 </body>

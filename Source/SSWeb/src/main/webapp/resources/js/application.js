@@ -8569,22 +8569,24 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 	var success = false;
 
 	$('#survey-dash').show();
-	$('#next-textarea-smiley').attr('data-survey-submit-disabled', true);
-
+	$('#next-textarea-smiley').attr('data-survey-submit-disabled',true);
+	var profImageUrl = $('#survey-profile-image-url').val();
+	
 	var payload = {
-		"mood": mood,
-		"feedback": feedback,
-		"agentId": agentId,
-		"customerEmail": customerEmail,
-		"firstName": firstName,
-		"lastName": lastName,
-		"isAbusive": isAbusive,
-		"agreedToShare": agreedToShare,
-		"isIsoEncoded": isIsoEncoded,
-		"surveyId": surveyId,
-		"agentName": agentName,
-		"onlyPostToSocialSurvey": onlyPostToSocialSurvey,
-		"agentProfileLink": agentProfileLink
+		"mood" : mood,
+		"feedback" : feedback,
+		"agentId" : agentId,
+		"customerEmail" : customerEmail,
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"isAbusive" : isAbusive,
+		"agreedToShare" : agreedToShare,
+		"isIsoEncoded" : isIsoEncoded,
+		"surveyId" : surveyId,
+		"agentName" : agentName,
+		"onlyPostToSocialSurvey" : onlyPostToSocialSurvey,
+		"agentProfileLink" : agentProfileLink,
+		"profImageUrl" : profImageUrl
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({

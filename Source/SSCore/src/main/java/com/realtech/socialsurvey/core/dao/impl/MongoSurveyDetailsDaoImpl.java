@@ -225,7 +225,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * collection.
      */
     @Override
-    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore )
+    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore, String profImageUrl )
     {
         LOG.info( "Method updateGatewayAnswer() to update review provided by customer started." );
         Query query = new Query();
@@ -237,6 +237,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( "review", review );
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, isAbusive );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        update.set( CommonConstants.PROFILE_IMAGE_URL, profImageUrl);
         SurveyDetails details = getSurveyBySurveyMongoId( surveyId );
         if ( details != null && details.getSurveyCompletedDate() != null ) {
             update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, new Date() );
@@ -3920,7 +3921,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     	return 0;
     }
     
-    
     @Override
     public void upsertReviewReply( ReviewReply reviewReply, String surveyId ) {
         Query query = new Query();
@@ -3986,4 +3986,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         
         return reply;
     }
+
+	@Override
+	public String getProfileImageUrl(String surveyId) {
+		LOG.info("getProfileImageUrl::started");
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(CommonConstants.DEFAULT_MONGO_ID_COLUMN).is(surveyId));
+			query.fields().include(CommonConstants.PROFILE_IMAGE_URL);
+			SurveyDetails surveyDetails = mongoTemplate.findOne(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+			return surveyDetails.getProfileImageUrl();
+		} catch (Exception e) {
+			LOG.error("error while fetching social media image from survey details " + e.getMessage());
+		}
+		return null;
+	}
 }

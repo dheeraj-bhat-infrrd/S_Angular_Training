@@ -108,7 +108,6 @@ public class SurveyDetails
     private int noOfRetake;
     private Date lastRetakeRequestDate;
     private List<RetakeSurveyHistory> retakeSurveyHistory;
-    private String profileImageUrl;
 
     //NPS details
     private int npsScore = -1;
@@ -120,6 +119,7 @@ public class SurveyDetails
     private int participantType;
 
     private String fbRecommendationType;
+    private String profileImageUrl;
     
     //replies to ss reviews
     private List<ReviewReply> reviewReply;
@@ -1042,15 +1042,6 @@ public class SurveyDetails
         this.fbRecommendationType = fbRecommendationType;
     }
 
-
-	public String getProfileImageUrl() {
-		return profileImageUrl;
-	}
-
-	public void setProfileImageUrl(String profileImageUrl) {
-		this.profileImageUrl = profileImageUrl;
-	}
-
     public List<ReviewReply> getReviewReply()
     {
         return reviewReply;
@@ -1060,5 +1051,13 @@ public class SurveyDetails
     {
         this.reviewReply = reviewReply;
     }
+    
+    public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
+	}
 
 }

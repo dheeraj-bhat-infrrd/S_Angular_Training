@@ -263,7 +263,7 @@ public interface SSApiIntegration
     @POST ( "/v2/surveys/{surveyId}/score")
     Response updateScore( @Path ( "surveyId") String surveyId, @Query ( "mood") String mood,
         @Query ( "feedback") String feedback, @Query ( "isAbusive") boolean isAbusive,
-        @Query ( "agreedToShare") String agreedToShare );
+        @Query ( "agreedToShare") String agreedToShare, @Query("profImageUrl") String profImageUrl );
 
 
     @GET ( "/v2/swearwords")
