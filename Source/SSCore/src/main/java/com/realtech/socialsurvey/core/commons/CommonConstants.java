@@ -385,6 +385,7 @@ public interface CommonConstants
     public static final String OPEN_RETAKE_SURVEY_REQUEST_COLUMN = "openRetakeSurveyRequest";
     public static final String ABUSIVE_NOTIFY_COLUMN = "abusiveNotify";
     public static final String REPLIED_MESSAGES = "repliedMessages";
+    public static final String PROFILE_IMAGE_URL = "profileImageUrl";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)

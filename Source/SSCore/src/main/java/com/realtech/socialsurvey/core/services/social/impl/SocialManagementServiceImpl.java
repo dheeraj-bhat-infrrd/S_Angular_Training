@@ -95,6 +95,7 @@ import com.realtech.socialsurvey.core.entities.integration.external.linkedin.Lin
 import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInText;
 import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInV2Content;
 import com.realtech.socialsurvey.core.entities.integration.external.linkedin.LinkedInVisibility;
+import com.realtech.socialsurvey.core.entities.integration.external.linkedin.Thumbnails;
 import com.realtech.socialsurvey.core.enums.HierarchyType;
 import com.realtech.socialsurvey.core.enums.ProfileStages;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
@@ -828,16 +829,36 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         linkedInRequest.setText(text);
         
         LinkedInV2Content content = new LinkedInV2Content();
-        ContentEntity profileEntity = new ContentEntity();
-        ContentEntity imageEntity = new ContentEntity();
-        profileEntity.setEntityLocation(profileUrl);
-        imageEntity.setEntityLocation(imageUrl);
         content.setDescription(description);
         content.setTitle(title);
-        ContentEntity[] entities = new ContentEntity[2];
-        entities[0] = profileEntity;
-        entities[1] = imageEntity;
-        content.setContentEntities(entities);
+		
+        // If reviewer has shared their SM picture then display it as URL's thumbnail
+		// else display company or SS logo.
+		String smImageUrl = surveyDetailsDao.getProfileImageUrl(surveyId);
+		if (smImageUrl != null && !smImageUrl.isEmpty()) {
+			ContentEntity[] entities = new ContentEntity[1];
+			LOG.info("setting only sm entity content");
+			ContentEntity smImageEntity = new ContentEntity();
+			smImageEntity.setEntityLocation(profileUrl);
+			Thumbnails[] thumbnails = new Thumbnails[1];
+			Thumbnails t = new Thumbnails();
+			t.setResolvedUrl(smImageUrl);
+			thumbnails[0] = t;
+			smImageEntity.setThumbnails(thumbnails);
+			entities[0] = smImageEntity;
+			content.setContentEntities(entities);
+		} else {
+			ContentEntity[] entities = new ContentEntity[1];
+			Thumbnails[] thumbnails = new Thumbnails[1];
+			Thumbnails t = new Thumbnails();
+			t.setResolvedUrl(imageUrl);
+			thumbnails[0] = t;
+			ContentEntity profileEntity = new ContentEntity();
+			profileEntity.setEntityLocation(profileUrl);
+			profileEntity.setThumbnails(thumbnails);
+			entities[0] = profileEntity;
+			content.setContentEntities(entities);
+		}
         linkedInRequest.setContent(content);
        	linkedInRequest.setOwner("urn:li:person:"+settings.getSocialMediaTokens().getLinkedInV2Token().getLinkedInId());
         

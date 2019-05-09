@@ -432,4 +432,10 @@ public interface SurveyDetailsDao
 
 	
 	public ReviewReply getReviewReply(String replyId, String surveyId);
+	/**
+	 * @param surveyId
+	 * @return
+	 */
+	public String getProfileImageUrl(String surveyId);
+
 }
