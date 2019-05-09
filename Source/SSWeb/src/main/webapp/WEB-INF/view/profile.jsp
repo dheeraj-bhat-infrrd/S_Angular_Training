@@ -950,6 +950,12 @@
 		var pageUrl = "${pageUrl}";
 		var showAllReviews = false;
 		var avgRating = '${floatingAverageRating}';
+		var isOgImageChange = '${isOgImageChange}';
+		var smImage = '${smImage}';
+		
+		if(isOgImageChange == "true" && smImage != null && smImage != '' && smImage != undefined){
+			document.querySelector('meta[property="og:image"]').setAttribute("content", smImage);
+		}
 		
 		$(document).ready(function() {
 						

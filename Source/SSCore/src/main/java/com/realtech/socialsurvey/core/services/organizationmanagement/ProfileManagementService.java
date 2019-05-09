@@ -771,4 +771,11 @@ public interface ProfileManagementService
 
     public List<String> getAvailableSurveySources( String profileLevel, long iden ) throws InvalidInputException;
 
+    /**
+     * Method to get sm image of reviewer from survey
+     * @param surveyId
+     * @return
+     */
+	public String getSMImageOfReviewer(String surveyId);
+
 }

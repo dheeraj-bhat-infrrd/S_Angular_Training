@@ -6799,5 +6799,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         return surveyDetailsDao.getDistinctValues( idenColumnName, iden, CommonConstants.SURVEY_SOURCE_COLUMN );
     }
-    
+
+	@Override
+	public String getSMImageOfReviewer(String surveyId) {
+		LOG.info("getSmImageOfReviewer::Started " + surveyId);
+		return surveyDetailsDao.getProfileImageUrl(surveyId);
+	}
 }
