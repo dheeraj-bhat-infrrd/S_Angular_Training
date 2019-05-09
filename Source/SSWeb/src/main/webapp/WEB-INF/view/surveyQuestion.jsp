@@ -4,6 +4,15 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 
+<c:choose>
+	<c:when test="${isAutoLogin == 'true' && allowOverrideForSocialMedia == 'false' }">
+		<c:set var="socialDisabled" value="social-auth-disabled"></c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="isAutoLogin" value="false"></c:set>
+	</c:otherwise>
+</c:choose>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -289,6 +298,7 @@
 				
 				<!-- For text area -->
 				<div data-ques-type="smiley-text-final" class="sq-quest-item hide">
+					<input type="hidden" id="survey-profile-image-url" value="">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
 					<hr class="hr-survey">

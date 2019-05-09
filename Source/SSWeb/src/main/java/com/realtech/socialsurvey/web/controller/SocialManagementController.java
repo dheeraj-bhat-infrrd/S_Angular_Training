@@ -163,7 +163,7 @@ public class SocialManagementController
     private String applicationBaseUrl;
 
     // Facebook
-    @Value ( "${FB_REDIRECT_URI}")
+	@Value("${FB_REDIRECT_URI}")
     private String facebookRedirectUri;
 
     @Value ( "${FB_CLIENT_ID}")
@@ -175,6 +175,9 @@ public class SocialManagementController
     @Value ( "${FB_URI}")
     private String facebookUri;
     
+    @Value("${FB_REDIRECT_URI_IMAGE}")
+    private String facebookRedirectImageUri;
+
     // Instagram
     @Value ( "${IG_REDIRECT_URI}" )
     private String instagramRedirectUri;
@@ -3550,30 +3553,32 @@ public class SocialManagementController
             Facebook facebook = (Facebook) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
             String profileLink = null;
             facebook4j.auth.AccessToken accessToken = null;
+            SocialMediaTokens mediaTokens = null;
             List<FacebookPage> facebookPages = new ArrayList<>();
             try {
                 accessToken = facebook.getOAuthAccessToken( oauthCode,
                     requestUtils.getRequestServerName( request ) + facebookRedirectImageUri );
                 facebook4j.User fbUser = facebook.getUser( facebook.getId() );
-                profileLink = facebookUri + facebook.getId();
-                profileImageUrl = facebook.getPictureURL(facebook.getId());
-                LOG.info("ProfilePic url " + profileImageUrl);
-                FacebookPage personalUserAccount = new FacebookPage();
-                personalUserAccount.setId( facebook.getId() );
-                personalUserAccount.setAccessToken( accessToken.getToken() );
-                personalUserAccount.setName( fbUser.getName() );
-                personalUserAccount.setProfileUrl( profileLink );
-                facebookPages.add( personalUserAccount );
+                    profileLink = facebookUri + facebook.getId();
+                    profileImageUrl = facebook.getPictureURL(facebook.getId());
+                  //String saveProfilePic = socialManagementService.saveProfilePicForReviewer(profileImageUrl);
+                    //call dao from service to set the image and save it in surveydetails table.
+					/*
+					 * FacebookPage personalUserAccount = new FacebookPage();
+					 * personalUserAccount.setProfileImageUrl( profileImageUrl ); facebookPages.add(
+					 * personalUserAccount );
+					 */
             } catch ( FacebookException e ) {
                 LOG.error( "Error while creating access token for facebook: ", e );
             }
-            // Storing token
-            facebookPages.addAll( socialManagementService.getFacebookPages( accessToken, profileLink ) );
             
             String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
             model.addAttribute( "pageNames", facebookPages );
             
             model.addAttribute( "fbAccessToken", fbAccessTokenStr );
+            String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
+            model.addAttribute( "mediaTokens", mediaTokensStr );
+
         } catch ( Exception e ) {
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
             LOG.error( "Exception while getting facebook access token. Reason : ", e );
@@ -3633,9 +3638,6 @@ public class SocialManagementController
             Map<String, Object> map = new Gson().fromJson( accessTokenStr, new TypeToken<Map<String, String>>() {}.getType() );
             String accessToken = (String) map.get( "access_token" );
             String expiresInStr = (String) map.get( "expires_in" );
-            long expiresIn = 0;
-            if(StringUtils.isNotBlank( expiresInStr ))
-                expiresIn = Long.valueOf( expiresInStr ).longValue();
 
             HttpGet httpGet = new HttpGet( linkedinProfileUriV2 );
             httpGet.setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + accessToken );
