@@ -337,14 +337,40 @@
 -							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
 							<div class="float-left bd-check-txt survey-authorize-font-size"><spring:message code="label.survey.authorize.key"/></div>
 
-							<div class="reg_form_row clearfix">
-					       <div class="reg-btn" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', ${isAutoLogin}, this);" data-link="${facebookLink}">Import from facebook</div>
-					       <div class="reg-btn" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);" data-link="${facebookLink}">Import from LinkedIn</div>
-					       <div class="reg-btn" id="import-Twitter" onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);" data-link="${facebookLink}">Import from Twitter</div>
-				          </div>
-
+							<%-- <div class="reg_form_row clearfix">
+					       <div class="reg_btn" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
+					       <div class="reg_btn" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
+					       <div class="reg_btn" id="import-Twitter" onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
+				          </div> --%>
 						</div>
 						
+						<div id="ss-survey-prof-image-div" class="ss-survey-prof-image-div">
+							<div class="ss-survey-prof-img-sel-cont">
+						        <div class="ss-survey-pi-sel-txt">Import my picture from </div>
+						        <div class="ss-survey-pi-sel-icn-cont">
+						            <div class="ss-survey-soc-icon icn-fb" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', ${isAutoLogin}, this);"></div>
+						            <div class="ss-survey-soc-icon icn-twit" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);"></div>
+						            <div class="ss-survey-soc-icon icn-lin" id="import-Twitter" onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);"></div>
+						        </div>
+						    </div>
+						    <div id="ss-survey-prof-img-cont" class="ss-survey-prof-img-cont ss-survey-pi-hide">
+						       	<div class="ss-survey-prof-img-div">
+									<img id="ss-survey-prof-img" class="ss-survey-prof-img" src="https://s3-us-west-1.amazonaws.com/agent-survey/dev/userprofilepics/d-e0bcca9de9f1c945da2e354e2a1444ded8836532bef7aafb6d0c1d4d71f23c8eb5ba48561d9ad09ccbe220cb59ed5db004c62124e446ff01c096304d1e8ab5e3">
+								</div>
+								<div class="ss-survey-prof-img-actions">
+									<div class="ss-survey-pi-act-txt">
+									    <input id="ss-survey-img-check" type="hidden" val="false">
+									    <div id="ss-survey-pi-chk-box" class="ss-survey-act-icns ss-survey-pi-chk-box ss-survey-pi-chk-box-unchecked"></div>
+									    Post my picture with the review.
+									</div>
+								    <div class="ss-survey-pi-act-txt">
+								    	<div id="ss-survey-pi-rem-icn" class="ss-survey-act-icns ss-survey-pi-rem-icn">x</div>
+								    	Remove my picture.
+								    </div>
+								</div>
+							</div>
+						</div>
+
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>
 							<div id="next-textarea-smiley" class="float-left sq-np-item sq-np-item-next btn-com" data-survey-submit-disabled=false><spring:message code="label.nxt.btn.key"/></div>

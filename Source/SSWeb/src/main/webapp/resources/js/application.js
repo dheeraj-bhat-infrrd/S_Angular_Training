@@ -8572,6 +8572,10 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 	$('#next-textarea-smiley').attr('data-survey-submit-disabled',true);
 	var profImageUrl = $('#survey-profile-image-url').val();
 	
+	if($('#ss-survey-img-check').val() == 'false'){
+		profImageUrl = "";
+	}
+	
 	var payload = {
 		"mood" : mood,
 		"feedback" : feedback,
@@ -8624,6 +8628,8 @@ function showFeedbackPage(mood) {
 	$("#smiles-final").hide();
 	$("#next-textarea-smiley").html("Post My Review");
 	$("#next-textarea-smiley").removeClass("btn-com-disabled");
+	$('#ss-survey-prof-image-div').show();
+	
 	isSmileTypeQuestion = false;
 	switch (mood) {
 		case "Great":
@@ -8733,6 +8739,8 @@ function showMasterQuestionPage() {
 			showToast();
 			return;
 		}
+		
+		$('#ss-survey-prof-image-div').hide();
 
 		//console.log(swearWords);
 		var isAbusive = false;
@@ -24094,17 +24102,29 @@ $(document).on('click','#google-banner-close-btn',function(e){
 
 function showProfileImageForSurvey(profileImage){
 	$('#survey-profile-image-url').val(profileImage);
+	$('#ss-survey-prof-img-cont').removeClass('ss-survey-pi-hide');
+	$('#ss-survey-prof-img').attr('src', profileImage);
 	
+	$(document).off('click','#ss-survey-pi-chk-box');
+	$(document).on('click','#ss-survey-pi-chk-box',function(e){
+		$('#ss-survey-img-check').val();
+		if($(this).hasClass('ss-survey-pi-chk-box-unchecked')){
+			$('#ss-survey-img-check').val(true);
+			$(this).removeClass('ss-survey-pi-chk-box-unchecked');
+		}else{
+			$('#ss-survey-img-check').val(false);
+			$(this).addClass('ss-survey-pi-chk-box-unchecked');
+		}
+	});
+	
+	$(document).off('click','#ss-survey-pi-rem-icn');
+	$(document).on('click','#ss-survey-pi-rem-icn',function(e){
+		$('#ss-survey-prof-img-cont').addClass('ss-survey-pi-hide');
+		$('#ss-survey-img-check').val(false);
+		if(!$('#ss-survey-pi-chk-box').hasClass('ss-survey-pi-chk-box-unchecked')){
+			$('#ss-survey-pi-chk-box').addClass('ss-survey-pi-chk-box-unchecked');
+		}
+		$('#survey-profile-image-url').val('');
+		$('#ss-survey-prof-img').attr('src', '');
+	});
 }
-
-$(document).on('click','#shr-post-profile-chk-box',function(e){
-	if($(this).hasClass('v-ed-checkbox-unchecked')){
-		$(this).addClass('v-ed-checkbox-checked');
-		$(this).removeClass('v-ed-checkbox-unchecked');
-	}else{
-		$(this).removeClass('v-ed-checkbox-checked');
-		$(this).addClass('v-ed-checkbox-unchecked');
-	}
-	
-});
-

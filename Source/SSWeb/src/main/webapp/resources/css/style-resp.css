@@ -178,6 +178,23 @@
 		.summit-popup-close-cont {
     		margin-top: 25px;
 		}
+		
+		.ss-survey-prof-img-cont{
+			width: 100%;
+    		display: grid;
+		}
+		
+		.ss-survey-prof-img-div{
+			margin: 0 auto;
+		}
+		
+		.ss-survey-prof-img-actions{
+			margin-top: 20px;
+		}
+		
+		.ss-survey-pi-act-txt{
+			justify-content: center;
+		}
 	}
 	
 	@media (max-width: 360px){
