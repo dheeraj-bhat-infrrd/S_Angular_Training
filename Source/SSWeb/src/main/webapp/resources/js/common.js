@@ -1414,3 +1414,17 @@ function paintAvgRatingForPpf(avgRating) {
 function redirectPageNotFoundpage(){
 	window.open(getLocationOrigin() + "/sspagenotfound.do",'_self');
 }
+
+function openAuthPageForSurvey(event,socialNetwork, isAutoLogin, element) {
+	event.stopPropagation();
+	if(isAutoLogin) {
+		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
+		showToast();
+		return;
+	}
+	
+	var dataLink = $(element).attr('data-link');
+	//confirmSocialAuth(socialNetwork, function() {
+		window.open("../../socialAuthImage.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	//}, dataLink);
+}

@@ -478,9 +478,9 @@ public class SurveyApiV2Controller
 
     @RequestMapping ( value = "/surveys/{surveyId}/score", method = RequestMethod.POST)
     @ApiOperation ( value = "Get Survey Transaction")
-    public double updateScore(@PathVariable ( "surveyId") String surveyId,String mood,String feedback,boolean isAbusive,String agreedToShare){
+    public double updateScore(@PathVariable ( "surveyId") String surveyId,String mood,String feedback,boolean isAbusive,String agreedToShare, String profImageUrl){
         LOGGER.info("Method storeScore() started to store score of survey");
-        double score = surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);
+        double score = surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare, profImageUrl);
         LOGGER.info("Method storeScore() to store score of survey finished successfully");
         return score;
     }

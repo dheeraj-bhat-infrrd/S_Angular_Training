@@ -86,6 +86,7 @@ $(document).ready(function() {
 	var columnName = "${columnName}";
 	var columnValue = "${columnValue}";
 	var socialNetwork = "${socialNetwork}";
+	var isFbImagePopup = "${isFbImagePopup}";
 
 	if(isFbImagePopup == 'true'){
 		if(profImage != null && profImage != undefined && profImage != ''){
@@ -155,13 +156,11 @@ $(document).ready(function() {
 				radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${fn:escapeXml(page.name)}"+" <br/>");
 			</c:forEach>
 			$("#page").append(radioButtonDiv);
-	
 			var saveButton= $("<div class='reg_btn'>save</div>");
 			
 			<c:if test="${not empty pageNames}">
 				$("#page").append(saveButton);
 			</c:if>
-	
 		    <c:if test="${isPageListEmpty}">
 				$("#page").append("<div>No connected instagram accounts</div>");
 			</c:if>
@@ -231,7 +230,7 @@ $(document).ready(function() {
 					}
 				});
 		    });
-		}
+		}		
 	}
 });
 

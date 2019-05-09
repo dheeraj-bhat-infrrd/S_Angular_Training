@@ -225,7 +225,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * collection.
      */
     @Override
-    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore )
+    public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare, double score, double npsScore, String profImageUrl )
     {
         LOG.info( "Method updateGatewayAnswer() to update review provided by customer started." );
         Query query = new Query();
@@ -237,6 +237,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( "review", review );
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, isAbusive );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        update.set( CommonConstants.PROFILE_IMAGE_URL, profImageUrl);
         SurveyDetails details = getSurveyBySurveyMongoId( surveyId );
         if ( details != null && details.getSurveyCompletedDate() != null ) {
             update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, new Date() );
