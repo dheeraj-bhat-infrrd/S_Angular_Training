@@ -91,8 +91,8 @@ $(document).ready(function() {
 	if(isImagePopup == 'true'){
 		if(profImage != null && profImage != undefined && profImage != ''){
 			parentWindow.showProfileImageForSurvey(profImage);
+			$('#page').text('Thank You for authorizing SocialSurvey to access your Social profile!');
 		}
-		$('#page').text('Thank You for authorizing SocialSurvey to access your Social profile!');
 		setTimeout(function() {
 			window.close();
 		}, 3000);
