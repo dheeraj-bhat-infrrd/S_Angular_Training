@@ -3538,7 +3538,7 @@ public class SocialManagementController
             model.addAttribute( "columnValue", columnValue );
             model.addAttribute( "fromDashboard", 1 );
         }
-        URL profileImageUrl = null;
+        String profileImageUrl = null;
         try {
         	model.addAttribute( "isFbImagePopup", "true" );
             // On auth error
@@ -3560,15 +3560,15 @@ public class SocialManagementController
                 accessToken = facebook.getOAuthAccessToken( oauthCode,
                     requestUtils.getRequestServerName( request ) + facebookRedirectImageUri );
                 facebook4j.User fbUser = facebook.getUser( facebook.getId() );
-                    profileLink = facebookUri + facebook.getId();
-                    profileImageUrl = facebook.getPictureURL(facebook.getId());
-                  //String saveProfilePic = socialManagementService.saveProfilePicForReviewer(profileImageUrl);
-                    //call dao from service to set the image and save it in surveydetails table.
-					/*
-					 * FacebookPage personalUserAccount = new FacebookPage();
-					 * personalUserAccount.setProfileImageUrl( profileImageUrl ); facebookPages.add(
-					 * personalUserAccount );
-					 */
+                profileLink = facebookUri + facebook.getId();
+                profileImageUrl = "http://graph.facebook.com/"+facebook.getId()+"/picture?type=large";
+                LOG.info("ProfilePic url " + profileImageUrl);
+                FacebookPage personalUserAccount = new FacebookPage();
+                personalUserAccount.setId( facebook.getId() );
+                personalUserAccount.setAccessToken( accessToken.getToken() );
+                personalUserAccount.setName( fbUser.getName() );
+                personalUserAccount.setProfileUrl( profileLink );
+                facebookPages.add( personalUserAccount );
             } catch ( FacebookException e ) {
                 LOG.error( "Error while creating access token for facebook: ", e );
             }
