@@ -210,6 +210,7 @@ $(document).ready(function() {
 								parentWindow.showProfileLinkInEditProfilePage("facebook", profileUrlLink);
 							} else {
 								parentWindow.removeProfileLinkInEditProfilePage("facebook");
+								parentWindow.showProfileImageForSurvey("${profileImage}");
 							}
 						}
 					});

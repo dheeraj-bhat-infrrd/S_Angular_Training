@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -163,7 +164,7 @@ public class SocialManagementController
     private String applicationBaseUrl;
 
     // Facebook
-    @Value ( "${FB_REDIRECT_URI}")
+	@Value("${FB_REDIRECT_URI}")
     private String facebookRedirectUri;
 
     @Value ( "${FB_CLIENT_ID}")
@@ -174,6 +175,9 @@ public class SocialManagementController
 
     @Value ( "${FB_URI}")
     private String facebookUri;
+    
+    @Value("${FB_REDIRECT_URI_IMAGE}")
+    private String facebookRedirectImageUri;
 
     // Instagram
     @Value ( "${IG_REDIRECT_URI}" )
@@ -3441,6 +3445,279 @@ public class SocialManagementController
         String surveyMongoId = request.getParameter( "surveyMongoId" );
         long entityId = Long.parseLong( request.getParameter( "entityId" ) );
         return socialManagementService.manualPostToLinkedInForEntity( entityType, entityId, surveyMongoId );
+    }
+    
+    @RequestMapping ( value = "/rest/survey/socialauth", method = RequestMethod.GET)
+    public String getSocialAuthPageForSurvey( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method getSocialAuthPageForSurvey() called from SocialManagementController" );
+        HttpSession session = request.getSession( false );
+        if ( session == null ) {
+            LOG.error( "Session is null!" );
+        }
+
+        // AuthUrl for diff social networks
+        String socialNetwork = request.getParameter( "social" );
+        String socialFlow = request.getParameter( "flow" );
+
+        session.removeAttribute( CommonConstants.SOCIAL_FLOW );
+        String serverBaseUrl = requestUtils.getRequestServerName( request );
+        switch ( socialNetwork ) {
+
+            // Building facebook authUrl
+            case "facebook":
+                Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectImageUri );
+                // Setting authUrl in model
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, facebook );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
+                    facebook.getOAuthAuthorizationURL( serverBaseUrl + facebookRedirectImageUri ) );
+                break;
+
+            // Building twitter authUrl
+            case "twitter":
+                RequestToken requestToken;
+                try {
+                    requestToken = socialManagementService.getTwitterRequestTokenForReviewer( serverBaseUrl );
+                } catch ( Exception e ) {
+                    LOG.error( "Exception while getting request token. Reason : " + e.getMessage(), e );
+                    model.addAttribute( "message", e.getMessage() );
+                    return JspResolver.ERROR_PAGE;
+                }
+
+                // We will keep the request token in session
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, requestToken );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, requestToken.getAuthorizationURL() );
+
+                LOG.info( "Returning the twitter authorizationurl : " + requestToken.getAuthorizationURL() );
+                break;
+                
+             // Building linkedin authUrl
+            case "linkedin":
+                if ( socialFlow != null && !socialFlow.isEmpty() ) {
+                    session.setAttribute( CommonConstants.SOCIAL_FLOW, socialFlow );
+                }
+                //String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
+                
+                String linkedInAuthV2 = socialManagementService.getLinkedinAuthUrl( linkedinAuthUriV2, linkedInApiKeyV2, serverBaseUrl + linkedinRedirectUri, linkedinScopeV2 );
+                
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuthV2 );
+
+                LOG.info( "Returning the linkedin authorizationurl : {}", linkedInAuthV2 );
+                break;
+
+            default:
+                LOG.error( "Social Network Type invalid in getSocialAuthPage" );
+        }
+
+        model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
+        if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") )
+            return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+        else
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+    }
+    
+    @RequestMapping ( value = "/facebookauthimage", method = RequestMethod.GET)
+    public String authenticateFacebookAccessForImage( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Facebook authentication url requested" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        boolean isNewUser = true;
+        URL profileImageUrl = null;
+
+        try {
+            // On auth error
+            String errorCode = request.getParameter( "error" );
+            if ( errorCode != null ) {
+                LOG.error( "Error code : {}", errorCode );
+                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
+                return JspResolver.SOCIAL_AUTH_MESSAGE;
+            }
+
+            // Getting Oauth accesstoken for facebook
+            String oauthCode = request.getParameter( "code" );
+            Facebook facebook = (Facebook) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            String profileLink = null;
+            facebook4j.auth.AccessToken accessToken = null;
+            SocialMediaTokens mediaTokens = null;
+            List<FacebookPage> facebookPages = new ArrayList<>();
+            try {
+                accessToken = facebook.getOAuthAccessToken( oauthCode,
+                    requestUtils.getRequestServerName( request ) + facebookRedirectImageUri );
+                facebook4j.User fbUser = facebook.getUser( facebook.getId() );
+                if ( user != null ) {
+                    profileLink = facebookUri + facebook.getId();
+                    profileImageUrl = facebook.getPictureURL(facebook.getId());
+                  //String saveProfilePic = socialManagementService.saveProfilePicForReviewer(profileImageUrl);
+                    //call dao from service to set the image and save it in surveydetails table.
+					/*
+					 * FacebookPage personalUserAccount = new FacebookPage();
+					 * personalUserAccount.setProfileImageUrl( profileImageUrl ); facebookPages.add(
+					 * personalUserAccount );
+					 */
+                }
+            } catch ( FacebookException e ) {
+                LOG.error( "Error while creating access token for facebook: ", e );
+            }
+            
+            String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
+            model.addAttribute( "pageNames", facebookPages );
+            
+            model.addAttribute( "fbAccessToken", fbAccessTokenStr );
+            String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
+            model.addAttribute( "mediaTokens", mediaTokensStr );
+
+        } catch ( Exception e ) {
+            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            LOG.error( "Exception while getting facebook access token. Reason : ", e );
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+        }
+
+        // Updating attributes
+        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        model.addAttribute( "isNewUser", isNewUser );
+        model.addAttribute("profileImage", profileImageUrl);
+        model.addAttribute( "socialNetwork", "facebook" );
+        model.addAttribute(CommonConstants.CALLBACK, "./data/storeFeedBack.do");
+        LOG.info( "Facebook Access tokens obtained  successfully!" );
+        return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+    }
+    
+    @RequestMapping ( value = "/linkedinauthimage", method = RequestMethod.GET)
+    public String authenticateLinkedInAccessV2Image( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method authenticateLinkedInAccessV2() called from SocialManagementController" );
+        return authenticateLinkedInAccessImage( model, request, V2, linkedInApiKeyV2, linkedInApiSecretV2, linkedinAccessUriV2,
+            linkedinRedirectUri );
+    }
+
+    public String authenticateLinkedInAccessImage( Model model, HttpServletRequest request, String version, String linkedInApiKey, String linkedInApiSecret, String linkedinAccessUri, String linkedinRedirectUri )
+    {
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        
+        
+        SocialMediaTokens mediaTokens = null;
+        try {
+
+            // On auth error
+            String errorCode = request.getParameter( "error" );
+            if ( errorCode != null ) {
+                LOG.error( "Error code : {}", errorCode );
+                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
+                return JspResolver.SOCIAL_AUTH_MESSAGE;
+            }
+
+            // Getting Oauth accesstoken for Linkedin
+            String oauthCode = request.getParameter( "code" );
+            List<NameValuePair> params = new ArrayList<NameValuePair>( 2 );
+            params.add( new BasicNameValuePair( "grant_type", "authorization_code" ) );
+            params.add( new BasicNameValuePair( "code", oauthCode ) );
+            params.add(
+                new BasicNameValuePair( "redirect_uri", requestUtils.getRequestServerName( request ) + linkedinRedirectUri ) );
+            params.add( new BasicNameValuePair( "client_id", linkedInApiKey ) );
+            params.add( new BasicNameValuePair( "client_secret", linkedInApiSecret ) );
+
+            // fetching access token
+            HttpClient httpclient = HttpClientBuilder.create().build();
+            HttpPost httpPost = new HttpPost( linkedinAccessUri );
+            httpPost.setEntity( new UrlEncodedFormEntity( params, "UTF-8" ) );
+            String accessTokenStr = httpclient.execute( httpPost, new BasicResponseHandler() );
+            Map<String, Object> map = new Gson().fromJson( accessTokenStr, new TypeToken<Map<String, String>>() {}.getType() );
+            String accessToken = (String) map.get( "access_token" );
+            String expiresInStr = (String) map.get( "expires_in" );
+            long expiresIn = 0;
+            if(StringUtils.isNotBlank( expiresInStr ))
+                expiresIn = Long.valueOf( expiresInStr ).longValue();
+
+            HttpGet httpGet = new HttpGet( linkedinProfileUriV2 );
+            httpGet.setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + accessToken );
+            httpGet.setHeader( CommonConstants.X_RESTLI_PROTOCOL_VERSION, CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE );
+            String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
+            IdInfoVO idInfoVO = new Gson().fromJson( basicProfileStr, IdInfoVO.class );
+            String profileLink = null;
+            
+            
+        } catch ( Exception e ) {
+            LOG.error( "Exception while getting linkedin access token. Reason : ", e );
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+        }
+
+        // Updating attributes
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        
+        model.addAttribute( "socialNetwork", "linkedin" );
+        
+        LOG.info( "Method authenticateLinkedInAccess() finished from SocialManagementController" );
+        return JspResolver.SOCIAL_AUTH_MESSAGE;
+    }
+    
+    /**
+     * The url that twitter send request to with the oauth verification code
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/twitterauthimage", method = RequestMethod.GET)
+    public String authenticateTwitterImageAccess( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Twitter authentication url requested" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        
+        SocialMediaTokens mediaTokens = null;
+        try {
+
+            // On auth error
+            String errorCode = request.getParameter( "oauth_problem" );
+            if ( errorCode != null ) {
+                LOG.error( "Error code : {}", errorCode );
+                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
+                return JspResolver.SOCIAL_AUTH_MESSAGE;
+            }
+
+            // Getting Oauth accesstoken for Twitter
+            AccessToken accessToken = null;
+            String profileLink = null;
+            String profileImage = null;
+            Twitter twitter = socialManagementService.getTwitterInstance();
+            String oauthVerifier = request.getParameter( "oauth_verifier" );
+            RequestToken requestToken = (RequestToken) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            try {
+                accessToken = twitter.getOAuthAccessToken( requestToken, oauthVerifier );
+                twitter4j.User twitterUser = twitter.showUser( twitter.getId() );
+                if ( twitterUser != null && twitterUser.getScreenName() != null ) {
+                    profileLink = CommonConstants.TWITTER_BASE_URL + twitterUser.getScreenName();
+                    profileImage = twitterUser.getOriginalProfileImageURL(); 
+                }
+            } catch ( TwitterException te ) {
+                if ( TwitterException.UNAUTHORIZED == te.getStatusCode() ) {
+                    LOG.error( "Unable to get the access token. Reason: UNAUTHORISED" );
+                } else {
+                    LOG.error( te.getErrorMessage() );
+                }
+
+                throw new NonFatalException( "Unable to procure twitter access token" );
+            }
+           
+            
+        } catch ( Exception e ) {
+            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            LOG.error( "Exception while getting twitter access token. Reason : " + e.getMessage(), e );
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+        }
+
+        // Updating attributes
+        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        model.addAttribute( "socialNetwork", "twitter" );
+        LOG.info( "Twitter Access tokens obtained and added to mongo successfully!" );
+        return JspResolver.SOCIAL_AUTH_MESSAGE;
     }
 
 }
