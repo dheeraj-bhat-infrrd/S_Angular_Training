@@ -1729,6 +1729,7 @@ public class SurveyManagementController
 				surveyAndStage.put("customerLastName", survey.getCustomerLastName());
 				surveyAndStage.put("customerEmail", survey.getCustomerEmail());
 				surveyAndStage.put("surveyId", survey.get_id());
+				surveyAndStage.put("ReviewerProfilePic", survey.getProfileImageUrl());
 				for (SurveyQuestionDetails surveyDetails : surveyQuestionDetails) {
 					for (SurveyResponse surveyResponse : survey.getSurveyResponse()) {
 						if (surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())) {
