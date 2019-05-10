@@ -264,7 +264,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;milliValue&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var createdOnStr &#x3d; convertToDate&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnStr &#x3d; convertToDate&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;&#xa;var optedOut &#x3d; 0&#x3b;&#xa;if&#x28;isLoginPrevented &#x21;&#x3d; null &#x26;&#x26; isLoginPrevented &#x3d;&#x3d; true&#x29; &#x7b;&#xa;optedOut &#x3d; 1&#x3b;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;function convertToDate&#x28;milliValue&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;var date &#x3d; new Date&#x28;milliValue&#x29;&#x3b;&#xd;&#xa;var year &#x3d; date.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;var month &#x3d; date.getMonth&#x28;&#x29;&#x2b;1&#x3b;&#xd;&#xa;var day &#x3d; date.getDate&#x28;&#x29;&#x3b;&#xd;&#xa;var hour &#x3d; date.getHours&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var min &#x3d; date.getMinutes&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;var sec &#x3d; date.getSeconds&#x28;&#x29;.toString&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;hour.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;hour &#x3d; &#x22;0&#x22;&#x2b;hour&#x3b;&#xd;&#xa;&#x7d; &#xd;&#xa;if&#x28;min.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;min &#x3d; &#x22;0&#x22;&#x2b;min&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;if&#x28;sec.length &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;sec &#x3d; &#x22;0&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;return &#x22;&#x22;&#x2b;year&#x2b;&#x22;-&#x22;&#x2b;month&#x2b;&#x22;-&#x22;&#x2b;day&#x2b;&#x22; &#x22;&#x2b;hour&#x2b;&#x22;&#x3a;&#x22;&#x2b;min&#x2b;&#x22;&#x3a;&#x22;&#x2b;sec&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;var createdOnStr &#x3d; convertToDate&#x28;createdOn&#x29;&#x3b;&#xd;&#xa;var modifiedOnStr &#x3d; convertToDate&#x28;modifiedOn&#x29;&#x3b;&#xd;&#xa;&#xa;var optedOut &#x3d; 0&#x3b;&#xa;if&#x28;isLoginPrevented &#x21;&#x3d; null &#x26;&#x26; isLoginPrevented &#x3d;&#x3d; &#x22;true&#x22;&#x29; &#x7b;&#xa;optedOut &#x3d; 1&#x3b;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>createdOnStr</name>
         <rename>createdOnStr</rename>
         <type>String</type>
@@ -1142,6 +1142,47 @@
     </step>
 
   <step>
+    <name>Filter rows 3</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>DateConverter </send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>final_agent_settings_id</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>final_agent_id</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1378</xloc>
+      <yloc>556</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Group Achievments</name>
     <type>GroupBy</type>
     <description/>
@@ -1642,6 +1683,42 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>566</xloc>
       <yloc>141</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Modified Java Script Value</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xa;&#xa;var final_agent_settings_id&#x3d;0&#x3b;&#xa;var final_agent_id &#x3d; 0&#x3b;&#xa;&#xa;if&#x28;AGENT_SETTINGS_ID &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_1&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_2&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_3&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_4&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_5&#x3b;&#xa;&#x7d;&#xa;&#xa;if&#x28;agentId &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId&#x3b;&#xa;&#x7d; else if&#x28;agentId_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_1&#x3b;&#xa;&#x7d; else if&#x28;agentId_2 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_2&#x3b;&#xa;&#x7d; else if&#x28;agentId_3 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_3&#x3b;&#xa;&#x7d; else if&#x28;agentId_4 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_4&#x3b;&#xa;&#x7d; else if&#x28;agentId_5 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_5&#x3b;&#xa;&#x7d;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_agent_settings_id</name>
+        <rename>final_agent_settings_id</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_agent_id</name>
+        <rename>final_agent_id</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1378</xloc>
+      <yloc>459</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2273,7 +2350,7 @@
 
         <field_path>&#x24;.isLoginPrevented</field_path>
 
-        <field_type>Boolean</field_type>
+        <field_type>String</field_type>
 
       </mongo_field>
       <mongo_field>
@@ -4679,87 +4756,10 @@
       </GUI>
     </step>
 
-  <step>
-    <name>Modified Java Script Value</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xa;&#xa;var final_agent_settings_id&#x3d;0&#x3b;&#xa;var final_agent_id &#x3d; 0&#x3b;&#xa;&#xa;if&#x28;AGENT_SETTINGS_ID &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_1&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_2&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_3&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_4&#x3b;&#xa;&#x7d; else if&#x28;AGENT_SETTINGS_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_settings_id&#x3d;AGENT_SETTINGS_ID_5&#x3b;&#xa;&#x7d;&#xa;&#xa;if&#x28;agentId &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId&#x3b;&#xa;&#x7d; else if&#x28;agentId_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_1&#x3b;&#xa;&#x7d; else if&#x28;agentId_2 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_2&#x3b;&#xa;&#x7d; else if&#x28;agentId_3 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_3&#x3b;&#xa;&#x7d; else if&#x28;agentId_4 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_4&#x3b;&#xa;&#x7d; else if&#x28;agentId_5 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	final_agent_id &#x3d; agentId_5&#x3b;&#xa;&#x7d;&#xa;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_agent_settings_id</name>
-        <rename>final_agent_settings_id</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>final_agent_id</name>
-        <rename>final_agent_id</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1378</xloc>
-      <yloc>459</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter rows 3</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>DateConverter </send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>final_agent_settings_id</leftvalue>
-   <function>IS NOT NULL</function>
-   <rightvalue/>
-   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>final_agent_id</leftvalue>
-   <function>IS NOT NULL</function>
-   <rightvalue/>
-   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1378</xloc>
-      <yloc>556</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step_error_handling>
       <error>
         <source_step>Insert &#x2f; Update AgentSettings</source_step>
-        <target_step>Write to log</target_step>
+        <target_step/>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
