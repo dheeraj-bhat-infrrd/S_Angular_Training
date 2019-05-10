@@ -3705,6 +3705,11 @@ public class SocialManagementController
 					CommonConstants.X_RESTLI_PROTOCOL_VERSION_VALUE);
 			String basicProfileStrResponse = httpclient.execute(httpGetImage, new BasicResponseHandler());
 			if (basicProfileStrResponse != null && basicProfileStrResponse.contains("identifier")) {
+				if(basicProfileStrResponse.contains("\"width\":200")) {
+					LOG.info("200X200 image is available");
+					basicProfileStrResponse = basicProfileStrResponse
+							.substring(basicProfileStrResponse.indexOf("\"width\":200"));
+				}
 				basicProfileStrResponse = basicProfileStrResponse
 						.substring(basicProfileStrResponse.indexOf("identifier"));
 				basicProfileStrResponse = basicProfileStrResponse.substring(basicProfileStrResponse.indexOf("http"),
