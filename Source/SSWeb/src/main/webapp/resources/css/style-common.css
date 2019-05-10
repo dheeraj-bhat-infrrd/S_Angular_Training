@@ -14542,6 +14542,7 @@ body.ss-not-found-page {
 	z-index: 10000;
 }
 
+/*Profile picture on reviews UI*/
 .review-details{
 	margin-left:60px!important;
 	line-height:16px!important;
@@ -14561,7 +14562,103 @@ body.ss-not-found-page {
 	width:43%;
 	margin-left:214px;
 }
-.btn-align{
-	margin-left:20px;
-	margin-top:20px;
+
+/*profile picture on reviews styles*/
+.ss-survey-prof-image-div {
+    width: 100%;
+    display: grid;
+    margin-top: 30px;
+    display:none;
+}
+
+.ss-survey-prof-img-sel-cont {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    width:320px;
+}
+
+.ss-survey-pi-sel-txt {
+    font-family: OpenSansBold;
+    color: #666;
+    font-size: 15px;
+}
+
+.ss-survey-pi-sel-icn-cont {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.ss-survey-soc-icon {
+    height: 30px;
+    width: 30px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.ss-survey-prof-img-cont {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 30px;
+    width: 430px;
+}
+
+.ss-survey-prof-img-div {
+    width: 150px;
+    height: 150px;
+}
+
+.ss-survey-prof-img {
+    width: 100%;
+    height: 100%;
+}
+
+.ss-survey-prof-img-actions {
+    display: grid;
+    margin-left: 25px;
+}
+
+.ss-survey-pi-act-txt {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    font-family: OpenSansSemiBold;
+    margin-bottom: 15px;
+}
+
+.ss-survey-act-icns {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.ss-survey-pi-chk-box {
+    background: url(../images/ss-tick.png) no-repeat;
+    background-position: center;
+    background-size: contain;
+    border: 2px solid #2f69aa;
+    border-radius: 3px;
+}
+
+.ss-survey-pi-chk-box-unchecked {
+    background: none;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #2f69aa;
+    border-radius: 3px;
+}
+
+.ss-survey-pi-rem-icn {
+    font-size: 30px;
+    font-family: OpenSans;
+}
+
+.ss-survey-pi-hide{
+	display: none !important;
 }
