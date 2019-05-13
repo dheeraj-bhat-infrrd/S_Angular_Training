@@ -4433,7 +4433,21 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         Twitter twitter = getTwitterInstance();
         RequestToken requestToken = twitter.getOAuthRequestToken( serverBaseUrl + twitterRedirectImageUri );
         return requestToken;
-    } 
+    }
+
+	@Override
+	public Facebook getFacebookInstanceForSmImage(String serverBaseUrl, String facebookRedirectImageUri) {
+
+        facebook4j.conf.ConfigurationBuilder confBuilder = new facebook4j.conf.ConfigurationBuilder();
+        confBuilder.setOAuthAppId( facebookClientId );
+        confBuilder.setOAuthAppSecret( facebookAppSecret );
+        confBuilder.setOAuthCallbackURL( serverBaseUrl + facebookRedirectImageUri );
+        confBuilder.setRestBaseURL( facebookRestBaseURL );
+        confBuilder.setOAuthPermissions( "public_profile" );
+        facebook4j.conf.Configuration configuration = confBuilder.build();
+
+        return new FacebookFactory( configuration ).getInstance();
+	} 
     
 	/*
 	 * @Override public String saveProfilePicForReviewer(URL profileImageUrl) {

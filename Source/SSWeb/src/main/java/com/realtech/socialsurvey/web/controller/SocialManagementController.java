@@ -3481,7 +3481,7 @@ public class SocialManagementController
 		case "facebook":
 			try {
 				LOG.info("inside facebook");
-				Facebook facebook = socialManagementService.getFacebookInstance(serverBaseUrl,
+				Facebook facebook = socialManagementService.getFacebookInstanceForSmImage(serverBaseUrl,
 						facebookRedirectImageUri);
 				// Setting authUrl in model
 				session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, facebook);
@@ -3519,7 +3519,7 @@ public class SocialManagementController
 			// serverBaseUrl + linkedinRedirectUri );
 
 			String linkedInAuthV2 = socialManagementService.getLinkedinAuthUrl(linkedinAuthUriV2, linkedInApiKeyV2,
-					serverBaseUrl + "/linkedinauthimage.do", linkedinScopeV2);
+					serverBaseUrl + "/linkedinauthimage.do", "r_liteprofile");
 
 			model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, linkedInAuthV2);
 
@@ -3532,6 +3532,7 @@ public class SocialManagementController
 
 		model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
 		model.addAttribute("isImagePopup", "true");
+		model.addAttribute("isComplete", "false");
 		LOG.info("returning to facebook intermediate from socialAuth");
 		if (socialNetwork.equalsIgnoreCase("facebook") || socialNetwork.equalsIgnoreCase("instagram")) {
 			LOG.info("confirm facebook intermediate");
@@ -3545,19 +3546,10 @@ public class SocialManagementController
 	public String authenticateFacebookAccessForImage(Model model, HttpServletRequest request) {
 		LOG.info("Facebook authentication url requested");
 		// User user = sessionHelper.getCurrentUser();
-		HttpSession session = request.getSession(false);
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		if (session.getAttribute("columnName") != null) {
-			String columnName = (String) session.getAttribute("columnName");
-			String columnValue = (String) session.getAttribute("columnValue");
-			session.removeAttribute("columnName");
-			session.removeAttribute("columnValue");
-			model.addAttribute("columnName", columnName);
-			model.addAttribute("columnValue", columnValue);
-			model.addAttribute("fromDashboard", 1);
-		}
+		
 		String profileImageUrl = null;
 		try {
+			HttpSession session = request.getSession(false);
 			model.addAttribute("isImagePopup", "true");
 			// On auth error
 			String errorCode = request.getParameter("error");
@@ -3620,33 +3612,24 @@ public class SocialManagementController
 						profileImageUrl = "";
 					}
 				}
-				FacebookPage personalUserAccount = new FacebookPage();
-				personalUserAccount.setId(facebook.getId());
-				personalUserAccount.setAccessToken(accessToken.getToken());
-				personalUserAccount.setName(fbUser.getName());
-				personalUserAccount.setProfileUrl(profileLink);
-				facebookPages.add(personalUserAccount);
 			} catch (FacebookException e) {
 				LOG.error("Error while creating access token for facebook: ", e);
 			}
-			// Storing token
-			facebookPages.addAll(socialManagementService.getFacebookPages(accessToken, profileLink));
 
 			String fbAccessTokenStr = new Gson().toJson(accessToken, facebook4j.auth.AccessToken.class);
-			model.addAttribute("pageNames", facebookPages);
-
 			model.addAttribute("fbAccessToken", fbAccessTokenStr);
-		} catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+		} catch (Exception e) {
 			LOG.error("Exception while getting facebook access token. Reason : ", e);
 			return JspResolver.SOCIAL_AUTH_MESSAGE;
 		}
 
 		// Updating attributes
-		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+		
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 		model.addAttribute("profileImage", profileImageUrl);
 		model.addAttribute("socialNetwork", "facebook");
+		model.addAttribute("isComplete", "true");
 		LOG.info("Facebook Access tokens obtained successfully!");
 		return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
 	}
@@ -3654,10 +3637,9 @@ public class SocialManagementController
 	@RequestMapping(value = "/linkedinauthimage", method = RequestMethod.GET)
 	public String authenticateLinkedInAccessV2Image(Model model, HttpServletRequest request) {
 		// User user = sessionHelper.getCurrentUser();
-		HttpSession session = request.getSession(false);
+		
 		model.addAttribute("isImagePopup", "true");
 		try {
-
 			// On auth error
 			String errorCode = request.getParameter("error");
 			if (errorCode != null) {
@@ -3748,7 +3730,7 @@ public class SocialManagementController
 		}
 
 		// Updating attributes
-		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
+		model.addAttribute("image", CommonConstants.YES);
 		model.addAttribute("socialNetwork", "linkedin");
 
 		LOG.info("Method authenticateLinkedInAccess() finished from SocialManagementController");
@@ -3765,9 +3747,9 @@ public class SocialManagementController
 	@RequestMapping(value = "/twitterauthimage", method = RequestMethod.GET)
 	public String authenticateTwitterImageAccess(Model model, HttpServletRequest request) {
 		LOG.info("Twitter authentication url requested");
-		HttpSession session = request.getSession(false);
+		
 		try {
-
+			HttpSession session = request.getSession(false);
 			// On auth error
 			String errorCode = request.getParameter("oauth_problem");
 			if (errorCode != null) {
@@ -3829,16 +3811,13 @@ public class SocialManagementController
 				throw new NonFatalException("Unable to procure twitter access token");
 			}
 			model.addAttribute("profileImage", profileImage);
-
-		} catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+		} catch (Exception e) {
 			LOG.error("Exception while getting twitter access token. Reason : " + e.getMessage(), e);
 			return JspResolver.SOCIAL_AUTH_MESSAGE;
 		}
 
-		// Updating attributes
-		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
-		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
+		model.addAttribute("image", CommonConstants.YES);
 		model.addAttribute("socialNetwork", "twitter");
 		LOG.info("Twitter Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;

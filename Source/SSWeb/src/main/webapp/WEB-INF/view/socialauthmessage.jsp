@@ -28,6 +28,7 @@
 						<div style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
 							<c:choose>
 								<c:when test="${success == 1}"><spring:message code="label.authorization.success" /></c:when>
+								<c:when test="${image == 1}"><spring:message code="label.authorization.success.sm.image" /></c:when>
 								<c:when test="${nogoogleplusfound == 1}"><spring:message code="label.no.google.found" /></c:when>
 								<c:when test="${message == 1}"><spring:message code="label.waitmessage.key" /></c:when>
 								<c:otherwise><spring:message code="label.authorization.failure" /></c:otherwise>

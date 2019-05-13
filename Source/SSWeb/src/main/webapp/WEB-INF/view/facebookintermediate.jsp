@@ -88,14 +88,17 @@ $(document).ready(function() {
 	var socialNetwork = "${socialNetwork}";
 	var isImagePopup = "${isImagePopup}";
 	var profImage = "${profileImage}";
+	var isComp = "${isComplete}";
 	if(isImagePopup == 'true'){
 		if(profImage != null && profImage != undefined && profImage != ''){
 			parentWindow.showProfileImageForSurvey(profImage);
-			$('#page').text('Thank You for authorizing SocialSurvey to access your Social profile!');
 		}
-		setTimeout(function() {
-			window.close();
-		}, 3000);
+		if(isComp == 'true'){
+			$('#page').text('Thank You for authorizing SocialSurvey to access your Social profile picture!');
+			setTimeout(function() {
+				window.close();
+			}, 3000);
+		}
 	} else {
 		if(isFixSocialMedia ==  1){
 			if(isNewUser==true || isNewUser=="true"){

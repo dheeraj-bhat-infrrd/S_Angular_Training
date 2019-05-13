@@ -386,5 +386,12 @@ public interface SocialManagementService
 	 */
 	public RequestToken getTwitterRequestTokenForAuthImage(String serverBaseUrl) throws TwitterException;
 
+	/**
+	 * @param serverBaseUrl
+	 * @param facebookRedirectImageUri
+	 * @return
+	 */
+	public Facebook getFacebookInstanceForSmImage(String serverBaseUrl, String facebookRedirectImageUri);
+
 }
 // JIRA SS-34 BY RM02 BOC
