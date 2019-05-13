@@ -420,4 +420,30 @@ public class SocialManagementServiceImplTest
         socialManagementServiceImpl.updateSurveyPreinitiationRecordsAsIgnored( "" );
     }
     
+    @Test
+    public void testTweetNullReviewerProfilePic() throws InvalidInputException, TwitterException
+    {
+        socialManagementServiceImpl.tweet( new OrganizationUnitSettings(), TestConstants.TEST_STRING, TestConstants.TEST_LONG, null);
+    }
+    
+    @Test
+    public void testTweetReviewerProfilePic() throws InvalidInputException, TwitterException
+    {
+        socialManagementServiceImpl.tweet( new OrganizationUnitSettings(), TestConstants.TEST_STRING, TestConstants.TEST_LONG, TestConstants.TEST_STRING);
+    }
+    
+    @Test
+    public void testUpdateStatusIntoFacebookPageWithNullReviewerProfilePic() throws InvalidInputException, FacebookException
+    {
+        socialManagementServiceImpl.updateStatusIntoFacebookPage( new OrganizationUnitSettings(), TestConstants.TEST_STRING, TestConstants.TEST_STRING,
+            TestConstants.TEST_LONG, null );
+    }
+    
+    @Test
+    public void testUpdateStatusIntoFacebookPageWithReviewerProfilePic() throws InvalidInputException, FacebookException
+    {
+        socialManagementServiceImpl.updateStatusIntoFacebookPage( new OrganizationUnitSettings(), TestConstants.TEST_STRING, TestConstants.TEST_STRING,
+            TestConstants.TEST_LONG, TestConstants.TEST_STRING  );
+    }
+    
 }

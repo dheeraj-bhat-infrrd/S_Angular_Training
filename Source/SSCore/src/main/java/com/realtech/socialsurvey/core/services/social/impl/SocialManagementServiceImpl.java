@@ -572,10 +572,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         
                         if ( companyId == Long.parseLong( customisedSocialNetworkCompanyId ) ) {
 							try {
+								if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+									statusUpdate.setMedia("Picture", new URL(profileImageUrl).openStream());
+								} else {
 									statusUpdate.setMedia("Picture", new URL(
 											"https://don7n2as2v6aa.cloudfront.net/remax-twitter-image.jpg?imgmax=800")
 													.openStream());
-								
+								}
                             } catch ( MalformedURLException e ) {
                                 LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
                             } catch ( IOException e ) {
