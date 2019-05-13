@@ -349,8 +349,8 @@
 						        <div class="ss-survey-pi-sel-txt">Import my picture from </div>
 						        <div class="ss-survey-pi-sel-icn-cont">
 						            <div class="ss-survey-soc-icon icn-fb" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', ${isAutoLogin}, this);"></div>
-						            <div class="ss-survey-soc-icon icn-twit" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);"></div>
-						            <div class="ss-survey-soc-icon icn-lin" id="import-Twitter" onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);"></div>
+						            <div class="ss-survey-soc-icon icn-lin" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);"></div>
+						            <div class="ss-survey-soc-icon icn-twit" id="import-Twitter" onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);"></div>
 						        </div>
 						    </div>
 						    <div id="ss-survey-prof-img-cont" class="ss-survey-prof-img-cont ss-survey-pi-hide">

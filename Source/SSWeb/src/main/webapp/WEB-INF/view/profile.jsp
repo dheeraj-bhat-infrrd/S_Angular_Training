@@ -103,16 +103,18 @@
 <meta http-equiv="cache-control" content="max-age=0" />
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />
-<meta property="twitter:description" content="${descriptionTag}" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:description" content="${descriptionTag}" />
 <meta property="og:description" content="${descriptionTag}" />
 <meta property="og:profileLevel" content="${profileLevel}" />
 <c:choose>
 	<c:when test="${isOgImageChange == 'TRUE'}">
-		<meta property="twitter:image" content="${smImage}"/>
+		<meta name="twitter:image" content="${smImage}"/>
 		<meta property="og:image" content="${smImage}" />
+		<meta property="og:url" content="${ogUrl}" />
 	</c:when>
 	<c:otherwise>
-		<meta property="twitter:image" content="${profile.profileImageUrlThumbnail}"/>
+		<meta name="twitter:image" content="${profile.profileImageUrlThumbnail}"/>
 		<meta property="og:image" content="${profile.profileImageUrlThumbnail}" />		
 	</c:otherwise>
 </c:choose>
@@ -123,23 +125,23 @@
 				<c:choose>
 					<c:when test="${companyName == companyNameForTitle}">
 						<meta property="og:title" content="${profName} ${title} ${companyNameForTitle} ${vertical} Professional Reviews" />
-						<meta property="twitter:title" content="${profName} ${title} ${companyNameForTitle} ${vertical} Professional Reviews" />
+						<meta name="twitter:title" content="${profName} ${title} ${companyNameForTitle} ${vertical} Professional Reviews" />
 					</c:when>
 					<c:otherwise>
 						<meta property="og:title" content="${profName} ${title} ${companyName} ${companyNameForTitle} ${vertical} Professional Reviews" />
-						<meta property="twitter:title" content="${profName} ${title} ${companyName} ${companyNameForTitle} ${vertical} Professional Reviews" />
+						<meta name="twitter:title" content="${profName} ${title} ${companyName} ${companyNameForTitle} ${vertical} Professional Reviews" />
 					</c:otherwise>
 				</c:choose>
 			</c:when>
 			<c:otherwise>
 				<meta property="og:title" content="${profName} ${vertical} Reviews" />
-				<meta property="twitter:title" content="${profName} ${vertical} Reviews" />
+				<meta name="twitter:title" content="${profName} ${vertical} Reviews" />
 			</c:otherwise>
 		</c:choose>
 	</c:when>
 	<c:otherwise>
 		<meta property="og:title" content="<spring:message code="label.profile.title.key" />" />
-		<meta property="twitter:title" content="<spring:message code="label.profile.title.key" />" />
+		<meta name="twitter:title" content="<spring:message code="label.profile.title.key" />" />
 		<title></title>
 		<title></title>
 	</c:otherwise>
@@ -203,9 +205,16 @@
 			<title><spring:message code="label.profile.title.key" /></title>
 		</c:otherwise>
 	</c:choose>
-	<c:if test="${not empty profile.completeProfileUrl}">
-		<link rel="canonical" href="${profile.completeProfileUrl}">
-	</c:if>
+	<c:choose>
+		<c:when test="${isOgImageChange == 'TRUE'}">
+			<link rel="canonical" href="${ogUrl}">
+		</c:when>
+		<c:otherwise>
+			<c:if test="${not empty profile.completeProfileUrl}">
+				<link rel="canonical" href="${profile.completeProfileUrl}">
+			</c:if>
+		</c:otherwise>
+	</c:choose>
 	<c:if test="${not empty averageRating}">
 		<fmt:formatNumber var="floatingAverageRating" type="number"
 			value="${averageRating}" maxFractionDigits="2" minFractionDigits="2" />
