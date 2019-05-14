@@ -260,7 +260,6 @@
 									</includes>
 								</resource>
 							</webResources>
-							<outputDirectory>${dev.deployment.path}</outputDirectory>
 						</configuration>
 					</plugin>
 				</plugins>
