@@ -307,10 +307,36 @@
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
-						<textarea id="text-area" class="sq-txt-area" maxlength="500" onkeydown="checkCharacterLimit(this);"></textarea>
+						<div id="ss-survey-txt-img-wrapper" class="ss-survey-txt-img-wrapper ss-survey-pi-hide">
+						    <div class="ss-survey-prof-img-act-wrapper">
+								<div class="ss-survey-prof-img-div">
+									<img id="ss-survey-prof-img-def" class="ss-survey-prof-img" src="/widget/images/person.png">
+									<img id="ss-survey-prof-img" class="ss-survey-prof-img ss-survey-pi-hide" src="/widget/images/person.png">
+								</div>
+								<div id="ss-survey-img-import-wrapper" class="ss-survey-img-import-wrapper ss-survey-pi-hide">
+									<div class="ss-survey-pi-sel-txt">Import Profile Photo </div>
+									<div class="ss-survey-pi-sel-icn-cont">
+										<div class="ss-survey-soc-icon icn-fb" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', false, this);"></div>
+										<div class="ss-survey-soc-icon icn-twit" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'twitter', false, this);"></div>
+										<div class="ss-survey-soc-icon icn-lin" id="import-Twitter" onclick="openAuthPageForSurvey(event,'linkedin', false, this);"></div>
+									</div>
+								</div>
+								<div id="ss-survey-pi-act-wrapper" class="ss-survey-pi-act-wrapper ss-survey-pi-hide">
+								    <div class="ss-survey-pi-act-txt">
+										<div id="ss-survey-pi-rem-icn" class="ss-survey-act-icns ss-survey-pi-rem-icn"><img class="ss-survey-profimg-close-icn" src="/resources/images/ss-close.png"></div>
+										Remove my picture.
+									</div>
+								</div>
+							</div>
+						    <div class="ss-survey-txtbox-disc-wrapper">
+								<textarea id="text-area" class="sq-txt-area" maxlength="500" onkeydown="checkCharacterLimit(this);" style="display: inline-block;"></textarea>
+								<div class="ss-survey-disclaimer-txt">Please do not include information you do not want publicly posted. By submitting you authorize the sharing of your name, rating and review on social media and other webpages.</div>
+							</div>
+						</div>
+						<%-- <textarea id="text-area" class="sq-txt-area" maxlength="500" onkeydown="checkCharacterLimit(this);"></textarea>
 						<div id="text-box-disclaimer" class="bd-check-txt-disclaimer">
 							<spring:message code="label.survey.disclaimer.key"/>
-						</div>
+						</div> --%>
 						<div id="smiles-final" class="sq-happy-wrapper clearfix">
 							<div id="sq-happy-smile" class="sq-smile-icn-container">
 								<div id="happy-smile" star-no="1" class="sq-smile-icn-wrapper sq-happy-smile"></div>
@@ -332,19 +358,19 @@
 							</div>
 						</div>
 	
-						<div id="pst-srvy-div" class="pst-srvy">
+						<%-- <div id="pst-srvy-div" class="pst-srvy">
 							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
 -							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
 							<div class="float-left bd-check-txt survey-authorize-font-size"><spring:message code="label.survey.authorize.key"/></div>
 
-							<%-- <div class="reg_form_row clearfix">
+							<div class="reg_form_row clearfix">
 					       <div class="reg_btn" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
 					       <div class="reg_btn" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'linkedin', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
 					       <div class="reg_btn" id="import-Twitter" onclick="openAuthPageForSurvey(event,'twitter', ${isAutoLogin}, this);" data-link="${facebookLink}">Import profile pic from facebook</div>
-				          </div> --%>
-						</div>
+				          </div>
+						</div> --%>
 						
-						<div id="ss-survey-prof-image-div" class="ss-survey-prof-image-div">
+						<%-- <div id="ss-survey-prof-image-div" class="ss-survey-prof-image-div">
 							<div class="ss-survey-prof-img-sel-cont">
 						        <div class="ss-survey-pi-sel-txt">Import my picture from </div>
 						        <div class="ss-survey-pi-sel-icn-cont">
@@ -369,7 +395,7 @@
 								    </div>
 								</div>
 							</div>
-						</div>
+						</div> --%>
 
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>

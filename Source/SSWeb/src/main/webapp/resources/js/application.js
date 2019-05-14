@@ -121,6 +121,7 @@ var zillowReviewLink;
 var isAutoFillReviewContentForZillowPost;
 var subjectContentForZillowPost;
 var reviewFooterContentForZillowPost;
+var customerProfileImageUrl;
 
 // Verticals master
 var verticalsMasterList;
@@ -8112,15 +8113,47 @@ function initSurveyWithUrl(q) {
 				surveyId = data.responseJSON.surveyId;
 				hiddenSection = data.responseJSON.hiddenSection;
 				companyName = data.responseJSON.companyName;
+				customerProfileImageUrl = data.responseJSON.reviewerProfilePic;
 				var copyToClipboard = data.responseJSON.copyToClipBoard;
 				$('#prof-container').attr('data-copy-to-clipboard', copyToClipboard);
 				companyId = data.responseJSON.companyId;
 				paintSurveyPage(data);
 				var message = $("#pst-srvy-div .bd-check-txt").html();
-				if (hiddenSection) {
-					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", companyName));
-				} else {
-					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
+				
+				if(message != undefined && message != null){
+					if (hiddenSection) {
+						$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", companyName));
+					} else {
+						$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
+					}
+				}
+				
+				if(customerProfileImageUrl != null && customerProfileImageUrl !=undefined && customerProfileImageUrl != ''){
+					$('#survey-profile-image-url').val(customerProfileImageUrl);
+					$('#ss-survey-prof-img').removeClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img-def').addClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img').attr('src', customerProfileImageUrl);
+					$('#ss-survey-pi-act-wrapper').removeClass('ss-survey-pi-hide');
+					$('#ss-survey-img-import-wrapper').addClass('ss-survey-pi-hide');
+					
+					$(document).off('click','#ss-survey-pi-rem-icn');
+					$(document).on('click','#ss-survey-pi-rem-icn',function(e){
+						$('#survey-profile-image-url').val('');
+						$('#ss-survey-prof-img').attr('src', '');
+
+						$('#ss-survey-prof-img').addClass('ss-survey-pi-hide');
+						$('#ss-survey-prof-img-def').removeClass('ss-survey-pi-hide');
+						
+						$('#ss-survey-img-import-wrapper').removeClass('ss-survey-pi-hide');
+						$('#ss-survey-pi-act-wrapper').addClass('ss-survey-pi-hide');
+					});
+				}else{
+					$('#survey-profile-image-url').val('');
+					$('#ss-survey-prof-img').addClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img-def').removeClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img').attr('src', '');
+					$('#ss-survey-pi-act-wrapper').addClass('ss-survey-pi-hide');
+					$('#ss-survey-img-import-wrapper').removeClass('ss-survey-pi-hide');
 				}
 				swearWords = getSwearWords(companyId);
 			}
@@ -8572,7 +8605,7 @@ function updateCustomerResponse(feedback, agreedToShare, isAbusive, isIsoEncoded
 	$('#next-textarea-smiley').attr('data-survey-submit-disabled',true);
 	var profImageUrl = $('#survey-profile-image-url').val();
 	
-	if($('#ss-survey-img-check').val() == 'false'){
+	if(profImageUrl == undefined){
 		profImageUrl = "";
 	}
 	
@@ -8628,7 +8661,7 @@ function showFeedbackPage(mood) {
 	$("#smiles-final").hide();
 	$("#next-textarea-smiley").html("Post My Review");
 	$("#next-textarea-smiley").removeClass("btn-com-disabled");
-	$('#ss-survey-prof-image-div').show();
+	$('#ss-survey-txt-img-wrapper').removeClass('ss-survey-pi-hide');
 	
 	isSmileTypeQuestion = false;
 	switch (mood) {
@@ -8740,7 +8773,12 @@ function showMasterQuestionPage() {
 			return;
 		}
 		
-		$('#ss-survey-prof-image-div').hide();
+		$('#ss-survey-txt-img-wrapper').addClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img').addClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-def').addClass('ss-survey-pi-hide');
+		
+		$('#ss-survey-img-import-wrapper').addClass('ss-survey-pi-hide');
+		$('#ss-survey-pi-act-wrapper').addClass('ss-survey-pi-hide');
 
 		//console.log(swearWords);
 		var isAbusive = false;
@@ -24102,29 +24140,23 @@ $(document).on('click','#google-banner-close-btn',function(e){
 
 function showProfileImageForSurvey(profileImage){
 	$('#survey-profile-image-url').val(profileImage);
-	$('#ss-survey-prof-img-cont').removeClass('ss-survey-pi-hide');
 	$('#ss-survey-prof-img').attr('src', profileImage);
+
+	$('#ss-survey-prof-img').removeClass('ss-survey-pi-hide');
+	$('#ss-survey-prof-img-def').addClass('ss-survey-pi-hide');
 	
-	$(document).off('click','#ss-survey-pi-chk-box');
-	$(document).on('click','#ss-survey-pi-chk-box',function(e){
-		$('#ss-survey-img-check').val();
-		if($(this).hasClass('ss-survey-pi-chk-box-unchecked')){
-			$('#ss-survey-img-check').val(true);
-			$(this).removeClass('ss-survey-pi-chk-box-unchecked');
-		}else{
-			$('#ss-survey-img-check').val(false);
-			$(this).addClass('ss-survey-pi-chk-box-unchecked');
-		}
-	});
+	$('#ss-survey-img-import-wrapper').addClass('ss-survey-pi-hide');
+	$('#ss-survey-pi-act-wrapper').removeClass('ss-survey-pi-hide');
 	
 	$(document).off('click','#ss-survey-pi-rem-icn');
 	$(document).on('click','#ss-survey-pi-rem-icn',function(e){
-		$('#ss-survey-prof-img-cont').addClass('ss-survey-pi-hide');
-		$('#ss-survey-img-check').val(false);
-		if(!$('#ss-survey-pi-chk-box').hasClass('ss-survey-pi-chk-box-unchecked')){
-			$('#ss-survey-pi-chk-box').addClass('ss-survey-pi-chk-box-unchecked');
-		}
 		$('#survey-profile-image-url').val('');
 		$('#ss-survey-prof-img').attr('src', '');
+
+		$('#ss-survey-prof-img').addClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-def').removeClass('ss-survey-pi-hide');
+		
+		$('#ss-survey-img-import-wrapper').removeClass('ss-survey-pi-hide');
+		$('#ss-survey-pi-act-wrapper').addClass('ss-survey-pi-hide');
 	});
 }
