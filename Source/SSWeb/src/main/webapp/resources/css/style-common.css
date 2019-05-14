@@ -3943,16 +3943,6 @@ button.paypal.is-active {
 	height: 40px;
 }
 
-.sq-txt-area {
-	width: 50%;
-	height: 150px;
-	border: 1px solid #e3e3e3;
-	border-radius: 3px;
-	padding: 10px;
-	margin-bottom: 10px;
-	font-size: 14px;
-}
-
 .pts-hover-1 {
 	position: absolute;
 	left: 0%;
@@ -14564,50 +14554,22 @@ body.ss-not-found-page {
 }
 
 /*profile picture on reviews styles*/
-.ss-survey-prof-image-div {
-    width: 100%;
+.ss-survey-txt-img-wrapper {
+    display: flex;
+    align-items: flex-start;
+}
+
+.ss-survey-prof-img-act-wrapper {
+    margin: 0 auto;
+    margin-right: 10px;
     display: grid;
-    margin-top: 30px;
-    display:none;
-}
-
-.ss-survey-prof-img-sel-cont {
-    display: flex;
-    align-items: center;
-    margin: 0 auto;
-    width:320px;
-}
-
-.ss-survey-pi-sel-txt {
-    font-family: OpenSansBold;
-    color: #666;
-    font-size: 15px;
-}
-
-.ss-survey-pi-sel-icn-cont {
-    display: flex;
-    align-items: center;
-    margin-left: 10px;
-}
-
-.ss-survey-soc-icon {
-    height: 30px;
-    width: 30px;
-    margin: 0 5px;
-    cursor: pointer;
-}
-
-.ss-survey-prof-img-cont {
-    display: flex;
-    align-items: center;
-    margin: 0 auto;
-    margin-top: 30px;
-    width: 430px;
 }
 
 .ss-survey-prof-img-div {
-    width: 150px;
-    height: 150px;
+    width: 170px;
+    height: 170px;
+    background: #e2e2e2;
+    margin-bottom: 12px;
 }
 
 .ss-survey-prof-img {
@@ -14615,9 +14577,30 @@ body.ss-not-found-page {
     height: 100%;
 }
 
-.ss-survey-prof-img-actions {
+.ss-survey-img-import-wrapper {
     display: grid;
-    margin-left: 25px;
+}
+
+.ss-survey-pi-sel-txt {
+    font-family: OpenSansBold;
+    color: #666;
+    font-size: 14px;
+}
+
+.ss-survey-pi-sel-icn-cont {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+
+.ss-survey-pi-hide {
+    display: none !important;
+}
+
+.ss-survey-pi-act-wrapper {
+    display: flex;
+    align-items: center;
 }
 
 .ss-survey-pi-act-txt {
@@ -14625,7 +14608,11 @@ body.ss-not-found-page {
     align-items: center;
     font-size: 13px;
     font-family: OpenSansSemiBold;
-    margin-bottom: 15px;
+}
+
+.ss-survey-pi-rem-icn {
+    font-size: 30px;
+    font-family: OpenSans;
 }
 
 .ss-survey-act-icns {
@@ -14638,27 +14625,38 @@ body.ss-not-found-page {
     cursor: pointer;
 }
 
-.ss-survey-pi-chk-box {
-    background: url(../images/ss-tick.png) no-repeat;
-    background-position: center;
-    background-size: contain;
-    border: 2px solid #2f69aa;
-    border-radius: 3px;
+.ss-survey-profimg-close-icn {
+    width: 25px;
+    height: 25px;
 }
 
-.ss-survey-pi-chk-box-unchecked {
-    background: none;
-    background-size: cover;
-    background-position: center;
-    border: 2px solid #2f69aa;
-    border-radius: 3px;
+.ss-survey-txtbox-disc-wrapper {
+    width: 60%;
+    margin: 0 auto;
+    margin-left: 10px;
 }
 
-.ss-survey-pi-rem-icn {
-    font-size: 30px;
+.sq-txt-area {
+    height: 170px;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.ss-survey-disclaimer-txt {
+    text-align: left;
+    padding: 0 5px;
     font-family: OpenSans;
+    font-size: 15px;
+    color: #6a6a6a;
 }
 
-.ss-survey-pi-hide{
-	display: none !important;
+.ss-survey-soc-icon {
+    width: 30px;
+    height: 30px;
+    margin: 0 5px;
+    cursor: pointer;
 }
