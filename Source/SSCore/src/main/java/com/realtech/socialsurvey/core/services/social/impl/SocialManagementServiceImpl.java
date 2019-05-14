@@ -549,16 +549,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             message = message.replaceAll( "null", "" );
                         }
                         StatusUpdate statusUpdate = new StatusUpdate( message );
-                        try {
-                        	if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-								statusUpdate.setMedia("Picture", new URL(profileImageUrl).openStream());
-                        	}
-							
-                        } catch ( MalformedURLException e ) {
-                            LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
-                        } catch ( IOException e ) {
-                            LOG.error( "error while posting image on twitter: " + e.getMessage(), e );
-                        }
                         
                         if ( companyId == Long.parseLong( customisedSocialNetworkCompanyId ) ) {
 							try {
