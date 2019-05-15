@@ -16,6 +16,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -196,11 +198,26 @@ public class Utils
 
     }
     
+    public List<String> maskEmailAddresses(List<String> emailAddresses){
+        List<String> maskedList = null;
+        
+        if(!CollectionUtils.isEmpty( emailAddresses )){
+            maskedList = new ArrayList<>();
+            for ( String emailAddress : emailAddresses ) {
+                maskedList.add( maskEmailAddress( emailAddress ) );
+            }
+            
+            return maskedList;
+        }
+        
+        return maskedList;
+    }
+    
     public String maskEmailAddress(String emailAddress) {
 		LOG.debug("Masking email address: " + emailAddress);
 		String maskedEmailAddress = null;
 		// replace @ with +
-		maskedEmailAddress = emailAddress.replace("@", "+");
+		maskedEmailAddress = emailAddress.replace("@", ".");
 		if (maskingPrefix != null && !maskingPrefix.isEmpty()) {
 			maskedEmailAddress = maskingPrefix + "+" + maskedEmailAddress;
 		}

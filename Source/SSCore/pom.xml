@@ -476,6 +476,16 @@
 				</filters>
 			</build>
 		</profile>
+		
+		
+		<profile>
+			<id>sales</id>
+			<build>
+				<filters>
+					<filter>src/main/resources/filler.sales.properties</filter>
+				</filters>
+			</build>
+		</profile>
 		<profile>
 			<id>test</id>
 			<build>
