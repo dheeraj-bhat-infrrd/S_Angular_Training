@@ -8858,7 +8858,7 @@ function redirectPageUponSurveySubmit() {
 		} else {
 			twitterFeedback = feedback;
 		}
-		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials(lastName) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "/" + surveyId + "'");
+		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials(lastName) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url=" + agentFullProfileLink + "/" + surveyId);
 		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "/" + surveyId + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials(lastName) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
 
 		$('#content-head').html('Survey Completed');
