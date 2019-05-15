@@ -1065,13 +1065,15 @@
 													<span class="float-left ppl-share-icns icn-lin-rev"
 														title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl}/${reviewItem._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(reviewItem.review)} + &source="></span>
 												</div>
-												<div class="float-right dash-flag-retake ">
-													<div class="clearfix">
-														<div
-															class="icn-flag float-left report-abuse-txt cursor-pointer "
-															title="Report"></div>
+												<c:if test="${ not (profileLevel == 'INDIVIDUAL' and profile.iden == 26047)}">
+													<div class="float-right dash-flag-retake ">
+														<div class="clearfix">
+															<div
+																class="icn-flag float-left report-abuse-txt cursor-pointer "
+																title="Report"></div>
+														</div>
 													</div>
-												</div>
+												</c:if>
 											</div>
 
 										</div>
