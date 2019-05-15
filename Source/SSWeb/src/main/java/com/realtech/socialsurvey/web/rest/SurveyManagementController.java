@@ -1831,7 +1831,8 @@ public class SurveyManagementController
 
 			    //Set GatewayQuestions configured at Agentlevel
 			    if( unitSettings != null && unitSettings.getSurvey_settings() != null && 
-			        (unitSettings.getAllowConfigureSecondaryWorkflow() != null && unitSettings.getAllowConfigureSecondaryWorkflow())) {
+			        (unitSettings.getAllowConfigureSecondaryWorkflow() != null && unitSettings.getAllowConfigureSecondaryWorkflow())
+			        && unitSettings.isAllowPartnerSurvey()) {
 
 			        SurveySettings surveySettings = unitSettings.getSurvey_settings();
 			        surveySettings = this.updatePartnerSurveySettings( unitSettings );
