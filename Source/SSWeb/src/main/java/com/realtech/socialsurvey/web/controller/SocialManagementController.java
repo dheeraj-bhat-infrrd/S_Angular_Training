@@ -3464,7 +3464,7 @@ public class SocialManagementController
 	@RequestMapping(value = "/socialAuthImage", method = RequestMethod.GET)
 	public String getSocialAuthPageForSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method getSocialAuthPageForSurvey() called from SocialManagementController");
-		HttpSession session = request.getSession(false);
+		HttpSession session = request.getSession(true);
 		if (session == null) {
 			LOG.error("Session is null!");
 		}
