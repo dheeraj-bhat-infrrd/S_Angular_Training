@@ -9326,6 +9326,10 @@ $('.sq-np-item-prev').click(function () {
 
 	}
 
+	if(questionDetails.questionType == "sb-master"){
+		$('#ss-survey-txt-img-wrapper').addClass('ss-survey-pi-hide');
+	}
+	
 	$("#next-star").removeClass("btn-com-disabled");
 	$("#next-smile").removeClass("btn-com-disabled");
 	$("#next-scale").removeClass("btn-com-disabled");
