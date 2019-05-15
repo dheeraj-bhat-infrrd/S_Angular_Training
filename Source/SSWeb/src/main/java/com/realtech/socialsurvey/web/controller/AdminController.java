@@ -836,11 +836,17 @@ public class AdminController
         }
 
         User loggedInUser =  sessionHelper.getCurrentUser();
+
+        boolean isSSAdmin = false;
         try {
+        	//to find if user is realtech admin
+        	if ( userManagementService.isUserSocialSurveyAdmin( loggedInUser.getUserId() ) ) {
+			    isSSAdmin = true;
+			}
             //if user is ssAdmin then he can generate accesstoken for any company
             // if user is an admin and trying to access api key for someother company then we have to stop him
             // if the loggerInUser companyId and the companyId which was given to generate api key are different the stop
-            if(!loggedInUser.isSuperAdmin()){
+            if(!loggedInUser.isSuperAdmin() && !isSSAdmin){
                 if( loggedInUser.getCompany().getCompanyId() != companyId ||
                     ( !loggedInUser.isCompanyAdmin() && !loggedInUser.isRegionAdmin() && !loggedInUser.isBranchAdmin()) )
                     return messageUtils.getDisplayMessage( DisplayMessageConstants.UNAUTHORISED_USER_ACCESS, DisplayMessageType.ERROR_MESSAGE )
