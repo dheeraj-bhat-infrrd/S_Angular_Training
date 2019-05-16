@@ -265,7 +265,9 @@ public class SurveyManagementController
 			String customerEmail = request.getParameter("customerEmail");
 			String firstName = request.getParameter("firstName");
 			String lastName = request.getParameter("lastName");
-			String agreedToShare = request.getParameter("agreedToShare");
+			//String agreedToShare = request.getParameter("agreedToShare"); Commenting and setting as true to resolve the loader issue on survey page. 
+			//As UI don't have authorize check box now so its coming as null
+			String agreedToShare = "true";
 			String strIsIsoEncoded = request.getParameter("isIsoEncoded");
 			String surveyId = request.getParameter("surveyId");
 			
