@@ -952,8 +952,14 @@ function paintReviews(result) {
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin-rev icn-lin-pp" title="LinkedIn" data-summary="'+reviewSummary+'" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&reviewid=' + reviewItem._id + '&source="></span>';
 		reviewsHtml += '			<span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(' + processedPermalink + ')"><input id="permalink_url_' + processedPermalink + '" type="hidden" value="' + profileUrl + '"/></span>';
 		reviewsHtml += '		</div>';
-		if (reviewItem.source != "Zillow")
-			reviewsHtml += '		<span class="icn-flag float-right report-abuse-txt prof-report-abuse-txt cursor-pointer  " title="Report Abuse"></span> ';
+		
+		var profileLevel = $("#profile-fetch-info").attr("profile-level");
+		var curProfIden = parseInt(currentProfileIden);
+		if(!(profileLevel == 'INDIVIDUAL' && curProfIden == 26047)){
+			if (reviewItem.source != "Zillow")
+				reviewsHtml += '		<span class="icn-flag float-right report-abuse-txt prof-report-abuse-txt cursor-pointer  " title="Report Abuse"></span> ';
+		}
+				
 		reviewsHtml += '	</div>';
 
 		processedPermalink++;

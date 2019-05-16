@@ -793,7 +793,8 @@ public class OrganizationManagementController
             OrganizationUnitSettings companySettings = organizationManagementService
                 .getCompanySettings( user.getCompany().getCompanyId() );
             model.addAttribute( "partnerSurveyAllowedAtCompany", companySettings.isAllowPartnerSurvey() );
-            model.addAttribute( "allowPartnerSurvey", companySettings.isAllowPartnerSurvey() );
+            model.addAttribute( "allowPartnerSurvey", ((entityType.equals( CommonConstants.AGENT_ID_COLUMN  ))? 
+                unitSettings.isAllowPartnerSurvey() : companySettings.isAllowPartnerSurvey()) );
             model.addAttribute( "addPhotosToReview", companySettings.isAddPhotosToReview());
                 
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );

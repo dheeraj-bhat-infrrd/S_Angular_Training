@@ -7050,6 +7050,11 @@ function deleteUserProfile(profileId, userId) {
 			$('#overlay-cancel').click();
 			// remove the tab from UI
 			$('#v-edt-tbl-row-' + profileId).remove();
+			$('#is-soc-mon-admin-chk').val('false');
+			$('#is-soc-mon-admin-chk').attr('data-value', 'false');
+			$('#is-soc-mon-admin-chk').siblings('.v-ed-checkbox').addClass('v-ed-checkbox-unchecked');
+			$('#is-soc-mon-admin-chk').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-checked');
+			$('#is-soc-mon-admin-chk').siblings('.v-ed-checkbox-inp').val(false);			
 		} else {
 			// close the popup
 			$('#overlay-cancel').click();
@@ -7584,6 +7589,14 @@ function saveUserDetailsByAdmin() {
 	if(hidePublicPage == null || hidePublicPage == undefined){
 		hidePublicPage = '';
 	}
+	var allowPartnerSurvey = $('#at-pst-cb').val();
+	if(allowPartnerSurvey == null || allowPartnerSurvey == undefined){
+		allowPartnerSurvey = '';
+	}
+	var isSocialMonitorAdmin = $('#is-soc-mon-admin-chk').val();
+	if(isSocialMonitorAdmin == null || isSocialMonitorAdmin == undefined){
+		isSocialMonitorAdmin = '';
+	}	
 	
 	var autoPostScore = $('#selected-user-autopost').val();
 	
@@ -7636,7 +7649,9 @@ function saveUserDetailsByAdmin() {
 		"autoPostScore" : autoPostScore,
 		"allowAutoPost" : isAutoPostEnabled,
 		"hidePublicPage" : hidePublicPage,
-		"isSSAdmin" : isSSAdmin
+		"isSSAdmin" : isSSAdmin,
+		"allowPartnerSurvey" : allowPartnerSurvey,
+		"isSocialMonitorAdmin" : isSocialMonitorAdmin
 	};
 
 	showOverlay();
@@ -23976,6 +23991,32 @@ function resetQuickEditsForm(){
 			$('#v-ed-hide-public-page').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-checked');
 		}
 	}
+	
+	var allowPartnerSurvey = $('#at-pst-cb').attr('data-value');
+	if(allowPartnerSurvey == 'true'){
+		if(!$('#at-pst-cb').siblings('.v-ed-checkbox').hasClass('v-ed-checkbox-checked')){
+			$('#at-pst-cb').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-unchecked');
+			$('#at-pst-cb').siblings('.v-ed-checkbox').addClass('v-ed-checkbox-checked');
+		}
+	}else{
+		if(!$('#at-pst-cb').siblings('.v-ed-checkbox').hasClass('v-ed-checkbox-unchecked')){
+			$('#at-pst-cb').siblings('.v-ed-checkbox').addClass('v-ed-checkbox-unchecked');
+			$('#at-pst-cb').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-checked');
+		}
+	}
+	
+	var isSocialMonitorAdmin = $('#is-soc-mon-admin-chk').attr('data-value');
+	if(isSocialMonitorAdmin == 'true'){
+		if(!$('#is-soc-mon-admin-chk').siblings('.v-ed-checkbox').hasClass('v-ed-checkbox-checked')){
+			$('#is-soc-mon-admin-chk').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-unchecked');
+			$('#is-soc-mon-admin-chk').siblings('.v-ed-checkbox').addClass('v-ed-checkbox-checked');
+		}
+	}else{
+		if(!$('#is-soc-mon-admin-chk').siblings('.v-ed-checkbox').hasClass('v-ed-checkbox-unchecked')){
+			$('#is-soc-mon-admin-chk').siblings('.v-ed-checkbox').addClass('v-ed-checkbox-unchecked');
+			$('#is-soc-mon-admin-chk').siblings('.v-ed-checkbox').removeClass('v-ed-checkbox-checked');
+		}
+	}	
 	
 }
 
