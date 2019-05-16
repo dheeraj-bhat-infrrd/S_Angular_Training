@@ -13340,6 +13340,16 @@ $('body').on('click', '#hide-pp-chk-box', function () {
 	}
 });
 
+$('body').on('click', '#allow-apr-chk-box', function () {
+	if ($('#allow-apr-chk-box').hasClass('bd-check-img-checked')) {
+		$('#allow-apr-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings("addPhotosToReview", true);
+	} else {
+		$('#allow-apr-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings("addPhotosToReview", false);
+	}
+});
+
 $('body').on('click', '#hide-bread-crumb-chk-box', function () {
 	if ($('#hide-bread-crumb-chk-box').hasClass('bd-check-img-checked')) {
 		$('#hide-bread-crumb-chk-box').removeClass('bd-check-img-checked');

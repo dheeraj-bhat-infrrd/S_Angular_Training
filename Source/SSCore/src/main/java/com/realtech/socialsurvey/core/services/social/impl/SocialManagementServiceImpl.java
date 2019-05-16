@@ -252,6 +252,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Value ( "${TWITTER_REDIRECT_URI}")
     private String twitterRedirectUri;
     
+    @Value ( "${TWITTER_IMAGE_CONSUMER_KEY}")
+    private String twitterImageConsumerKey;
+    @Value ( "${TWITTER_IMAGE_CONSUMER_SECRET}")
+    private String twitterImageConsumerSecret;
     @Value ( "${TWITTER_REDIRECT_URI_IMAGE}")
     private String twitterRedirectImageUri;
     
@@ -830,7 +834,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         // If reviewer has shared their SM picture then display it as URL's thumbnail
 		// else display company or SS logo.
 		String smImageUrl = surveyDetailsDao.getProfileImageUrl(surveyId);
-		if (smImageUrl != null && !smImageUrl.isEmpty()) {
+		if (companySettings != null && companySettings.isAddPhotosToReview() && smImageUrl != null && !smImageUrl.isEmpty()) {
 			ContentEntity[] entities = new ContentEntity[1];
 			LOG.info("setting only sm entity content");
 			ContentEntity smImageEntity = new ContentEntity();
@@ -4423,7 +4427,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 	@Override
 	public RequestToken getTwitterRequestTokenForAuthImage(String serverBaseUrl) throws TwitterException {
-        Twitter twitter = getTwitterInstance();
+        Twitter twitter = getTwitterInstanceForSmImage();
         RequestToken requestToken = twitter.getOAuthRequestToken( serverBaseUrl + twitterRedirectImageUri );
         return requestToken;
     }
@@ -4442,6 +4446,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         return new FacebookFactory( configuration ).getInstance();
 	} 
     
+	@Override
+    public Twitter getTwitterInstanceForSmImage()
+    {
+        ConfigurationBuilder builder = new ConfigurationBuilder();
+        builder.setOAuthConsumerKey( twitterImageConsumerKey );
+        builder.setOAuthConsumerSecret( twitterImageConsumerSecret );
+        Configuration configuration = builder.build();
+
+        return new TwitterFactory( configuration ).getInstance();
+    }
 	/*
 	 * @Override public String saveProfilePicForReviewer(URL profileImageUrl) {
 	 * 

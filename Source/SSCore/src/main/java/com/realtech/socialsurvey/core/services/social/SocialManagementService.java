@@ -393,5 +393,10 @@ public interface SocialManagementService
 	 */
 	public Facebook getFacebookInstanceForSmImage(String serverBaseUrl, String facebookRedirectImageUri);
 
+	/**
+	 * @return
+	 */
+	public Twitter getTwitterInstanceForSmImage();
+
 }
 // JIRA SS-34 BY RM02 BOC

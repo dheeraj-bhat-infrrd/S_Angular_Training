@@ -2043,4 +2043,10 @@ public interface OrganizationManagementService
     public SocialMediaStatusVO getProfileUrlAndStatus( String socialNetwork, long entityId, String entityType )
         throws InvalidInputException, NoRecordsFetchedException;
 
+    /**
+     * @param companyId
+     * @return
+     */
+	public boolean isAddPhotosToReviewEnabled(long companyId);
+
 }

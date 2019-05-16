@@ -10539,7 +10539,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_FROM_BREAD_CRUMB )
                 || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR )
                 || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA )
-                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW )) {
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ADD_PHOTOS_TO_REVIEW)) {
             	
                 boolean flag = Boolean.parseBoolean( status );
                 organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, flag,
@@ -12293,4 +12294,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "deleteLinkedInProfileUrl end" );
         return url;
     }
+
+
+	@Override
+	public boolean isAddPhotosToReviewEnabled(long companyId) {
+		// TODO Auto-generated method stub
+		return organizationUnitSettingsDao.isAddPhotosToReviewEnabled(companyId);
+	}
 }

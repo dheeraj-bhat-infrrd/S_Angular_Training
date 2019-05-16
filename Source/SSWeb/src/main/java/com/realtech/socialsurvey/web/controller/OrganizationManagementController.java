@@ -794,6 +794,7 @@ public class OrganizationManagementController
                 .getCompanySettings( user.getCompany().getCompanyId() );
             model.addAttribute( "partnerSurveyAllowedAtCompany", companySettings.isAllowPartnerSurvey() );
             model.addAttribute( "allowPartnerSurvey", companySettings.isAllowPartnerSurvey() );
+            model.addAttribute( "addPhotosToReview", companySettings.isAddPhotosToReview());
                 
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
             SurveySettings surveySettings = null;

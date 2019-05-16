@@ -603,6 +603,14 @@ public class DashboardController
             model.addAttribute( "allowReply", allowReply);
             model.addAttribute( "allowReplyForCompany", isReplyEnabledForCompany);
             model.addAttribute( "currentSessionUserId", currentSessionUserId);
+            
+            if ( !profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            	boolean isAddPhtotsToReview = organizationManagementService.isAddPhotosToReviewEnabled(unitSettings.getCompanyId());
+            	model.addAttribute("addPhotosToReview",isAddPhtotsToReview);
+            } else {
+            	model.addAttribute("addPhotosToReview",unitSettings.isAddPhotosToReview());
+            }
+            
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             model.addAttribute( "message", e.getMessage() );

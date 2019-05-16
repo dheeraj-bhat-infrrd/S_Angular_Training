@@ -30,9 +30,10 @@ public class PublicProfileAggregate
     private IndividualReviewAggregate reviewAggregate;
     private String surveyId;
     private String companyName;
+    private boolean addPhototsToReview;
 
 
-    public String getProfileUrl()
+	public String getProfileUrl()
     {
         return profileUrl;
     }
@@ -268,7 +269,15 @@ public class PublicProfileAggregate
 	public void setCompanyName(String companyName) {
 		this.companyName = companyName;
 	}
+	
+	public boolean isAddPhototsToReview() {
+		return addPhototsToReview;
+	}
 
+
+	public void setAddPhototsToReview(boolean addPhototsToReview) {
+		this.addPhototsToReview = addPhototsToReview;
+	}
 
 	@Override
     public String toString()

@@ -137,6 +137,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_HIDE_FROM_BREAD_CRUMB = "hideFromBreadCrumb";
     public static final String KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA = "allowOverrideForSocialMedia";
     public static final String KEY_ALLOW_CONFIGURE_SECONDARY_WORKFLOW = "allowConfigureSecondaryWorkflow";
+    public static final String KEY_ADD_PHOTOS_TO_REVIEW = "addPhotosToReview";
 
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
@@ -2733,5 +2734,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         mongoTemplate.updateMulti( query, update, collection );
 
         LOG.info( "Finished updating {} with settings: {} having idens:{}", collection, settings, idenList);
+    }
+
+
+	@Override
+	public boolean isAddPhotosToReviewEnabled(long companyId) {
+        LOG.debug("check is addphtots feature enabled for company {}", companyId);
+        Query query = new  Query();
+        query.addCriteria(Criteria.where(KEY_IDEN).is(companyId));
+        query.fields().exclude( ID ).include(KEY_ADD_PHOTOS_TO_REVIEW).include(KEY_IDEN);
+        OrganizationUnitSettings unitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        if(unitSettings != null) {
+        	return unitSettings.isAddPhotosToReview();
+        }
+        return false;
     }
 }

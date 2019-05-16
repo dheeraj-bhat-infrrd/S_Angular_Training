@@ -274,6 +274,7 @@ public class ProfileManagementController
                 setSettingSetByEntityInModel( model, companyProfile );
                 String json = new Gson().toJson( companyProfile );
                 model.addAttribute( "profileJson", json );
+                model.addAttribute("addPhotosToReview", companyProfile.isAddPhotosToReview());
                 double averageRating = profileManagementService.getAverageRatings( companyId,
                     CommonConstants.PROFILE_LEVEL_COMPANY, false );
                 model.addAttribute( "averageRating", averageRating );
@@ -306,7 +307,7 @@ public class ProfileManagementController
                 setSettingSetByEntityInModel( model, regionProfile );
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
-
+                model.addAttribute("addPhotosToReview", companyProfile.isAddPhotosToReview());
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
                         regionProfile.getIden() );
@@ -372,7 +373,7 @@ public class ProfileManagementController
 
                 //set setting detail by branch Setting
                 setSettingSetByEntityInModel( model, branchProfile );
-
+                model.addAttribute("addPhotosToReview", companyProfile.isAddPhotosToReview());
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 try {
@@ -445,7 +446,7 @@ public class ProfileManagementController
 
                 //set setting detail by agent Setting
                 setSettingSetByEntityInModel( model, individualProfile );
-
+                model.addAttribute("addPhotosToReview", companyProfile.isAddPhotosToReview());
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 
