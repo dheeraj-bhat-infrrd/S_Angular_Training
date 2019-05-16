@@ -80,6 +80,7 @@ public class OrganizationUnitSettings implements Serializable
     private boolean isCopyToClipboard;
     private SocialMediaShareFromMailConfig socialMediaShareFromMailConfig;
     private boolean manualCustomerSuurveyPrevented;
+    private boolean addPhotosToReview;
     
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
@@ -1511,7 +1512,17 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
-    @Override
+    public boolean isAddPhotosToReview() {
+		return addPhotosToReview;
+	}
+
+
+	public void setAddPhotosToReview(boolean addPhotosToReview) {
+		this.addPhotosToReview = addPhotosToReview;
+	}
+
+
+	@Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier

@@ -780,5 +780,9 @@ public interface UserManagementService
      * @throws InvalidInputException
      */
     void removeLogoImage( String collection, OrganizationUnitSettings unitSettings ) throws InvalidInputException;
+
+
+    void removeUserAsSocialMonitorAdmin( User assigneeUser )
+        throws InvalidInputException, NoRecordsFetchedException;
 }
 // JIRA SS-34 BY RM02 BOC

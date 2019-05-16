@@ -192,6 +192,13 @@
 									<div class="float-left customized-settings-child cust-resp-txt">Allow admins to override social media</div>
 									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
 								</div>
+								<!-- settings to enable/disable add photos to review feature -->
+								<div class="ss-admin-comp-settings" style="">		
+									<div id="allow-apr-chk-box" class="float-left bd-check-img clear-both"></div>	
+									<input type="hidden" id="allow-apr-cb" name="addphotostorvw" value="${addPhotosToReview}">	
+									<div class="float-left customized-settings-child cust-resp-txt">Allow reviewers image in reviews</div>	
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>	
+								</div>
 								</c:if>				
 								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 								<div class="ss-admin-comp-settings" style="">
@@ -968,6 +975,10 @@ $(document).ready(function() {
 	
 	if("${allowRegionAdminToAddUser}" == "false"){
 		$('#alw-rgn-admin-add-usr-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${addPhotosToReview}" == "false"){
+		$('#allow-apr-chk-box').addClass('bd-check-img-checked');
 	}
 	
 	var accountMasterId = "${accountMasterId}";

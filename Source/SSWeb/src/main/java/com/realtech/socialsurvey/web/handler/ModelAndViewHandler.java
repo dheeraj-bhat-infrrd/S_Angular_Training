@@ -68,6 +68,8 @@ public class ModelAndViewHandler
     private static final String COMPANY_NAME = "companyName";
     
     private static final String COMPANY_NAME_FOR_TITLE = "companyNameForTitle";
+    
+    private static final String ADD_PHOTOS_TO_REVIEW = "addPhotosToReview";
 
     @Autowired
     private BotRequestUtils botRequestUtils;
@@ -111,6 +113,7 @@ public class ModelAndViewHandler
         model.addAttribute( PROFILE_URL, profileAggregate.getProfileUrl() );
         model.addAttribute( COMPANY_NAME, profileAggregate.getCompanyName() );
         model.addAttribute( COMPANY_NAME_FOR_TITLE, profileAggregate.getCompanyName() );
+        model.addAttribute( ADD_PHOTOS_TO_REVIEW, profileAggregate.isAddPhototsToReview() );
 
         if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileAggregate.getProfileLevel() ) ) {
             model.addAttribute( REGION_PROFILE_NAME, profileAggregate.getProfileName() );

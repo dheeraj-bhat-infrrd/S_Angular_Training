@@ -1739,6 +1739,8 @@ public class UserManagementController
             boolean isSocialMonitorEnabled = reportingDashboardManagement
                 .isSocialMonitorEnabled( user.getCompany().getCompanyId() );
             model.addAttribute( "isSocialMonitorEnabled", isSocialMonitorEnabled );
+            boolean isSocialMonitorAdmin = organizationManagementService.isSocialMonitorAdmin( userId );
+            model.addAttribute( "isSocialMonitorAdmin", isSocialMonitorAdmin );
 
             // Logo information
             AgentSettings individualProfile = this.getLogoForAgent( userId, companyId, branchId, regionId );
@@ -1809,6 +1811,8 @@ public class UserManagementController
         String emailId = request.getParameter( "emailId" );
         String profileUrl = request.getParameter( "profileUrl" );
         String requestProfileName = profileUrl;
+        HttpSession session = request.getSession( false );
+        User adminUser = sessionHelper.getCurrentUser();
 
         // Format name values
         if ( firstName != null && firstName != "" ) {
@@ -1974,8 +1978,18 @@ public class UserManagementController
                 if(request.getParameter( "hidePublicPage" ) != null) {
                     hidePublicPage = Boolean.parseBoolean( request.getParameter( "hidePublicPage" ) );
                 }
-                updateMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE, hidePublicPage);  
+                updateMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE, hidePublicPage);
+
             }
+            if(StringUtils.isNotEmpty( request.getParameter("allowPartnerSurvey" ))) {
+                updateMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
+                    Boolean.parseBoolean( request.getParameter("allowPartnerSurvey" ) ));
+            }            
+
+            if(StringUtils.isNotEmpty(request.getParameter( "isSocialMonitorAdmin" ) )) {
+                boolean isSocialMonitorAdmin = Boolean.parseBoolean( request.getParameter( "isSocialMonitorAdmin" ) );
+                this.setSocialMonitorAdmin( adminUser, user, isSocialMonitorAdmin );
+            }            
             
             SurveySettings surveySettings = agentSettings.getSurvey_settings();
             boolean allowAutoPost = false;
@@ -1987,7 +2001,8 @@ public class UserManagementController
           
             updateMap.put( MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings);
 
-            organizationUnitSettingsDao.updateOrganizationSettingsByQuery( queryMap, updateMap, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            organizationUnitSettingsDao.updateOrganizationSettingsByQuery( queryMap, updateMap, 
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in updateUserByAdmin(). Nested exception is ", e );
             return e.getMessage();
@@ -2500,6 +2515,20 @@ public class UserManagementController
             userAssignments.add( assignment );
         }
         return userAssignments;
+    }
+    
+    private void setSocialMonitorAdmin(User admin, User assigneeUser, boolean setFlag) {
+        try {
+        if(setFlag) {
+            userManagementService.assignUserAsSocialMonitorAdmin( admin, assigneeUser );
+        }
+        else {
+            userManagementService.removeUserAsSocialMonitorAdmin( assigneeUser );
+        }
+        }
+        catch(InvalidInputException | NoRecordsFetchedException e) {
+            LOG.error( "Exception while trying to update social monitor admin status :"+e.getMessage() );
+        }
     }
 }
 

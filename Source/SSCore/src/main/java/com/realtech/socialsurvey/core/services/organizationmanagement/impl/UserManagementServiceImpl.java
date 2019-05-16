@@ -6032,4 +6032,30 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             CommonConstants.IMAGE_TYPE_LOGO );
 
     }
+    
+    @Transactional
+    @Override public void removeUserAsSocialMonitorAdmin( User assigneeUser )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            for ( UserProfile profile : userProfiles ) {
+                if ( ( profile.getUser().getUserId() ==  assigneeUser.getUserId()  )
+                    && profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID
+                    && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    
+                    DeleteDataTracker tracker = new DeleteDataTracker();
+                    tracker.setEntityId( String.valueOf(profile.getUserProfileId()) );
+                    tracker.setEntityType( "USER_PROFILE" );
+                    tracker.setIsDeleted( 0 );
+                    tracker.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+                    tracker.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+                    deleteDataTrackerDao.save(tracker);                    
+                    
+                    userProfileDao.delete( profile );
+                }
+            }
+        }
+        
+    }    
 }

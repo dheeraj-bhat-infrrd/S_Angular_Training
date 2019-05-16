@@ -970,7 +970,7 @@
 				<ref bean="archiveSocialFeedCollectionJob" />
 				<ref bean="ftpfileuploader" />
 				<!-- <ref bean="updatesurveyjobdetail"/> -->
-				 <ref bean="losearchsitemapjobdetail" />
+				<ref bean="losearchsitemapjobdetail" />
 				<!-- <ref bean="solrImport" /> -->
 			</list>
 		</property>

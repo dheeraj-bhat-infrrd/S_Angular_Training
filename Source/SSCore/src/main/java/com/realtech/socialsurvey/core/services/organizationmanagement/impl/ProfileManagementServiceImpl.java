@@ -5882,7 +5882,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             ? getReviews( profileUnderConcern.getIden(), -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
                 profileAggregate.getProfileLevel(), false, null, null, processSortCriteria( companyProfile.getIden(), null ), null, null, false )
             : null );
-
+        profileAggregate.setAddPhototsToReview(companyProfile.isAddPhotosToReview());
         // NOTE: It was decided not to show Social posts on the UI. So not fetching anymore.
 
         //set company name

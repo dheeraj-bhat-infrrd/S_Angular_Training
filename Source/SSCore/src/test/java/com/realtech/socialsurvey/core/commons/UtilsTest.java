@@ -107,7 +107,7 @@ public class UtilsTest {
 	public void testMaskEmailAddress(){
 		Whitebox.setInternalState(utils, "maskingPrefix", "test");
 		Whitebox.setInternalState(utils, "maskingSuffix", "@abc.com");
-		assertEquals("Masked email address does not match expected", "test+my+example.com@abc.com", utils.maskEmailAddress("my@example.com"));
+		assertEquals("Masked email address does not match expected", "test+my.example.com@abc.com", utils.maskEmailAddress("my@example.com"));
 	}
 
 

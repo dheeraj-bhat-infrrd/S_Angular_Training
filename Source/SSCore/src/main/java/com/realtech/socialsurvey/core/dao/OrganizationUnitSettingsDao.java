@@ -583,4 +583,10 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public boolean removeLinkedInProfileUrlInUnitSettings( long iden, String collectionName );
+
+    /**
+     * @param companyId
+     * @return
+     */
+	public boolean isAddPhotosToReviewEnabled(long companyId);
 }

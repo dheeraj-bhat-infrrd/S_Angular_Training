@@ -429,13 +429,17 @@ public class ProfileViewController
             //return the appropriate profile template
             profileTemplate = modelAndViewHandler.handlePublicProfileModelAndView( model, profileAggregate, isBotRequest );
             
-            String smImage = profileManagementService.getSMImageOfReviewer(surveyId);
-            LOG.info("request image is " + request.getRequestURL().toString() );
-            if(smImage != null && !smImage.isEmpty()) {
-            	model.addAttribute( "isOgImageChange", "TRUE" );
-            	model.addAttribute( "smImage", smImage);
-            	model.addAttribute( "ogUrl" , request.getRequestURL().toString());
+            if(profileAggregate.isAddPhototsToReview()) {
+            	LOG.info("Prof image display feature is turned on");
+            	String smImage = profileManagementService.getSMImageOfReviewer(surveyId);
+                LOG.info("request image is " + request.getRequestURL().toString() );
+                if(smImage != null && !smImage.isEmpty()) {
+                	model.addAttribute( "isOgImageChange", "TRUE" );
+                	model.addAttribute( "smImage", smImage);
+                	model.addAttribute( "ogUrl" , request.getRequestURL().toString());
+                }
             }
+            
 
             LOG.info( "Service to initiate agent profile page with review popup executed successfully" );
 

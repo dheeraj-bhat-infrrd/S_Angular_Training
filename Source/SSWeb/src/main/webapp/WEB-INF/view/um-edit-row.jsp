@@ -275,7 +275,43 @@
 						<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
 					</div>	
 				</div>
+
 			</c:if>
+			
+				<c:if test="${partnerSurveyAllowedForCompany}">
+					<div class="v-ed-row">
+					<c:set var="partnerSurveyCheckClass" value=""></c:set>
+						<c:choose>
+							<c:when test="${partnerSurveyAllowedForUser == true}">
+								<c:set var="partnerSurveyCheckClass" value="v-ed-checkbox-checked"></c:set>				
+							</c:when>
+							<c:when test="${partnerSurveyAllowedForUser == false}">
+								<c:set var="partnerSurveyCheckClass" value="v-ed-checkbox-unchecked"></c:set>				
+							</c:when>	
+						</c:choose>
+						<div id="v-ed-hide-ps-chk-box" class="float-left v-ed-checkbox ${partnerSurveyCheckClass} v-ed-click-item"></div>
+						<input type="hidden" id="at-pst-cb" name="allowpartnersurveyuser" data-value="${partnerSurveyAllowedForUser}" value="${partnerSurveyAllowedForUser}" class="v-ed-checkbox-inp">
+						<div class="float-left v-ed-row-txt">Allow partner survey</div>
+					</div>
+				</c:if>				
+			
+			<c:if test="${isSocialMonitorEnabled}">
+				<div class="v-ed-row">
+					<c:set var="smAdminCheckClass" value=""></c:set>
+						<c:choose>
+							<c:when test="${isSocialMonitorAdmin == true}">
+								<c:set var="smAdminCheckClass" value="v-ed-checkbox-checked"></c:set>				
+							</c:when>
+							<c:when test="${isSocialMonitorAdmin == false}">
+								<c:set var="smAdminCheckClass" value="v-ed-checkbox-unchecked"></c:set>				
+							</c:when>	
+						</c:choose>
+						<div id="v-ed-hide-ps-chk-box" class="float-left v-ed-checkbox ${smAdminCheckClass} v-ed-click-item"></div>
+						<input type="hidden" id="is-soc-mon-admin-chk" name="isSocialMonitorAdmin" data-value="${isSocialMonitorAdmin}" value="${isSocialMonitorAdmin}" class="v-ed-checkbox-inp">
+						<div class="float-left v-ed-row-txt"><spring:message code="label.grantsocialmonitoradminprivileges.key" /></div>
+					</div>
+			</c:if>	
+							
 			<div id="profile-tbl-wrapper-${userId}" class="v-edt-tbl-wrapper">
 				<table class="v-edt-tbl">
 					<tr class="v-edt-tbl-header">
