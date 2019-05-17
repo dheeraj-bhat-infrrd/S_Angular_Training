@@ -209,4 +209,12 @@ public class FileUploadServiceImpl implements FileUploadService
         // TODO Auto-generated method stub
         return false;
     }
+
+
+	@Override
+	public String uploadCustomerImageFile(File fileLocal, String imageFileName, boolean b)
+			throws InvalidInputException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

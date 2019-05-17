@@ -196,7 +196,7 @@
 								<div class="ss-admin-comp-settings" style="">		
 									<div id="allow-apr-chk-box" class="float-left bd-check-img clear-both"></div>	
 									<input type="hidden" id="allow-apr-cb" name="addphotostorvw" value="${addPhotosToReview}">	
-									<div class="float-left customized-settings-child cust-resp-txt">Allow reviewers image in reviews</div>	
+									<div class="float-left customized-settings-child cust-resp-txt">Display reviewers image in reviews</div>	
 									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>	
 								</div>
 								</c:if>				

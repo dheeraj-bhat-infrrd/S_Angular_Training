@@ -97,6 +97,9 @@ public class CloudUploadServiceImpl implements FileUploadService
 
     @Value ( "${AMAZON_FTP_BUCKET}")
     private String ftpBucket;
+    
+    @Value ( "${AMAZON_CUS_IMG_BUCKET}")
+    private String customerImageBucket;
 
 
     @Override
@@ -442,6 +445,19 @@ public class CloudUploadServiceImpl implements FileUploadService
         } else {
             LOG.error( "Method fuploadFileAtSurveyCsvBucket failed to upload" );
             throw new InvalidInputException( "Upload failed: because the file or file name was empty" );
+        }
+    }
+
+
+	@Override
+	public String uploadCustomerImageFile( File file, String imageName, boolean preserveFileName )
+			throws InvalidInputException {
+        LOG.info( "Method uploadCustomerImageFile inside AmazonUploadServiceImpl called for image {}", imageName );
+        try {
+            return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + customerImageBucket, preserveFileName );
+        } catch ( InvalidInputException e ) {
+            LOG.error( "uploadCustomerImageFile::IOException occured while reading file. Reason : " + e.getMessage(), e );
+            throw new FatalException( "IOException occured while reading file. Reason : " + e.getMessage(), e );
         }
     }
 
