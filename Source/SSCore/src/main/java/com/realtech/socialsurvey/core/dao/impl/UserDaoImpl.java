@@ -294,7 +294,6 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             throw new InvalidInputException( "User ids passed cannot be null or empty" );
         }
         Criteria criteria = getSession().createCriteria( User.class );
-        LOG.info( "Method getUsersForUserIds called to fetch users for user ids : " + userIds );
         try {
             criteria.add( Restrictions.in( CommonConstants.USER_ID, userIds ) );
 
@@ -305,7 +304,6 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             throw new DatabaseException( "Exception caught in getUsersForUserIds() ", hibernateException );
         }
         @SuppressWarnings ( "unchecked") List<User> users = criteria.list();
-        LOG.info( "Method getUsersForUserIds call ended to fetch users for user ids." );
         return users;
     }
 
