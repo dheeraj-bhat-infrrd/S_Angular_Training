@@ -7,5 +7,6 @@
 		<core default="false" instanceDir="ss-socialposts" name="ss-socialposts"/>
 		<core default="false" instanceDir="ss-emails" name="ss-emails"/>
 		<core default="false" instanceDir="ss-feeds" name="ss-feeds"/>
+		<core default="false" instanceDir="ss-sms" name="ss-sms"/>
 	</cores>
 </solr>

@@ -10,7 +10,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 
@@ -19,9 +18,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreI
 public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationService, InitializingBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyPreInitiationServiceImpl.class);
-
-	@Autowired
-	private UserProfileDao userProfileDao;
 	
 	@Autowired
 	private SurveyPreInitiationDao surveyPreInitiationDao;
@@ -43,4 +39,5 @@ public class SurveyPreInitiationServiceImpl implements SurveyPreInitiationServic
 		LOG.debug("Method deleteSurveyReminder() finished");
 		return surveys;
 	}
+	
 }

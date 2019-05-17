@@ -32,4 +32,5 @@
 <script src="${initParam.resourcesPath}/resources/js/widgetPageLoader.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/admin-dashboard.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/umMultiSelect.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery.timepicker.min.js"></script>
 

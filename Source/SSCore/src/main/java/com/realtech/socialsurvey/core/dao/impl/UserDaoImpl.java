@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
@@ -31,8 +30,6 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -636,6 +633,28 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         } catch ( HibernateException e ) {
             LOG.error( "HibernateException caught in getCompanyIdsForUserIds(). Reason: " + e.getMessage(), e );
             throw new DatabaseException( "HibernateException caught in getCompanyIdsForUserIds().", e );
+        }
+    }
+
+    @Override
+    public long getCompanyIdForUserId( long userId ) throws InvalidInputException
+    {
+        LOG.debug( "Inside method getCompanyIdForUserId {}", userId );
+        if ( userId == 0 ) {
+                throw new InvalidInputException( "Invalid userId, userId= 0") ;
+        }
+        try {
+            Criteria criteria = getSession().createCriteria( User.class );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN , userId));
+            criteria.setProjection( Projections.property( CommonConstants.EMAIL_ID ) );
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ));
+           criteria.add( criterion );
+           return (Long)criteria.uniqueResult();
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getCompanyIdForUserId(). Reason: ", e );
+            throw new DatabaseException( "HibernateException caught in getCompanyIdForUserId().", e );
         }
     }
 

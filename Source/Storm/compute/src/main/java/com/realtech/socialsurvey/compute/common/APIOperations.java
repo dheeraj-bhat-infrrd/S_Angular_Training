@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
+import com.realtech.socialsurvey.compute.entities.SmsInfo;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
+import com.realtech.socialsurvey.compute.entities.SolrSmsWrapper;
 import com.realtech.socialsurvey.compute.entities.UserEvent;
 import com.realtech.socialsurvey.compute.entities.request.SolrAdd;
 import com.realtech.socialsurvey.compute.entities.request.SolrRequest;
@@ -57,6 +59,17 @@ public class APIOperations
     {
         LOG.debug( "Getting the message based on UUID." );
         return getUniqueEmailMessage( "*:*", "randomUUID:" + emailMessage.getRandomUUID() );
+    }
+    
+    /**
+     * Searches for sms from SOLR based on UUID
+     * @param smsInfo
+     * @return
+     */
+    public Optional<SolrSmsWrapper> getSmsFromSOLR( SmsInfo smsInfo )
+    {
+        LOG.debug( "Getting the sms based on UUID." );
+        return getUniqueSms( "*:*", "randomUUID:" + smsInfo.getRandomUUID() );
     }
 
 
@@ -108,6 +121,42 @@ public class APIOperations
             return Optional.empty();
         }
     }
+    
+    private Optional<SolrSmsWrapper> getUniqueSms( String query, String fieldQuery )
+    {
+        LOG.debug( "Getting the unique sms" );
+        SolrSmsWrapper solrSmsWrapper = null;
+        Call<SOLRResponseObject<SolrSmsWrapper>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+            .getSolrAPIIntergrationService().getSms( query, fieldQuery, 0, 1, "json" ); // start is 0 and rows 1 for unique messages
+        try {
+            Response<SOLRResponseObject<SolrSmsWrapper>> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "Unique sms response {}", response.body() );
+            }
+            if ( response.body().getResponse().getNumFound() > 0 ) {
+                solrSmsWrapper = response.body().getResponse().getDocs().get( 0 );
+            }
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "getUniqueSms: IOException/ APIIntegrationException caught", e );
+        }
+        if ( solrSmsWrapper != null ) {
+            return Optional.of( solrSmsWrapper );
+        } else {
+            return Optional.empty();
+        }
+    }
+    
+    /**
+     * Searches for sms from SOLR based on twilioSmsId
+     * @param twilioSmsId
+     * @return
+     */
+    public Optional<SolrSmsWrapper> getSmsFromSOLRByTwilioSmsId( String twilioSmsId )
+    {
+        LOG.debug( "Getting the sms on twilioSmsId" );
+        return getUniqueSms( "*:*", "twilioSmsId:" + twilioSmsId );
+    }
 
     /**
      * Gets all the email messages of given field using pagination
@@ -154,6 +203,32 @@ public class APIOperations
         } catch ( IOException | APIIntegrationException e ) {
             LOG.error( "postEmailToSolr: IOException/ APIIntegrationException caught", e );
             throw new SolrProcessingException( "Exception while posting email message to solr", e );
+        }
+    }
+    
+    /**
+     * Inserts the sms with extra meta data in SOLR
+     * @param solrSmsWrapper
+     * @return
+     */
+    public boolean postSmsToSolr( SolrSmsWrapper solrSmsWrapper )
+    {
+        SolrRequest<SolrSmsWrapper> solrRequest = new SolrRequest<>();
+        SolrAdd<SolrSmsWrapper> solrAdd = new SolrAdd<>();
+        solrAdd.setDoc( solrSmsWrapper );
+        solrRequest.setAdd( solrAdd );
+        Call<SOLRResponseObject<SolrSmsWrapper>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+            .getSolrAPIIntergrationService().postSms( solrRequest, true );
+        try {
+            Response<SOLRResponseObject<SolrSmsWrapper>> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "post sms to solr response {}", response.body() );
+            }
+            return true;
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "postSmsToSolr: IOException/ APIIntegrationException caught", e );
+            throw new SolrProcessingException( "Exception while posting sms to solr", e );
         }
     }
 

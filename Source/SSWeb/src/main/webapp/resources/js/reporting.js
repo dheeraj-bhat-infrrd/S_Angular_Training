@@ -3410,6 +3410,80 @@ function resendMultipleIncompleteSurveyRequestsForNewDashboard(incompleteSurveyI
 	}, true, {});
 }
 
+$(document).on('click', '#rep-resend-mult-sms-icn.mult-sms-icn-active', function() {
+	var selectedSurveys = $('#rep-icn-sur-popup-cont').data('selected-survey');
+	
+	if(!(selectedSurveys && selectedSurveys.length > 0 )){
+		$('#overlay-toast').html("Please select survey to send sms reminder.");
+		return;
+	}
+	
+	resendMultipleIncompleteSurveyRequestsForNewDashboardViaSMS(selectedSurveys);
+});
+
+function resendMultipleIncompleteSurveyRequestsForNewDashboardViaSMS(incompleteSurveyIds) {
+	showOverlay();
+	callAjaxPOSTWithTextData("/surveys/sendsmsreminder/manual.do?surveysSelected=" + incompleteSurveyIds, function(data) {
+		data = JSON.parse(data);
+		
+		$(".error-sms-survey-reminder").remove();
+		$(".success-sms-survey-reminder").remove();
+		
+		if (data.errMsg == undefined || data.errMsg == "") {
+			// unselect all the options after deleting
+			$('#sms-survey-count').data('sms-count', 0);
+			$('#rep-del-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#rep-resend-mult-sms-icn').removeClass('mult-sms-icn-active');
+			$('#rep-icn-sur-popup-cont').data('selected-survey', []);
+			$('.rep-sur-icn-checkbox').removeClass('sb-q-chk-yes').addClass('sb-q-chk-no');
+
+			var errorReminderCount = 0;
+			var successReminderCount = 0;
+			var smsTimeWindowWarning = 0;
+			for (var i = 0; i < data.length; i++) {	
+				var item  = data[i];
+				var smsResponseHtml = "";
+				if(item.responseType == 'SUCCESS'){
+					++successReminderCount;
+					smsResponseHtml = "<div class='success-sms-survey-reminder'>"+item.message+"</div>";
+					
+					//updateCount
+					$("#spi-sms-reminder-count-"+item.surveyPreIntitiationId).text("SMS Reminder count - "+ item.reminderCountsSms+1);
+					$("#spi-modifiedon-"+item.surveyPreIntitiationId).attr("data-value", item.modifiedOn);
+					
+				}
+				else if(item.responseType == 'ERROR') {
+					++errorReminderCount;
+					smsResponseHtml = "<div class='error-sms-survey-reminder'>"+item.message+"</div>";
+				}
+				else {
+					++smsTimeWindowWarning;
+					smsResponseHtml = "<div class='error-sms-survey-reminder'>"+item.message+"</div>";
+				}
+				$("div[data-iden=sur-pre-"+item.surveyPreInitiationId+"]").after(smsResponseHtml);
+			}
+			
+			var responseMessage = "";
+			if(successReminderCount > 0 ){
+				responseMessage += "Successfully sent " + successReminderCount+ " reminders.";
+			} 
+			
+			if(errorReminderCount > 0 ){
+				responseMessage += " Failed to sent "+ errorReminderCount +" reminders." ;
+			}
+			if(smsTimeWindowWarning > 0) {
+				responseMessage += " Failed to sent "+ smsTimeWindowWarning +" reminders."
+			}
+			
+			$('#overlay-toast').html(responseMessage);
+			showToastLong();
+		}else{
+			var toastmsg = data.errMsg;
+			$('#overlay-toast').html(toastmsg);
+			showToastLong();
+		}
+	}, true, {});
+}
 
 $(document).on('click', '#rep-del-mult-sur-icn.mult-sur-icn-active', function(e) {
 	e.stopPropagation();
@@ -3472,14 +3546,70 @@ function removeMultipleIncompleteSurveyRequestForNewDashboard(incompleteSurveyId
 
 
 $(document).on('click', '#rep-sur-next.paginate-button', function() {
+	
+	var selectedSurveys = $('#rep-icn-sur-popup-cont').data('selected-survey');
+	
+	if(selectedSurveys && selectedSurveys.length != 0){
+		confirmIncompleteSurveyNext();
+	} else {
+		incompleteTabNext();
+	}
+});
+
+$(document).on('click', '#rep-sur-previous.paginate-button', function() {
+	
+	var selectedSurveys = $('#rep-icn-sur-popup-cont').data('selected-survey');
+	
+	if(selectedSurveys && selectedSurveys.length != 0){
+		confirmIncompleteSurveyPrivious();
+	} else {
+		incompleteTabPrevious();
+	}
+});
+
+function clearIncompleteTabSelection(){
+	$('#rep-del-mult-sur-icn').removeClass('mult-sur-icn-active');
+	$('#rep-resend-mult-sur-icn').removeClass('mult-sur-icn-active');
+	$('#rep-icn-sur-popup-cont').data('selected-survey', []);
+	$('.rep-sur-icn-checkbox').removeClass('sb-q-chk-yes').addClass('sb-q-chk-no');
+}
+
+function incompleteTabNext(){
+	clearIncompleteTabSelection();
+	$('#overlay-continue').removeAttr("onclick");
+	$('#overlay-main').hide();
 	var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
 	var incompleteSurveyBatchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
 	incompleteSurveyStartIndex = incompleteSurveyStartIndex + incompleteSurveyBatchSize;
 	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
 	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
-});
+}
 
-$(document).on('click', '#rep-sur-previous.paginate-button', function() {
+
+function confirmIncompleteSurveyNext(){
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Continue");
+	$('#overlay-cancel').html("Stay on the page");
+	$('#overlay-header').html("Confirm next");
+	$('#overlay-text').html("You will lose your selection. Are you sure you want go to next page?");
+	$('#overlay-continue').attr("onclick", "incompleteTabNext()");
+}
+
+function confirmIncompleteSurveyPrivious(){
+	$('#overlay-main').show();
+	$('#overlay-continue').show();
+	$('#overlay-continue').html("Continue");
+	$('#overlay-cancel').html("Stay on the page");
+	$('#overlay-header').html("Confirm Previous");
+	$('#overlay-text').html("You will lose your selection. Are you sure you want go to next page?");
+	$('#overlay-continue').attr("onclick", "incompleteTabPrevious()");
+}
+
+function incompleteTabPrevious(){
+	clearIncompleteTabSelection();
+	$('#overlay-continue').removeAttr("onclick");
+	$('#overlay-main').hide();
 	var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
 	var incompleteSurveyBatchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
 	if (incompleteSurveyStartIndex % incompleteSurveyBatchSize == 0) {
@@ -3490,7 +3620,7 @@ $(document).on('click', '#rep-sur-previous.paginate-button', function() {
 	incompleteSurveyStartIndex = incompleteSurveyStartIndex * incompleteSurveyBatchSize;
 	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
 	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
-});
+}
 
 $(document).on('keypress', '#rep-sel-page', function(e) {
 	// if the letter is not digit then don't type anything

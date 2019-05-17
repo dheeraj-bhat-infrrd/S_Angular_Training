@@ -4,9 +4,11 @@ import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.SmsEntity;
 import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.core.entities.ftp.FtpUploadRequest;
 import com.realtech.socialsurvey.core.entities.integration.stream.FailedStreamMessage;
+import com.realtech.socialsurvey.core.vo.SmsVO;
 
 /**
  * Handles stream failure messages
@@ -36,7 +38,14 @@ public interface StreamFailureDao
      * @return
      */
     public List<EmailEntity> getAllFailedStreamEmailMessages( int start, int batchSize );
-
+    
+    /**
+     * 
+     * @param start
+     * @param batchSize
+     * @return
+     */
+    public List<FailedStreamMessage> getAllFailedStreamSms( int start, int batchSize );
 
     /**
      * 
@@ -83,4 +92,17 @@ public interface StreamFailureDao
 	 * @return
 	 */
     public boolean saveFailedUserEvent( UserEvent userEvent );
+
+
+	/**
+	 * @param smsEntity
+	 * @return
+	 */
+	public boolean insertFailedSmsMessage(SmsEntity smsEntity);
+	
+	/**
+	 * @param smsVO
+	 * @return
+	 */
+	public boolean insertFailedSmsOfTopology( SmsVO smsVO );
 }

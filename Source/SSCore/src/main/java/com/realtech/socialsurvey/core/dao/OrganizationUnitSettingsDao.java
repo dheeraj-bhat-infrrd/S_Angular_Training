@@ -97,6 +97,16 @@ public interface OrganizationUnitSettingsDao
     public void updateParticularKeyOrganizationUnitSettings( String keyToUpdate, Object updatedRecord,
         OrganizationUnitSettings unitSettings, String collectionName );
 
+    /**
+     * Updates a particular key organization unit by id
+     * @param keyToUpdate
+     * @param updatedRecord
+     * @param iden
+     * @param collectionName
+     * @param modifiedBy
+     */
+    public void updateParticularKeyOfOrganizationUnitSettingsByIden( String keyToUpdate, Object updatedRecord, long iden,
+        String collectionName, long modifiedBy );
 
     /**
      * Updates a particular key organization unit by id
@@ -210,6 +220,8 @@ public interface OrganizationUnitSettingsDao
 
 
     public List<OrganizationUnitSettings> getCompanyList();
+    
+    public List<OrganizationUnitSettings> getSmsSurveyReminderEnabledCompanyList();
 
 
     public List<OrganizationUnitSettings> getCompanyListByKey( String searchKey );
@@ -575,7 +587,7 @@ public interface OrganizationUnitSettingsDao
 
     public void updateSettingsForList( String collection, Map<String, Object> settings,
         List<Long> idenList );
-
+    
     /**
      * Method to remove linkedin profile url from unit settings
      * @param iden
@@ -583,4 +595,15 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public boolean removeLinkedInProfileUrlInUnitSettings( long iden, String collectionName );
+
+
+    /**
+     * Method to fetch agent setting with specific fields
+     * @param collectionName
+     * @param identifier
+     * @param fields
+     * @return
+     */
+    public OrganizationUnitSettings fetchUnitSettingsById(String collectionName, long identifier, String... fields );
+
 }

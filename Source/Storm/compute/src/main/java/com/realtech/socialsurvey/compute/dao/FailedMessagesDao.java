@@ -16,6 +16,13 @@ public interface FailedMessagesDao
      * @return
      */
     public boolean insertFailedEmailMessages( FailedEmailMessage failedEmailMessage );
+    
+    /** 
+     * Inserts a failed sms
+     * @param failedSms
+     * @return
+     */
+    public boolean insertFailedSms( FailedSms failedSms );
 
     /**
      * Inserts a Failed Social Post
@@ -36,12 +43,24 @@ public interface FailedMessagesDao
      * @param randomUUID
      */
     int deleteFailedEmailMessage(String randomUUID);
+    
+    /**
+     * Deletes failed sms
+     * @param randomUUID
+     */
+    int deleteFailedSms(String randomUUID);
 
     /**
      * Updated failed email message retry count
      * @param randomUUID
      */
     int updatedFailedEmailMessageRetryCount(String randomUUID);
+    
+    /**
+     * Updated failed sms retry count
+     * @param randomUUID
+     */
+    int updatedFailedSmsRetryCount(String randomUUID);
 
      /**
      * Deletes temporary failed social post

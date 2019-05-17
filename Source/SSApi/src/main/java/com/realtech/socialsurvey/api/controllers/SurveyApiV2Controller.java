@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -26,6 +28,7 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.models.BulkSurveyPutVO;
 import com.realtech.socialsurvey.api.models.SurveyPutVO;
+import com.realtech.socialsurvey.api.models.TransactionInfoPutVO;
 import com.realtech.socialsurvey.api.models.v2.BulkSurveyProcessResponseVO;
 import com.realtech.socialsurvey.api.models.v2.IncompeteSurveyGetVO;
 import com.realtech.socialsurvey.api.models.v2.SurveyCountVO;
@@ -118,13 +121,13 @@ public class SurveyApiV2Controller
         throws SSApiException
     {
         LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
+
         request.setAttribute( "input", surveyModel );
-        
         String message = "Survey successfully created.";
         boolean isDuplicate = false;
         boolean isUnsubscribed = false;
         boolean isPartnerSurveyAllowed = true;
-        
+
         String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
         
@@ -189,7 +192,6 @@ public class SurveyApiV2Controller
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }
     }
-
 
     @RequestMapping ( value = "/surveys/{surveyId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get Survey Transaction")

@@ -39,6 +39,11 @@ public class EncompassCrmInfoVO implements Serializable
     private String customFieldFive;
 
     private boolean allowPartnerSurvey;
+    
+    private String borrowerContactNumber;
+    private String coBorrowerContactNumber;
+    private String buyerAgentContactNumber;
+    private String sellerAgentContactNumber;
 
 
     public String getCrm_source()
@@ -363,9 +368,57 @@ public class EncompassCrmInfoVO implements Serializable
     {
         this.allowPartnerSurvey = allowPartnerSurvey;
     }
+    
+
+    public String getBorrowerContactNumber()
+    {
+        return borrowerContactNumber;
+    }
 
 
-    public static EncompassCrmInfoVO encompassCrmInfoVOMapper( EncompassCrmInfo encompassCrmInfo, boolean allowPartnerSurvey )
+    public void setBorrowerContactNumber( String borrowerContactNumber )
+    {
+        this.borrowerContactNumber = borrowerContactNumber;
+    }
+
+
+    public String getCoBorrowerContactNumber()
+    {
+        return coBorrowerContactNumber;
+    }
+
+
+    public void setCoBorrowerContactNumber( String coBorrowerContactNumber )
+    {
+        this.coBorrowerContactNumber = coBorrowerContactNumber;
+    }
+
+
+    public String getBuyerAgentContactNumber()
+    {
+        return buyerAgentContactNumber;
+    }
+
+
+    public void setBuyerAgentContactNumber( String buyerAgentContactNumber )
+    {
+        this.buyerAgentContactNumber = buyerAgentContactNumber;
+    }
+
+
+    public String getSellerAgentContactNumber()
+    {
+        return sellerAgentContactNumber;
+    }
+
+
+    public void setSellerAgentContactNumber( String sellerAgentContactNumber )
+    {
+        this.sellerAgentContactNumber = sellerAgentContactNumber;
+    }
+
+
+    public static EncompassCrmInfoVO encompassCrmInfoVOMapper( EncompassCrmInfo encompassCrmInfo, boolean allowPartnerSurvey, boolean smsSurveyReminderEnabled )
     {
         EncompassCrmInfoVO encompassCrmInfoVO = new EncompassCrmInfoVO();
         encompassCrmInfoVO.setCompanyId( encompassCrmInfo.getCompanyId() );
@@ -395,6 +448,15 @@ public class EncompassCrmInfoVO implements Serializable
         encompassCrmInfoVO.setCustomFieldFour( encompassCrmInfo.getCustomFieldFour() );
         encompassCrmInfoVO.setCustomFieldFive( encompassCrmInfo.getCustomFieldFive() );
         encompassCrmInfoVO.setAllowPartnerSurvey( allowPartnerSurvey );
+        
+        // Add encompass fields only when company is enabled for sms reminder feature.
+        if ( smsSurveyReminderEnabled ) {
+            encompassCrmInfoVO.setBorrowerContactNumber( encompassCrmInfo.getBorrowerContactNumber() );
+            encompassCrmInfoVO.setCoBorrowerContactNumber( encompassCrmInfo.getCoBorrowerContactNumber() );
+            encompassCrmInfoVO.setSellerAgentContactNumber( encompassCrmInfo.getSellerAgentContactNumber() );
+            encompassCrmInfoVO.setBuyerAgentContactNumber( encompassCrmInfo.getBuyerAgentContactNumber() );
+        }
+        
         return encompassCrmInfoVO;
     }
 }

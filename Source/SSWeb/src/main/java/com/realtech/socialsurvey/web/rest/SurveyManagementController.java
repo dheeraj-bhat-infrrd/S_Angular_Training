@@ -81,6 +81,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSe
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateContactSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 import com.realtech.socialsurvey.core.utils.CommonUtils;
@@ -778,20 +779,16 @@ public class SurveyManagementController
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
 
 		long agentId = 0;
-		String customerEmail;
-		String firstName;
-		String lastName;
-		String custRelationWithAgent;
-		String agentName;
-		String source;
-		customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
-		firstName = request.getParameter("firstName");
-		lastName = request.getParameter("lastName");
-		agentName = request.getParameter("agentName");
-		source = "customer";
+		String customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String agentName = request.getParameter("agentName");
+		String source = "customer";
+		String countryCode = request.getParameter( "country_code" );
+		String custContactNumber = countryCode + request.getParameter("custContactNo");
 		// custRelationWithAgent = request.getParameter("relationship");
 		// TODO:remove customer relation with agent
-		custRelationWithAgent = "transacted";
+		String custRelationWithAgent = "transacted";
 		String errorMsg = null;
 		try {
 			try {
@@ -817,6 +814,7 @@ public class SurveyManagementController
 			model.addAttribute("customerEmail", customerEmail);
 			model.addAttribute("relation", custRelationWithAgent);
 			model.addAttribute("source", source);
+			model.addAttribute("custContactNo", custContactNumber);
 
 			User user = userManagementService.getUserByUserId(agentId);
 			OrganizationUnitSettings agentSettings = userManagementService.getUserSettings(agentId);
@@ -826,7 +824,8 @@ public class SurveyManagementController
 				throw new NonFatalException("Public reviews are not allowed for " + agentName);
 			}
 			try {
-				surveyHandler.initiateSurveyRequest(user.getUserId(), customerEmail, firstName, lastName, source);
+			    surveyHandler.checkIfContactNumberSurveyedForAgent(user.getUserId(), custContactNumber);
+				surveyHandler.initiateSurveyRequest(user.getUserId(), customerEmail, firstName, lastName, source, custContactNumber);
 			}
 			catch (SelfSurveyInitiationException e) {
 				errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.SELF_SURVEY_INITIATION, DisplayMessageType.ERROR_MESSAGE)
@@ -837,7 +836,14 @@ public class SurveyManagementController
 				errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.DUPLICATE_SURVEY_REQUEST, DisplayMessageType.ERROR_MESSAGE)
 						.getMessage();
 				throw new NonFatalException(e.getMessage(), e.getErrorCode());
-			}
+			} 
+			
+			catch (DuplicateContactSurveyRequestException e) {
+                errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.DUPLICATE_CONTACT_SURVEY_REQUEST, DisplayMessageType.ERROR_MESSAGE)
+                        .getMessage();
+                throw new NonFatalException(e.getMessage(), e.getErrorCode());
+            } 
+            
 
 		}
 		catch (NonFatalException e) {
@@ -854,6 +860,7 @@ public class SurveyManagementController
 			model.addAttribute("lastName", lastName);
 			model.addAttribute("customerEmail", customerEmail);
 			model.addAttribute("relation", custRelationWithAgent);
+			model.addAttribute("custContactNo", custContactNumber);
 			return JspResolver.SHOW_SURVEY_FORM;
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
@@ -927,7 +934,7 @@ public class SurveyManagementController
 				}
 
 				if (surveyPreInitiation == null) {
-					surveyPreInitiation = surveyHandler.preInitiateSurvey(user, customerEmail, custFirstName, custLastName, 0, null, surveySource);
+					surveyPreInitiation = surveyHandler.preInitiateSurvey(user, customerEmail, custFirstName, custLastName, 0, null, surveySource, null );
 				}
 
 				String surveyURL = surveyHandler.composeLink(agentId, customerEmail, custFirstName, custLastName,

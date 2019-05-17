@@ -34,6 +34,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
@@ -77,7 +79,6 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
-import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -99,6 +100,7 @@ import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
+import com.realtech.socialsurvey.core.entities.SMSTimeWindow;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
@@ -122,6 +124,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.factories.ApplicationSettingsInstanceProvider;
+import com.realtech.socialsurvey.core.services.contact.ContactUnsubscribeService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
@@ -269,6 +273,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
+    
+    @Value ( "${SMS_SURVEY_REMINDER_INTERVAL}")
+    private int smsSurveyReminderInterval;
 
     @Autowired
     private EmailUnsubscribeService unsubscribeService;
@@ -290,6 +297,26 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     
     @Autowired
     private GenericDao<DeleteDataTracker, Long> deleteDataTrackerDao;
+    
+    @Autowired
+    private ContactUnsubscribeService contactUnsubscribeService;
+    
+    @Autowired
+    private ApplicationSettingsInstanceProvider applicationSettingsInstanceProvider;
+    
+    @Value ( "${COUNTRY_DIALIN_CODES}")
+    private String countryDialInCodes;
+    
+    private List<String> dialInCodes;
+    
+    @PostConstruct
+    private void fetchCountryDialInCodeList() {
+    	if( dialInCodes == null ) {
+    		
+    		dialInCodes = new ArrayList<>();
+    	}
+    	dialInCodes = Arrays.asList( countryDialInCodes.split( "," ) );
+    }
 
     /**
      * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -2481,6 +2508,43 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 .setProfileStages( profileCompletionList.getProfileCompletionList( agentSettings.getProfileStages() ) );
         }
         return agentSettings;
+    }
+    
+
+    @Override
+    public OrganizationUnitSettings getAgentSettingForSmsReminder( long agentId ) throws InvalidInputException
+    {
+        LOG.debug( "Getting agent settings for agent id: {}", agentId );
+        if ( agentId <= 0l ) {
+            LOG.warn( "Invalid agent id for fetching user settings." );
+            throw new InvalidInputException( "Invalid agent id for fetching user settings." );
+        }
+        return organizationUnitSettingsDao.fetchUnitSettingsById(CommonConstants.AGENT_SETTINGS_COLLECTION, agentId,
+            MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAILS_FIRST_NAME,
+            MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAILS_NAME,
+            CommonConstants.SURVEY_SETTINGS_AUTOMATIC_SMS_SURVEY_REMINDER,
+            CommonConstants.SURVEY_SETTINGS_MANUAL_SMS_SURVEY_REMINDER );
+    }
+    
+    @Override
+    public OrganizationUnitSettings getCompanySettingForSmsReminder( long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "Getting agent settings for agent id: {}", companyId );
+        if ( companyId <= 0l ) {
+            LOG.warn( "Invalid agent id for fetching user settings." );
+            throw new InvalidInputException( "Invalid agent id for fetching user settings." );
+        }
+        return organizationUnitSettingsDao.fetchUnitSettingsById(CommonConstants.COMPANY_SETTINGS_COLLECTION, companyId,
+            CommonConstants.SURVEY_SETTINGS_AUTOMATIC_SMS_SURVEY_REMINDER,
+            CommonConstants.SURVEY_SETTINGS_MANUAL_SMS_SURVEY_REMINDER,          
+            CommonConstants.SURVEY_SETTINGS_DUPLICATE_SURVEY_INTERVAL,
+            CommonConstants.SURVEY_SETTINGS_MAX_NUMBER_OF_SMS_SURVEY_REMINDERS,
+            CommonConstants.SURVEY_SETTINGS_SMS_SURVEY_REMINDER_INTERVAL,
+            CommonConstants.SURVEY_SETTINGS_ENABLED_SMS_SURVEY_REMINDER,
+            CommonConstants.KEY_SMS_TIME_WINDOW_START,
+            CommonConstants.KEY_SMS_TIME_WINDOW_END,
+            CommonConstants.KEY_SMS_WINDOW_TIMEZONE
+            );
     }
 
 
@@ -4741,7 +4805,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         continue;
                     }
                     //If agent is deleted, mark survey as corrupt and fetch next survey
-                    if ( user != null && checkIfSurveyAgentIsDeleted( user, survey ) ) {
+                    if ( user != null && checkAndMarkSurveyAsCorruptIfSurveyAgentIsDeleted( user, survey ) ) {
                         LOG.debug( "The agent id : {} is deleted. Skipping record.", survey.getAgentId() );
                         continue;
                     }
@@ -4812,7 +4876,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         continue;
                     }
                     //If agent is deleted, mark survey as corrupt and fetch next survey
-                    if ( user != null && checkIfSurveyAgentIsDeleted( user, survey ) ) {
+                    if ( user != null && checkAndMarkSurveyAsCorruptIfSurveyAgentIsDeleted( user, survey ) ) {
                         LOG.debug( "The agent id : {} is deleted. Skipping record.", survey.getAgentId() );
                         continue;
                     }
@@ -4855,6 +4919,198 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             }
         }
     }
+    
+    @Override
+    public void incompleteSurveyReminderSenderOverSms()
+    {
+        try {
+            //update last run start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SMS_SENDER,
+                CommonConstants.BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SMS_SENDER );
+
+            LOG.info( "Batch incompleteSurveyReminderSmsSender started" );
+
+            for ( OrganizationUnitSettings company : organizationManagementService.getSmsSurveyReminderEnabledCompanyList() ) {
+
+                LOG.info( "getting reminder information for company with id {}", company.getIden() );
+
+                SMSTimeWindow smsTimeWindow = company.getSurvey_settings().getSmsTimeWindow();
+                
+                if(smsTimeWindow == null) {
+                    smsTimeWindow = applicationSettingsInstanceProvider.getApplicationSettings().getSmsTimeWindow();
+                }
+
+                LOG.info( "Found smsTimeWindow startTime : {}, endTime: {}, timeZone: {}", smsTimeWindow.getStartTime(),
+                    smsTimeWindow.getEndTime(), smsTimeWindow.getTimeZone() );
+
+                if (surveyHandler.isSMSWindowTimeValid( smsTimeWindow)) {
+
+                    List<SurveyPreInitiation> incompleteSurveyCustomers  = getIncompleteSurveysForCompany( company );
+                    LOG.info( "Found {} incompleteSurveyCustomers for company id {}",
+                        ( incompleteSurveyCustomers != null ? incompleteSurveyCustomers.size() : 0 ), company.getIden() );
+
+                    Map<String, Boolean> agentCustomercontactcheck = new HashMap<>();
+
+                    for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
+                        
+                        if(StringUtils.isNotEmpty(survey.getCustomerContactNumber())) {
+                            sendSmsSurveyReminderForSurveyPreInitiations( survey, company, agentCustomercontactcheck );
+                        }
+                    }
+                }
+            }
+            LOG.info( "Batch IncompleteSmsSurveyReminderSender finished" );
+            //Update last build time in batch tracker table
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SMS_SENDER );
+        } catch ( Exception e ) {
+            LOG.error( "Error in IncompleteSmsSurveyReminderSender", e );
+            try {
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SMS_SENDER, e.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError(
+                    CommonConstants.BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SMS_SENDER, System.currentTimeMillis(), e );
+            } catch ( NoRecordsFetchedException | InvalidInputException e1 ) {
+                LOG.error( "Error while updating error message in IncompleteSmsSurveyReminderSender " );
+            } catch ( UndeliveredEmailException e1 ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+    private List<SurveyPreInitiation> getIncompleteSurveysForCompany(OrganizationUnitSettings company) {
+        int reminderInterval = smsSurveyReminderInterval;
+        int maxReminderCount = 0;
+        
+        if( company.getSurvey_settings() != null ) {
+            
+            if( company.getSurvey_settings().getSmsSurveyReminderInterval() > 0 ) {
+                
+                reminderInterval = company.getSurvey_settings().getSmsSurveyReminderInterval();
+            }
+            
+            if( company.getSurvey_settings().getMaxNumberOfSmsSurveyReminders() > 0  ) {
+                
+                maxReminderCount = company.getSurvey_settings().getMaxNumberOfSmsSurveyReminders();
+            }
+        }
+        
+        if( maxReminderCount == 0) {
+            
+            maxReminderCount = applicationSettingsInstanceProvider.getApplicationSettings().getDefaultSmsSurveyReminderCount();
+        }
+        
+        //getting minLastReminderTime and maxLastReminderTime
+        long currentTime = System.currentTimeMillis();
+        Map<String, Date> lastReminderTimeCriterias = surveyHandler.getMinMaxLastSurveyReminderTime( currentTime,
+            reminderInterval );
+        Date minLastReminderTime = lastReminderTimeCriterias.get( "minLastReminderTime" );
+        Date maxLastReminderTime = lastReminderTimeCriterias.get( "maxLastReminderTime" );
+        LOG.info( "minLastReminderTime is {} and maxLastReminderTime is {} for company with id {}", minLastReminderTime,
+            maxLastReminderTime, company.getIden() );
+
+        //get survey list to send survey reminder mail
+        LOG.info( "getting survey list to send survey reminder sms for company with id {}", company.getIden() );
+        return surveyHandler
+            .getIncompleteSurveyForSmsReminder( company.getIden(), minLastReminderTime, maxLastReminderTime, maxReminderCount );
+        
+    }
+    
+    private void sendSmsSurveyReminderForSurveyPreInitiations(SurveyPreInitiation survey, OrganizationUnitSettings company, Map<String, Boolean> agentCustomercontactcheck) {
+
+        LOG.info( "Processing survey pre initiation id: {}", survey.getSurveyPreIntitiationId() );
+        
+        // dayInMillis is equal to 1000 * 60 * 60 * 24;
+        long dayInMillis = 86400000L;
+        Date criteriaDate = new Date( System.currentTimeMillis() - ( 15 * dayInMillis ) );
+        if ( survey.getCreatedOn().before( new Timestamp( criteriaDate.getTime() ) ) ) {
+            LOG.warn( "Cannot send sms reminder for the survey older than 15 days" );
+            return;
+        }
+        
+        //Check if customer contact number is unsubscribed.
+        if ( contactUnsubscribeService.isUnsubscribed( survey.getCompanyId(), survey.getCustomerContactNumber()) ) {
+            LOG.warn( "Customer has unsubscribed his number {} for social survey.", survey.getCustomerContactNumber() );
+            return;
+        }
+        
+        
+
+        User user = null;
+        try {
+            user = getUserByUserId( survey.getAgentId() );
+        } catch ( InvalidInputException ie ) {
+            LOG.warn( "Invalid user mapped to the agent id" );
+            return;
+        }
+        //If agent is deleted, mark survey as corrupt and fetch next survey
+        if ( user != null && checkAndMarkSurveyAsCorruptIfSurveyAgentIsDeleted( user, survey ) ) {
+            LOG.warn( "The agent id : {} is deleted. Skipping record.", survey.getAgentId() );
+            return;
+        }
+        
+        StringBuilder builder = new StringBuilder( survey.getCustomerContactNumber() );
+        if( builder.charAt( 0 ) == '+' ) {
+            builder.delete(0, 1);
+        }
+        
+        String countryDialInCode = "1";
+        String contactNumber = builder.substring( builder.length() - 10 );
+        if( builder.length() > 10 ) {
+            
+            countryDialInCode = builder.substring( 0,  builder.length() - 10 );
+            if( !dialInCodes.contains( countryDialInCode ) && !countryDialInCode.equals( "0" ) ) {
+                
+                LOG.warn("Customer contact number {} is invalid", survey.getCustomerContactNumber() );
+                return;
+            }
+            
+            if( countryDialInCode.equals( "0" ) ) {
+                
+                countryDialInCode = "1";
+            }
+        }
+        
+        if(surveyHandler.checkIfContactNumberAlreadySurveyed(  countryDialInCode, contactNumber, survey.getAgentId(), company ) || surveyHandler.checkIfContactNumberAlreadySurveyed( countryDialInCode, contactNumber, survey.getAgentId(), survey.getCreatedOn(), company ) != 0 ) {
+        	LOG.warn("Contact number {} is associated with survey {} for agent {} ",
+					survey.getCustomerContactNumber(), survey.getSurveyPreIntitiationId(), survey.getAgentId());
+        	surveyHandler.updateReminderCountSms( survey.getSurveyPreIntitiationId(), true, false );
+            return;
+        }
+    
+        survey.setCustomerContactNumber( "+" + countryDialInCode + contactNumber );
+
+        try {
+            LOG.info( "Sending Survey Reminder Sms." );
+            
+            OrganizationUnitSettings agentSettings = getAgentSettingForSmsReminder( survey.getAgentId() );
+            
+            if(agentSettings.getSurvey_settings().isOptedOutAutomaticSmsSurveyReminder()) {
+                LOG.info("Agent {} is opted out for automatic sms survey reminder, AgentID - {}",agentSettings.getContact_details().getName(),  survey.getAgentId());       
+                return;
+            }
+            String agentFirstName = agentSettings.getContact_details().getName();
+
+            if(agentCustomercontactcheck.containsKey(survey.getCustomerContactNumber() + survey.getAgentId())) {
+				LOG.warn("Contact number {} is associated with survey {} for agent {} ",
+						survey.getCustomerContactNumber(), survey.getSurveyPreIntitiationId(), survey.getAgentId());
+				surveyHandler.updateReminderCountSms( survey.getSurveyPreIntitiationId(), true, false );
+                return;
+			} 
+            else {
+            	agentCustomercontactcheck.put(survey.getCustomerContactNumber() + survey.getAgentId(), true);
+            }
+
+            // send a survey invitation sms
+            boolean isSuccess = surveyHandler.sendSms(survey, agentFirstName, true);
+            surveyHandler.updateReminderCountSms( survey.getSurveyPreIntitiationId(), true, true);
+        } catch ( InvalidInputException e ) {
+            LOG.error( "InvalidInputException caught while sending sms in IncompleteSmsSurveyReminderSender.", e );
+        }
+    
+    }
 
 
     @Transactional
@@ -4891,7 +5147,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
      * @param survey
      * @return
      */
-    private boolean checkIfSurveyAgentIsDeleted( User user, SurveyPreInitiation survey )
+    private boolean checkAndMarkSurveyAsCorruptIfSurveyAgentIsDeleted( User user, SurveyPreInitiation survey )
     {
         //If user is deleted, mark the survey status as corrupt
         if ( user.getStatus() == CommonConstants.STATUS_INACTIVE ) {

@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.QueryParam;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
@@ -23,14 +23,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
@@ -55,7 +58,6 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reports.AdminReports;
@@ -66,7 +68,9 @@ import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurve
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.vo.SurveyInviteResponse;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 import retrofit.client.Response;
@@ -138,7 +142,12 @@ public class DashboardController
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String appBaseUrl;
-
+    
+    @Autowired
+    SSApiIntergrationBuilder ssApiIntergrationBuilder;
+    
+    @Value("${SOCIAL_MONITOR_AUTH_HEADER}")
+    private String authHeader;
 
     /*
      * Method to initiate dashboard
@@ -770,6 +779,8 @@ public class DashboardController
             }
 
             model.addAttribute( "incompleteSurveys", surveyDetails );
+            HttpSession session = request.getSession( false );
+            model.addAttribute( "manualSmsSurveyReminderEnabled", session.getAttribute( "manualSmsSurveyReminderEnabled" ) );
 
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
@@ -1219,7 +1230,40 @@ public class DashboardController
         LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() finished." );
         return new Gson().toJson( response );
     }
+    
+    /**
+	 * Method to send multiple survey reminders via sms
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping ( value = "/surveys/sendsmsreminder/manual")
+	public String sendMultipleSurveyRemindersViaSms( Model model, HttpServletRequest request )
+	{
+		LOG.info( "Method sendMultipleSurveyRemindersViaSms() called" );
+		final String authorizationHeader = "Basic " + authHeader;
+		try {
+			String surveysSelectedStr = request.getParameter( "surveysSelected" );
 
+			User user = sessionHelper.getCurrentUser();
+
+			long companyId = user.getCompany().getCompanyId();
+			
+			LOG.info( "Company Id is - {}", companyId);
+
+			Response apiResponse = ssApiIntergrationBuilder.getIntegrationApi().sendMultipleSurveyRemindersViaSms(authorizationHeader, companyId, surveysSelectedStr);
+			return new String( ( (TypedByteArray) apiResponse.getBody() ).getBytes() );
+		} catch ( Exception exception ) {
+			LOG.error( "Exception occured in method sendMultipleSurveyRemindersViaSms, reason : ", exception );
+			Map<String, String> response = new HashMap<>();
+			response.put( "errMsg", "Something went wrong, Please try again after sometime." );
+			return new Gson().toJson( response );
+		}
+		
+
+	}
 
     /**
      * Method to resend multiple pre intiated survey reminders
@@ -1663,7 +1707,7 @@ public class DashboardController
         String errorMsg = null;
         try {
             try {
-                surveyHandler.initiateSurveyRequest( user.getUserId(), custEmail, custFirstName, custLastName, "customer" );
+                surveyHandler.initiateSurveyRequest( user.getUserId(), custEmail, custFirstName, custLastName, "customer", null );
             } catch ( SelfSurveyInitiationException e ) {
                 errorMsg = messageUtils
                     .getDisplayMessage( DisplayMessageConstants.SELF_SURVEY_INITIATION, DisplayMessageType.ERROR_MESSAGE )
@@ -1690,65 +1734,74 @@ public class DashboardController
 
 
     @ResponseBody
-    @RequestMapping ( value = "/getalreadysurveyedemailids", method = RequestMethod.POST)
-    public String getAlreadySurveyedEmailIds( HttpServletRequest request )
+    @PostMapping ( value = "/getalreadysurveyedemailids")
+    public ResponseEntity<?> getAlreadySurveyedEmailIds( @QueryParam ( "source") String source,
+        @RequestBody List<SurveyRecipient> surveyRecipients )
     {
         LOG.info( "Method getAlreadySurveyedEmailIds() called from DashboardController." );
         User user = sessionHelper.getCurrentUser();
-        List<SurveyRecipient> surveyRecipients = null;
+        
+        List<SurveyRecipient> alreadySurveyedList =new ArrayList<>();
+
         long agentId = 0;
-        String errorMsg = "error";
-        List<String> alreadySurveyedEmails = new ArrayList<String>();
+        
+        List<String> alreadySurveyedEmails = new ArrayList<>();
         try {
-            String source = request.getParameter( "source" );
-            String payload = request.getParameter( "receiversList" );
-            try {
-                if ( payload == null ) {
-                    throw new InvalidInputException( "SurveyRecipients passed was null or empty" );
-                }
-                surveyRecipients = new ObjectMapper().readValue( payload,
-                    TypeFactory.defaultInstance().constructCollectionType( List.class, SurveyRecipient.class ) );
-            } catch ( IOException ioException ) {
-                throw new NonFatalException( "Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR,
-                    ioException );
+
+            if ( CollectionUtils.isEmpty( surveyRecipients ) ) {
+             
+                return new ResponseEntity<>(getErrorResponse( "400", "SurveyRecipients passed was null or empty" ), HttpStatus.BAD_REQUEST );
             }
+
             if ( source.equalsIgnoreCase( CommonConstants.SURVEY_REQUEST_AGENT ) ) {
                 agentId = user.getUserId();
             }
 
-            if ( !surveyRecipients.isEmpty() ) {
-                for ( SurveyRecipient recipient : surveyRecipients ) {
-                    long currentAgentId = 0;
-                    if ( agentId != 0 ) {
-                        currentAgentId = agentId;
-                    } else if ( recipient.getAgentId() != 0 ) {
-                        currentAgentId = recipient.getAgentId();
-                    } else {
-                        throw new InvalidInputException( "Agent id can not be null" );
-                    }
+            for ( SurveyRecipient recipient : surveyRecipients ) {
+                long currentAgentId = 0;
+                if ( agentId != 0 ) {
+                    currentAgentId = agentId;
+                } else if ( recipient.getAgentId() != 0 ) {
+                    currentAgentId = recipient.getAgentId();
+                } else {
+                    return new ResponseEntity<>(getErrorResponse("400", "Agent id can not be null"), HttpStatus.BAD_REQUEST );
+                }
+                boolean foundSurveys = false;
+                SurveyRecipient alreadySurveyed = new SurveyRecipient();
+                if ( surveyHandler.hasCustomerAlreadySurveyed( currentAgentId, recipient.getEmailId() ) ) {
+                    alreadySurveyed.setRefId( recipient.getRefId() );
+                    alreadySurveyed.setEmailId( recipient.getEmailId() );
+                    foundSurveys = true;
+                }
 
-                    if ( surveyHandler.hasCustomerAlreadySurveyed( currentAgentId, recipient.getEmailId() ) ) {
-                        alreadySurveyedEmails.add( recipient.getEmailId() );
-                    }
+                if (StringUtils.isNotEmpty( recipient.getContactNumber() ) && surveyHandler.hasCustomerAlreadySurveyedForContactNumber( currentAgentId, recipient.getContactNumber())) {
+                    alreadySurveyed.setRefId( recipient.getRefId() );
+                    alreadySurveyed.setContactNumber( recipient.getContactNumber());
+                    foundSurveys = true;
+                }
+                
+                if(foundSurveys) {
+                    alreadySurveyedList.add( alreadySurveyed );
                 }
             }
-        } catch ( NonFatalException e ) {
+        } catch ( Exception e ) {
             LOG.error( "NonFatalException caught in getAlreadySurveyedEmailIds(). Nested exception is ", e );
-            return errorMsg;
+            return new ResponseEntity<>(getErrorResponse("500", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR );
         }
 
         LOG.info( "Method getAlreadySurveyedEmailIds() finished from DashboardController." );
-        return new Gson().toJson( alreadySurveyedEmails );
+
+        return new ResponseEntity<>( alreadySurveyedList, HttpStatus.OK );
     }
 
 
     @ResponseBody
-    @RequestMapping ( value = "/sendmultiplesurveyinvites", method = RequestMethod.POST)
-    public String sendMultipleSurveyInvitations( HttpServletRequest request )
+    @PostMapping ( value = "/sendmultiplesurveyinvites")
+    public ResponseEntity<?> sendMultipleSurveyInvitations(  @QueryParam ( "source") String source,
+        @RequestBody List<SurveyRecipient> surveyRecipients )
     {
         LOG.info( "Method sendMultipleSurveyInvitations() called from DashboardController." );
         User user = sessionHelper.getCurrentUser();
-        List<SurveyRecipient> surveyRecipients = null;
         long agentId = 0;
         String selfSurveyErrorMsg = null;
         String duplicateSurveyErrorMsg = null;
@@ -1756,21 +1809,12 @@ public class DashboardController
         int surveySentCount = 0;
 
         try {
-            String source = request.getParameter( "source" );
-            String payload = request.getParameter( "receiversList" );
-            // String columnName = request.getParameter("columnName");
-            try {
-                if ( payload == null ) {
-                	LOG.warn("SurveyRecipients passed was null or empty");
-                    throw new InvalidInputException( "SurveyRecipients passed was null or empty" );
-                }
-                surveyRecipients = new ObjectMapper().readValue( payload,
-                    TypeFactory.defaultInstance().constructCollectionType( List.class, SurveyRecipient.class ) );
-            } catch ( IOException ioException ) {
-            	LOG.error("Error occurred while parsing the Json.",ioException);
-                throw new NonFatalException( "Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR,
-                    ioException );
+            
+            if ( CollectionUtils.isEmpty( surveyRecipients ) ) {
+                
+                return new ResponseEntity<>(getErrorResponse( "400", "SurveyRecipients passed was null or empty" ), HttpStatus.BAD_REQUEST );
             }
+           
             if ( source.equalsIgnoreCase( CommonConstants.SURVEY_REQUEST_AGENT ) ) {
                 agentId = user.getUserId();
             }
@@ -1808,7 +1852,7 @@ public class DashboardController
 
                     try {
                         surveyHandler.initiateSurveyRequest( currentAgentId, recipient.getEmailId(), recipient.getFirstname(),
-                            recipient.getLastname(), source );
+                            recipient.getLastname(), source, recipient.getContactNumber() );
                         surveySentCount++;
                     } catch ( SelfSurveyInitiationException e ) {
                         if ( selfSurveyErrorMsg == null ) {
@@ -1833,19 +1877,16 @@ public class DashboardController
                     errorMsg += duplicateSurveyErrorMsg;
                 }
                 if ( !errorMsg.isEmpty() ) {
-                	LOG.warn("NonFatalException occurred while sending surveys");
-                    throw new NonFatalException( "NonFatalException occurred while sending surveys" );
+                    return new ResponseEntity<>(getErrorResponse("500", errorMsg), HttpStatus.INTERNAL_SERVER_ERROR );
                 }
             }
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in sendMultipleSurveyInvitations(). Nested exception is ", e );
-            if ( errorMsg == null )
-                errorMsg = "error";
-            return errorMsg;
+            return new ResponseEntity<>(getErrorResponse("500", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR );
         }
 
         LOG.info( "Method sendMultipleSurveyInvitations() finished from DashboardController." );
-        return "{\"status\" : \"Success\", \"surveySentCount\" : " + surveySentCount + "}";
+        return new ResponseEntity<>(new SurveyInviteResponse( "SUCCESS", surveySentCount ), HttpStatus.OK );
     }
 
 
@@ -2348,7 +2389,15 @@ public class DashboardController
         return status;
     }
     
-
+    private ErrorResponse getErrorResponse(String code, String message){
+        
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrCode(code);
+        errorResponse.setErrMessage(message);
+        
+        return errorResponse;
+    }
+        
     @ResponseBody
     @RequestMapping ( value = "/createreviewreply")
     public String createReviewReply( HttpServletRequest request ) throws InvalidInputException

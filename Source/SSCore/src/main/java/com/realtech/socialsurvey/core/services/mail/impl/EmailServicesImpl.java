@@ -2363,7 +2363,16 @@ public class EmailServicesImpl implements EmailServices
         String senderEmailAddress, String messageId, String sendUsingDomain )
         throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.debug( "Executing the sendSurveyReminderMail() method" );
+    	LOG.info( "calling forwardCustomerReplyMail" );
+        LOG.info("resolvedMailto: {} ", recipientMailId);
+        LOG.info("subject: {} ", subject);
+        LOG.info("mailBody: {} ", mailBody);
+        LOG.info("senderName: {} ", senderName);
+        LOG.info("senderEmailAddress: {} ", senderEmailAddress);
+        LOG.info("messageId: {} ", messageId);
+        LOG.info("sendUsingDomain: {} ", sendUsingDomain);
+        
+        LOG.info( "Executing the sendSurveyReminderMail() method" );
         boolean saveForwardMailDetails = true;
 
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -2395,7 +2404,7 @@ public class EmailServicesImpl implements EmailServices
         try {
             // Find Forward mail details with messageId
             if ( forwardMailDetailsDao.checkIfForwardMailDetailsExist( senderEmailAddress, recipientMailId, messageId ) ) {
-                LOG.debug( "This mail has already been sent to the recipient" );
+                LOG.info( "This mail has already been sent to the recipient" );
                 return;
             }
         } catch ( UnsupportedOperationException uoe ) {
@@ -2414,7 +2423,7 @@ public class EmailServicesImpl implements EmailServices
             forwardMailDetailsDao.insertForwardMailDetails( forwardMailDetail );
         }
 
-        LOG.debug( "Forwarding customer reply mail from {} to : {}", senderEmailAddress, recipientMailId );
+        LOG.info( "Forwarding customer reply mail from {} to : {}", senderEmailAddress, recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         emailEntity.setMailType( CommonConstants.EMAIL_TYPE_FORWARD_CUSTOMER_REPLY_MAIL );
         emailEntity.setSenderName( senderName );
@@ -2424,9 +2433,9 @@ public class EmailServicesImpl implements EmailServices
             emailEntity.setSendEmailThrough( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US );
         }
 
-        LOG.trace( "Calling email sender to send mail" );
+        LOG.info( "Calling email sender to send mail" );
         sendEmail( emailEntity, subject, mailBody, true, false );
-        LOG.debug( "Successfully forwarded customer reply mail from {} to : {}", senderEmailAddress, recipientMailId );
+        LOG.info( "Successfully forwarded customer reply mail from {} to : {}", senderEmailAddress, recipientMailId );
     }
 
 

@@ -1415,6 +1415,10 @@ button.paypal.is-active {
 	padding-left: 70px;
 }
 
+.height-70{
+	height: 70px !important;
+}
+
 .padding-left-45 {
 	padding-left: 45px;
 }
@@ -2473,7 +2477,7 @@ button.paypal.is-active {
 	z-index: 2;
 }
 
-.st-dd-item {
+.st-dd-item, .sms-tz-dd-wrapper {
 	border-bottom: 1px solid #dcdcdc;
 	line-height: 28px;
 	cursor: pointer;
@@ -4334,7 +4338,7 @@ button.paypal.is-active {
 }
 
 .bg-black-success {
-	background-color: #95E566 !important;
+	background-color: #5fba7d !important;
 }
 
 .bg-black-success .err-new-close {
@@ -9085,7 +9089,7 @@ span.paginate-divider {
 }
 
 .mult-sur-icn-wrapper {
-	width: 80px;
+	width: 100px;
 	margin: 0 auto;
 }
 
@@ -9098,17 +9102,37 @@ span.paginate-divider {
 	opacity: 0.5;
 }
 
+.mult-sms-icn {
+	width: 30px;
+	height: 30px;
+	margin: 0 auto 10px 5px;
+	border: 1px solid #EFDDDD;
+	border-radius: 50%;
+	opacity: 0.5;
+}
+
 .mult-sur-icn-active {
+	cursor: pointer;
+	opacity: 1;
+}
+
+.mult-sms-icn-active {
 	cursor: pointer;
 	opacity: 1;
 }
 
 .del-mult-sur-icn {
 	background: url(../images/delete.png) no-repeat center;
+	margin-left: 5px;
 }
 
 .resend-mult-sur-icn {
 	background: url(../images/fast_mail.png) no-repeat center;
+	background-size: contain;
+}
+
+.resend-mult-sms-icn {
+	background: url(../images/fast_sms.png) no-repeat center;
 	background-size: contain;
 }
 
@@ -9698,6 +9722,12 @@ label.url-change-input-label {
 
 .line-height-25 {
 	line-height: 25px !important;
+}
+
+.encomp-contact-label {
+	line-height: 20px;
+    text-align: center;
+    padding-left: 10px;
 }
 
 .share-social-link-cont {
@@ -12318,7 +12348,7 @@ img.lead-img {
 }
 
 .width-offset {
-	width: 100px;
+	width: 101px;
 }
 
 .stream-alert {
@@ -13815,6 +13845,31 @@ body.ss-not-found-page {
 	height: 36px;
 }
 
+.error-sms-survey-reminder {
+	text-align: left;
+    color: #ce3737;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    margin-left: 34px;
+}
+
+.success-sms-survey-reminder {
+	text-align: left;
+    color: green;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    margin-left: 34px;
+}
+
+.error-sms-survey-settings {
+    text-align: left;
+    color: #ce3737;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+    font-size: 11px;
+    line-height: 11px;
+}
+
 /* Reviews Reply Start */
 
 .review-reply-main {
@@ -14522,6 +14577,72 @@ body.ss-not-found-page {
     background-color: #e2e2e2;
 }
 
+ .sms-tz-dd-wrapper {
+	position: absolute;
+	width: 127px;
+	background-color: #fff;
+	padding: 0;
+	border-radius: 0 0 3px 3px;
+	border: 1px solid #eee;
+	margin-left:8px;
+	z-index: 2;
+	margin-top: 30px;
+ }
+ 
+ .sms-tmz-schd-lvl {
+    font-family: opensanslight;
+    font-weight: bold !important;
+    line-height: 16px;
+    text-align: left;
+ }
+ 
+ .sms-input {
+	width: 50px;
+	height: 30px;
+	border: 1px solid #e3e3e3;
+	border-radius: 3px;
+	box-shadow: 0px 2px 2px 0px #e3e3e3;
+	padding: 0 10px;
+	font-family: opensanslight;
+    font-weight: bold !important;
+}
+ 
+.sms-tz-txt{
+	margin-top:10px;
+	margin-bottom:10px;
+	margin-right:8px;
+}
+
+.sms-time {
+	border-radius: 3px;
+	width:67px;
+	height:30px;
+	border: 1px solid #b5b4b4;
+	margin-top:10px;
+	margin-bottom:10px;
+	margin-right:5px;
+	padding: 4px;
+}
+
+.sms-sttng-ip-wrapper{
+	padding-top: 10px;
+}
+
+.sms-tz-dropdown {
+	width: 100px;
+	height: 30px;
+	text-shadow:0 1px 0 #FFF;
+}
+
+.sms-time-set-button {
+	border-radius: 3px;
+	border: 1px solid #b5b4b4;
+	width:50px;
+	height:30px;
+	margin-top: 10px;
+	padding: 2px;
+}
+ 
 .ms-assign-popup-count-cont {
     display: flex;
     align-items: center;

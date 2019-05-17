@@ -117,5 +117,14 @@ public final class ComputeConstants
     public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
     public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
     public static final String COMPANY_SETTINGS_COLLECTION = "COMPANY_SETTINGS";
+    
+    public static final String TWILIO_STATUS_CALLBACK_URL = "TWILIO_STATUS_CALLBACK_URL";
+    public static final String TWILIO_ACCOUNT_SID = "TWILIO_ACCOUNT_SID";
+    public static final String TWILIO_AUTH_TOKEN = "TWILIO_AUTH_TOKEN";
+    public static final String TWILIO_FROM_NUMBER = "TWILIO_FROM_NUMBER";
+    public static final String TWILIO_BODY_PARAM_KEY = "Body";
+    public static final String TWILIO_FROM_PARAM_KEY = "From";
+    public static final String TWILIO_TO_PARAM_KEY = "To";
+    public static final String TWILIO_STATUS_CALLBACK_URL_PARAM_KEY = "StatusCallback";
 
 }

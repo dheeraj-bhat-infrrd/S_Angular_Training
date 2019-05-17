@@ -876,7 +876,7 @@ input#find-pro-submit{
 .welcome-popup-wrapper {
     position: relative;
     top: 75px;
-    width: 900px;
+    width: 1370px;
     margin: 0 auto 20px;
     background: #fff;
     border: 1px solid #dcdcdc;
@@ -1085,15 +1085,19 @@ span.txt-highlight {
 }
 
 .wc-review-th1,.wc-review-tc1 {
-    width: 30%;
+    width: 22.5%;
 }
 
 .wc-review-th2,.wc-review-tc2 {
-    width: 30%;
+    width: 22.5%;
 }
 
 .wc-review-th3,.wc-review-tc3 {
-    width: 30%;
+    width: 22.5%;
+}
+
+.wc-review-th6,.wc-review-tc6 {
+    width: 22.5%;
 }
 
 .wc-review-th4,.wc-review-tc4 {
@@ -1101,23 +1105,27 @@ span.txt-highlight {
 }
 
 .wc-admin-table .wc-review-th1,.wc-admin-table  .wc-review-tc1{
-	width: 22.5%;
+	width: 17%;
 }
 
 .wc-admin-table .wc-review-th2,.wc-admin-table  .wc-review-tc2{
-	width: 22.5%;
+	width: 17%;
 }
 
 .wc-admin-table .wc-review-th3,.wc-admin-table  .wc-review-tc3{
-	width: 22.5%;
+	width: 17%;
 }
 
 .wc-admin-table .wc-review-th4,.wc-admin-table  .wc-review-tc4{
-	width: 22.5%;
+	width: 17%;
+}
+
+.wc-admin-table .wc-review-th6,.wc-admin-table  .wc-review-tc6{
+	width: 23%;
 }
 
 .wc-admin-table .wc-review-th5,.wc-admin-table  .wc-review-tc5{
-	width: 10%;
+	width: 8%;
 }
 
 .wc-review-input{
@@ -1127,6 +1135,9 @@ span.txt-highlight {
 	border: 1px solid #dcdcdc;
 	border-radius:3px;
 	padding: 0 0 0 15px;
+}
+.wc-review-contact {
+	width:246px;
 }
 
 .wc-review-table{

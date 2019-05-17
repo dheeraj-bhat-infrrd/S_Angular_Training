@@ -218,7 +218,9 @@ public interface CommonConstants
     public static final String SURVEY_SOURCE_ID_COLUMN = "sourceId";
     public static final String VERTICAL_NAME = "verticalName";
     public static final String CUSTOMER_EMAIL_ID_KEY_COLUMN = "customerEmailId";
+    public static final String CUSTOMER_CONTACT_NUMBER_KEY_COLUMN = "customerContactNumber";
     public static final String CUSTOMER_FIRST_NAME_COLUMN = "customerFirstName";
+    public static final String CUSTOMER_LAST_NAME_COLUMN = "customerLastName";
     public static final String ENGAGEMENT_CLOSED_TIME = "engagementClosedTime";
     public static final String BATCH_TYPE_COLUMN = "batchType";
     public static final String SOURCE_COLUMN = "source";
@@ -261,6 +263,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_TRANSACTION_ACTIVITY_MONITOR = "transactionActivityMonitor";
     public static final String BATCH_TYPE_FTP_FILE_UPLOADER = "FTPFileUploader";
     public static final String BATCH_TYPE_SEO_SITE_MAP_GENERATOR = "SEOSiteMapGenerator";
+    String BATCH_TYPE_INCOMPLETE_SURVEY_REMINDER_SMS_SENDER = "IncompleteSurveyReminderSmsSender";
 
     
     //batch name constant for batch tracker
@@ -293,6 +296,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_TRANSACTION_ACTIVITY_MONITOR = "Transaction Activity Monitor";
     public static final String BATCH_NAME_FTP_FILE_UPLOADER = "FTP files uploader";
     public static final String BATCH_NAME_SEO_SITE_MAP_GENERATOR = "SEO Site Map Generator Batch";
+    String BATCH_NAME_INCOMPLETE_SURVEY_REMINDER_SMS_SENDER = "Incomplete Survey Reminder Sms Sender";
 
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
@@ -565,6 +569,12 @@ public interface CommonConstants
     public static final String LINKEDIN_URL_PART = "licdn";
     public static final String FILE_SEPARATOR = "/";
 
+    //default setting for sms time window
+    public static final int DEFUALT_SMS_START_TIME_WINDOW = 10;
+    public static final int DEFUALT_SMS_END_TIME_WINDOW = 17;
+    public static final String DEFUALT_SMS_TIME_ZONE = "Eastern";
+    public static final String LAST_SMS_REMINDER_TIME = "lastSmsReminderTime";
+
     public static final String ACTIVE_SUBSCRIPTION_MAIL_SUBJECT = "Active Subscription List in Braintree";
     public static final String TRANSACTION_LIST_MAIL_SUBJECT = "Transaction list for Subscription ";
 
@@ -815,6 +825,23 @@ public interface CommonConstants
     public static final String TEMP_HIERARCHY_UPLOAD_COLLECTION = "TEMP_HIERARCHY_UPLOAD";
     public static final String SURVEY_CSV_UPLOAD_COLLECTION = "SURVEY_CSV_UPLOAD";
     public static final String FAILED_CLICK_EVENTS_COLLECTION = "FAILED_CLICK_EVENTS";
+    
+    
+    /*
+     * Mongo keys
+     * SMS SURVEY REMINDER CONSTANTS
+     */
+    public static final String SURVEY_SETTINGS_SMS_SURVEY_REMINDER_INTERVAL = "survey_settings.smsSurveyReminderInterval";
+    public static final String SURVEY_SETTINGS_MAX_NUMBER_OF_SMS_SURVEY_REMINDERS = "survey_settings.maxNumberOfSmsSurveyReminders";
+    public static final String SURVEY_SETTINGS_AUTOMATIC_SMS_SURVEY_REMINDER = "survey_settings.optedOutAutomaticSmsSurveyReminder";
+    public static final String SURVEY_SETTINGS_MANUAL_SMS_SURVEY_REMINDER = "survey_settings.manualSmsSurveyReminderEnabled";
+    public static final String SURVEY_SETTINGS_ENABLED_SMS_SURVEY_REMINDER = "survey_settings.smsSurveyReminderEnabled";
+    public static final String SURVEY_SETTINGS_DUPLICATE_SURVEY_INTERVAL = "survey_settings.duplicateSurveyInterval";
+    public static final String KEY_SMS_TIME_WINDOW_START = "survey_settings.smsTimeWindow.startTime";
+    public static final String KEY_SMS_TIME_WINDOW_END = "survey_settings.smsTimeWindow.endTime";
+    public static final String KEY_SMS_WINDOW_TIMEZONE = "survey_settings.smsTimeWindow.timeZone";
+    
+    
     /*
      * Mongo social post Source
      */
@@ -829,6 +856,10 @@ public interface CommonConstants
     public static final String DATE_FORMAT = "MM/dd/yyyy";
     public static final String DATE_FORMAT_WITH_TZ = "MM/dd/YYYY HH:MM:SS z";
     public static final String ZILLOW_SHARE_DATE_FORMAT = "YYYY-MM-dd";
+    public static final String UTC_HOURS_FORMAT = "HH";
+    public static final String UTC_TIME_ZONE = "UTC";
+    
+    public static final String HOURS_MINS_TIME_FORMATE = "hh:mm a";
 
     /*
      * Constats for Find a pro
@@ -1693,7 +1724,7 @@ public interface CommonConstants
 
     public static final String OS_LINUX = "linux";
 
-    //Unsubscribed Email Constatns SS-1547
+    //Unsubscribed Email Constants SS-1547
     public static final int STATUS_UNSUBSCRIBED = 1;
     public static final int STATUS_RESUBSCRIBED = 2;
     public static final int LEVEL_APPLICATION = 1;
@@ -1707,7 +1738,16 @@ public interface CommonConstants
     public static final String STATUS_NOT_IN_UNSUBSCRIBED_LIST = "Can not resubscribe. Email id not unsubscribed before.";
     public static final String STATUS_SUCCESS_RESUBSCRIBE = "Email id successfully resubscribed.";
     public static final String STATUS_UNSUBSCRIBE_FAILED = "FAILED TO UNSUBSCRIBE";
-    
+
+    // Unsubscribed Contact Number Constants SE-147
+    public static final String CONTACT_NUMBER = "contactNumber";
+    public static final String CONTACT_STATUS_SUCCESS_UNSUBSCRIBE = "Contact number successfully unsubscribed.";
+    public static final String CONTACT_STATUS_ALREADY_UNSUBSCRIBED = "Can not unsubscribe. Contact number has already been unsubscribed.";
+    public static final String CONTACT_STATUS_SUCCESS_RESUBSCRIBE = "Contact number successfully resubscribed.";
+    public static final String CONTACT_STATUS_ALREADY_RESUBSCRIBED = "Can not resubscribe. Contact number is already resubscribed.";
+    public static final String CONTACT_STATUS_NOT_IN_UNSUBSCRIBED_LIST = "Can not resubscribe. Contact number not unsubscribed before.";
+    public static final String UNSUBSCRIBED_CONTACTS = "UNSUBSCRIBED_CONTACTS";
+
     // Widget Constants
     public static final String WIDGET_CONFIGURATION_COLUMN = "widgetConfiguration";
     public static final String WIDGET_FONT = "font";
@@ -1847,6 +1887,7 @@ public interface CommonConstants
     public static final String STATE_NAME = "state";
     public static final String CITY_STATE_NAME = "citystate";
     
+    String HEADER_API_KEY = "apikey";
     public static final String X_RESTLI_PROTOCOL_VERSION = "X-Restli-Protocol-Version";
     public static final String X_RESTLI_PROTOCOL_VERSION_VALUE = "2.0.0";
     

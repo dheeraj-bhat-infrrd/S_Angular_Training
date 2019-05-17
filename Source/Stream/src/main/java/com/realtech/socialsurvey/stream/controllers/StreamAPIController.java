@@ -14,19 +14,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.realtech.socialsurvey.stream.entities.TransactionIngestionMessage;
+import com.realtech.socialsurvey.stream.common.CommonUtil;
 import com.realtech.socialsurvey.stream.entities.ReportRequest;
 import com.realtech.socialsurvey.stream.entities.SurveyProcessData;
+import com.realtech.socialsurvey.stream.entities.TransactionIngestionMessage;
 import com.realtech.socialsurvey.stream.messages.EmailMessage;
 import com.realtech.socialsurvey.stream.messages.SendgridEvent;
+import com.realtech.socialsurvey.stream.messages.SmsInfo;
 import com.realtech.socialsurvey.stream.messages.UserEvent;
 import com.realtech.socialsurvey.stream.services.AuthenticationService;
+import com.realtech.socialsurvey.stream.services.OptInOptOutContactService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -58,6 +63,15 @@ public class StreamAPIController
     private KafkaTemplate<String, String> kafkaTransactionIngestionTemplate;
     
     private KafkaTemplate<String, String> kafkaSurveyProcessorTemplate;
+    
+    private KafkaTemplate<String, String> kafkaSmsTemplate;
+    
+    private KafkaTemplate<String, String> kafkaSmsEventsTemplate;
+    
+    private OptInOptOutContactService optInOptOutContactService;
+    
+    @Autowired
+    private CommonUtil commonUtil;
     
     @Value ( "${kafka.topic.solrTopic}")
     private String solrTopic;
@@ -132,7 +146,28 @@ public class StreamAPIController
         this.kafkaSurveyProcessorTemplate = kafkaSurveyProcessorTemplate;
     }
     
-    @ApiOperation ( value = "Queues an email message.", response = Void.class)
+    @Autowired
+    @Qualifier ( "smsTemplate")
+    public void setKafkaSmsTemplate( KafkaTemplate<String, String> kafkaSmsTemplate )
+    {
+        this.kafkaSmsTemplate = kafkaSmsTemplate;
+    }
+
+    @Autowired
+    @Qualifier ( "smsEventsTemplate")
+	public void setKafkaSmsEventsTemplate(KafkaTemplate<String, String> kafkaSmsEventsTemplate) {
+    	
+		this.kafkaSmsEventsTemplate = kafkaSmsEventsTemplate;
+	}
+
+
+	@Autowired
+    public void setOptInOptOutContactService(OptInOptOutContactService optInOptOutContactService) {
+		
+		this.optInOptOutContactService = optInOptOutContactService;
+	}
+
+	@ApiOperation ( value = "Queues an email message.", response = Void.class)
     @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Successfully queued the message"),
         @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
         @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
@@ -145,7 +180,48 @@ public class StreamAPIController
         kafkaEmailTemplate.send( new GenericMessage<>( emailMessage ) ).get( 60, TimeUnit.SECONDS );
         return new ResponseEntity<>( HttpStatus.CREATED );
     }
-
+    
+    @ApiOperation ( value = "Queues an sms.", response = Void.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Successfully queued the message"),
+        @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse ( code = 503, message = "Service not available") })
+    @PostMapping ( value = "/sms" )
+    public ResponseEntity<?> queueSms( @RequestBody final SmsInfo smsInfo )
+        throws InterruptedException, ExecutionException, TimeoutException
+    {
+        LOG.trace( "Queueing sms: {}", smsInfo );
+        kafkaSmsTemplate.send( new GenericMessage<>( smsInfo ) ).get( 60, TimeUnit.SECONDS );
+        return new ResponseEntity<>( HttpStatus.CREATED );
+    }
+    
+    @ApiOperation ( value = "Receives request from twilio for incoming messages.", response = Void.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Acknowledged the message"),
+        @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse ( code = 503, message = "Service not available") })
+    @PostMapping ( value = "/twilio/contact/opt", consumes = {"application/x-www-form-urlencoded"})
+    public ResponseEntity<?> receiveUnsubscribeResubscribeEvents( @RequestParam( "From" ) String contactNumber,
+    		@RequestParam( "Body" ) String messageBody ) throws InterruptedException, ExecutionException, TimeoutException
+    {
+    	optInOptOutContactService.processIncomingMessage( contactNumber, messageBody );
+        return new ResponseEntity<>( HttpStatus.OK );
+    }
+    
+    @ApiOperation ( value = "Receives callback events from twilio of outgoing messages.", response = Void.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Acknowledged the message"),
+        @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse ( code = 503, message = "Service not available") })
+    @PostMapping ( value = "/twilio/sms/events", consumes = {"application/x-www-form-urlencoded"})
+    public ResponseEntity<?> receiveTwilioSmsEvents( @RequestParam( "SmsSid" ) String smsSid,
+    		@RequestParam( "SmsStatus" ) String smsStatus, @RequestParam( required = false, name = "ErrorCode" ) String errorCode,
+    		@RequestParam( required = false, name = "ErrorMessage" ) String errorMessage ) throws InterruptedException, ExecutionException, TimeoutException
+    {
+    	SmsInfo smsInfo = commonUtil.buildSmsEntity( smsSid, smsStatus, errorCode, errorMessage );
+    	kafkaSmsEventsTemplate.send( new GenericMessage<>( smsInfo ) ).get( 60, TimeUnit.SECONDS );
+        return new ResponseEntity<>( HttpStatus.OK );
+    }
 
     @ApiOperation ( value = "Indicates to refresh SOLR for Social Survey.", response = Void.class)
     @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Acknowledged the message"),

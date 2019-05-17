@@ -4,9 +4,11 @@ import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.SmsEntity;
 import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.core.entities.ftp.FtpUploadRequest;
 import com.realtech.socialsurvey.core.entities.integration.stream.FailedStreamMessage;
+import com.realtech.socialsurvey.core.vo.SmsVO;
 
 /**
  * Handles stream messages
@@ -37,6 +39,14 @@ public interface StreamMessagesService
      * @return
      */
     public List<EmailEntity> getAllFailedStreamEmailMsgs( int start, int batchSize );
+    
+    /**
+     * 
+     * @param start
+     * @param batchSize
+     * @return
+     */
+    public List<FailedStreamMessage> getAllFailedStreamSms( int start, int batchSize );
 
 
     /**
@@ -44,7 +54,6 @@ public interface StreamMessagesService
      * @param id
      */
     public void deleteFailedStreamMsg( String id );
-
 
     /**
      * 
@@ -65,6 +74,11 @@ public interface StreamMessagesService
      * 
      */
     public void startFailedStreamMessagesRetry();
+    
+    /**
+     * 
+     */
+    public void startFailedStreamSmsRetry();
 
 
     /**
@@ -86,4 +100,18 @@ public interface StreamMessagesService
     
     @SuppressWarnings ( "rawtypes")
     public FailedStreamMessage getFailedStreamMsg( String id );
+
+    /**
+     * Saves sms entity that failed streaming
+     * @param smsEntity
+     * @return
+     */
+    public boolean saveFailedStreamSmsMessages(SmsEntity smsEntity);
+    
+    /**
+     * Saves failed sms into stream failed messages
+     * @param smsEntity
+     * @return
+     */
+    public boolean saveFailedSmsInTopology( SmsVO smsVO );
 }

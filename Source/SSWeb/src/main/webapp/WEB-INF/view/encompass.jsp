@@ -25,6 +25,10 @@
 					<c:set var="propertyAddress" value="${ appSettings.crm_info.propertyAddress }" />
 					<c:set var="loanProcessorEmail" value="${ appSettings.crm_info.loanProcessorEmail }" />
 					<c:set var="loanProcessorName" value="${ appSettings.crm_info.loanProcessorName }" />
+					<c:set var="borrowerContactNumber" value="${ appSettings.crm_info.borrowerContactNumber }" />
+					<c:set var="coBorrowerContactNumber" value="${ appSettings.crm_info.coBorrowerContactNumber }" />
+					<c:set var="buyerAgentContactNumber" value="${ appSettings.crm_info.buyerAgentContactNumber }" />
+					<c:set var="sellerAgentContactNumber" value="${ appSettings.crm_info.sellerAgentContactNumber }" />
 				</c:if>
 				<c:if test="${alertEmails != null}">
 				    <c:set var="alertEmail" value="${ alertEmails }" />
@@ -284,6 +288,83 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <c:if test="${smsSurveyReminderEnabled}">
+	                    <!-- Borrower Contact number-->
+						<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
+							<div class="hm-item-row item-row-OR clearfix float-left">
+								<div class="um-item-row-left width-offset text-right encomp-contact-label">
+									<spring:message code="label.crm.borrower.contactnumber.key" />
+								</div>
+								<div class="clearfix float-right ">
+									<div class="um-item-row-icon margin-left-0"></div>
+									<div class="um-item-row-icon margin-left-0"></div>
+								</div>
+								<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+									<div class="rfr_icn icn-field-id en-icn"></div>
+									<input id="borrower-contact-number" type="text" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Contact Number" name="borrowerContactNumber" value="${borrowerContactNumber}">
+									<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Co Borrower Contact number -->
+						
+						<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
+							<div class="hm-item-row item-row-OR clearfix float-left">
+								<div class="um-item-row-left width-offset text-right encomp-contact-label">
+									<spring:message code="label.crm.coborrower.contactnumber.key" />
+								</div>
+								<div class="clearfix float-right ">
+									<div class="um-item-row-icon margin-left-0"></div>
+									<div class="um-item-row-icon margin-left-0"></div>
+								</div>
+								<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+									<div class="rfr_icn icn-field-id en-icn"></div>
+									<input id="coborrower-contact-number" type="text" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Contact Number" name="coBorrowerContactNumber" value="${coBorrowerContactNumber}">
+									<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Buyer Contact number -->
+						
+						<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
+							<div class="hm-item-row item-row-OR clearfix float-left">
+								<div class="um-item-row-left width-offset text-right encomp-contact-label">
+									<spring:message code="label.crm.buyer.contactnumber.key" />
+								</div>
+								<div class="clearfix float-right ">
+									<div class="um-item-row-icon margin-left-0"></div>
+									<div class="um-item-row-icon margin-left-0"></div>
+								</div>
+								<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+									<div class="rfr_icn icn-field-id en-icn"></div>
+									<input id="buyer-contact-number" type="text" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Contact Number" name="buyerAgentContactNumber" value="${buyerAgentContactNumber}">
+									<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Seller Contact number -->
+						
+						<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
+							<div class="hm-item-row item-row-OR clearfix float-left">
+								<div class="um-item-row-left width-offset text-right encomp-contact-label">
+									<spring:message code="label.crm.seller.contactnumber.key" />
+								</div>
+								<div class="clearfix float-right ">
+									<div class="um-item-row-icon margin-left-0"></div>
+									<div class="um-item-row-icon margin-left-0"></div>
+								</div>
+								<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+									<div class="rfr_icn icn-field-id en-icn"></div>
+									<input id="seller-contact-number" type="text" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Contact Number" name="sellerAgentContactNumber" value="${sellerAgentContactNumber}">
+									<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
+								</div>
+							</div>
+						</div>
+					</c:if>
 
 					<div class="encompass-btn clearfix">
 						<div>

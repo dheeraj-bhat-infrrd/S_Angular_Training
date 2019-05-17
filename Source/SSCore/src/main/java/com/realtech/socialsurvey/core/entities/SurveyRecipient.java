@@ -1,12 +1,14 @@
 package com.realtech.socialsurvey.core.entities;
 
 public class SurveyRecipient {
+    private String refId;
 	private long agentId;
 	private String agentName;
 	private String firstname;
 	private String lastname;
 	private String emailId;
 	private String agentEmailId;
+	private String contactNumber;
 
 	public String getAgentEmailId()
     {
@@ -58,7 +60,25 @@ public class SurveyRecipient {
 		this.agentName = agentName;
 	}
 
-	@Override
+	public String getContactNumber() {
+		return contactNumber;
+	}
+
+	public void setContactNumber(String contactNumber) {
+		this.contactNumber = contactNumber;
+	}
+	
+	public String getRefId()
+    {
+        return refId;
+    }
+
+    public void setRefId( String refId )
+    {
+        this.refId = refId;
+    }
+
+    @Override
 	public String toString() {
 		return "firstname: " + firstname + "\t lastname: " + lastname + "\t emailId: " + emailId;
 	}

@@ -112,6 +112,32 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
         return surveys.get( CommonConstants.INITIAL_INDEX );
     }
+    
+    /*
+     * Method to fetch survey details on the basis of agentId and customer email.
+     */
+    @Override
+    public SurveyDetails getSurveyByAgentIdAndCustomerContactNumber( long agentId, String customerContactNumber, String firstName,
+        String lastName )
+    {
+        LOG.debug( "Method getSurveyByAgentIdAndCustomerEmail() to insert details of survey started." );
+        Query query = new Query( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_CONTACT_NUMBER_KEY_COLUMN ).is( customerContactNumber ) );
+        if ( firstName != null && !firstName.isEmpty() ) {
+            query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_FIRST_NAME_COLUMN ).is( firstName ) );
+        }
+        if ( lastName != null && !lastName.isEmpty() ) {
+            query.addCriteria( Criteria.where(CommonConstants.CUSTOMER_LAST_NAME_COLUMN ).is( lastName ) );
+        }
+        
+        //get the oldest record
+        query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.isEmpty() )
+            return null;
+        LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
+        return surveys.get( CommonConstants.INITIAL_INDEX );
+    }
 
 
     @Override
@@ -143,6 +169,37 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( surveys == null || surveys.size() == 0 )
             return null;
         LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
+        return surveys.get( CommonConstants.INITIAL_INDEX );
+    }
+    
+    @Override
+    public SurveyDetails getSurveyByAgentIdAndCustomerContactNumberAndNoOfDays( long agentId, String customerContactNumber, String firstName,
+        String lastName, int noOfDays )
+    {
+        LOG.debug( "Method getSurveyByAgentIdAndCustomerContactNumberAndNoOfDays()  started." );
+
+        Date startDate = null;
+        if ( noOfDays == -1 ) {
+            startDate = new Date( 0l );
+        } else {
+            startDate = getNdaysBackDate( noOfDays );
+        }
+
+        Query query = new Query( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        query.addCriteria( Criteria.where( CommonConstants.CUSTOMER_CONTACT_NUMBER_KEY_COLUMN ).is( customerContactNumber ) );
+        if ( firstName != null && !firstName.isEmpty() ) {
+            query.addCriteria( Criteria.where( "customerFirstName" ).is( firstName ) );
+        }
+        if ( lastName != null && !lastName.isEmpty() ) {
+            query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
+        }
+
+        query.addCriteria( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) );
+        
+        List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
+        if ( surveys == null || surveys.isEmpty() )
+            return null;
+        LOG.debug( "Method getSurveyByAgentIdAndCustomerContactNumberAndNoOfDays() to insert details of survey finished." );
         return surveys.get( CommonConstants.INITIAL_INDEX );
     }
 

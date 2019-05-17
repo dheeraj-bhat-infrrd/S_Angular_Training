@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
 
 import java.util.Set;
 import java.util.TimeZone;
@@ -33,6 +34,8 @@ import java.util.UUID;
 import com.mongodb.BulkWriteError;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.vo.BulkWriteErrorVO;
+import com.realtech.socialsurvey.core.vo.SmsSurveyReminderResponseVO;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -43,6 +46,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -77,8 +82,10 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.factories.ApplicationSettingsInstanceProvider;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.contact.ContactUnsubscribeService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.EmailUnsubscribeService;
@@ -91,6 +98,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
+import com.realtech.socialsurvey.core.services.sms.SmsServices;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -156,6 +164,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private EmailServices emailServices;
+    
+    @Autowired
+    private SmsServices smsServices;
+    
+    @Autowired
+    private ApplicationSettingsInstanceProvider applicationSettingsInstanceProvider;
     
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -236,6 +250,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${ZILLOW_REVIEW_POST_URL}")
     private String zillowReviewwPostUrl;
     
+
+    @Value ( "${COUNTRY_DIALIN_CODES}")
+    private String countryDialInCodes;
+    
+    private List<String> dialInCodes;
+    
     @Autowired
     private Utils utils;
 
@@ -253,6 +273,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     
     @Autowired
     private EmailUnsubscribeService unsubscribeService;
+    
+    @Autowired
+    private ContactUnsubscribeService contactUnsubscribeService;
     
     @Autowired
 	private StreamApiIntegrationBuilder streamApiIntergrationBuilder;
@@ -297,16 +320,33 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     private static final int SURVEY_CSV_AGENT_EMAIL_INDEX_FOR_ADMIN = 0;
     
+    private static final int SURVEY_CSV_CUSTOMER_CONTACT_NUMBER_INDEX_FOR_AGENT = 3;
+    private static final int SURVEY_CSV_CUSTOMER_CONTACT_NUMBER_INDEX_FOR_ADMIN = 4;
+    
     private static final String AGENT_EMAIL = "Agent Email";
     private static final String CUSTOMER_FIRST_NAME = "Customer First Name";
     private static final String CUSTOMER_LAST_NAME = "Customer Last Name";
     private static final String CUSTOMER_EMAIL = "Customer Email";
+    private static final String CUSTOMER_CONTACT_NUMBER = "Customer Contact Number";
     
-    private static final List<String> AGENT_HEADER = Arrays.asList( CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_EMAIL );
-    private static final List<String> ADMIN_HEADER = Arrays.asList( AGENT_EMAIL, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_EMAIL );
+    private static final List<String> AGENT_HEADER = Arrays.asList( CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_EMAIL, CUSTOMER_CONTACT_NUMBER );
+    private static final List<String> ADMIN_HEADER = Arrays.asList( AGENT_EMAIL, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_EMAIL, CUSTOMER_CONTACT_NUMBER );
+    
+    private  static final String SMS_FAILED_OUT_OFF_WINDOW_TIME_MSG = "SMS send failed: We can only send text messages to your customers between %s and %s %s Time. Please try again during those hours.";
+    private  static final String SMS_FAILED_LIMIT_REACHED_MSG = "SMS send failed: You have reached your limit for sending text reminders to this customer.";
+
+    private  static final String SMS_FAILED_ONLY_ONE_REMINDER_MSG = "SMS send failed: You can only send 1 text message to your customer every 24 hours. Please try again later.";
 
     
 
+    @PostConstruct
+    private void fetchCountryDialInCodeList() {
+    	if( dialInCodes == null ) {
+    		
+    		dialInCodes = new ArrayList<>();
+    	}
+    	dialInCodes = Arrays.asList( countryDialInCodes.split( "," ) );
+    }
 
     /**
      * Method to store question and answer format into mongo.
@@ -617,6 +657,36 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Method to increase reminder count by 1, updateReminderCount() finished." );
     }
 
+    /*
+     * Method to increase reminder count by 1. This method is called every time a reminder sms is
+     * sent to the customer.
+     */
+    @Override
+    @Transactional
+    public SurveyPreInitiation updateReminderCountSms( long surveyPreInitiationId, boolean autoReminder, boolean isNotDuplicate )
+    {
+    	LOG.debug( "Method to increase reminder count by 1, updateReminderCountSms() started." );
+    	SurveyPreInitiation survey = surveyPreInitiationDao.findById( SurveyPreInitiation.class, surveyPreInitiationId );
+    	if ( survey != null ) {
+    		Timestamp timestamp = new Timestamp( System.currentTimeMillis() );
+    		if(isNotDuplicate) {
+	    		survey.setModifiedOn( timestamp );
+	    		survey.setLastSmsReminderTime( timestamp );
+	    		survey.setReminderCountsSms( survey.getReminderCountsSms() + 1 );
+	    		if ( autoReminder ) {
+	    			survey.setIsAutoSmsReminderSent(1);
+	    		}
+	    	}
+    		else {
+    			survey.setLastSmsReminderTime( timestamp );
+	    		survey.setReminderCountsSms( survey.getReminderCountsSms() + 1 );
+    		}
+    		surveyPreInitiationDao.merge( survey );
+    		LOG.debug( "Method to increase reminder count by 1, updateReminderCountSms() finished." );
+    	}
+        return survey;
+    }
+
 
     @Override
     @Transactional
@@ -825,7 +895,44 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "method getIncompleteSurveyForReminderEmail finished." );
         return incompleteSurveyCustomers;
     }
+    
+    /*
+     * Method to get list of customers' contact numbers who have not completed survey yet. It checks if
+     * max number of reminder sms have been sent. It also checks if required number of days have
+     * been passed since the last sms was sent.
+     */
+    @Override
+    @Transactional
+    public List<SurveyPreInitiation> getIncompleteSurveyForSmsReminder( long companyId, Date minLastReminderDate,
+        Date maxLastReminderDate, int maxReminderCount )
+    {
+        LOG.debug( "method getIncompleteSurveyForSmsReminder started." );
 
+        Criterion companyCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId );
+        Criterion statusCriteria = Restrictions.in( CommonConstants.STATUS_COLUMN,
+            Arrays.asList( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED, CommonConstants.SURVEY_STATUS_INITIATED ) );
+
+        Criterion minLastReminderCriteria = Restrictions.gt( CommonConstants.CREATED_ON, minLastReminderDate );
+        Criterion maxLastReminderCriteria = Restrictions.lt( CommonConstants.CREATED_ON, maxLastReminderDate );
+
+        Criterion lastReminderTimeNull = Restrictions.isNull( CommonConstants.LAST_SMS_REMINDER_TIME );
+
+        Criterion lastReminderTimeAndCriteria = Restrictions.and(minLastReminderCriteria, maxLastReminderCriteria, lastReminderTimeNull);
+
+        Criterion reminderCountCriteria = Restrictions.eq( "reminderCountsSms", 0 );
+
+        Criterion contactNumberCriteria = Restrictions.isNotNull("customerContactNumber");
+
+        Criterion autoReminderCriteria = Restrictions.eq( "isAutoSmsReminderSent", 0 );
+
+        LOG.info( "Criteria to getIncompleteSurveyForSmsReminder is {} {} {} {} {} {}", companyCriteria, statusCriteria, 
+        		lastReminderTimeAndCriteria, reminderCountCriteria, contactNumberCriteria, autoReminderCriteria );
+
+        List<SurveyPreInitiation> incompleteSurveyCustomers = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class, companyCriteria,
+            statusCriteria, lastReminderTimeAndCriteria, reminderCountCriteria, contactNumberCriteria, autoReminderCriteria );
+        LOG.debug( "method getIncompleteSurveyForSmsReminder finished." );
+        return incompleteSurveyCustomers;
+    }
 
     @Override
     @Transactional
@@ -992,7 +1099,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     @Transactional
     public void storeSPIandSendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,
-        String custRelationWithAgent, User user, boolean isAgent, String source ) throws InvalidInputException, SolrException,
+        String custRelationWithAgent, User user, boolean isAgent, String source, String custContactNumber ) throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
         LOG.debug( "Method storeSPIandSendSurveyInvitationMail() called." );
@@ -1009,7 +1116,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
 
         SurveyPreInitiation surveyPreInitiation = preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0,
-            custRelationWithAgent, source );
+            custRelationWithAgent, source, custContactNumber );
 
         //prepare and send email
         if(surveyPreInitiation.getIsSurveyRequestSent() == CommonConstants.IS_SURVEY_REQUEST_SENT_TRUE) {
@@ -1266,7 +1373,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             if ( surveyPreInitiation != null ) {
                 markSurveyAsStarted( surveyPreInitiation );
             } else
-                preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, surveySource );
+                preInitiateSurvey( user, custEmail, custFirstName, custLastName, 0, custRelationWithAgent, surveySource, null );
         } else {
             //TODO survey will be null, Need to handle this
             /*SurveyPreInitiation surveyPreInitiation = getPreInitiatedSurvey( survey.getSurveyPreIntitiationId() );
@@ -2421,7 +2528,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     // Method to store details of a customer in mysql at the time of sending invite.
     @Override
     public SurveyPreInitiation preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
-        String custRelationWithAgent, String source )
+        String custRelationWithAgent, String source, String custContactNumber )
     {
         LOG.debug(
             "Method preInitiateSurvey() started to store details of a customer in mysql at the time of  sending invite" );
@@ -2446,6 +2553,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             surveyPreInitiation.setIsSurveyRequestSent( CommonConstants.IS_SURVEY_REQUEST_SENT_TRUE );
         }
         surveyPreInitiation.setSurveySource( source );
+        if( custContactNumber != null && !custContactNumber.isEmpty() ) {
+        	
+        	surveyPreInitiation.setCustomerContactNumber( custContactNumber );
+        	surveyPreInitiation.setReminderCountsSms( 0 );
+        }
         surveyPreInitiation = surveyPreInitiationDao.save( surveyPreInitiation );
 
         LOG.debug( "Method preInitiateSurvey() finished." );
@@ -2468,17 +2580,28 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         return surveyPreInitiation;
     }
+    
+    public void checkIfContactNumberSurveyedForAgent(long agentId, String recipientContactNumber ) throws InvalidInputException, DuplicateContactSurveyRequestException {
+        
+        if ( agentId <= 0l ) {
+            LOG.warn( "AgentId should be non zero value" );
+            throw new InvalidInputException( "Agent id is invalid" );
+        }
+        
+        if (StringUtils.isNotEmpty( recipientContactNumber ) && hasCustomerAlreadySurveyedForContactNumber( agentId, recipientContactNumber)) {
+            throw new DuplicateContactSurveyRequestException( "Survey request already sent" );
+        }
+    }
 
 
     @Override
     @Transactional
     public void initiateSurveyRequest( long agentId, String recipientEmailId, String recipientFirstname,
-        String recipientLastname, String source )
+        String recipientLastname, String source, String recipientContactNumber )
         throws DuplicateSurveyRequestException, InvalidInputException, SelfSurveyInitiationException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
-        LOG.debug( "Sending survey request for agent id: " + agentId + " recipientEmailId: " + recipientEmailId
-            + " recipientFirstname: " + recipientFirstname + " recipientLastname: " + recipientLastname );
+        LOG.debug( "Sending survey request for agent id: {} recipientEmailId: {} recipientFirstname: {} recipientLastname: {}", agentId, recipientEmailId, recipientFirstname, recipientLastname );
         if ( agentId <= 0l ) {
             LOG.warn( "Agentid should be non zero value" );
             throw new InvalidInputException( "Agent id is invalid" );
@@ -2559,7 +2682,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         LOG.debug( "Sending survey request mail." );
         storeSPIandSendSurveyInvitationMail( recipientFirstname, recipientLastname, recipientEmailId, null, agent, true,
-            source );
+            source, recipientContactNumber );
     }
 
 
@@ -2978,7 +3101,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     try {
                         initiateSurveyRequest( user.getUserId(), bulkSurveyDetail.getCustomerEmailId(),
                             bulkSurveyDetail.getCustomerFirstName(), bulkSurveyDetail.getCustomerLastName(),
-                            CommonConstants.SURVEY_SOURCE_BULK_UPLOAD );
+                            CommonConstants.SURVEY_SOURCE_BULK_UPLOAD, null );
                         status = CommonConstants.BULK_SURVEY_VALID;
                     } catch ( DuplicateSurveyRequestException | InvalidInputException | SelfSurveyInitiationException
                         | SolrException | NoRecordsFetchedException | UndeliveredEmailException | ProfileNotFoundException e ) {
@@ -3391,6 +3514,41 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             return true;
         }
         return false;
+    }
+    
+    @Override
+    public boolean hasCustomerAlreadySurveyedForContactNumber( long currentAgentId, String customerContactNumber )
+    {
+        
+
+        StringBuilder builder = new StringBuilder( customerContactNumber );
+        if( builder.charAt( 0 ) == '+' ) {
+
+            builder.delete(0, 1);
+        }
+        
+        String countryDialInCode = "1";
+        String contactNumber = builder.substring( builder.length() - 10 );
+        if( builder.length() > 10 ) {
+            countryDialInCode = builder.substring( 0,  builder.length() - 10 );
+            if( !dialInCodes.contains( countryDialInCode ) && !countryDialInCode.equals( "0" ) ) {
+                LOG.warn("Customer contact number {} is invalid", customerContactNumber );
+            } else {
+                if( countryDialInCode.equals( "0" ) ) {
+                    
+                    countryDialInCode = "1";
+                }
+            }   
+        }
+        
+        User currentAgent = userDao.findById( User.class, currentAgentId );
+        int duplicateSurveyInterval = 120;
+        if ( currentAgent != null && currentAgent.getCompany() != null ) {
+            duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany( currentAgent.getCompany().getCompanyId() );
+        }
+        
+        return checkIfContactNumberAlreadyExists( countryDialInCode, contactNumber, currentAgentId,  duplicateSurveyInterval);
+               
     }
 
 
@@ -5081,6 +5239,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 String customerFirstName = "";
                 String customerLastName = "";
                 String customerEmail = "";
+                String customerContactNumber = "";
 
                 // agent Email
                 String agentEmail = "";
@@ -5096,6 +5255,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                             customerFirstName = entry.getValue().get( SURVEY_CSV_CUSTOMER_FIRST_NAME_INDEX_FOR_AGENT );
                             customerLastName = entry.getValue().get( SURVEY_CSV_CUSTOMER_LAST_NAME_INDEX_FOR_AGENT );
                             customerEmail = entry.getValue().get( SURVEY_CSV_CUSTOMER_EMAIL_INDEX_FOR_AGENT );
+                            if( entry.getValue().size() > 3 ) {
+                            	customerContactNumber = entry.getValue().get( SURVEY_CSV_CUSTOMER_CONTACT_NUMBER_INDEX_FOR_AGENT );
+                            }
 
                         } else {
 
@@ -5103,6 +5265,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                             customerFirstName = entry.getValue().get( SURVEY_CSV_CUSTOMER_FIRST_NAME_INDEX_FOR_ADMIN );
                             customerLastName = entry.getValue().get( SURVEY_CSV_CUSTOMER_LAST_NAME_INDEX_FOR_ADMIN );
                             customerEmail = entry.getValue().get( SURVEY_CSV_CUSTOMER_EMAIL_NAME_INDEX_FOR_ADMIN );
+                            if( entry.getValue().size() > 4 ) {
+                            	customerContactNumber = entry.getValue().get( SURVEY_CSV_CUSTOMER_CONTACT_NUMBER_INDEX_FOR_ADMIN );
+                            }
 
                         }
                     } catch ( NullPointerException | IndexOutOfBoundsException unableToParseRow ) {
@@ -5123,7 +5288,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
                     // construct survey pre-initiation object from the extracted row
                     SurveyPreInitiation survey = buildSurveyPreInitiationFromCsvRecord( csvInfo.getCompanyId(), agentEmail,
-                        customerFirstName, customerLastName, customerEmail, csvInfo.getUploadedDate() );
+                        customerFirstName, customerLastName, customerEmail, customerContactNumber, csvInfo.getUploadedDate() );
 
 
                     // perform all the necessary checks for the SPI object 
@@ -5205,7 +5370,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @return
      */
     private SurveyPreInitiation buildSurveyPreInitiationFromCsvRecord( long companyId, String agentEmail,
-        String customerFirstName, String customerLastName, String customerEmail, Date uploadedDate )
+        String customerFirstName, String customerLastName, String customerEmail, String customerContactNumber, Date uploadedDate )
     {
         LOG.debug( "method buildSurveyPreInitiationFromCsvRecord called" );
         SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
@@ -5215,6 +5380,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyPreInitiation.setCustomerEmailId( customerEmail );
         surveyPreInitiation.setCustomerFirstName( customerFirstName );
         surveyPreInitiation.setCustomerLastName( customerLastName );
+        
+        if( !StringUtils.isEmpty( customerContactNumber ) ) {
+        	
+        	surveyPreInitiation.setCustomerContactNumber( filterContactNumber( customerContactNumber ) );
+        }
 
         surveyPreInitiation.setSurveySource( "CSV_UPLOAD" );
         surveyPreInitiation.setEngagementClosedTime( new Timestamp( uploadedDate.getTime() ) );
@@ -5226,6 +5396,24 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return surveyPreInitiation;
 
     }
+    
+    private String filterContactNumber( String customerContactNumber ) {
+		
+    	boolean flag = false;
+		StringBuilder builder = new StringBuilder( customerContactNumber );
+
+		if( builder.charAt( 0 ) == '+' ) {
+
+			builder.delete(0, 1);
+			flag= true;
+		}
+		builder.replace(0, builder.length(), builder.toString().replaceAll("[^\\d]", ""));
+		
+		if( flag && builder.length() > 0 ) {
+			builder.insert(0, '+');
+		}
+		return builder.substring( 0, Math.min( builder.length(), 30 ) );
+	}
 
 
     /**
@@ -5566,9 +5754,338 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     	surveyPreInitiationTemp.setCustomFieldTwo(surveyPreInitiation.getCustomFieldTwo());
     	surveyPreInitiationTemp.setCustomFieldOne(surveyPreInitiation.getCustomFieldOne());
     	return surveyPreInitiationTemp;
+    }
+    
+
+    @Override
+    public boolean sendSms( SurveyPreInitiation survey, String agentFirstName,  boolean saveToStreamLater ) throws InvalidInputException
+    {
+
+        String surveyLink = composeLink( survey.getAgentId(), survey.getCustomerEmailId(), survey.getCustomerFirstName(),
+            survey.getCustomerLastName(), survey.getSurveyPreIntitiationId(), false );
+
+        SmsEntity smsEntity = new SmsEntity();
+        smsEntity.setRecipientName( survey.getCustomerFirstName()
+            + ( StringUtils.isEmpty( survey.getCustomerLastName() ) ? "" : " " + survey.getCustomerLastName() ) );
+        smsEntity.setRecipientContactNumber( survey.getCustomerContactNumber() );
+        smsEntity.setAgentId( survey.getAgentId() );
+        smsEntity.setCompanyId( survey.getCompanyId() );
+        smsEntity.setSpiId( survey.getSurveyPreIntitiationId() );
+
+        ApplicationSettings applicationSettings = applicationSettingsInstanceProvider.getApplicationSettings();
+
+        String configuredSmsText = applicationSettings.getDefaultSmsReminderText();
+
+        return smsServices.sendSmsReminder( configuredSmsText, surveyLink, survey.getCustomerFirstName(), agentFirstName, smsEntity, saveToStreamLater );
+    }
+    
+    @Override
+    public long checkIfContactNumberAlreadySurveyed( String countryDialInCode, String contactNumber,
+    		long agentId, Timestamp createOn, OrganizationUnitSettings companySettings ) {
+    	List<String> contactList = new ArrayList<>();
     	
+    	contactList.add( "+" + countryDialInCode + contactNumber );
+    	contactList.add( countryDialInCode + contactNumber );
+    	if( "1".equals( countryDialInCode ) ) {
+    		
+    		contactList.add( "+0" + contactNumber );
+    		contactList.add( "0" + contactNumber );
+    		contactList.add( contactNumber );
+    	}
+
+    	int duplicateSurveyInterval = 0;
+    	if ( companySettings != null && companySettings.getSurvey_settings() != null
+    			&& companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ) {
+    		duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+    	} else {
+    		duplicateSurveyInterval = defaultSurveyRetakeInterval;
+    	}
+    	
+    	return surveyPreInitiationDao.getSurveyCountByAgentIdAndCustomeContactNumberForPastNDays(agentId, contactList,
+    			createOn, duplicateSurveyInterval);
+    }
+    
+    @Override
+    public boolean checkIfContactNumberAlreadyExists( String countryDialInCode, String contactNumber,
+            long agentId, int duplicateSurveyInterval ) {
+        List<String> contactList = new ArrayList<>();
+        
+        contactList.add( "+" + countryDialInCode + contactNumber );
+        contactList.add( countryDialInCode + contactNumber );
+        if( "1".equals( countryDialInCode ) ) {
+            contactList.add( "+0" + contactNumber );
+            contactList.add( "0" + contactNumber );
+            contactList.add( contactNumber );
+        }
+        
+        long count = surveyPreInitiationDao.getSurveyPreInitiationCount(agentId, contactList, duplicateSurveyInterval);
+        return count > 0 ? true : false; 
+    }
+    
+    @Override
+    public boolean checkIfContactNumberAlreadySurveyed(String countryDialInCode, String contactNumber,
+        long agentId, OrganizationUnitSettings companySettings) {
+
+		  List<String> contactList = new ArrayList<>();
+
+		  contactList.add( "+" + countryDialInCode + contactNumber ); contactList.add(
+		  countryDialInCode + contactNumber ); if( "1".equals( countryDialInCode ) ) {
+
+		  contactList.add( "+0" + contactNumber ); contactList.add( "0" + contactNumber
+		  ); contactList.add( contactNumber ); }
+
+        int duplicateSurveyInterval = 0;
+        if ( companySettings != null && companySettings.getSurvey_settings() != null
+                && companySettings.getSurvey_settings().getDuplicateSurveyInterval() > 0 ) {
+            duplicateSurveyInterval = companySettings.getSurvey_settings().getDuplicateSurveyInterval();
+        } else {
+            duplicateSurveyInterval = defaultSurveyRetakeInterval;
+        }
+        long count = surveyPreInitiationDao.getSurveyPreInitiationCountAlreadySent(agentId, contactList, duplicateSurveyInterval);
+        return count > 0 ? true : false; 
     }
 
+    @Override
+    public List<SmsSurveyReminderResponseVO> sendMultipleIncompleteSurveyReminder(long companyId,  String[] surveysSelectedArray) throws NonFatalException
+    {
+        OrganizationUnitSettings companySettings = userManagementService.getCompanySettingForSmsReminder( companyId );
+
+        if ( companySettings == null ){
+            LOG.warn("No company settings found");
+            throw new InvalidInputException( "No company settings found" );
+        }
+        
+        if(companySettings.getSurvey_settings() == null) {
+            LOG.warn("No Survey settings found");
+            throw new InvalidInputException( "No Survey settings found" );
+        }
+        
+        if( !companySettings.getSurvey_settings().isSmsSurveyReminderEnabled()) {
+            LOG.warn("Company is not allowed to send SMS reminder");
+            throw new InvalidInputException( "Company is not configured for sms survey reminder" );
+        }
+
+        SMSTimeWindow smsTimeWindow = companySettings.getSurvey_settings().getSmsTimeWindow();
+
+        if( smsTimeWindow == null ) {
+            LOG.warn("SmsTimeWindow not found, using default time from application properties.");
+            smsTimeWindow = applicationSettingsInstanceProvider.getApplicationSettings().getSmsTimeWindow();
+        }
+
+        LOG.info( "Found smsTimeWindow startTime : {}, endTime: {}, timeZone: {}", smsTimeWindow.getStartTime(),
+            smsTimeWindow.getEndTime(), smsTimeWindow.getTimeZone() );
+
+        List<SmsSurveyReminderResponseVO> smsSurveyReminderResponses = new ArrayList<>();
+        SmsSurveyReminderResponseVO smsSurveyReminderResponse = new SmsSurveyReminderResponseVO();
+
+        //converting time into utc and comparing them to server utc time.
+        if(isSMSWindowTimeValid( smsTimeWindow)) {
+            int maxReminderCount = 0;
+            if( companySettings.getSurvey_settings().getMaxNumberOfSmsSurveyReminders() > 0 ) {
+                maxReminderCount = companySettings.getSurvey_settings().getMaxNumberOfSmsSurveyReminders();
+            }
+            else {
+                maxReminderCount = applicationSettingsInstanceProvider.getApplicationSettings().getDefaultSmsSurveyReminderCount();
+            }
+    
+        	// Send sms to complete survey to each customer.
+        	LOG.info("Method to sendMultipleIncompleteSurveyReminder started ");
+
+        	for ( String incompleteSurveyIdStr : surveysSelectedArray ) {
+    			try {
+                    smsSurveyReminderResponse.setResponseType( "ERROR" );
+                    smsSurveyReminderResponses.add( smsSurveyReminderResponse );
+    				long surveyPreInitiationId;
+    				try {
+    					surveyPreInitiationId = Integer.parseInt( incompleteSurveyIdStr );
+    				} catch ( NumberFormatException e ) {
+    					LOG.error("Invalid surveyPreInitiationIdStr passed",e);
+    					throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed", e );
+    				}
+    				smsSurveyReminderResponse.setSurveyPreInitiationId( surveyPreInitiationId );
+    				SurveyPreInitiation survey = getPreInitiatedSurveyById( surveyPreInitiationId );
+    				
+    				if ( survey == null ) {
+                        LOG.warn("Invalid surveyPreInitiationIdStr passed");
+                        throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed" );
+                    }
+    				
+    				//check if max survey reminder has been reached
+    		        if ( survey.getReminderCountsSms() >= maxReminderCount ) {
+    		            smsSurveyReminderResponse.setMessage(SMS_FAILED_LIMIT_REACHED_MSG);
+    		            continue;
+    		        }
+    				
+    				OrganizationUnitSettings agentSettings = userManagementService.getAgentSettingForSmsReminder( survey.getAgentId() );
+    				
+    				if ( StringUtils.isEmpty( survey.getCustomerContactNumber() ) ) {
+    					LOG.warn("Customer contact number not found");
+    					smsSurveyReminderResponse.setMessage("Cannot send the reminder to " + survey.getCustomerFirstName()+ " " + survey.getCustomerLastName() + 
+    	                    ". Customer contact number not found. ");
+    					continue;
+    				}
+    				
+    				if( survey.getCustomerContactNumber().length() < 10 ) {
+    					
+    					LOG.warn("Customer contact number is invalid");
+    					smsSurveyReminderResponse.setMessage("SMS send failed: Customer contact number " + survey.getCustomerContactNumber() + " is invalid. ");
+    					continue;
+    				}
+    				
+    				StringBuilder builder = new StringBuilder( survey.getCustomerContactNumber() );
+    				if( builder.charAt( 0 ) == '+' ) {
+    
+    					builder.delete(0, 1);
+    				}
+    				
+    				String countryDialInCode = "1";
+            		String contactNumber = builder.substring( builder.length() - 10 );
+            		if( builder.length() > 10 ) {
+            			
+            			countryDialInCode = builder.substring( 0,  builder.length() - 10 );
+            			if( !dialInCodes.contains( countryDialInCode ) && !countryDialInCode.equals( "0" ) ) {
+            				LOG.warn("Customer contact number is invalid");
+            				smsSurveyReminderResponse.setMessage( "SMS send failed: Customer contact number " + survey.getCustomerContactNumber() + " is invalid. ");
+        					continue;
+            			}
+            			
+            			if( countryDialInCode.equals( "0" ) ) {
+            				
+            				countryDialInCode = "1";
+            			}
+            		}
+    
+    				Calendar yesterDayDate = Calendar.getInstance();
+    				yesterDayDate.add( Calendar.DATE, -1 );
+                    if ( survey.getLastSmsReminderTime() != null && survey.getLastSmsReminderTime().after( yesterDayDate.getTime() ) ) {
+    				    smsSurveyReminderResponse.setMessage(SMS_FAILED_ONLY_ONE_REMINDER_MSG);
+    					continue;
+    				}
+    				
+    				if( this.checkIfContactNumberAlreadySurveyed( countryDialInCode, contactNumber, survey.getAgentId(), survey.getCreatedOn(), companySettings ) != 0 ) {
+    				    smsSurveyReminderResponse.setMessage( "SMS send failed: Contact number is associated with other survey for same agent.");
+    					continue;
+    				}
+    				
+    				survey.setCustomerContactNumber( "+" + countryDialInCode + contactNumber );
+    				
+    				//Check if customer contact number is unsubscribed.
+                    if ( contactUnsubscribeService.isUnsubscribed( survey.getCompanyId(), survey.getCustomerContactNumber()) ) {
+                        LOG.debug( "Customer has unsubscribed his number {} either for the company {} or for social survey.",
+                            survey.getCustomerEmailId(), survey.getCompanyId() );
+                        smsSurveyReminderResponse.setMessage( "Cannot send the reminder to " + survey.getCustomerContactNumber()
+    					+ ". The customer has unsubscribed this contact number for social survey. ");
+                        continue;
+                    }
+                    
+                    String agentFirstName = agentSettings.getContact_details().getName();
+    
+                    boolean isSuccess = sendSms(survey, agentFirstName, false);
+                    
+                    if(!isSuccess) {
+                        LOG.warn( "Stream api might be down or throwing error." );
+                        smsSurveyReminderResponse.setMessage( "SMS send failed: could not process request right now, try again after some time.");
+                        continue;
+                    }
+                    
+    				// Increasing value of reminder count for sms by 1.
+                    SurveyPreInitiation surveyPreInitiationUpdated = updateReminderCountSms( survey.getSurveyPreIntitiationId(), false, true );
+                    smsSurveyReminderResponse.setMessage( "Reminder sms sent successfully to " + survey.getCustomerContactNumber());
+    				smsSurveyReminderResponse.setResponseType( "SUCCESS" );
+    				smsSurveyReminderResponse.setCustomerName( surveyPreInitiationUpdated.getCustomerFirstName() +" "+ surveyPreInitiationUpdated.getCustomerLastName());
+    				smsSurveyReminderResponse.setReminderCountsSms(surveyPreInitiationUpdated.getReminderCountsSms());
+    				smsSurveyReminderResponse.setModifiedOn( surveyPreInitiationUpdated.getModifiedOn());
+    			} catch ( NumberFormatException e ) {
+    				LOG.error("Number format exception occured while parsing incomplete survey id : "+incompleteSurveyIdStr,e);
+    				throw new NonFatalException(
+    						"Number format exception occured while parsing incomplete survey id : " + incompleteSurveyIdStr, e );
+    			}
+    		}
+        	LOG.info("Method to sendMultipleIncompleteSurveyReminder finished");
+        	return smsSurveyReminderResponses;
+        }
+        else {
+            for(String surveyPreInitiationId : surveysSelectedArray) {
+                smsSurveyReminderResponse.setSurveyPreInitiationId( Long.parseLong( surveyPreInitiationId ));
+                smsSurveyReminderResponse.setMessage(String.format( SMS_FAILED_OUT_OFF_WINDOW_TIME_MSG, smsTimeWindow.getStartTime(), smsTimeWindow.getEndTime(), smsTimeWindow.getTimeZone()));
+                smsSurveyReminderResponses.add( smsSurveyReminderResponse );
+            }
+            return smsSurveyReminderResponses;
+        }
+    }
+
+
+    @Override
+    public boolean isSMSWindowTimeValid( SMSTimeWindow smsTimeWindow )
+    {
+        try {
+            if(smsTimeWindow == null) {
+                LOG.warn( "smsTimeWindow cann't be null" );
+                return false;
+            }
+            
+            DateTimeZone timeZone = DateTimeZone.forID( smsTimeWindow.getTimeZone() );
+            
+            DateTime currentLocalDateTime = DateTime.now( timeZone );
+            
+            // Get the system based on timezone specified for company
+            LOG.info( "Current time is {} inside method isSMSWindowTimeValid and SMSTimeWindow is {}",  currentLocalDateTime, smsTimeWindow);
+
+            int currentHours = currentLocalDateTime.getHourOfDay();
+            int currentMins = currentLocalDateTime.getMinuteOfHour();
+
+            DateFormat dateFormat = new SimpleDateFormat( CommonConstants.HOURS_MINS_TIME_FORMATE );
+            Calendar calendar = Calendar.getInstance();
+
+            Date startDate = dateFormat.parse( smsTimeWindow.getStartTime() );
+
+            calendar.setTime( startDate );
+            int startHours = calendar.get( Calendar.HOUR_OF_DAY );
+            int startMins = calendar.get( Calendar.MINUTE );
+
+            Date endDate = dateFormat.parse( smsTimeWindow.getEndTime() );
+            calendar.setTime( endDate );
+            int endHours = calendar.get( Calendar.HOUR_OF_DAY );
+            int endMins = calendar.get( Calendar.MINUTE );
+
+            if ( startHours > endHours || ( startHours == endHours && startMins > endMins ) ) {
+                int tempEndHours = 23;
+                int tempEndMins = 59;
+                int tempStartHours = 0;
+                int tempStartMins = 0;
+
+                // First window from start time to 23:59
+                boolean inFirstRange = isTimeInRange( currentHours, currentMins, startHours, startMins, tempEndHours,
+                    tempEndMins );
+
+                // Second window from 00:00 to end time
+                boolean inSecondRange = isTimeInRange( currentHours, currentMins, tempStartHours, tempStartMins, endHours,
+                    endMins );
+
+                // Valid if it is in first and second range.
+                return inFirstRange && inSecondRange;
+            } else {
+                // from start time to end time
+                return isTimeInRange( currentHours, currentMins, startHours, startMins, endHours, endMins );
+            }
+        } catch ( ParseException e ) {
+            LOG.error( "Found ParseException in method isSMSWindowTimeValid while converting current date into UTC", e );
+        }
+        return false;
+    }
+    
+
+    private boolean isTimeInRange( int currentHours, int currentMins, int startHours, int startMins, int endHours, int endMins )
+    {
+        if ( ( ( currentHours < startHours || currentHours > endHours )
+            || ( currentHours == startHours && currentMins < startMins )
+            || ( currentHours == endHours && currentMins > endMins ) ) ) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
     @Override
     public ReviewReplyVO createOrUpdateReplyToReview( String surveyId, String replyText, String replyByName, String replyById, String replyId, String entityType )
         throws InvalidInputException
@@ -5676,6 +6193,25 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String customerEmail = surveyDetails.getCustomerEmail();
         
         emailServices.sendMailForDeleteReplyOnReview(surveyUrl, agentName, customerName,  customerEmail);
+    }
+
+    @Override
+    public boolean isCompanyAllowedForAutoReminder( long companyId ) {
+
+    	OrganizationUnitSettings companySettings;
+		try {
+			companySettings = userManagementService.getCompanySettingForSmsReminder( companyId );
+
+			if ( companySettings == null || companySettings.getSurvey_settings() == null){
+	            LOG.warn("No company settings found for companyId: {} ", companyId);
+	            return false;
+	        }
+			return companySettings.getSurvey_settings().isSmsSurveyReminderEnabled();
+
+		} catch (InvalidInputException e) {
+			LOG.info( "Sms survey reminder setting is not enable for companyId {} ", companyId );
+			return false;
+		}
     }
     
 }

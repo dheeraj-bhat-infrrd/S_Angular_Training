@@ -337,12 +337,11 @@ function retrieveState() {
 $(document).on('click', function (e) {
 	var close = false;
 	if ($('#overlay-send-survey').is(':visible')) {
-		$('#overlay-send-survey').find('#wc-review-table-inner').children().each(function () {
-			if (!$(this).hasClass('wc-review-hdr')) {
-				$(this).children().each(function () {
+		$('#overlay-send-survey').find('.wc-review-data-row').each(function() {
+				$(this).children().each(function() {
+
 					if (!$(this).hasClass('last')) {
 						var input = $(this).children(":input").val();
-						console.log(input);
 						if (input != "") {
 							close = true;
 							$('#overlay-header-survey').html("Warning");
@@ -364,9 +363,6 @@ $(document).on('click', function (e) {
 					}
 
 				});
-
-			}
-
 		});
 		if (!close) {
 			$('#overlay-send-survey').hide();
@@ -3395,6 +3391,14 @@ var ratingMouseUp = function (e) {
 		container.slideUp(200);
 	}
 	$(document).unbind("mouseup", ratingMouseUp);
+};
+
+var smsTimeZoneMouseUp = function (e){
+	var container = $('#sms-dd-wrapper-tz');
+	if (!container.is(e.target) && container.has(e.target).length == 0){
+		container.slideToggle(200);
+	}
+	$(document).unbind("mouseup",smsTimeZoneMouseUp);
 };
 
 var replyScoreMouseUp = function (e) {
@@ -6603,6 +6607,199 @@ function updateCopyToClipBoardSettings(updateCopyToClipBoardSetting, disableEle)
 		showToast();
 	}, payload, true, disableEle);
 
+}
+
+$(document).on('click', '#sms-enabled-flag-chk-box', function(e) {
+	var isEnabled;
+	if ($(this).hasClass('bd-check-img-checked')) {
+		$(this).removeClass('bd-check-img-checked');
+		isEnabled = true;
+		$("#smsFeatureDiv").removeClass("hide");
+	} else {
+		isEnabled = false;
+		$(this).addClass('bd-check-img-checked');
+		$("#smsFeatureDiv").addClass("hide");
+	}
+	
+	if(isEnabled == false){
+		toggleAutomaticSmsSurveyReminder(false);
+	}
+	
+	updateSettings( "survey_settings.smsSurveyReminderEnabled", isEnabled);
+	toggleManualSmsSurveyReminder(isEnabled);
+});
+
+$(document).on('click', '#sms-manual-flag-chk-box', function(e) {
+	var isAllowed = false;
+	if ($(this).hasClass('bd-check-img-checked')) {
+		isAllowed = true;
+	} 
+	toggleManualSmsSurveyReminder(isAllowed);
+});
+
+function toggleManualSmsSurveyReminder(isAllowed) {
+	
+	if(isAllowed) {
+		$("#sms-manual-flag-chk-box").removeClass('bd-check-img-checked');
+	} else {
+		$("#sms-manual-flag-chk-box").addClass('bd-check-img-checked');
+	}
+
+	var payload = {
+		"value" : isAllowed
+	};
+
+	callAjaxPostWithPayloadData("./settings/manualsmssurveyreminder/toggle.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+}
+
+$(document).on('click', '#sms-automatic-flag-chk-box', function(e) {
+	var isAllowed = false;
+	if ($(this).hasClass('bd-check-img-checked')) {
+		isAllowed = true;
+	} 
+	toggleAutomaticSmsSurveyReminder(isAllowed);
+});
+
+function toggleAutomaticSmsSurveyReminder(isAllowed) {
+
+	if (isAllowed) {
+		$("#sms-automatic-flag-chk-box").removeClass('bd-check-img-checked');
+	} else {
+		$("#sms-automatic-flag-chk-box").addClass('bd-check-img-checked');
+	}
+	
+	var payload = {
+		"value" : isAllowed
+	};
+
+	callAjaxPostWithPayloadData("./settings/automaticsmssurveyreminder/toggle.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+}
+
+
+
+function updateSettings(settingName, settingStatus) {
+
+	var payload = {
+			"settingName" : settingName,
+			"settingStatus" : settingStatus
+	};
+
+	callAjaxPostWithPayloadData("./updatesettings.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+}
+
+//for sms reminder count
+$('body').on('blur', '#max-sms-reminder', function() {
+	
+	if (validateReminderInterval('max-sms-reminder')) {
+		if($("#max-sms-reminder").val() > 3){
+			$('#overlay-toast').html("Failed: You cann't set max sms reminder count greater than 3.");
+			return false;
+		}
+		
+		updateSettings('survey_settings.maxNumberOfSmsSurveyReminders', $("#max-sms-reminder").val());
+	}
+});
+
+//for sms reminder interval
+$('body').on('blur', '#sms-reminder-interval', function() {
+	
+	if (validateReminderInterval('sms-reminder-interval')) {
+		
+		updateSettings('survey_settings.smsSurveyReminderInterval', $("#sms-reminder-interval").val());
+	}
+});
+
+//for sms send time schedule
+$(document).on('click','#smsTimeSetButton',function(){
+	var startTime = $('#sms-time-window-start').val();
+	var endTime = $('#sms-time-window-end').val();
+	var timeZone = $('#timezone-list').val();
+	
+	if(validationTimeWindow(startTime, endTime, timeZone)){
+		$('#sms-time-window-error-msg').addClass("hide");
+		setSMSTime(startTime, endTime, timeZone);
+	}
+});
+
+function validationTimeWindow(startTime, endTime, timeZone){
+	if(startTime == undefined || startTime == ''){
+		$('#overlay-toast').html("Please select start time!");
+		showToast();
+		return false;
+	}
+	
+	if(endTime == undefined || endTime == ''){
+		$('#overlay-toast').html("Please select end time!");
+		showToast();
+		return false;
+	}
+	
+	var startTimeMinutesOfDay = getMinuteOfDay(startTime);
+	var endTimeMinutesOfDay = getMinuteOfDay(endTime);
+	
+	var timeWindowDurationInMinutes = 0;
+	if(startTimeMinutesOfDay > endTimeMinutesOfDay){
+		timeWindowDurationInMinutes = (1440 - startTimeMinutesOfDay) + endTimeMinutesOfDay;
+	} else {
+		timeWindowDurationInMinutes = endTimeMinutesOfDay - startTimeMinutesOfDay;
+	}
+	if(timeWindowDurationInMinutes < 120){
+		$('#sms-time-window-error-msg').html("Please ensure the delivery time window is at least 2 hrs");
+		$('#sms-time-window-error-msg').removeClass("hide");
+		return false;
+	}
+	
+	return true;
+}
+
+function getMinuteOfDay(time) {
+    var hours = Number(time.match(/^(\d+)/)[1]);
+    var minutes = Number(time.match(/:(\d+)/)[1]);
+    var AMPM = time.match(/\s(.*)$/)[1];
+    if ((AMPM == "PM" || AMPM == "pm") && hours < 12) hours = hours + 12;
+    if ((AMPM == "AM" || AMPM == "am") && hours == 12) hours = hours - 12;
+    var hoursMinutes = hours * 60;   
+    return hoursMinutes + minutes;
+}
+
+function setSMSTime( start, end, timeZone ) {
+
+	var payload = {
+		"startTime" : start,
+		"endTime"	: end,
+		"timeZone"	: timeZone
+	};
+	$.ajax({
+		url : "./updatesmswindow.do",
+		type : "POST",
+		contentType: "application/json",
+		dataType : "json",
+		data : JSON.stringify(payload),
+		complete : function(data) {
+			if (data.status ==200) {
+				$('#overlay-toast').html(data.responseText);
+				showToast();
+			} 
+			
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+			showToast();
+		}
+	});
 }
 
 function resetOptOutTextFlow(resetId) {
@@ -12631,40 +12828,35 @@ function showSurveysUnderResolution(startIndexCmp, batchSizeCmp) {
 		startIndexCmp += batchSizeCmp;
 	}, payload, true);
 }
-var surveyId = 4;
+
 // Send Survey Agent
-$(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function () {
-	$(this).removeClass('error-survey');
-	$(this).siblings().addClass('hidden');
-	var parentDiv = $(this).parent().parent();
-	if (parentDiv.is(':last-child')) {
-		var htmlData = '<div id="survey-' + surveyId + '" class="wc-review-tr  clearfix">' + '<div class="wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
-		parentDiv.after(htmlData);
-		surveyId++;
-		// enable remove button
-		if ($('#wc-review-table-inner').children().length > 2) {
-			$('.wc-review-rmv-icn').show();
-		}
-		$('#wc-review-table-inner').find(':nth-child(3)').find('.wc-review-rmv-icn').hide();
-
-		// setting up perfect scrollbar
-		setTimeout(function () {
-			$('#wc-review-table').perfectScrollbar();
-			$('#wc-review-table').perfectScrollbar('update');
-		}, 1000);
-	}
+$(document).on('input', '#wc-review-table-inner[data-role="agent"] input', function() {
+	inputEventOnSurveyInvite(this, false);
 });
 
-var surveyAdminId = 4;
 // Send Survey Admin
-$(document).on('input', '#wc-review-table-inner[data-role="admin"] input', function () {
-	$(this).removeClass('error-survey');
-	$(this).siblings().addClass('hidden');
-	var parentDiv = $(this).parent().parent();
+$(document).on('input', '#wc-review-table-inner[data-role="admin"] input', function() {
+	inputEventOnSurveyInvite(this, true);
+});
+
+function inputEventOnSurveyInvite(eventTarget, isForAdmin){
+	$(eventTarget).removeClass('error-survey');
+	var parentDiv = $(eventTarget).closest(".wc-review-tr");
+	
+	$(eventTarget).closest(".wc-review-data-col").find(".validation").addClass("hidden");
+	
 	if (parentDiv.is(':last-child')) {
-		var htmlData = '<div id="survey-' + surveyAdminId + '"class="wc-review-tr clearfix">' + '<div class="wc-review-tc1 survey-user float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div></div>' + '<div class="wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + '<div class="wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' + '<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn hide"></div></div>' + '</div>';
+		var surveyRowId = calculateSurveyInviteNextId(parentDiv.attr("id"));
+		
+		var htmlData = '';
+		if(isForAdmin){
+			htmlData = createLastSurveyInviteRowForAdmin(surveyRowId);
+		} else {
+			htmlData = createLastSurveyInviteRowForAgent(surveyRowId);
+		}
+		
 		parentDiv.after(htmlData);
-		surveyAdminId++;
+		applyCssEffectsToContactNumber();
 		// enable remove button
 		if ($('#wc-review-table-inner').children().length > 2) {
 			$('.wc-review-rmv-icn').show();
@@ -12677,9 +12869,114 @@ $(document).on('input', '#wc-review-table-inner[data-role="admin"] input', funct
 			$('#wc-review-table').perfectScrollbar('update');
 		}, 1000);
 
-		attachAutocompleteAgentSurveyInviteDropdown();
+		if(isForAdmin){
+			attachAutocompleteAgentSurveyInviteDropdown();
+		}
 	}
-});
+}
+
+function createLastSurveyInviteRowForAgent(surveyRowId){
+	return '<div id="survey-' + surveyRowId + '" class="wc-review-tr wc-review-data-row clearfix">' +
+	'<div class="wc-review-data-col wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' + 
+	'<div class="wc-review-data-col wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' + 
+	'<div class="wc-review-data-col wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' +
+	'<div class="wc-review-data-col wc-review-tc6 survey-contact float-left"><input type="hidden" id="sel-prof-country-code" value="${countryAbbr}"><div class="float-left lp-con-row lp-row clearfix contact-phone"><div class="lp-edit-wrapper clearfix float-left contact-phone-edit">' +
+	'<input class="wc-review-input wc-review-contact reg-details reg-details float-left prof-edditable-sin" type="tel" data-phone-number="work" placeholder="Contact Number"></div>' +
+	'</div><div class="validation validationcontact float-left hidden"></div></div><div class="wc-review-data-col wc-review-tc4 last float-left"><div class="wc-review-rmv-icn hide"></div></div></div>';
+}
+
+function createLastSurveyInviteRowForAdmin(surveyRowId){
+	return '<div id="survey-' + surveyRowId + '" class="wc-review-tr wc-review-data-row clearfix">' +
+	'<div class="wc-review-data-col wc-review-tc1 survey-user float-left pos-relative"><input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div></div>' +
+	'<div class="wc-review-data-col wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>' +
+	'<div class="wc-review-data-col wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>' +
+	'<div class="wc-review-data-col wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>' +
+	'<div class="wc-review-data-col wc-review-tc6 survey-contact float-left"><input type="hidden" id="sel-prof-country-code" value="${countryAbbr}"><div class="float-left lp-con-row lp-row clearfix contact-phone"><div class="lp-edit-wrapper clearfix float-left contact-phone-edit">' +
+	'<input class="wc-review-input wc-review-contact reg-details reg-details float-left prof-edditable-sin" type="tel" data-phone-number="work" placeholder="Contact Number"></div>' +
+	'</div><div class="validation validationcontact float-left hidden"></div></div><div class="wc-review-data-col wc-review-tc5 last float-left"><div class="wc-review-rmv-icn hide"></div></div></div>';
+}
+
+function calculateSurveyInviteNextId(surveyInviteRowId){
+	surveyInviteRowId = surveyInviteRowId.replace(/(\d+)+/g, function(match, number) { return parseInt(number)+1; });
+	return surveyInviteRowId;
+}
+
+function applyCssEffectsToContactNumber() {
+	
+	$('input.wc-review-contact:last').intlTelInput({
+		utilsScript :window.location.pathname.includes("/rest/survey/showsurveypage")?"../../../resources/js/utils.js": "../resources/js/utils.js"
+	});
+	$('div.contact-phone-edit:last').css('width', '100%');
+	$('div.contact-phone-edit:last').css('margin', '0px');		
+	
+	$('div.dial-country-code:last').css({
+		'width': '51px !important',
+		'font-size': '14px',
+		'line-height':'26px',
+		'margin-top': '7px'
+		});
+	
+	$('input.reg-details:last').css('height', '40px');
+	$('div.contact-phone:last').css('padding-left', '0px');
+	$('input.wc-review-contact:last').css('padding-left', '90px');
+	$('input.wc-review-contact:last').css('margin-left', '0px');
+	
+	$('input.wc-review-contact:last').intlTelInput("setCountry", "us");
+	$('input.wc-review-contact:last').intlTelInput("setNumber", "");
+	
+	$('input.wc-review-contact:last').on('keypress', function (e) {
+		var count = $(this).val().length;
+		if (count > 9) {
+			return false;
+		} else {
+			var regex = new RegExp("^[0-9]+$");
+			var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+			if (regex.test(str)) {
+				return true;
+			}
+			e.preventDefault();
+			return false;
+		}
+	});
+	
+	$('input.wc-review-contact:last').on('paste', function (e) {
+		var pastedData = e.originalEvent.clipboardData.getData('text').trim();
+		if( pastedData.startsWith("+") ) {
+			pastedData = pastedData.slice( 1 );
+		}
+		
+		var regex = new RegExp("^[0-9]+$");
+		if (regex.test(pastedData)) {
+			if( pastedData.length > 10 ) {
+				var lastTenDigit = pastedData.length - 10;
+				var contactWithoutDialCode = pastedData.substr( lastTenDigit );
+				var dialCode = pastedData.substr( 0, lastTenDigit );
+				var countryCodeValue = "us";
+				if( dialCode != "0" ) {
+					for (var i = 0; i < countryList.length; i++) {
+			        	var c = countryList[i];
+			        	if( c.length > 2 && c[2] == dialCode  ) {
+			        		countryCodeValue = c[1];
+			        		break;
+			        	}
+					}
+				}
+				$(this).intlTelInput("setCountry", countryCodeValue);
+				$(this).val(contactWithoutDialCode);
+			}
+			else {
+				$(this).intlTelInput("setCountry", "us");
+				$(this).val(pastedData);
+			}
+			e.preventDefault();
+			return true;
+		}
+		else {
+			e.preventDefault();
+			return false;
+		}
+	});
+}
 
 $(document).on('click', '.wc-review-rmv-icn', function () {
 	var parentDiv = $('#wc-review-table-inner');
@@ -12719,13 +13016,19 @@ $(document).on('click', '#wc-send-survey', function () {
 		allowrequest = checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded();
 	}
 
-	$('#wc-review-table-inner').children().each(function () {
-		if (!$(this).hasClass('wc-review-hdr')) {
+	$('#wc-review-table-inner').find(".wc-review-data-row").each(function() {
+
 			firstname = $(this).find('input.wc-review-fname').first().val();
 			lastname = $(this).find('input.wc-review-lname').first().val();
 			agentname = $(this).find('input.wc-review-agentname').first().attr('agent-name');
 			var emailId = $(this).find('input.wc-review-email').first().val();
+			var countryCode =$(this).find('.dial-country-code').text();
+			var contactNoWitoutCode = $(this).find('input.wc-review-contact').first().val();
+			var contactNo = "";
+			if( contactNoWitoutCode != '' ) {
 
+				contactNo = countryCode + contactNoWitoutCode;
+			}
 			var dataName = $(this).find('input.wc-review-agentname').first().attr('data-name');
 			if (dataName == 'agent-name') {
 				agentId = $(this).find('input.wc-review-agentname').first().attr('agent-id');
@@ -12810,13 +13113,27 @@ $(document).on('click', '#wc-send-survey', function () {
 					allowrequest = false;
 				}
 			}
+			
+			if( contactNoWitoutCode != "" ) {
+
+				var count = contactNoWitoutCode.length;
+				if ( count < 10 ) {
+
+					$(this).find('.wc-review-contact').addClass("error-survey");
+					$(this).find('.validationcontact').html("Enter a valid contact number.").removeClass("hidden");
+					$(this).find('.wc-review-contact').siblings().css("display", "block");
+					allowrequest = false;
+				}
+			}
 
 			if (emailId != "") {
 				if (customerEmailRegex.test(emailId.trim())) {
 					var receiver = new Object();
+					receiver.refId = $(this).attr("id");
 					receiver.firstname = firstname;
 					receiver.lastname = lastname;
 					receiver.emailId = emailId;
+					receiver.contactNumber = contactNo;
 					receiver.agentEmailId = agentEmailId;
 					receiver.agentId = agentId;
 
@@ -12837,13 +13154,7 @@ $(document).on('click', '#wc-send-survey', function () {
 					allowrequest = false;
 				}
 			}
-		}
 	});
-
-	// Check if recievers list empty
-	/*
-	 * if (receiversList.length == 0) { $('#overlay-toast').html('Add customers to send survey request!'); showToast(); allowrequest = false; return false; }
-	 */
 
 	// check if there is no duplicate entries
 	var receiversListLength = receiversList.length;
@@ -12869,111 +13180,173 @@ $(document).on('click', '#wc-send-survey', function () {
 		allowrequest = false;
 		return false;
 	}
+	
+	// check if there is no duplicate contact number entries
+	var receiversContactListLength = receiversList.length;
+	var surveyContactIndex = [];
+	var duplicateContact = false;
+	for (var i = 0; i < receiversContactListLength; i++) {
+		for (var j = i + 1; j < receiversContactListLength; j++) {
+			var flag = (receiversList[i].value.contactNumber != "" && receiversList[j].value.contactNumber != "") ? true : false;
+			if (flag && receiversList[i].value.contactNumber == receiversList[j].value.contactNumber && receiversList[i].value.agentEmailId == receiversList[j].value.agentEmailId) {
+				surveyContactIndex.push(i);
+				surveyContactIndex.push(j);
+			}
+		}
+	}
+	if (surveyContactIndex.length != 0) {
+		duplicateContact = true;
+		for (var k = 0; k < surveyContactIndex.length; k++) {
+			$("#" + receiversList[surveyContactIndex[k]].key).find(".wc-review-contact").addClass("error-survey");
+			$("#" + receiversList[surveyContactIndex[k]].key).find(".validationcontact").html("Duplicate not allowed.").removeClass("hidden");
+		}
+
+	}
+	if (duplicateContact) {
+		allowrequest = false;
+		return false;
+	}
 
 	var rec = [];
-	for (key in receiversList) {
+	for (var key in receiversList) {
 		rec.push(receiversList[key].value);
 	}
 	var receiverList = JSON.stringify(rec);
-	var payload = {
-		"receiversList": receiverList,
-		"source": 'agent'
-	};
+	
+	var sourceValue = "agent";
+	
 	if (columnName != undefined) {
-		payload = {
-			"receiversList": receiverList,
-			"source": 'admin',
-			"columnName": columnName,
-		};
+		sourceValue = "admin";
+
 	}
 	var surveyed = [];
 	var alreadysureyed = false;
 	if (allowrequest) {
-		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function (data) {
-			var alreadySurveyedEmails = $.parseJSON(data);
-			// To check if the email had already surveyed
-			if (alreadySurveyedEmails.length != 0) {
-				for (var i = 0; i < receiversListLength; i++) {
-					for (var j = 0; j < alreadySurveyedEmails.length; j++) {
-						if (receiversList[i].value.emailId == alreadySurveyedEmails[j]) {
+		$.ajax({
+			url : "./getalreadysurveyedemailids.do?source="+sourceValue,
+			dataType: "json",
+            contentType: "application/json;charset=utf-8",
+			type : "POST",
+			data : receiverList,
+			async : true,
+			cache : false,
+			success : function(data) {
+				// To check if the email had already surveyed
+				if (data.length != 0) {
+					for (var i = 0; i < data.length; i++) {
+						var emailAlreadySurveyed = data[i].emailId;
+						var contactNumberAlreadySurveyed = data[i].contactNumber;
+						var alreadySurveyedRefId = data[i].refId;
+						if(emailAlreadySurveyed){
+							$("#" + alreadySurveyedRefId).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
+							$("#" + alreadySurveyedRefId).find(".survey-email").find('.validationemail').html("Already surveyed.").removeClass("hidden");
+						}
+						
+						if(contactNumberAlreadySurveyed){
+							$("#" + alreadySurveyedRefId).find(".survey-contact").find('.wc-review-contact').addClass("error-survey");
+							$("#" + alreadySurveyedRefId).find(".survey-contact").find('.validationcontact').html("Already surveyed.").removeClass("hidden");
+						}
+						
+						if (receiversList[i].value.emailId == data[j]) {
+
 							alreadysureyed = true;
 							surveyed.push(i);
 						}
 					}
-				}
 
-				if (surveyed.length != 0) {
-					for (var k = 0; k < surveyed.length; k++) {
-						$("#" + receiversList[surveyed[k]].key).find(".survey-email").find(':nth-child(1)').addClass("error-survey");
-						$("#" + receiversList[surveyed[k]].key).find(".survey-email").find(':nth-child(2)').html("Already surveyed.").removeClass("hidden");
+					if (alreadysureyed) {
+						allowrequest = false;
+						return false;
 					}
 
+				} else {
+					$('#send-survey-dash').removeClass("hide");
+					if(surveysent){
+						return;
+					}
+					surveysent=true;
+					$('.ps-container').scrollTop(0).perfectScrollbar('update');
+					
+					$.ajax({
+						url : "./sendmultiplesurveyinvites.do?source="+sourceValue,
+						dataType: "json",
+			            contentType: "application/json;charset=utf-8",
+						type : "POST",
+						data : receiverList,
+						async : true,
+						cache : false,
+						success : function(data) {
+							
+							$('#send-survey-dash').addClass("hide");
+							$('.overlay-login').hide();
+							// Update the incomplete survey on dashboard
+							getIncompleteSurveyCount(colName, colValue);
+							
+							if(data.status == 'SUCCESS'){
+								var response = data;
+								if (response.surveySentCount == 1){
+									showInfo(response.surveySentCount + ' Survey Request Sent Successfully!');
+								    surveysent=false;
+								}
+									
+								else{
+									showInfo(response.surveySentCount + ' Survey Requests Sent Successfully!');
+									surveysent=false;
+								}
+							} else {
+								showError("Error while sending survey request!");
+								surveysent=false;
+							}
+							enableBodyScroll();
+						},
+						error : function(e) {
+							if(e.status == 504) {
+								redirectToLoginPageOnSessionTimeOut(e.status);
+								return;
+							}
+							if(e.status == 0) {
+								return;
+							}
+							showError("Error while sending survey request!");
+							surveysent=false;
+						}
+					});
 				}
-				if (alreadysureyed) {
-					allowrequest = false;
-					return false;
-				}
-
-			} else {
-				$('#send-survey-dash').removeClass("hide");
-				if (surveysent) {
+			},
+			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
 					return;
 				}
-				surveysent = true;
-				$('.ps-container').scrollTop(0).perfectScrollbar('update');
-				callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function (data) {
-
-					$('#send-survey-dash').addClass("hide");
-					$('.overlay-login').hide();
-					// Update the incomplete survey on dashboard
-					getIncompleteSurveyCount(colName, colValue);
-					if (data == "error") {
-						showError("Error while sending survey request!");
-						surveysent = false;
-					} else if (data.indexOf("Success") > -1) {
-						var response = $.parseJSON(data);
-						if (response.surveySentCount == 1) {
-							showInfo(response.surveySentCount + ' Survey Request Sent Successfully!');
-							surveysent = false;
-						}
-
-						else {
-							showInfo(response.surveySentCount + ' Survey Requests Sent Successfully!');
-							surveysent = false;
-						}
-
-					} else {
-						$('#overlay-toast').html(data);
-					}
-
-					enableBodyScroll();
-				}, payload, true);
+				if(e.status == 0) {
+					return;
+				}
+				redirectErrorpage();
 			}
-		}, payload, true);
+		});
 	}
 });
 
 
 function checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded() {
 	var allowrequest = true;
-	$('#wc-review-table-inner').children().each(function () {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function () {
-				if ($(this).hasClass('survey-user')) {
-					$(this).find(':nth-child(1)').addClass("error-survey");
-					$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
-					allowrequest = false;
-				} else if ($(this).hasClass('survey-fname')) {
-					$(this).find(':nth-child(1)').addClass("error-survey");
-					$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
-					allowrequest = false;
-				} else if ($(this).hasClass('survey-email')) {
-					$(this).find(':nth-child(1)').addClass("error-survey");
-					$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
-					allowrequest = false;
-				}
-			});
-		}
+
+	$('#wc-review-table-inner').find(".wc-review-data-row").each(function() {
+		$(this).children().each(function() {
+			if ($(this).hasClass('survey-user')) {
+				$(this).find(':nth-child(1)').addClass("error-survey");
+				$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
+				allowrequest = false;
+			} else if ($(this).hasClass('survey-fname')) {
+				$(this).find(':nth-child(1)').addClass("error-survey");
+				$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
+				allowrequest = false;
+			} else if ($(this).hasClass('survey-email')) {
+				$(this).find(':nth-child(1)').addClass("error-survey");
+				$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
+				allowrequest = false;
+			}
+		});
 	});
 	return allowrequest;
 }
@@ -12981,19 +13354,17 @@ function checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded() {
 function removeErrorMessagesAndDetermineIfRequiredDataIsPresent() {
 
 	var end = false;
-	$('#wc-review-table-inner').children().each(function () {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function () {
-				$(this).find(':nth-child(1)').removeClass("error-survey");
-				$(this).find(':nth-child(2)').addClass("hidden");
-				if (!$(this).hasClass('last')) {
-					var input = $(this).children(":input").val();
-					if (input != "") {
-						end = true;
-					}
+	$('#wc-review-table-inner').find(".wc-review-data-row").each(function() {
+		$(this).children().each(function() {
+			$(this).find('.wc-review-input').removeClass("error-survey");
+			$(this).find('.validation').addClass("hidden");
+			if (!$(this).hasClass('last')) {
+				var input = $(this).children(":input").val();
+				if (input != "") {
+					end = true;
 				}
-			});
-		}
+			}				
+		});
 	});
 	return end;
 }
@@ -13096,6 +13467,17 @@ $('body').on('click', '.st-dd-item-min-post', function () {
 	changeRatingPattern(rating, ratingParent);
 
 	updatePostScore("rating-settings-form");
+});
+
+$('body').on('click', '.sms-dd-item', function() {
+	var pageHash = window.location.hash;
+	if (pageHash.toLowerCase() == "#showcomplaintressettings") {
+		$('#comp-rating-post').val($(this).html());
+		$('#sms-dd-wrapper-tz').slideToggle(200);
+		return;
+	}
+	$('#sms-tz-list').val($(this).html());
+	$('#sms-dd-wrapper-tz').slideToggle(200);
 });
 
 $('body').on('click', '#st-settings-location-on', function () {
@@ -15768,7 +16150,7 @@ $(document).on('change', '.survey-csv-file-input', function () {
 
 $(document).on('click', '#wc-send-survey-upload-cancel', function (event) {
 	$(".wc-btn-row").show();
-	$(".welcome-popup-body-wrapper").show();
+	$("#welcome-popup-invite > .welcome-popup-body-wrapper").show();
 	$(".survey-upload-csv").hide();
 });
 
@@ -15800,7 +16182,7 @@ $(document).on('click', '#wc-send-survey-upload-confirm', function (event) {
 
 $(document).on('click', '#wc-send-survey-upload-csv', function (event) {
 	$(".wc-btn-row").hide();
-	$(".welcome-popup-body-wrapper").hide();
+	$("#welcome-popup-invite > .welcome-popup-body-wrapper").hide();
 	$(".survey-upload-csv").show();
 });
 

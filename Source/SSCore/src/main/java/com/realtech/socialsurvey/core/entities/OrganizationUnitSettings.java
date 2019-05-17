@@ -137,6 +137,8 @@ public class OrganizationUnitSettings implements Serializable
     
     private String optoutText;
     private Boolean isLoginEnableAllowed;
+    
+	private boolean isIncompleteSurveyDeleteEnabled = true;
 
     //customer success information
     private String customerSuccessName;
@@ -168,9 +170,7 @@ public class OrganizationUnitSettings implements Serializable
 
     //ss-admin notes
     List<Notes> notes;
-
-    private boolean isIncompleteSurveyDeleteEnabled = true;
-
+    
     private boolean branchAdminAllowedToDeleteUser = true;//To Allow Branch Admin Delete User.
 
     private boolean regionAdminAllowedToDeleteUser = true;//To Allow Region Admin Delete User
@@ -178,8 +178,7 @@ public class OrganizationUnitSettings implements Serializable
     private boolean branchAdminAllowedToAddUser = true;//To Allow Branch Admin Add User
 
     private boolean regionAdminAllowedToAddUser = true;//To Allow Region Admin Add User
-    
-    
+
     public boolean isIncompleteSurveyDeleteEnabled() {
     	return isIncompleteSurveyDeleteEnabled;
     }
@@ -1151,8 +1150,7 @@ public class OrganizationUnitSettings implements Serializable
         this.isLoginEnableAllowed = isLoginEnableAllowed;
     }
 
-
-    public Notification getNotification()
+	public Notification getNotification()
     {
         return notification;
     }
@@ -1210,6 +1208,7 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.regionAdminAllowedToAddUser = regionAdminAllowedToAddUser;
     }
+    
 
 
     public String getCustomerSuccessName()
@@ -1497,7 +1496,6 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.lastConversationDate = lastConversationDate;
     }
-
 
     public List<Notes> getNotes()
     {

@@ -18,9 +18,12 @@ import retrofit.http.*;
 import java.util.List;
 import java.util.Map;
 
-
 public interface SSApiIntegration
 {
+	@POST( "/v1/surveys/sendsmsreminder/manual" )
+	Response sendMultipleSurveyRemindersViaSms( @Header ( "authorizationHeader") String authorizationHeader,
+	    @Query ( "companyId") long companyId, @Query("selectedSurveys") String selectedSurveys);
+	
     @POST ( "/v1/nocaptcha")
     Response validateCaptcha( @Body CaptchaAPIRequest captchaRequest );
 
@@ -590,4 +593,5 @@ public interface SSApiIntegration
     List<UserVo> getAllUnverifiedUsersInHierarchy( @Path ("namePattern") String searchKey, @Query ("companyId") long companyId,
         @Query ("adminId") long userId, @Query ("sort") String sortingOrder, @Query( "entityType" ) String entityType,
         @Header ("authorizationHeader") String authorizationHeader  );
+    
 }

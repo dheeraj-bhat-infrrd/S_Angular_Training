@@ -132,6 +132,18 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
      */
     List<SurveyPreInitiation> getValidSurveyByAgentIdAndCustomeEmailForPastNDays( long agentId, String customerEmail, int noOfDays )
         throws DatabaseException;
+    
+    /**
+     * 
+     * @param agentId
+     * @param contactNumberList
+     * @param createdOn
+     * @param noOfDays
+     * @return
+     * @throws DatabaseException
+     */
+    long getSurveyCountByAgentIdAndCustomeContactNumberForPastNDays( long agentId, List<String> contactNumberList, Timestamp createdOn, int noOfDays )
+    		throws DatabaseException;
 
     List<SurveyPreInitiation> getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize );
 
@@ -194,5 +206,48 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
      */
 	
 	public List<SurveyPreInitiation> fetchSurveysByStatus(List<Integer> status, int startingIndex, int limit) throws DatabaseException;
+
+
+	/**
+	 * @param agentId
+	 * @param customerContactNumber
+	 * @return
+	 * @throws DatabaseException
+	 */
+	List<SurveyPreInitiation> getValidSurveyByAgentIdAndCustomerContactNumber(long agentId, String customerContactNumber)
+			throws DatabaseException;
+
+
+    /**
+     * Method to get valid surveys by contact number
+     * @param agentId
+     * @param customerContactNumber
+     * @return
+     * @throws DatabaseException
+     */
+    public List<SurveyPreInitiation> getValidSurveyByAgentIdAndCustomeContactNumber( long agentId, List<String> customerContactNumber )
+        throws DatabaseException;
+
+
+    /**
+     * Method to get number of count from SurveyPreinitiations for duplicate contact number and agent id. 
+     * @param agentId
+     * @param contactNumberList
+     * @param noOfDays
+     * @return
+     * @throws DatabaseException
+     */
+    public long getSurveyPreInitiationCount( long agentId, List<String> contactNumberList, int noOfDays ) throws DatabaseException;
+
+
+	/**
+	 * @param agentId
+	 * @param contactNumber
+	 * @param noOfDays
+	 * @return
+	 * @throws DatabaseException
+	 */
+	long getSurveyPreInitiationCountAlreadySent(long agentId, List<String> contactNumber, int noOfDays)
+			throws DatabaseException;
 	
 }

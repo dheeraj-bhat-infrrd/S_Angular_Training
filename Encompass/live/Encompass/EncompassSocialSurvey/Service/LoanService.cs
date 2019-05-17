@@ -183,7 +183,7 @@ namespace EncompassSocialSurvey.Service
                 String filePath = EncompassSocialSurveyConfiguration.TempFolderPath + Path.DirectorySeparatorChar + fileName;
                 // Write header
                 var csv = new System.Text.StringBuilder();
-                var newLine = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}", "Loan Number", "Customer First Name", "Customer Last Name", "Customer Email Address", "Agent Email Address", "Loan Id", "Engagement Closed Time", "Participant Type","Loan Processor Name", "Loan Processor Email", "Property Address", "Custom Field One", "Custom Field Two", "Custom Field Three", "Custom Field Four", "Custom Field Five");
+                var newLine = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16}", "Loan Number", "Customer First Name", "Customer Last Name", "Customer Email Address", "Agent Email Address", "Loan Id", "Engagement Closed Time", "Participant Type","Loan Processor Name", "Loan Processor Email", "Property Address","Contact Number", "Custom Field One", "Custom Field Two", "Custom Field Three", "Custom Field Four", "Custom Field Five");
                 csv.AppendLine(newLine);
                 if (null != loansVM)
                 {
@@ -195,7 +195,7 @@ namespace EncompassSocialSurvey.Service
 
 
                         newLine = null;
-                        newLine = string.Format("\"{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{6}\",\"{7}\",\"{8}\",\"{9}\",\"{10}\",\"{11}\",\"{12}\",\"{13}\",\"{14}\",\"{15}\"", loanVM.LoanNumber, loanVM.CustomerFirstName, loanVM.CustomerLastName, loanVM.CustomerEmailId, loanVM.AgentEmailId, loanVM.SurveySourceId, loanVM.EngagementClosedTime, ParticipantType, loanVM.LoanProcessorName, loanVM.LoanProcessorEmail, loanVM.PropertyAddress, loanVM.customFieldOne, loanVM.customFieldTwo, loanVM.customFieldThree, loanVM.customFieldFour, loanVM.customFieldFive);
+                        newLine = string.Format("\"{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{6}\",\"{7}\",\"{8}\",\"{9}\",\"{10}\",\"{11}\",\"{12}\",\"{13}\",\"{14}\",\"{15}\",\"{16}\"", loanVM.LoanNumber, loanVM.CustomerFirstName, loanVM.CustomerLastName, loanVM.CustomerEmailId, loanVM.AgentEmailId, loanVM.SurveySourceId, loanVM.EngagementClosedTime, ParticipantType, loanVM.LoanProcessorName, loanVM.LoanProcessorEmail, loanVM.PropertyAddress, loanVM.ContactNumber, loanVM.customFieldOne, loanVM.customFieldTwo, loanVM.customFieldThree, loanVM.customFieldFour, loanVM.customFieldFive);
                         csv.AppendLine(newLine);
                     }
                 }
