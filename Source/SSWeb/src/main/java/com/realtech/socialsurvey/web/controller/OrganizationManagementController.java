@@ -796,7 +796,8 @@ public class OrganizationManagementController
             model.addAttribute( "allowPartnerSurvey", ((entityType.equals( CommonConstants.AGENT_ID_COLUMN  ))? 
                 unitSettings.isAllowPartnerSurvey() : companySettings.isAllowPartnerSurvey()) );
             model.addAttribute( "addPhotosToReview", companySettings.isAddPhotosToReview());
-                
+            LOG.info("Show company settings with feature {}",companySettings.isAddPhotosToReview());    
+            
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
             SurveySettings surveySettings = null;
             AgentSettings agentSettings = null;

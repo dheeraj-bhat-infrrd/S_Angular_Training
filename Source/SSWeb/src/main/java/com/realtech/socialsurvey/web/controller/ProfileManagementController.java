@@ -275,6 +275,7 @@ public class ProfileManagementController
                 String json = new Gson().toJson( companyProfile );
                 model.addAttribute( "profileJson", json );
                 model.addAttribute("addPhotosToReview", companyProfile.isAddPhotosToReview());
+                LOG.info("Profile page company with feature " + companyProfile.isAddPhotosToReview());
                 double averageRating = profileManagementService.getAverageRatings( companyId,
                     CommonConstants.PROFILE_LEVEL_COMPANY, false );
                 model.addAttribute( "averageRating", averageRating );
@@ -308,6 +309,7 @@ public class ProfileManagementController
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 model.addAttribute("addPhotosToReview", companyProfile.isAddPhotosToReview());
+                LOG.info("Profile page region with feature " + companyProfile.isAddPhotosToReview());
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
                         regionProfile.getIden() );
@@ -374,6 +376,7 @@ public class ProfileManagementController
                 //set setting detail by branch Setting
                 setSettingSetByEntityInModel( model, branchProfile );
                 model.addAttribute("addPhotosToReview", companyProfile.isAddPhotosToReview());
+                LOG.info("Profile page branch with feature " + companyProfile.isAddPhotosToReview());
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 try {
@@ -447,6 +450,7 @@ public class ProfileManagementController
                 //set setting detail by agent Setting
                 setSettingSetByEntityInModel( model, individualProfile );
                 model.addAttribute("addPhotosToReview", companyProfile.isAddPhotosToReview());
+                LOG.info("Profile page agent with feature " + companyProfile.isAddPhotosToReview());
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 

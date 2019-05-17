@@ -114,7 +114,7 @@ public class ModelAndViewHandler
         model.addAttribute( COMPANY_NAME, profileAggregate.getCompanyName() );
         model.addAttribute( COMPANY_NAME_FOR_TITLE, profileAggregate.getCompanyName() );
         model.addAttribute( ADD_PHOTOS_TO_REVIEW, profileAggregate.isAddPhototsToReview() );
-
+        LOG.info("Public page for profile level {} is invoked with feature as {}", profileAggregate.getProfileLevel(), profileAggregate.isAddPhototsToReview());
         if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileAggregate.getProfileLevel() ) ) {
             model.addAttribute( REGION_PROFILE_NAME, profileAggregate.getProfileName() );
         } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileAggregate.getProfileLevel() ) ) {

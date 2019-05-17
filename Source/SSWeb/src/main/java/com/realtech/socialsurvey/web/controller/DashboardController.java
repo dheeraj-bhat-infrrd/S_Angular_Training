@@ -605,10 +605,17 @@ public class DashboardController
             model.addAttribute( "currentSessionUserId", currentSessionUserId);
             
             if ( !profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
-            	boolean isAddPhtotsToReview = organizationManagementService.isAddPhotosToReviewEnabled(unitSettings.getCompanyId());
+            	long companyId = unitSettings.getCompanyId();
+            	if(companyId == 0) {
+            		User userTemp = userManagementService.getUserByUserId(unitSettings.getIden());
+            		companyId = userTemp.getCompany().getCompanyId();
+            	}
+            	boolean isAddPhtotsToReview = organizationManagementService.isAddPhotosToReviewEnabled(companyId);
             	model.addAttribute("addPhotosToReview",isAddPhtotsToReview);
+            	LOG.info("Review tab with profile level {}, and feature is {}", profileLevel, isAddPhtotsToReview );
             } else {
             	model.addAttribute("addPhotosToReview",unitSettings.isAddPhotosToReview());
+            	LOG.info("Review tab with profile level company andfeature is {}", unitSettings.isAddPhotosToReview() );
             }
             
         } catch ( NonFatalException e ) {
