@@ -327,8 +327,10 @@
 									</div>
 								</c:if>
 								<c:if test="${!profile.hiddenSection }">
-									<div class="prof-btn-survey float-left"
-										id="read-write-share-btn">Write a Review</div>
+									<c:if test="${not (companyId == 1685)}">
+										<div class="prof-btn-survey float-left"
+											id="read-write-share-btn">Write a Review</div>
+									</c:if>
 								</c:if>
 
 							</div>
