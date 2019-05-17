@@ -483,6 +483,7 @@
 									</div>
 								</c:if>
 								<c:if test="${not empty profile && !profile.hiddenSection}">
+									<c:if test="${not (companyId == 1685)}">
 									<c:choose>
 										<c:when test="${profileLevel == 'INDIVIDUAL'}">
 											<c:choose>
@@ -506,6 +507,7 @@
 												id="read-write-share-btn">Write a Review</span></a>
 										</c:otherwise>
 									</c:choose>
+									</c:if>
 								</c:if>
 							</div>
 						</div>
