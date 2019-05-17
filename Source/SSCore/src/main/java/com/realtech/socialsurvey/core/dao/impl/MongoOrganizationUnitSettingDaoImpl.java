@@ -2739,7 +2739,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 	@Override
 	public boolean isAddPhotosToReviewEnabled(long companyId) {
-        LOG.debug("check is addphtots feature enabled for company {}", companyId);
+        LOG.info("check is addphtots feature enabled for company {}", companyId);
         Query query = new  Query();
         query.addCriteria(Criteria.where(KEY_IDEN).is(companyId));
         query.fields().exclude( ID ).include(KEY_ADD_PHOTOS_TO_REVIEW).include(KEY_IDEN);

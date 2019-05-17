@@ -3589,7 +3589,7 @@ public class SocialManagementController
 						if (!dir.exists()) {
 							dir.mkdirs();
 						}
-						String imageFileName = "FB_Survey_" + facebook.getId() + CommonConstants.IMAGE_FORMAT_PNG;
+						String imageFileName = "FB_Survey_" + facebook.getId() + "." + CommonConstants.IMAGE_FORMAT_PNG;
 
 						String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR
 								+ CommonConstants.USER_IMAGE_NAME;
@@ -3597,7 +3597,7 @@ public class SocialManagementController
 						ImageIO.write(bufferedImage, CommonConstants.IMAGE_FORMAT_PNG, fileOuputStream);
 						fileOuputStream.close();
 						File fileLocal = new File(filePath);
-						profileImageUrl = fileUploadService.uploadProfileImageFile(fileLocal, imageFileName, false);
+						profileImageUrl = fileUploadService.uploadCustomerImageFile(fileLocal, imageFileName, true);
 						profileImageUrl = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonCusImgBucket
 								+ CommonConstants.FILE_SEPARATOR + profileImageUrl;
 						LOG.info("FB image path in amazon is " + profileImageUrl);
@@ -3699,7 +3699,7 @@ public class SocialManagementController
 				if (!dir.exists()) {
 					dir.mkdirs();
 				}
-				String imageFileName = "Lkdn_SurveyImage_";
+				String imageFileName = "Lkdn_Survey_";
 				if(idInfoVO != null && idInfoVO.getId() != null && !idInfoVO.getId().isEmpty()) {
 					LOG.info("idinfo not empty");
 					imageFileName+=idInfoVO.getId();
@@ -3707,7 +3707,7 @@ public class SocialManagementController
 					LOG.info("id is empty so getting a random number");
 					imageFileName+=(int)(Math.random() * 1000 + 1);
 				}
-				imageFileName+=CommonConstants.IMAGE_FORMAT_PNG;
+				imageFileName+= "." + CommonConstants.IMAGE_FORMAT_PNG;
 				LOG.info("LinkedIn image is " + imageFileName);
 				String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR
 						+ CommonConstants.USER_IMAGE_NAME;
@@ -3716,7 +3716,7 @@ public class SocialManagementController
 				fileOuputStream.close();
 
 				File fileLocal = new File(filePath);
-				basicProfileStrResponse = fileUploadService.uploadProfileImageFile(fileLocal, imageFileName, false);
+				basicProfileStrResponse = fileUploadService.uploadCustomerImageFile(fileLocal, imageFileName, true);
 				basicProfileStrResponse = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonCusImgBucket
 						+ CommonConstants.FILE_SEPARATOR + basicProfileStrResponse;
 				LOG.info("Amazon S3 link " + basicProfileStrResponse);
@@ -3781,8 +3781,7 @@ public class SocialManagementController
 						if (!dir.exists()) {
 							dir.mkdirs();
 						}
-						String imageFileName = "Twitter_UserImage_" + twitterUser.getId()
-								+ CommonConstants.IMAGE_FORMAT_PNG;
+						String imageFileName = "Twitter_Survey_" + twitterUser.getId() + "." + CommonConstants.IMAGE_FORMAT_PNG;
 
 						String filePath = dir.getAbsolutePath() + CommonConstants.FILE_SEPARATOR
 								+ CommonConstants.USER_IMAGE_NAME;
@@ -3791,8 +3790,8 @@ public class SocialManagementController
 						fileOuputStream.close();
 
 						File fileLocal = new File(filePath);
-						profileImage = fileUploadService.uploadProfileImageFile(fileLocal, imageFileName, false);
-						profileImage = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonImageBucket
+						profileImage = fileUploadService.uploadCustomerImageFile(fileLocal, imageFileName, true);
+						profileImage = amazonEndpoint + CommonConstants.FILE_SEPARATOR + amazonCusImgBucket
 								+ CommonConstants.FILE_SEPARATOR + profileImage;
 						LOG.info("Twitter user image link in s3 is " + profileImage);
 					} else {

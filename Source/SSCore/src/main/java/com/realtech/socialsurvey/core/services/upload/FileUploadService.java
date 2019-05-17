@@ -113,4 +113,13 @@ public interface FileUploadService
 
 
     public boolean deleteFileAtFTPBucket( String fileName ) throws NonFatalException;
+
+    /**
+     * @param fileLocal
+     * @param imageFileName
+     * @param b
+     * @return
+     * @throws InvalidInputException
+     */
+	public String uploadCustomerImageFile(File fileLocal, String imageFileName, boolean b) throws InvalidInputException;
 }
