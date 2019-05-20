@@ -5,9 +5,11 @@ import java.util.List;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.ReportRequest;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.SmsEntity;
 import com.realtech.socialsurvey.core.entities.SurveyProcessData;
 import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.core.entities.ftp.FtpUploadRequest;
+import com.realtech.socialsurvey.core.vo.SmsVO;
 
 import retrofit.client.Response;
 import retrofit.http.Body;
@@ -26,6 +28,11 @@ public interface StreamApi
     @POST ( "/api/v1/stream/mail")
     public Response streamEmailMessage( @Body EmailEntity emailEntity );
 
+    @POST ( "/api/v1/stream/sms")
+    public Response streamSmsMessage( @Body SmsEntity smsEntity );
+    
+    @POST ( "/api/v1/stream/sms")
+    public Response streamSmsVoMessage( @Body SmsVO smsVO );
 
     @POST ( "/api/v1/stream/sendgrid/events")
     public Response streamClickEvent( @Body List<SendGridEventEntity> sendGridEventEntity );

@@ -18,9 +18,11 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.StreamFailureDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.SmsEntity;
 import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.core.entities.ftp.FtpUploadRequest;
 import com.realtech.socialsurvey.core.entities.integration.stream.FailedStreamMessage;
+import com.realtech.socialsurvey.core.vo.SmsVO;
 
 /**
  * Records failed stream messages in mongo collection 'FAILED_STREAM_MESSAGES'
@@ -53,6 +55,42 @@ public class MongoStreamFailureDaoImpl implements StreamFailureDao
         LOG.trace( "Inserting email entity into failed messages {}", emailEntity );
         mongoTemplate.insert( emailEntity, FAILED_STREAM_MESSAGES_COLLECTION );
         LOG.debug( "Inserting failed email message." );
+        return true;
+    }
+    
+    @Override
+    public boolean insertFailedSmsMessage( SmsEntity smsEntity )
+    {
+        LOG.debug( "Inserting failed sms message" );
+        LOG.info( "Inserting sms entity into failed messages {}", smsEntity );
+        
+        FailedStreamMessage<SmsEntity> failedStreamMessage = new FailedStreamMessage<>();
+        failedStreamMessage.setCompanyId( smsEntity.getCompanyId() );
+        failedStreamMessage.setFailedDate( System.currentTimeMillis() );
+        failedStreamMessage.setMessageClass( SmsEntity.class.getName() );
+        failedStreamMessage.setEntityType( "SMS" );
+        failedStreamMessage.setMessage( smsEntity );
+        
+        mongoTemplate.insert( failedStreamMessage, FAILED_STREAM_MESSAGES_COLLECTION );
+        LOG.debug( "Inserting failed sms message." );
+        return true;
+    }
+    
+    @Override
+    public boolean insertFailedSmsOfTopology( SmsVO smsVO )
+    {
+        LOG.debug( "Inserting failed sms message" );
+        LOG.trace( "Inserting sms entity into failed messages {}", smsVO );
+        
+        FailedStreamMessage<SmsVO> failedStreamMessage = new FailedStreamMessage<>();
+        failedStreamMessage.setCompanyId( smsVO.getCompanyId() );
+        failedStreamMessage.setFailedDate( System.currentTimeMillis() );
+        failedStreamMessage.setMessageClass( SmsVO.class.getName() );
+        failedStreamMessage.setEntityType( "SMS" );
+        failedStreamMessage.setMessage( smsVO );
+        
+        mongoTemplate.insert( failedStreamMessage, FAILED_STREAM_MESSAGES_COLLECTION );
+        LOG.debug( "Inserting failed sms message." );
         return true;
     }
 
@@ -88,6 +126,28 @@ public class MongoStreamFailureDaoImpl implements StreamFailureDao
         LOG.debug( "Method getAllFailedStreamMessages() finished for start index {} and batch size {}", start, batchSize );
         return failedStreamMsgs;
     }
+    
+    @SuppressWarnings("rawtypes")
+	@Override
+    public List<FailedStreamMessage> getAllFailedStreamSms( int start, int batchSize )
+    {
+        LOG.debug( "Method getAllFailedStreamSms() started for start index {} and batch size {}", start, batchSize );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_STREAM_RETRY_FAILED ).ne( true ) );
+
+        query.addCriteria( Criteria.where( "entityType" ).is( "SMS" ) );
+
+        if ( start > 0 )
+            query.skip( start );
+
+        if ( batchSize > 0 )
+            query.limit( batchSize );
+
+        LOG.info("Query is {}", query);
+        List<FailedStreamMessage> failedStreamMsgs = mongoTemplate.find( query, FailedStreamMessage.class, FAILED_STREAM_MESSAGES_COLLECTION );
+        LOG.debug( "Method getAllFailedStreamSms() finished for start index {} and batch size {}", start, batchSize );
+        return failedStreamMsgs;
+    }
 
 
     @Override
@@ -114,7 +174,6 @@ public class MongoStreamFailureDaoImpl implements StreamFailureDao
         LOG.debug( "Updated retry flag for failed stream message" );
 
     }
-
 
     @Override
     public <T> boolean insertFailedStreamMessage( FailedStreamMessage<T> failedStreamMessage )

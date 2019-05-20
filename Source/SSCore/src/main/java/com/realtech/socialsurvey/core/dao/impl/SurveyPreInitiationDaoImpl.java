@@ -17,10 +17,12 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -786,21 +788,9 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             //customer Email
             criteria.add( Restrictions.eq( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, customerEmail ) );
 
-
             //days criteria
             if ( noOfDays > 0 ) {
-
-                Calendar startTime = Calendar.getInstance();
-                startTime.add( Calendar.DATE, -1 * noOfDays );
-                // strip the time component of start time
-                startTime.set( Calendar.HOUR_OF_DAY, 0 );
-                startTime.set( Calendar.MINUTE, 0 );
-                startTime.set( Calendar.SECOND, 0 );
-                startTime.set( Calendar.MILLISECOND, 0 );
-
-                Timestamp startDate = new Timestamp( startTime.getTimeInMillis() );
-
-                criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, startDate ) );
+                criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, getTimeStampFromNDays( noOfDays ) ) );
             }
             
             //status criteria
@@ -820,6 +810,125 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
 
     }
+    
+    @Override
+    public long getSurveyCountByAgentIdAndCustomeContactNumberForPastNDays( long agentId, List<String> contactNumberList,
+        Timestamp createdOn, int noOfDays ) throws DatabaseException
+    {
+        LOG.debug( "Method getSurveyCountByAgentIdAndCustomeContactNumberForPastNDays() started." );
+        try {
+            Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+
+            DetachedCriteria minCreatedOn = DetachedCriteria.forClass( SurveyPreInitiation.class )
+                .setProjection( Property.forName( CommonConstants.CREATED_ON ).min() )
+                .add( Restrictions.in( CommonConstants.CUSTOMER_CONTACT_NUMBER_KEY_COLUMN, contactNumberList ) )
+                .add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
+            
+            criteria.add( Property.forName( CommonConstants.CREATED_ON ).gt( minCreatedOn ) );
+            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
+            criteria.add( Restrictions.in( CommonConstants.CUSTOMER_CONTACT_NUMBER_KEY_COLUMN, contactNumberList ) );
+            criteria.add( Restrictions.eq( CommonConstants.CREATED_ON, createdOn ) );
+
+            //days criteria
+            if ( noOfDays > 0 ) {
+                criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, getTimeStampFromNDays( noOfDays ) ) );
+            }
+
+            //status criteria
+            List<Integer> statusList = new ArrayList<>();
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+            statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+
+            criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, statusList ) );
+
+            criteria.setProjection( Projections.rowCount() );
+            LOG.debug( "Method getSurveyCountByAgentIdAndCustomeContactNumberForPastNDays() finished." );
+            return (long) criteria.uniqueResult();
+        } catch ( HibernateException e ) {
+            LOG.error( "Exception caught in getSurveyCountByAgentIdAndCustomeContactNumberForPastNDays() ", e );
+            throw new DatabaseException( "Exception caught in getSurveyCountByAgentIdAndCustomeContactNumberForPastNDays() ",
+                e );
+        }
+    }
+    
+    
+    @Override
+    public long getSurveyPreInitiationCount( long agentId, List<String> contactNumberList, int noOfDays ) throws DatabaseException {
+        LOG.debug( "Method getSurveyCount() started. {}, {}, {}",agentId, contactNumberList, noOfDays );
+        try {
+            Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+            
+            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
+            criteria.add( Restrictions.in( CommonConstants.CUSTOMER_CONTACT_NUMBER_KEY_COLUMN, contactNumberList ) );
+
+            //days criteria
+            if ( noOfDays > 0 ) {
+                criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, getTimeStampFromNDays( noOfDays ) ) );
+            }
+
+            //status criteria
+            List<Integer> statusList = new ArrayList<>();
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+            statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+
+            criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN,  statusList ) );
+
+            criteria.setProjection( Projections.rowCount() );
+            LOG.debug( "Method getSurveyCount() finished." );        
+            return (long) criteria.uniqueResult();
+        } catch ( HibernateException e ) {
+            LOG.error( "Exception caught in getSurveyCount() ", e );
+            throw new DatabaseException( "Exception caught in getSurveyCount() ", e );
+        }
+    }
+    
+    @Override
+    public long getSurveyPreInitiationCountAlreadySent( long agentId,  List<String> contactNumber, int noOfDays ) throws DatabaseException {
+        LOG.debug( "Method getSurveyCount() started. {}, {}, {}",agentId, contactNumber, noOfDays );
+        try {
+            Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+            
+            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
+            criteria.add( Restrictions.in( CommonConstants.CUSTOMER_CONTACT_NUMBER_KEY_COLUMN, contactNumber ) );
+            criteria.add( Restrictions.gt( "reminderCountsSms",  0 ) );
+            
+            //days criteria
+            if ( noOfDays > 0 ) {
+                criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, getTimeStampFromNDays( noOfDays ) ) );
+            }
+
+            //status criteria
+            List<Integer> statusList = new ArrayList<>();
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+            statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+
+            criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN,  statusList ) );
+
+            criteria.setProjection( Projections.rowCount() );
+            LOG.debug( "Method getSurveyCount() finished." );        
+            return (long) criteria.uniqueResult();
+        } catch ( HibernateException e ) {
+            LOG.error( "Exception caught in getSurveyCount() ", e );
+            throw new DatabaseException( "Exception caught in getSurveyCount() ", e );
+        }
+    }
+    
+
+    private Timestamp getTimeStampFromNDays( int noOfDays )
+    {
+        //days criteria
+        Calendar startTime = Calendar.getInstance();
+        startTime.add( Calendar.DATE, -1 * noOfDays );
+        // strip the time component of start time
+        startTime.set( Calendar.HOUR_OF_DAY, 0 );
+        startTime.set( Calendar.MINUTE, 0 );
+        startTime.set( Calendar.SECOND, 0 );
+        startTime.set( Calendar.MILLISECOND, 0 );
+        return new Timestamp( startTime.getTimeInMillis() );
+    }
 
 
     @SuppressWarnings ( "unchecked")
@@ -836,6 +945,33 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             criteria.add( Restrictions.eq( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, customerEmail ) );
             //status criteria
             List<Integer> statusList = new ArrayList<Integer>();
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+            statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+            
+            criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN,  statusList ) );
+            LOG.debug( "Method getSurveyByAgentIdAndCustomeEmail() finihed." );
+            return criteria.list();
+        } catch ( HibernateException e ) {
+            LOG.error( "Exception caught in getSurveyByAgentIdAndCustomeEmailForPastNDays() ", e );
+            throw new DatabaseException( "Exception caught in getSurveyByAgentIdAndCustomeEmailForPastNDays() ", e );
+        }
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<SurveyPreInitiation> getValidSurveyByAgentIdAndCustomeContactNumber( long agentId, List<String> customerContactNumber )
+        throws DatabaseException
+    {
+        LOG.debug( "Method getSurveyByAgentIdAndCustomeEmail() started." );
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+        try {
+            //agent id
+            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
+            //customer Email
+            criteria.add( Restrictions.in( CommonConstants.CUSTOMER_CONTACT_NUMBER_KEY_COLUMN, customerContactNumber ) );
+            //status criteria
+            List<Integer> statusList = new ArrayList<>();
             statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
             statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
             statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
@@ -1106,5 +1242,32 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		}
 		LOG.debug("Method fetchSurveysByStatus() finished");
 		return null;
+	}
+	
+	@SuppressWarnings ( "unchecked")
+	@Override
+	public List<SurveyPreInitiation> getValidSurveyByAgentIdAndCustomerContactNumber( long agentId, String customerContactNumber )
+			throws DatabaseException
+	{
+		LOG.debug( "Method getSurveyByAgentIdAndCustomeEmail() started." );
+		Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+		try {
+			//agent id
+			criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
+			//customer contact number
+			criteria.add( Restrictions.eq( CommonConstants.CUSTOMER_CONTACT_NUMBER_KEY_COLUMN, customerContactNumber ) );
+			//status criteria
+			List<Integer> statusList = new ArrayList<Integer>();
+			statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+			statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+			statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+
+			criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN,  statusList ) );
+			LOG.debug( "Method getSurveyByAgentIdAndCustomeEmail() finihed." );
+			return criteria.list();
+		} catch ( HibernateException e ) {
+			LOG.error( "Exception caught in getSurveyByAgentIdAndCustomeEmailForPastNDays() ", e );
+			throw new DatabaseException( "Exception caught in getSurveyByAgentIdAndCustomeEmailForPastNDays() ", e );
+		}
 	}
 }

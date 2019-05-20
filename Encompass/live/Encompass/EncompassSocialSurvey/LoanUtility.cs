@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System;
 using EncompassSocialSurvey.Service;
 using EncompassSocialSurvey.Entity;
+using System.Text.RegularExpressions;
 
 namespace EncompassSocialSurvey
 {
@@ -167,6 +168,12 @@ namespace EncompassSocialSurvey
                 {
                     fieldIds.Insert(EncompassSocialSurveyConstant.CUSTOM_FIELD_FIVE_INDEX, encompassCredential.customFieldFive); //custom field one
                 }
+
+                if (!string.IsNullOrWhiteSpace(encompassCredential.ContactNumber))
+                {
+                    fieldIds.Insert(EncompassSocialSurveyConstant.CONTACT_NUMBER_INDEX, encompassCredential.ContactNumber); //custom field one
+                }
+
                 #endregion
 
                 LoanService loanService = new LoanService();
@@ -247,6 +254,7 @@ namespace EncompassSocialSurvey
                         String propertyAddress = null;
                         String loanProcessorName = null;
                         String loanProcessorEmail = null;
+                        String contactNumber = null;
 
                         String customFieldOne = null;
                         String customFieldTwo = null;
@@ -259,15 +267,20 @@ namespace EncompassSocialSurvey
                             propertyAddress = fieldValues[EncompassSocialSurveyConstant.PROPERTY_ADDRESS_INDEX];
                         }
 
-                       /* if (!string.IsNullOrWhiteSpace(encompassCredential.loanProcessorName))
+                        if (!string.IsNullOrWhiteSpace(encompassCredential.ContactNumber))
                         {
-                            loanProcessorName = fieldValues[EncompassSocialSurveyConstant.LOAN_PROCESSOR_NAME_INDEX];
+                            contactNumber = fieldValues[EncompassSocialSurveyConstant.CONTACT_NUMBER_INDEX];
                         }
 
-                        if (!string.IsNullOrWhiteSpace(encompassCredential.loanProcessorEmail))
-                        {
-                            loanProcessorEmail = fieldValues[EncompassSocialSurveyConstant.LOAN_PROCESSOR_EMAIL_INDEX];
-                        } */
+                        /* if (!string.IsNullOrWhiteSpace(encompassCredential.loanProcessorName))
+                         {
+                             loanProcessorName = fieldValues[EncompassSocialSurveyConstant.LOAN_PROCESSOR_NAME_INDEX];
+                         }
+
+                         if (!string.IsNullOrWhiteSpace(encompassCredential.loanProcessorEmail))
+                         {
+                             loanProcessorEmail = fieldValues[EncompassSocialSurveyConstant.LOAN_PROCESSOR_EMAIL_INDEX];
+                         } */
 
                         if (!string.IsNullOrWhiteSpace(encompassCredential.customFieldOne))
                         {
@@ -346,12 +359,15 @@ namespace EncompassSocialSurvey
                         forLoanVM_Borrower.PropertyAddress = propertyAddress;
                         forLoanVM_Borrower.LoanProcessorName = loanProcessorName;
                         forLoanVM_Borrower.LoanProcessorEmail = loanProcessorEmail;
+                        forLoanVM_Borrower.ContactNumber = this.FilterContactNumber(contactNumber);
                         forLoanVM_Borrower.customFieldOne = customFieldOne;
                         forLoanVM_Borrower.customFieldTwo = customFieldTwo;
                         forLoanVM_Borrower.customFieldThree = customFieldThree;
                         forLoanVM_Borrower.customFieldFour = customFieldFour;
                         forLoanVM_Borrower.customFieldFive = customFieldFive;
                         returnLoansViewModel.Add(forLoanVM_Borrower);
+
+                        
 
                         //add coborrower
                         if ((string.IsNullOrWhiteSpace(fieldValues[5]) && string.IsNullOrWhiteSpace(fieldValues[6])) == false)
@@ -393,6 +409,7 @@ namespace EncompassSocialSurvey
                             forLoanVM_Co_Borrower.PropertyAddress = propertyAddress;
                             forLoanVM_Co_Borrower.LoanProcessorName = loanProcessorName;
                             forLoanVM_Co_Borrower.LoanProcessorEmail = loanProcessorEmail;
+                            forLoanVM_Co_Borrower.ContactNumber = this.FilterContactNumber(contactNumber);
 
                             returnLoansViewModel.Add(forLoanVM_Co_Borrower);  
                         }
@@ -437,6 +454,7 @@ namespace EncompassSocialSurvey
                                 forLoanVM_buyer_agent.PropertyAddress = propertyAddress;
                                 forLoanVM_buyer_agent.LoanProcessorName = loanProcessorName;
                                 forLoanVM_buyer_agent.LoanProcessorEmail = loanProcessorEmail;
+                                forLoanVM_buyer_agent.ContactNumber = this.FilterContactNumber(contactNumber);
 
                                 returnLoansViewModel.Add(forLoanVM_buyer_agent);
                             }
@@ -480,6 +498,7 @@ namespace EncompassSocialSurvey
                                 forLoanVM_seller_agent.PropertyAddress = propertyAddress;
                                 forLoanVM_seller_agent.LoanProcessorName = loanProcessorName;
                                 forLoanVM_seller_agent.LoanProcessorEmail = loanProcessorEmail;
+                                forLoanVM_seller_agent.ContactNumber = this.FilterContactNumber(contactNumber);
 
                                 returnLoansViewModel.Add(forLoanVM_seller_agent);
                             }
@@ -549,6 +568,30 @@ namespace EncompassSocialSurvey
 
             Logger.Info("Exiting the method LoanUtility.PopopulateLoanList()");
             return returnLoansViewModel;
+        }
+
+        /// <summary>
+        /// Method to filter contact number. It will remove non numeric charecter from number.
+        /// </summary>
+        /// <param name="contactNumber"></param>
+        private string FilterContactNumber(string contactNumber)
+        {
+            if(string.IsNullOrEmpty(contactNumber))
+            {
+                return null;
+            }
+
+            string tempContactNumber = Regex.Replace(contactNumber, "[^+0-9]", "");
+
+            if (string.IsNullOrEmpty(tempContactNumber))
+            {
+                return null;
+            }
+
+            tempContactNumber = tempContactNumber.StartsWith("+", StringComparison.Ordinal)
+                ? "+" + tempContactNumber.Substring(1).Replace("+", "")
+                : tempContactNumber.Replace("+", "");
+            return tempContactNumber;
         }
 
         /// <summary>

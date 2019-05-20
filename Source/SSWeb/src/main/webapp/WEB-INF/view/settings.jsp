@@ -63,7 +63,8 @@
 									<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 								</div>
 							</div>
-					    <div class="margin-top-twenty">
+
+					    <div class="margin-top-twenty ss-comp-settings">
 								<div id="atpst-chk-box" class="float-left bd-check-img"></div>
 								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
@@ -76,7 +77,7 @@
 									<input type="hidden" id="at-pst-cb" name="allowreplytoall" value="${isReplyEnabledForCompany}">
 									<div class="float-left bd-check-txt">Allow reply to reviews for company</div>
 									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
-								</div>	
+								</div>
 							</c:if>
 							<c:if test="${ (not empty companyAdminSwitchId) or isRealTechOrSSAdmin == true or user.isOwner == 1}">
 									<c:choose>
@@ -147,6 +148,7 @@
 							
 							<c:if test="${ columnName != 'agentId'  or isRealTechOrSSAdmin == true }">
 								<div id="customized-setting-div" class="st-score-rt-top" style="">Customized Feature Settings:</div>
+
 								<c:if test="${ isRealTechOrSSAdmin == true and columnName != 'companyId' }">	
 								<div class="ss-admin-comp-settings" style="">		
 									<div id="hide-pp-chk-box" class="float-left bd-check-img clear-both"></div>	
@@ -339,6 +341,73 @@
 								</div>
 							</div>
 							</c:if>
+							
+							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
+								<div class="margin-top-twenty  ss-admin-comp-settings">
+									<div id="sms-enabled-flag-chk-box" class="float-left bd-check-img"></div>
+									<input type="hidden" id="smsSurveyReminderEnabled" name="smsSurveyReminderEnabled" value="${ smsSurveyReminderEnabled }">
+									<div class="float-left bd-check-txt">Enable SMS survey reminder for this company</div>
+									<div class="ss-admin-only-visible">Only visible to SS-Admin</div>
+								</div>
+							</c:if>
+							
+							<div id = "smsFeatureDiv">
+								<c:if test="${ not empty companyAdminSwitchId or isRealTechOrSSAdmin == true or user.isOwner ==1 }">
+									<div class="margin-top-twenty ss-comp-settings">
+										<div id="sms-manual-flag-chk-box" class="float-left bd-check-img"></div>
+										<input type="hidden" id="manualSmsSurveyReminderEnabled" name="manualSmsSurveyReminderEnabled" value="${surveysettings.manualSmsSurveyReminderEnabled }">
+										<div class="float-left bd-check-txt"><spring:message code="label.companysettings.companyadmin.manualSmsSurveyReminder.${columnName}" /></div>
+									</div>
+								</c:if>
+								
+								<div class="margin-top-twenty ss-comp-settings">
+									<div id="sms-automatic-flag-chk-box" class="float-left bd-check-img"></div>
+									<input type="hidden" id="atm-srv-rmd-cb" value="${surveysettings.optedOutAutomaticSmsSurveyReminder}">
+									<div class="float-left bd-check-txt"><spring:message code="label.companysettings.companyadmin.automaticSmsSurveyReminder.${columnName}" /></div>
+								</div>
+								
+								<c:if test="${ columnName == 'companyId' }">
+									<div class="ss-comp-settings height-70">
+										<div class="sms-tmz-schd-lvl">SMS survey reminder time window</div>
+										<div>
+											<input id="sms-time-window-start" type="text" class="float-left sms-time"
+												placeholder="From" value="${smsTimeWindow.startTime}" /> 
+											<input id="sms-time-window-end" type="text" class="float-left sms-time"
+												placeholder="To" value="${smsTimeWindow.endTime}" />
+											<div class="float-left sms-tz-txt">
+												<!-- set the sms send timezone -->
+												<select id="timezone-list" class="sms-tz-dropdown"
+													name="sms-tz-list">
+													<c:forEach var="timeZone" items="${timeZones}">
+														<option class="float-left sms-tz-item-row-txt"
+															 value="${timeZone.zoneId}" ${timeZone.zoneId == smsTimeWindow.timeZone ? "selected='selected'" : ''}>${timeZone.displayName}</option>
+													</c:forEach>
+												</select>
+												<div class="float-left sms-tz-dd-wrapper hide" id="sms-dd-wrapper-tz"></div>
+											</div>
+											<input id="smsTimeSetButton" type="button" class="sms-time-set-button btn" value="Save">
+										</div>
+										<div id="sms-time-window-error-msg" class="error-sms-survey-settings float-left hide"></div>
+									</div>
+					
+									<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
+										<div class="ss-comp-settings">
+											<div class="float-left comp-mail-thrs-txt">Max number of SMS reminder</div>
+											<div class="float-left sms-sttng-ip-wrapper">
+												<input type="text" id="max-sms-reminder" class="sms-input" value="${maxSmsReminders}" maxlength="1">
+											</div>
+										</div>
+									</c:if>
+									<div class="ss-comp-settings">
+										<div class="float-left comp-mail-thrs-txt">Send SMS reminder after</div>
+										<div class="float-left sms-sttng-ip-wrapper">
+											<input type="text" id="sms-reminder-interval" class="sms-input" value="${smsReminderInterval}" maxlength="1">
+										</div>
+										<div class="float-left comp-mail-thrs-txt">&nbsp;&nbsp;&nbsp;days</div>
+									</div>
+								</c:if>
+							</div>
+							
 							<c:if test="${ ( not empty companyAdminSwitchId || highestrole == 1 ) && ( columnName == 'agentId' || columnName == 'branchId' || columnName == 'regionId' ) }">
 								<div class="margin-top-twenty">
 									<div id="conf-sec-flow-chk-box" class="float-left bd-check-img clear-both"></div>
@@ -357,7 +426,7 @@
 							
 							<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
-							<div class="ss-admin-comp-settings" style="height: 80px;padding-top: 5px;padding-left:0px;">
+							<div class="ss-admin-comp-settings" style="height: 80px;padding-top: 5px;">
 								<div class="clearfix padding-bottom-twenty">
 									<div class="float-left st-score-rt-top email-setting-sel-lbl">
 										<spring:message code="label.send.email.via.key" />
@@ -879,9 +948,10 @@ $(document).ready(function() {
 		}
 	}
 	
-	if( "${columnName}" != "agentId" && "${columnName}" != "companyId" ){
+	/* if( "${columnName}" != "agentId" && "${columnName}" != "companyId" ){
 		$('#customized-setting-div').addClass('margin-top-hundred');
-	}
+	} */
+	
 	if( "${columnName}" == "companyId" ){
 		$('#customized-setting-div').addClass('cust-resp');
 		$('#customized-setting-div').addClass('cust-div-resp');
@@ -900,6 +970,29 @@ $(document).ready(function() {
 	if("${autoPostEnabled}" == "false"){
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 	}
+	
+	if("${smsSurveyReminderEnabled}" == "false"){
+		$("#smsFeatureDiv").addClass("hide");
+		$('#sms-enabled-flag-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${surveysettings.manualSmsSurveyReminderEnabled}" == "false"){
+		$('#sms-manual-flag-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if( "${surveysettings.optedOutAutomaticSmsSurveyReminder}" == '' || "${surveysettings.optedOutAutomaticSmsSurveyReminder}" == "false" ) {
+		$('#sms-automatic-flag-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	$('.sms-input').on('keypress', function (e) {
+		var regex = new RegExp("^[0-9.]+$");
+		var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+		if (regex.test(str)) {
+			return true;
+		}
+		e.preventDefault();
+		return false;
+	});
 	
 	if("${isReplyEnabled}" == "false"){
 		$('#allow-reply-chk-box').addClass('bd-check-img-checked');
@@ -1119,5 +1212,16 @@ $(document).ready(function() {
 		}
 	}
 	
+	$('#sms-time-window-start').timepicker({ 
+		'step': 15,
+		'disableTextInput' :true,
+		'timeFormat': 'h:i a'
+	});
+	$('#sms-time-window-end').timepicker({ 
+		'step': 15,
+		'disableTextInput' :true,
+		'timeFormat': 'h:i a'
+	});
+
 });
 </script>

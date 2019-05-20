@@ -594,6 +594,8 @@ public interface UserManagementService
 
 
     public void incompleteSurveyReminderSender();
+    
+    public void incompleteSurveyReminderSenderOverSms();
 
 
     public void inviteCorporateToRegister( User user, int planId ) throws InvalidInputException, UndeliveredEmailException;
@@ -781,6 +783,21 @@ public interface UserManagementService
      */
     void removeLogoImage( String collection, OrganizationUnitSettings unitSettings ) throws InvalidInputException;
 
+    /**
+     * Method to fetch agent setting with fields
+     * @param identifier
+     * @return
+     */
+    public OrganizationUnitSettings getAgentSettingForSmsReminder( long agentId ) throws InvalidInputException;
+
+
+    /**
+     * Method to fetch company settings with fields
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    public OrganizationUnitSettings getCompanySettingForSmsReminder( long companyId ) throws InvalidInputException;
 
     void removeUserAsSocialMonitorAdmin( User assigneeUser )
         throws InvalidInputException, NoRecordsFetchedException;

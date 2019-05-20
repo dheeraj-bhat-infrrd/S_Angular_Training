@@ -2,24 +2,24 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.vo.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.realtech.socialsurvey.core.vo.ManageTeamBulkResponse;
-
-import com.realtech.socialsurvey.core.vo.BranchVO;
-
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.vo.ManageTeamBulkResponse;
+import com.realtech.socialsurvey.core.vo.NotesVo;
+import com.realtech.socialsurvey.core.vo.OrganizationUnitIds;
+import com.realtech.socialsurvey.core.vo.SocialMediaStatusVO;
+import com.realtech.socialsurvey.core.vo.UserVo;
+import com.realtech.socialsurvey.core.vo.BranchVO;
+import com.realtech.socialsurvey.core.vo.CompanyStatistics;
+import com.realtech.socialsurvey.core.vo.CustomerSuccessInformation;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
+import com.realtech.socialsurvey.core.entities.Notes;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -80,7 +81,7 @@ public interface OrganizationManagementService
     String KEY_IS_REVIEW_REPLY_ENABLED_FOR_COMPANY = "survey_settings.isReplyEnabledForCompany";
     String KEY_IS_REVIEW_REPLY_ENABLED = "survey_settings.isReplyEnabled";
     String KEY_REVIEW_REPLY_SCORE = "survey_settings.reviewReplyScore";
-
+	
 
     public User addCompanyInformation( User user, Map<String, String> organizationalDetails )
         throws SolrException, InvalidInputException;
@@ -825,6 +826,11 @@ public interface OrganizationManagementService
      * Method to get the list of all the company ids
      */
     public Set<Company> getAllCompanies();
+    
+    /**
+     * Method to get the list of all the company with sms feature enabled
+     */
+    public List<OrganizationUnitSettings> getSmsSurveyReminderEnabledCompanyList();
 
 
     public Map<Long, BranchFromSearch> fetchBranchesMapByCompany( long companyId )
@@ -1751,6 +1757,7 @@ public interface OrganizationManagementService
 
     public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status );
 
+    public boolean updateSettings( String entityType, long entityId, String flagToBeUpdated, String status, long modifiedBy );
     
     void updateAgentProfileDisable( long companyId, boolean isAgentProfileDisabled ) throws InvalidInputException;
 

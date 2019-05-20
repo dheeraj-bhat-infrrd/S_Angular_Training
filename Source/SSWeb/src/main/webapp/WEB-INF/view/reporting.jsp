@@ -350,9 +350,13 @@
 							<div id="inc-survey-cont" class="welcome-popup-body-wrapper clearfix">
 								<div id="rep-icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="icn-sur-popup-cont"></div>
 								<div class="mult-sur-icn-wrapper">
+									<input type="hidden" id="sms-survey-count" data-sms-count = "0"></input>
 									<div id="rep-resend-mult-sur-icn" class="mult-sur-icn resend-mult-sur-icn float-left" title="Resend"></div>
 									<c:if test="${ isIncompleteSurveyDeleteEnabled == 'true' or isRealTechOrSSAdmin == true }">
-										<div id="rep-del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right" title="Delete"></div>
+										<div id="rep-del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-left" title="Delete"></div>
+									</c:if>
+									<c:if test="${ smsSurveyOptionEnabled == 'true' }">
+										<div id="rep-resend-mult-sms-icn" class="mult-sms-icn resend-mult-sms-icn float-right" title="Resend SMS"></div>
 									</c:if>
 								</div>
 							</div>

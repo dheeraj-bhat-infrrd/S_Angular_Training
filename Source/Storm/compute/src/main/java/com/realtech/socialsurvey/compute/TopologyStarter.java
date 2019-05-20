@@ -69,5 +69,19 @@ public class TopologyStarter
                     : ChararcterUtils.appendWithHypen( SurveyProcessorTopologyStarterHelper.SURVEY_PROCESSOR_TOPOLOGY,
                     EnvConstants.getProfile() ) );
         
+        //Sms topology
+        new SmsTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SmsTopologyStarterHelper.SMS_TOPOLOGY
+                : ChararcterUtils.appendWithHypen( SmsTopologyStarterHelper.SMS_TOPOLOGY, EnvConstants.getProfile() ) );
+        
+        //Sms event topology
+        new SmsEventsTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SmsEventsTopologyStarterHelper.SMS_EVENT_TOPOLOGY
+                : ChararcterUtils.appendWithHypen( SmsEventsTopologyStarterHelper.SMS_EVENT_TOPOLOGY, EnvConstants.getProfile() ) );
+        
+        //Contact unsubscribe/resubscribe topology
+        new ContactOptTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? ContactOptTopologyStarterHelper.CONTACT_OPT_TOPOLOGY
+                : ChararcterUtils.appendWithHypen( ContactOptTopologyStarterHelper.CONTACT_OPT_TOPOLOGY, EnvConstants.getProfile() ) );
     }
 }

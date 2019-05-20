@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gson.JsonObject;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
+import com.realtech.socialsurvey.compute.entities.SolrSmsWrapper;
 import com.realtech.socialsurvey.compute.entities.UserEvent;
 import com.realtech.socialsurvey.compute.entities.request.SolrRequest;
 import com.realtech.socialsurvey.compute.entities.response.SOLRResponseObject;
@@ -28,8 +29,16 @@ public interface SolrApiIntegrationService
     Call<SOLRResponseObject<SolrEmailMessageWrapper>> postEmail(@Body SolrRequest<SolrEmailMessageWrapper> entity, @Query("commit") boolean commit);
     
     @Headers("Content-Type: application/json")
+    @POST("ss-sms/update/json")
+    Call<SOLRResponseObject<SolrSmsWrapper>> postSms(@Body SolrRequest<SolrSmsWrapper> entity, @Query("commit") boolean commit);
+    
+    @Headers("Content-Type: application/json")
     @GET("ss-emails/select")
     Call<SOLRResponseObject<SolrEmailMessageWrapper>> getEmailMessage(@Query("q") String query, @Query("fq") String fieldQuery, @Query("start") int start, @Query("rows") int rows, @Query("wt") String wt);
+    
+    @Headers("Content-Type: application/json")
+    @GET("ss-sms/select")
+    Call<SOLRResponseObject<SolrSmsWrapper>> getSms(@Query("q") String query, @Query("fq") String fieldQuery, @Query("start") int start, @Query("rows") int rows, @Query("wt") String wt);
 
     @Headers("Content-Type: application/json")
     @GET("ss-emails/select")

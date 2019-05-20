@@ -80,10 +80,9 @@ public class AgentSettings extends OrganizationUnitSettings {
 	public void setLoginPrevented(boolean isLoginPrevented) {
 		this.isLoginPrevented = isLoginPrevented;
 	}
-
-	@Override
-	public String toString() {
-		return super.toString();
-	}
-
+	
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

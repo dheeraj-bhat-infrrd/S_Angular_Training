@@ -286,6 +286,7 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
         LOG.debug( "Method to check if region is default checkIfRegionIsDefault() finished." );
         return  (int) query.uniqueResult();
 	}
+    
 
     public List<Long> getRegionIdList( String entityType, long entityId )
     {

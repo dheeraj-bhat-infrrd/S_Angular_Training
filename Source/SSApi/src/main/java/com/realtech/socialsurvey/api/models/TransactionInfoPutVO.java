@@ -13,18 +13,22 @@ public class TransactionInfoPutVO {
  	private String customer1FirstName;
  	private String customer1LastName;
  	private String customer1Email;
+ 	private String customer1ContactNumber;
  	private String customer2FirstName;
  	private String customer2LastName;
  	private String customer2Email;
+ 	private String customer2ContactNumber;
  	
     private String buyerAgentFirstName;
     private String buyerAgentLastName;
     private String buyerAgentEmail;
+    private String buyerAgentContactNumber;
     private String sellerAgentFirstName;
     private String sellerAgentLastName;
     private String sellerAgentEmail;
+    private String sellerAgentContactNumber;
  	
- 	 //adding property address feild 
+ 	 //adding property address field 
     private String propertyAddress;
 
  	
@@ -151,6 +155,37 @@ public class TransactionInfoPutVO {
     {
         this.sellerAgentEmail = sellerAgentEmail;
     }
-	 
+	public String getCustomer1ContactNumber()
+	{
+		return customer1ContactNumber;
+	}
+	public void setCustomer1ContactNumber(String customer1ContactNumber)
+	{
+		this.customer1ContactNumber = customer1ContactNumber;
+	}
+	public String getCustomer2ContactNumber()
+	{
+		return customer2ContactNumber;
+	}
+	public void setCustomer2ContactNumber(String customer2ContactNumber)
+	{
+		this.customer2ContactNumber = customer2ContactNumber;
+	}
+	public String getBuyerAgentContactNumber()
+	{
+		return buyerAgentContactNumber;
+	}
+	public void setBuyerAgentContactNumber(String buyerAgentContactNumber)
+	{
+		this.buyerAgentContactNumber = buyerAgentContactNumber;
+	}
+	public String getSellerAgentContactNumber()
+	{
+		return sellerAgentContactNumber;
+	}
+	public void setSellerAgentContactNumber(String sellerAgentContactNumber)
+	{
+		this.sellerAgentContactNumber = sellerAgentContactNumber;
+	}
 	
 }

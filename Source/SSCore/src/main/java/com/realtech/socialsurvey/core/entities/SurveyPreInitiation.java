@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -65,6 +66,9 @@ public class SurveyPreInitiation implements Serializable
 
     @Column ( name = "CUSTOMER_EMAIL_ID")
     private String customerEmailId;
+    
+    @Column ( name = "CUSTOMER_CONTACT_NUMBER")
+    private String customerContactNumber;
 
     @Column ( name = "CUSTOMER_INTERACTION_DETAILS")
     private String customerInteractionDetails;
@@ -74,12 +78,21 @@ public class SurveyPreInitiation implements Serializable
     
     @Column ( name = "IS_SURVEY_REQUEST_SENT")
     private int isSurveyRequestSent;
+    
+    @Column ( name = "IS_AUTO_SMS_REMINDER_SENT")
+    private int isAutoSmsReminderSent;
 
     @Column ( name = "REMINDER_COUNTS")
     private int reminderCounts;
+    
+    @Column ( name = "REMINDER_COUNTS_SMS")
+    private int reminderCountsSms;
 
-    @Column ( name = "LAST_REMINDER_TIME")
+	@Column ( name = "LAST_REMINDER_TIME")
     private Timestamp lastReminderTime;
+	
+	@Column ( name = "LAST_SMS_REMINDER_TIME")
+    private Timestamp lastSmsReminderTime;
 
     @Column ( name = "STATUS")
     private int status;
@@ -135,13 +148,18 @@ public class SurveyPreInitiation implements Serializable
 		
 	@Column( name = "CUSTOM_FIELD_FIVE")	
 	private String customFieldFive;
-
-	
         
 	@Transient
     private String errorCodeDescription;
 
-
+	@PrePersist
+	void preInsert() {
+		
+		if (this.lastSmsReminderTime == null) {
+			this.lastSmsReminderTime = new Timestamp( System.currentTimeMillis() );
+		}
+	}
+	
     public String getErrorCodeDescription()
     {
         return errorCodeDescription;
@@ -327,6 +345,15 @@ public class SurveyPreInitiation implements Serializable
         return customerInteractionDetails;
     }
 
+    
+    public String getCustomerContactNumber() {
+		return customerContactNumber;
+	}
+
+
+	public void setCustomerContactNumber(String customerContactNumber) {
+		this.customerContactNumber = customerContactNumber;
+	}
 
     public void setCustomerInteractionDetails( String customerInteractionDetails )
     {
@@ -358,7 +385,15 @@ public class SurveyPreInitiation implements Serializable
     }
 
 
-    public int getReminderCounts()
+    public int getIsAutoSmsReminderSent() {
+		return isAutoSmsReminderSent;
+	}
+
+	public void setIsAutoSmsReminderSent(int isAutoSmsReminderSent) {
+		this.isAutoSmsReminderSent = isAutoSmsReminderSent;
+	}
+
+	public int getReminderCounts()
     {
         return reminderCounts;
     }
@@ -368,6 +403,15 @@ public class SurveyPreInitiation implements Serializable
     {
         this.reminderCounts = reminderCounts;
     }
+
+
+	public int getReminderCountsSms() {
+		return reminderCountsSms;
+	}
+
+	public void setReminderCountsSms(int reminderCountsSms) {
+		this.reminderCountsSms = reminderCountsSms;
+	}
 
 
     public Timestamp getLastReminderTime()
@@ -382,7 +426,17 @@ public class SurveyPreInitiation implements Serializable
     }
 
 
-    public int getStatus()
+    public Timestamp getLastSmsReminderTime() {
+		return lastSmsReminderTime;
+	}
+
+
+	public void setLastSmsReminderTime(Timestamp lastSmsReminderTime) {
+		this.lastSmsReminderTime = lastSmsReminderTime;
+	}
+
+
+	public int getStatus()
     {
         return status;
     }
@@ -545,5 +599,4 @@ public class SurveyPreInitiation implements Serializable
  	public void setCustomFieldFive(String customFieldFive) {	
 		this.customFieldFive = customFieldFive;	
 	}
-
 }

@@ -16,25 +16,32 @@
 					<div class="wc-review-th1 float-left"><spring:message code="label.firstname.key" /></div>
 					<div class="wc-review-th2 float-left"><spring:message code="label.lastname.key" /></div>
 					<div class="wc-review-th3 float-left"><spring:message code="label.emailid.key" /></div>
+					<div class="wc-review-th6 float-left">Contact Number</div>
 					<div class="wc-review-th4 float-left"></div>
 				</div>
-				<div id="survey-1" class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
-					<div class="wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
-					<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn hide"></div></div>
+				<div id="survey-1" class="wc-review-tr wc-review-data-row clearfix">
+					<div class="wc-review-data-col wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc6 survey-contact float-left"><jsp:include page="country_code.jsp"></jsp:include><div class="validation validationcontact float-left hidden"></div></div>
+					<!-- <div class="wc-review-data-col wc-review-tc6 float-left"><input class="wc-review-input wc-review-contact"  placeholder="Contact Number"><div class="validation hidden"></div></div> -->
+					<div class="wc-review-data-col wc-review-tc4 last float-left"><div class="wc-review-rmv-icn hide"></div></div>
 				</div>
-				<div id="survey-2" class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
-					<div class="wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
-					<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn"></div></div>
+				<div id="survey-2" class="wc-review-tr wc-review-data-row clearfix">
+					<div class="wc-review-data-col wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc6 survey-contact float-left"><jsp:include page="country_code.jsp"></jsp:include><div class="validation validationcontact float-left hidden"></div></div>
+					<!-- <div class="wc-review-data-col wc-review-tc6 float-left"><input class="wc-review-input wc-review-contact" placeholder="Contact Number"><div class="validation hidden"></div></div> -->
+					<div class="wc-review-data-col wc-review-tc4 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
-				<div id="survey-3" class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
-					<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
-					<div class="wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
-					<div class="wc-review-tc4 last float-left"><div class="wc-review-rmv-icn"></div></div>
+				<div id="survey-3" class="wc-review-tr wc-review-data-row clearfix">
+					<div class="wc-review-data-col wc-review-tc1 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc3 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc6 survey-contact float-left"><jsp:include page="country_code.jsp"></jsp:include><div class="validation validationcontact float-left hidden"></div></div>
+					<!-- <div class="wc-review-data-col wc-review-tc6 float-left"><input class="wc-review-input wc-review-contact" placeholder="Contact Number"><div class="validation hidden"></div></div> -->
+					<div class="wc-review-data-col wc-review-tc4 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 			</div>
 		</div>

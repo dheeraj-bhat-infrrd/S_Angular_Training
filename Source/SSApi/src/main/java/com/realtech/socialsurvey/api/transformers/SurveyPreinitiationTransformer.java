@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 
 @Component
@@ -35,6 +38,9 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 	 
 	 @Autowired
 	 private Utils utils;
+
+	 @Autowired
+	 SurveyHandler surveyHandler;
 	
 	@Override
 	public List<SurveyPreInitiation> transformApiRequestToDomainObject(
@@ -136,26 +142,40 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
         }
         Boolean participantAdded = true;
         SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        boolean enabledForSmsReminder = surveyHandler.isCompanyAllowedForAutoReminder(companyId);
         if ( participant.equals( BORROWER ) ) {
             surveyPreInitiation.setCustomerEmailId( transactionInfo.getCustomer1Email() );
             surveyPreInitiation.setCustomerFirstName( transactionInfo.getCustomer1FirstName() );
             surveyPreInitiation.setCustomerLastName( transactionInfo.getCustomer1LastName() );
             surveyPreInitiation.setParticipantType( CommonConstants.SURVEY_PARTICIPANT_TYPE_BORROWER );
+            if(enabledForSmsReminder) {
+            	surveyPreInitiation.setCustomerContactNumber(contactNumberFilteration(transactionInfo.getCustomer1ContactNumber()));
+            }
+            	
         }else if ( participant.equals( COBORROWER )) {
             surveyPreInitiation.setCustomerEmailId( transactionInfo.getCustomer2Email() );
             surveyPreInitiation.setCustomerFirstName( transactionInfo.getCustomer2FirstName() );
             surveyPreInitiation.setCustomerLastName( transactionInfo.getCustomer2LastName() );
             surveyPreInitiation.setParticipantType( CommonConstants.SURVEY_PARTICIPANT_TYPE_COBORROWER );
+            if(enabledForSmsReminder) {
+            	surveyPreInitiation.setCustomerContactNumber(contactNumberFilteration(transactionInfo.getCustomer2ContactNumber()));
+            }
         }else if ( participant.equals( BUYER )) {
             surveyPreInitiation.setCustomerEmailId( transactionInfo.getBuyerAgentEmail() );
             surveyPreInitiation.setCustomerFirstName( transactionInfo.getBuyerAgentFirstName() );
             surveyPreInitiation.setCustomerLastName( transactionInfo.getBuyerAgentLastName() );
             surveyPreInitiation.setParticipantType( CommonConstants.SURVEY_PARTICIPANT_TYPE_BUYER_AGENT );
+            if(enabledForSmsReminder) {
+            	surveyPreInitiation.setCustomerContactNumber(contactNumberFilteration(transactionInfo.getBuyerAgentContactNumber()));
+            }
         }else if ( participant.equals( SELLER )) {
             surveyPreInitiation.setCustomerEmailId( transactionInfo.getSellerAgentEmail() );
             surveyPreInitiation.setCustomerFirstName( transactionInfo.getSellerAgentFirstName() );
             surveyPreInitiation.setCustomerLastName( transactionInfo.getSellerAgentLastName() );
             surveyPreInitiation.setParticipantType( CommonConstants.SURVEY_PARTICIPANT_TYPE_SELLER_AGENT );
+            if(enabledForSmsReminder) {
+            	surveyPreInitiation.setCustomerContactNumber(contactNumberFilteration(transactionInfo.getSellerAgentContactNumber()));
+            }
         }else {
             participantAdded = false;
         }
@@ -181,6 +201,22 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 
         return surveyPreInitiation;
     }
+
+    private String contactNumberFilteration(String contactNumber) {
+		if(contactNumber == null) {
+			return null;
+		}
+		String plus = "+";
+		String regex = "^\\+(?:[0-9] ?){9,30}[0-9]$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(plus.concat(contactNumber.replaceAll("[^0-9]", "")));
+		if(matcher.matches()) {
+			return matcher.group(0);
+		}
+		else {
+			return null;
+		}
+	}
 
 	@Override
 	public SurveyPutVO transformDomainObjectToApiResponse(

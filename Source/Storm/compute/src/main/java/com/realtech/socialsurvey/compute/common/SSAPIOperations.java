@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.common;
 import com.realtech.socialsurvey.compute.entities.*;
 import com.realtech.socialsurvey.compute.entities.response.BulkWriteErrorVO;
 import com.realtech.socialsurvey.compute.entities.response.FtpSurveyResponse;
+import com.realtech.socialsurvey.compute.entities.response.RebrandlyVO;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
@@ -12,7 +13,6 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -280,6 +280,70 @@ public class SSAPIOperations
             return response.body();
         }
         return false;
+    }
+    
+    public boolean isContactNumberUnsubscribed( String recipientContactNumber, long companyId )
+    {
+        Call<Boolean> request = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .isContactrNumberUnsubscribed( recipientContactNumber, companyId );
+        Response<Boolean> response = null;
+        try {
+            response = request.execute();
+        } catch ( IOException e ) {
+            LOG.error( "Exception while fetching contact number unsubscribed status." );
+        }
+        if ( response != null ) {
+            return response.body();
+        }
+        return false;
+    }
+    
+    public boolean unsubscribeResubscribeContact( String recipientContactNumber, boolean changeFlag, String incomingMessageBody )
+    {
+        Call<Boolean> request = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .unsubscribeContact(recipientContactNumber, changeFlag, 1, incomingMessageBody);
+        Response<Boolean> response = null;
+        try {
+            response = request.execute();
+        } catch ( IOException e ) {
+            LOG.error( "Exception while fetching unsubscribing/resubscribing contact number." );
+        }
+        if ( response != null ) {
+            return response.body();
+        }
+        return false;
+    }
+    
+    public RebrandlyVO getShortenedSurveyUrl( String surveyUrl )
+    {
+        Call<RebrandlyVO> request = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .getShortenedSurveyUrl( surveyUrl );
+        Response<RebrandlyVO> response = null;
+        try {
+            response = request.execute();
+        } catch ( IOException e ) {
+            LOG.error( "Exception while fetching rebrandly shortened url." );
+        }
+        if ( response != null ) {
+            return response.body();
+        }
+        return null;
+    }
+    
+    public Boolean addFailedStreamSms( SmsInfo smsInfo )
+    {
+        Call<Boolean> request = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .addFailedStreamSms( smsInfo );
+        Response<Boolean> response = null;
+        try {
+            response = request.execute();
+        } catch ( IOException e ) {
+            LOG.error( "Exception while adding failed sms." );
+        }
+        if ( response != null ) {
+            return response.body();
+        }
+        return Boolean.FALSE;
     }
 
     //checkIfSurveyIsOld

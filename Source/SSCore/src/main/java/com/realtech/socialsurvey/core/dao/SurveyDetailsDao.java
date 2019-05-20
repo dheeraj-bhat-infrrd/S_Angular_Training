@@ -430,6 +430,31 @@ public interface SurveyDetailsDao
 	
 	public void deleteReviewReply( String replyId, String surveyId);
 
+
+    /**
+     * Method to get survey by contact number with number of past n days
+     * @param agentId
+     * @param customerContactNumber
+     * @param firstName
+     * @param lastName
+     * @param noOfDays
+     * @return
+     */
+    public SurveyDetails getSurveyByAgentIdAndCustomerContactNumberAndNoOfDays( long agentId, String customerContactNumber,
+        String firstName, String lastName, int noOfDays );
+
+
+    /**
+     * Method to get survey by contact numbe
+     * @param agentId
+     * @param customerContactNumber
+     * @param firstName
+     * @param lastName
+     * @return
+     */
+    public SurveyDetails getSurveyByAgentIdAndCustomerContactNumber( long agentId, String customerContactNumber, String firstName,
+        String lastName );
+
 	
 	public ReviewReply getReviewReply(String replyId, String surveyId);
 	/**

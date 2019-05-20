@@ -232,7 +232,7 @@ public class BulkSurveyFileUploadImpl implements BulkSurveyFileUpload {
 				User agent = userManagementService.getUserByEmail(surveyUpload.getAgentEmailId());
 				if (agent.getCompany().getCompanyId() == companyId) {
 					surveyHandler.initiateSurveyRequest(agent.getUserId(), surveyUpload.getCustomerEmailId(), surveyUpload.getCustomerFirstName(),
-							surveyUpload.getCustomerLastName(), CommonConstants.SURVEY_SOURCE_FILE_UPLOAD);
+							surveyUpload.getCustomerLastName(), CommonConstants.SURVEY_SOURCE_FILE_UPLOAD, null );
 				}
 				else {
 					LOG.warn("Agent does not belong to the company");

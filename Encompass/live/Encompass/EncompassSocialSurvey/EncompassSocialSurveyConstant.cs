@@ -103,15 +103,17 @@ namespace EncompassSocialSurvey
 
         public const int LOAN_PROCESSOR_EMAIL_INDEX = 17;
 
-        public const int CUSTOM_FIELD_ONE_INDEX = 18;
+        public const int CONTACT_NUMBER_INDEX = 18;
 
-        public const int CUSTOM_FIELD_TWO_INDEX = 19;
+        public const int CUSTOM_FIELD_ONE_INDEX = 19;
 
-        public const int CUSTOM_FIELD_THREE_INDEX = 20;
+        public const int CUSTOM_FIELD_TWO_INDEX = 20;
 
-        public const int CUSTOM_FIELD_FOUR_INDEX = 21;
+        public const int CUSTOM_FIELD_THREE_INDEX = 21;
 
-        public const int CUSTOM_FIELD_FIVE_INDEX = 22;
+        public const int CUSTOM_FIELD_FOUR_INDEX = 22;
+
+        public const int CUSTOM_FIELD_FIVE_INDEX = 23;
 
         public const string SOCIAL_SURVEY_ENCRYPTION_SALT = "6f90b8d50f490e647d92e2a74d2c44d7";
 

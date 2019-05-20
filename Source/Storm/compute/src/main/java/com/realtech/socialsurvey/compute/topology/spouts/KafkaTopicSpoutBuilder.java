@@ -45,6 +45,18 @@ public class KafkaTopicSpoutBuilder
     // Email topic spout
     private static final String MAIL_TOPIC = "mail-topic";
     private static final String MAIL_CONSUMER_GROUP = "mcg01";
+    
+    // SMS topic spout
+    private static final String SMS_TOPIC = "sms-topic";
+    private static final String SMS_CONSUMER_GROUP = "scg01";
+    
+    // Twilio SMS event topic spout
+    private static final String TWILIO_SMS_EVENT_TOPIC = "sms-events-topic";
+    private static final String TWILIO_SMS_EVENT_CONSUMER_GROUP = "secg01";
+    
+    // SMS topic spout
+    private static final String CONTACT_OPT_TOPIC = "contact-opt-topic";
+    private static final String CONTACT_OPT_CONSUMER_GROUP = "cocg01";
 
     // Socail post topic
     private static final String SOCIAL_POST_TOPIC = "social-post-topic";
@@ -111,6 +123,58 @@ public class KafkaTopicSpoutBuilder
         mailSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
         LOG.info( "Mail topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
         return new KafkaSpout( mailSpoutConfig );
+    }
+    
+    /**
+     * Sms topic kafka spout
+     */
+    public KafkaSpout smsTopicKafkaSpout()
+    {
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SMS_TOPIC
+                : ChararcterUtils.appendWithHypen( SMS_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SMS_CONSUMER_GROUP
+                : ChararcterUtils.appendWithHypen( SMS_CONSUMER_GROUP, EnvConstants.getProfile() );
+        SpoutConfig smsSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        smsSpoutConfig.ignoreZkOffsets = false;
+        smsSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Sms topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( smsSpoutConfig );
+    }
+    
+    /**
+     * Twilio sms events kafka spout
+     * @return
+     */
+    public KafkaSpout twilioSmsEventTopicSpout()
+    {
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? TWILIO_SMS_EVENT_TOPIC
+                : ChararcterUtils.appendWithHypen( TWILIO_SMS_EVENT_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? TWILIO_SMS_EVENT_CONSUMER_GROUP
+                : ChararcterUtils.appendWithHypen( TWILIO_SMS_EVENT_CONSUMER_GROUP, EnvConstants.getProfile() );
+        SpoutConfig twilioSmsEventSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        twilioSmsEventSpoutConfig.ignoreZkOffsets = false;
+        twilioSmsEventSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Twilio sms event spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( twilioSmsEventSpoutConfig );
+    }
+    
+    /**
+     * Contact Opt topic kafka spout
+     */
+    public KafkaSpout contactOptTopicKafkaSpout()
+    {
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? CONTACT_OPT_TOPIC
+                : ChararcterUtils.appendWithHypen( CONTACT_OPT_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? CONTACT_OPT_CONSUMER_GROUP
+                : ChararcterUtils.appendWithHypen( CONTACT_OPT_CONSUMER_GROUP, EnvConstants.getProfile() );
+        SpoutConfig contactOptSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        contactOptSpoutConfig.ignoreZkOffsets = false;
+        contactOptSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Contact Opt topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( contactOptSpoutConfig );
     }
 
     /**

@@ -19,6 +19,7 @@ public class FailedStreamMessage<T> implements Serializable
     private long companyId;
     private boolean streamRetryFailed;
     private String messageClass;
+    private String entityType;
     private T message;
 
 
@@ -82,7 +83,17 @@ public class FailedStreamMessage<T> implements Serializable
     }
 
 
-    public T getMessage()
+    public String getEntityType() {
+		return entityType;
+	}
+
+
+	public void setEntityType(String entityType) {
+		this.entityType = entityType;
+	}
+
+
+	public T getMessage()
     {
         return message;
     }

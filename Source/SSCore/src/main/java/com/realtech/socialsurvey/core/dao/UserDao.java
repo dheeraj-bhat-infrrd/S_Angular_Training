@@ -128,4 +128,12 @@ public interface UserDao extends GenericDao<User, Long>
 	 */
 	public List getSocialSurveyAdmins() throws HibernateException;
 
+    /**
+     * Method to get companyId for userId.
+     * @param userId
+     * @return
+     * @throws InvalidInputException 
+     */
+    public long getCompanyIdForUserId( long userId ) throws InvalidInputException;
+
 }

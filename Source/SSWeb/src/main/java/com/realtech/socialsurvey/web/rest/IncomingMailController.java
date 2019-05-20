@@ -92,7 +92,8 @@ public class IncomingMailController
         String mailTo = request.getParameter( "to" );
         String headers = request.getParameter( "headers" );
         
-        LOG.debug( "HTML from sendgrid, {}",  mailBody);
+        LOG.info( "sendgrid header: {}",  headers);
+        LOG.info( "HTML from sendgrid, {}",  mailBody);
 
         if ( mailFrom == null || mailFrom.isEmpty() ) {
             LOG.error( "From address is missing from request" );
@@ -284,6 +285,7 @@ public class IncomingMailController
 
     private String parseHeaderForMessageId( String headers )
     {
+    	LOG.info("method parseHeaderForMessageId is start parsing header: {} ", headers );
         if ( headers == null || headers.isEmpty() ) {
             LOG.error( "Headers passed cannot be null or empty" );
             return null;
@@ -295,8 +297,9 @@ public class IncomingMailController
         Matcher matcher = pattern.matcher( headers );
         if ( matcher.find() ) {
             if(LOG.isDebugEnabled()) {
-                LOG.debug( "Found Message id in message header : {}", matcher.group( 1 ) );
+                LOG.info( "Found Message id in message header : {}", matcher.group( 1 ) );
             }
+            LOG.info( "Found Message id in message header : {}", matcher.group( 1 ) );
             return matcher.group( 1 ).trim();
         }
         LOG.error( "Could not find message Id in the header" );

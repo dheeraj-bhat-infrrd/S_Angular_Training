@@ -35,6 +35,11 @@ public class EncompassCrmInfo extends CRMInfo
 	private String customFieldFive;
 
 	private List<String> alertEmail;
+	
+	private String borrowerContactNumber;
+    private String coBorrowerContactNumber;
+    private String buyerAgentContactNumber;
+    private String sellerAgentContactNumber;
     
 
     public String getVersion()
@@ -302,6 +307,56 @@ public class EncompassCrmInfo extends CRMInfo
     public void setAlertEmail( List<String> alertEmail )
     {
         this.alertEmail = alertEmail;
+    }
+    
+    
+    
+
+    public String getBorrowerContactNumber()
+    {
+        return borrowerContactNumber;
+    }
+
+
+    public void setBorrowerContactNumber( String borrowerContactNumber )
+    {
+        this.borrowerContactNumber = borrowerContactNumber;
+    }
+
+
+    public String getCoBorrowerContactNumber()
+    {
+        return coBorrowerContactNumber;
+    }
+
+
+    public void setCoBorrowerContactNumber( String coBorrowerContactNumber )
+    {
+        this.coBorrowerContactNumber = coBorrowerContactNumber;
+    }
+
+
+    public String getBuyerAgentContactNumber()
+    {
+        return buyerAgentContactNumber;
+    }
+
+
+    public void setBuyerAgentContactNumber( String buyerAgentContactNumber )
+    {
+        this.buyerAgentContactNumber = buyerAgentContactNumber;
+    }
+
+
+    public String getSellerAgentContactNumber()
+    {
+        return sellerAgentContactNumber;
+    }
+
+
+    public void setSellerAgentContactNumber( String sellerAgentContactNumber )
+    {
+        this.sellerAgentContactNumber = sellerAgentContactNumber;
     }
 
 
