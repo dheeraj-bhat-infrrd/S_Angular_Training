@@ -4,6 +4,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <c:set var="start" value='${startIndex}'></c:set>
+<input type="hidden" id="allow-apr-profile" name="addphotostorvw" value="${addPhotosToReview}">
 <c:if test="${not empty reviews}">
 	<c:forEach var="reviewItem" varStatus="loop" items="${reviews}">
 		<c:choose>
@@ -50,6 +51,7 @@
 		<div data-agentid="${reviewItem.agentId}" survey-mongo-id="${reviewItem._id}"
 			data-review="${fn:escapeXml(reviewItem.review)}" data-score="${reviewItem.score}" 
 			 class="ppl-review-item dsh-review-cont hide">
+			 <c:if test="${addPhotosToReview}">
 			<c:choose>
 				<c:when test="${ not empty reviewItem.profileImageUrl }">
 					<div class="ss-widget-prof-pic-cont">
@@ -62,9 +64,9 @@
 				</div>
 				</c:otherwise>
 			</c:choose>
+			</c:if>
 
-
-			<div class="ppl-header-wrapper clearfix review-details">
+			<div class="ppl-header-wrapper clearfix">
 			<div class="float-left ppl-header-right">
 					<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-modified="false" 
 						data-rating="${reviewItem.score}" data-source="${reviewItem.source }">

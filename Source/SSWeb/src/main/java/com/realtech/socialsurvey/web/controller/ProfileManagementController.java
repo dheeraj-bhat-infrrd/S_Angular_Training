@@ -5103,7 +5103,7 @@ public class ProfileManagementController
             int startIndex = Integer.parseInt( request.getParameter( "startIndex" ) );
             int numRows = Integer.parseInt( request.getParameter( "numOfRows" ) );
             boolean hiddenSection = Boolean.parseBoolean( request.getParameter( "hiddenSection" ) );
-            OrganizationUnitSettings unitSettings = null;  
+            OrganizationUnitSettings unitSettings = null; 
             long companyId = user.getCompany().getCompanyId();
             
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -5129,6 +5129,17 @@ public class ProfileManagementController
             } else {
                 throw new InvalidInputException( "Invalid profile level." );
             }
+            
+			if (!entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
+				boolean isAddPhtotsToReview = organizationManagementService.isAddPhotosToReviewEnabled(companyId);
+				model.addAttribute("addPhotosToReview", isAddPhtotsToReview);
+				LOG.info("Edit profile page review section with profile level {}, and feature is {}", entityType,
+						isAddPhtotsToReview);
+			} else {
+				model.addAttribute("addPhotosToReview", unitSettings.isAddPhotosToReview());
+				LOG.info("Edit profile page review section with profile level company andfeature is {}",
+						unitSettings.isAddPhotosToReview());
+			}
             
             boolean isReplyEnabledForCompany = false;
             OrganizationUnitSettings settings = organizationManagementService

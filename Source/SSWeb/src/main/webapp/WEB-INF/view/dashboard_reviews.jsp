@@ -4,6 +4,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <c:set var="hiddenSection" value="${hiddenSection}"></c:set>
+<input type="hidden" id="allow-apr-dashboard" name="addphotostorvw" value="${addPhotosToReview}">
 <c:choose>
 	<c:when test="${entityType == 'companyId'}">
 		<c:set value="1" var="profilemasterid"></c:set>
@@ -45,6 +46,7 @@
 			</c:otherwise>
 		</c:choose>
 		<div data-agentid="${feedback.agentId}" data-review="${fn:escapeXml(feedback.review)}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide review-attr">
+			<c:if test="${ addPhotosToReview}">
 			<c:choose>
 				<c:when test="${ not empty feedback.profileImageUrl }">
 					<div class="ss-widget-prof-pic-cont">
@@ -57,7 +59,8 @@
 				</div>
 				</c:otherwise>
 			</c:choose>
-			<div class="ppl-header-wrapper clearfix review-details">
+			</c:if>
+			<div class="ppl-header-wrapper clearfix">
 			<div class="float-left ppl-header-right">
 					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
 					</div>
