@@ -4,7 +4,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-
+<input type="hidden" id="allow-single-review" name="addphotostorvw" value="${addPhotosToReview}">
 <c:if test="${not empty reviewAggregate}">
 	<c:if test="${reviewAggregate.surveyIdValid}">
 		<c:choose>
@@ -80,6 +80,7 @@
 			</div>
 			<div class="single-review-popup-body-wrapper clearfix">
 				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 sr-review-details">
+				<c:if test="${ addPhotosToReview}">
 				<c:choose>
 				<c:when test="${ not empty singleReviewItem.profileImageUrl }">
 					<div class="ss-reviewer-prof-pic-cont">
@@ -92,6 +93,7 @@
 				</div>
 				</c:otherwise>
 			</c:choose>
+			</c:if>
 					<span class="sr-reviewed-by">Reviewed by ${customerDisplayName}.</span>
 					<div class="sr-margin-bottom-50">
 						<span>Posted on </span> 
