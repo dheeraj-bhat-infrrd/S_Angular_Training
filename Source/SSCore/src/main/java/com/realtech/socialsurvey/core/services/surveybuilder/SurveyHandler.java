@@ -1,12 +1,14 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import com.realtech.socialsurvey.core.vo.BulkWriteErrorVO;
+import com.realtech.socialsurvey.core.vo.SmsSurveyReminderResponseVO;
 import com.realtech.socialsurvey.core.vo.SurveyDetailsVO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReviewReplyVO;
+import com.realtech.socialsurvey.core.entities.SMSTimeWindow;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -31,6 +34,8 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.sms.UndeliveredSmsException;
+import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateContactSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
@@ -82,13 +87,14 @@ public interface SurveyHandler
 
 
     public void updateReminderCount( long surveyPreInitiationId, boolean reminder );
-
-
+    
     public void markSurveyAsSent( SurveyPreInitiation surveyPreInitiation );
 
 
     public Map<String, Map<String, String>> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException;
 
+    
+    public List<SurveyPreInitiation> getIncompleteSurveyForSmsReminder( long companyId, Date minLastReminderDate , Date maxLastReminderDate, int maxReminderCount );
 
     public List<SurveyPreInitiation> getIncompleteSurveyForReminderEmail( Company company, Date minLastReminderDate , 
         Date maxLastReminderDate, int maxReminderCount );
@@ -121,7 +127,7 @@ public interface SurveyHandler
 
 
     public void storeSPIandSendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,
-        String custRelationWithAgent, User user, boolean isAgent, String source ) throws InvalidInputException, SolrException,
+        String custRelationWithAgent, User user, boolean isAgent, String source, String custContactNumber ) throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException;
 
 
@@ -181,6 +187,7 @@ public interface SurveyHandler
      * @param recipientFirstname
      * @param recipientLastname
      * @param source
+     * @param recipientContactNumber
      * @throws DuplicateSurveyRequestException
      * @throws InvalidInputException
      * @throws SelfSurveyInitiationException
@@ -190,7 +197,7 @@ public interface SurveyHandler
      * @throws ProfileNotFoundException 
      */
     public void initiateSurveyRequest( long agentId, String recipientEmailId, String recipientFirstname,
-        String recipientLastname, String source ) throws DuplicateSurveyRequestException, InvalidInputException,
+        String recipientLastname, String source, String recipientContactNumber ) throws DuplicateSurveyRequestException, InvalidInputException,
         SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
         ProfileNotFoundException;
 
@@ -290,7 +297,7 @@ public interface SurveyHandler
 
 
     public SurveyPreInitiation preInitiateSurvey( User user, String custEmail, String custFirstName, String custLastName, int i,
-        String custRelationWithAgent, String source );
+        String custRelationWithAgent, String source, String custContactNumber );
 
 
     public void updateSurveyDetailsBySurveyId( SurveyDetails surveyDetails );
@@ -458,10 +465,98 @@ public interface SurveyHandler
 	public SurveyPreInitiation saveSurveyPreInitiationTempObject(SurveyPreInitiation surveyPreInitiation)
 			throws InvalidInputException;
 	
+	//public void sendSurveyReminderSms( SurveyPreInitiation survey ) throws InvalidInputException, ProfileNotFoundException, UndeliveredSmsException, NoRecordsFetchedException;
+	
+
+	/**
+	 * @param companyId
+	 * @param surveysSelectedArray
+	 * @return
+	 * @throws NonFatalException
+	 */
+	public List<SmsSurveyReminderResponseVO> sendMultipleIncompleteSurveyReminder( long companyId, String[] surveysSelectedArray ) throws NonFatalException;
+	
+	/**
+	 * Method to send sms survey reminder 
+	 * @param survey
+	 * @return 
+	 * @throws InvalidInputException
+	 */
+	public boolean sendSms( SurveyPreInitiation survey, String agentFirstName, boolean saveToStreamLater) throws InvalidInputException;
+
+	/**
+	 * @param countryDialInCode
+	 * @param contactNumber
+	 * @param agentId
+	 * @param createOn
+	 * @param companySettings
+	 * @return
+	 */
+	public long checkIfContactNumberAlreadySurveyed( String countryDialInCode, String contactNumber, long agentId, Timestamp createOn, OrganizationUnitSettings companySettings );
+
+    /**
+     * @param currentAgentId
+     * @param customerContactNumber
+     * @return
+     */
+    public boolean hasCustomerAlreadySurveyedForContactNumber( long currentAgentId, String customerContactNumber );
+
+    /**
+     * Method to check if contact number already exists for agent in survey pre initiations
+     * @param countryDialInCode
+     * @param contactNumber
+     * @param agentId
+     * @param duplicateSurveyInterval
+     * @return
+     */
+    public boolean checkIfContactNumberAlreadyExists( String countryDialInCode, String contactNumber, long agentId, int duplicateSurveyInterval );
+
+    /**
+     * Check if contact number surveyed 
+     * @param userId
+     * @param custContactNumber
+     * @throws InvalidInputException 
+     * @throws DuplicateContactSurveyRequestException 
+     */
+    public void checkIfContactNumberSurveyedForAgent( long userId, String custContactNumber ) throws InvalidInputException, DuplicateContactSurveyRequestException;
+
+
 	
 	public ReviewReplyVO createOrUpdateReplyToReview( String surveyId, String replyText, String replyByName, String replyById, String replyId, String entityType )
         throws InvalidInputException;
 	
 	
 	public void deleteReviewReply(String replyId, String surveyId) throws InvalidInputException;
+
+    /**
+     * @param smsTimeWindow
+     * @return
+     */
+    public boolean isSMSWindowTimeValid(SMSTimeWindow smsTimeWindow);
+
+	/**
+	 * @param companyId
+	 * @return
+	 */
+	public boolean isCompanyAllowedForAutoReminder(long companyId);
+
+    /**
+     * @param countryDialInCode
+     * @param contactNumber
+     * @param agentId
+     * @param companySettings
+     * @return
+     */
+    public boolean checkIfContactNumberAlreadySurveyed( String countryDialInCode, String contactNumber, long agentId,
+        OrganizationUnitSettings companySettings );
+
+	/**
+	 * Method to update reminder count and modifiedon and last sms reminder sent time
+	 * @param surveyPreInitiationId
+	 * @param autoReminder
+	 * @param isNotDuplicate
+	 * @return
+	 */
+	public SurveyPreInitiation updateReminderCountSms(long surveyPreInitiationId, boolean autoReminder,
+			boolean isNotDuplicate);
 }

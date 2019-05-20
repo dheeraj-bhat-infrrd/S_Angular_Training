@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 
 import com.realtech.socialsurvey.core.entities.*;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
@@ -46,7 +47,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.WidgetTemplateConstants;
-import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -57,11 +57,13 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.factories.ApplicationSettingsInstanceProvider;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
@@ -165,7 +167,13 @@ public class OrganizationManagementController
     private SSApiIntergrationBuilder ssApiIntergrationBuilder;
     
     @Autowired
+    private ApplicationSettingsInstanceProvider applicationSettingsInstanceProvider;
+    
+    @Autowired
     private FileOperations fileOperations;
+
+    @Autowired
+    private SurveyPreInitiationService surveyPreInitiationService;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -205,6 +213,9 @@ public class OrganizationManagementController
     
     @Value("${SOCIAL_MONITOR_AUTH_HEADER}")
     private String authHeader;
+    
+    @Value ( "${SMS_SURVEY_REMINDER_INTERVAL}")
+    private int smsSurveyReminderInterval;
 
     /**
      * Method to upload logo image for a company
@@ -698,6 +709,13 @@ public class OrganizationManagementController
             organizationManagementService.decryptEncompassPasswordIfPossible( unitSettings );
             
             model.addAttribute( CommonConstants.USER_APP_SETTINGS, unitSettings );
+            
+            boolean smsSurveyReminderEnabled = false;
+            if(unitSettings.getSurvey_settings()!= null) {
+                smsSurveyReminderEnabled  = unitSettings.getSurvey_settings().isSmsSurveyReminderEnabled(); 
+            }
+            
+            model.addAttribute( "smsSurveyReminderEnabled", smsSurveyReminderEnabled );
 
 
             model.addAttribute( CommonConstants.ENCOMPASS_VERSION_LIST,
@@ -789,7 +807,7 @@ public class OrganizationManagementController
                 collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
             }
-                            
+
             OrganizationUnitSettings companySettings = organizationManagementService
                 .getCompanySettings( user.getCompany().getCompanyId() );
             model.addAttribute( "partnerSurveyAllowedAtCompany", companySettings.isAllowPartnerSurvey() );
@@ -808,10 +826,7 @@ public class OrganizationManagementController
             } else {
                 surveySettings = unitSettings.getSurvey_settings();
             }
-            if ( surveySettings == null ) {
-                surveySettings = new SurveySettings();
-
-            }
+            
             if ( surveySettings.getShow_survey_above_score() == 0f ) {
                 surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
                 surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
@@ -834,7 +849,6 @@ public class OrganizationManagementController
 
             model.addAttribute( "columnName", entityType );
             model.addAttribute( "columnValue", entityId );
-
             model.addAttribute( "autoPostEnabled", false );
             model.addAttribute( "autoPostLinkToUserSite", false );
             model.addAttribute( "vendastaAccess", unitSettings.isVendastaAccessible() );
@@ -880,6 +894,8 @@ public class OrganizationManagementController
                 model.addAttribute( "autoPostLinkToUserSite", surveySettings.isAutoPostLinkToUserSiteEnabled() );
                 model.addAttribute( "minreplyscore", surveySettings.getReviewReplyScore());
                 model.addAttribute("isReplyEnabled", surveySettings.isReplyEnabled());
+                
+                
             }
 
             //enocode before sending to UI
@@ -946,6 +962,9 @@ public class OrganizationManagementController
             model.addAttribute( "allowRegionAdminToAddUser", unitSettings.getRegionAdminAllowedToAddUser() );
             model.addAttribute( "allowRegionAdminToDeleteUser", unitSettings.getRegionAdminAllowedToDeleteUser() );
             
+            // Set required sms survey reminder settings model attribute
+            setModelAtrributeForSmsReminderSettings( model, entityType, userCompanySettings );
+            
             SurveySettings compSurveySettings = null;
             compSurveySettings = companySettings.getSurvey_settings();
             boolean isReplyEnabledForCompany = false;
@@ -963,6 +982,50 @@ public class OrganizationManagementController
         LOG.info( "Finished fetching {} settings with iden:{}", entityType, entityId);
 
         return JspResolver.EDIT_SETTINGS;
+    }
+
+
+    /**
+     * Method to add settings model attribute for sms reminder feature
+     * @param model
+     * @param entityType
+     * @param companySettings
+     * @param unitSettings
+     */
+    private void setModelAtrributeForSmsReminderSettings( Model model, String entityType,
+        OrganizationUnitSettings companySettings )
+    {
+        if ( companySettings.getSurvey_settings() != null ) {
+            model.addAttribute( "smsSurveyReminderEnabled", companySettings.getSurvey_settings().isSmsSurveyReminderEnabled() );
+        }
+
+        if ( companySettings.getSurvey_settings() != null && entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            SurveySettings surveySettings = companySettings.getSurvey_settings();
+            
+            ApplicationSettings applicationSettings = applicationSettingsInstanceProvider.getApplicationSettings();
+            
+            if(surveySettings.getSmsTimeWindow() != null) {
+                model.addAttribute( "smsTimeWindow", surveySettings.getSmsTimeWindow() );
+            } else {
+                model.addAttribute( "smsTimeWindow", applicationSettings.getSmsTimeWindow() );
+            }
+            
+            if ( surveySettings.getSmsSurveyReminderInterval() > 0 ) {
+                model.addAttribute( "smsReminderInterval", surveySettings.getSmsSurveyReminderInterval() );
+            } else {
+                model.addAttribute( "smsReminderInterval", smsSurveyReminderInterval );
+            }
+            model.addAttribute("timeZones", applicationSettings.getTimeZones() );
+
+            int maxSmsReminders = surveySettings.getMaxNumberOfSmsSurveyReminders();
+
+            if (  maxSmsReminders <= 0 ) {
+                maxSmsReminders = applicationSettings.getDefaultSmsSurveyReminderCount();
+            }
+
+            model.addAttribute( "maxSmsReminders", maxSmsReminders );
+        }
+
     }
 
 
@@ -999,10 +1062,16 @@ public class OrganizationManagementController
         String loanOfficerName = request.getParameter( "loan-officer-name" );
 
         String alertEmails = request.getParameter( "alert-email" );
+        
+        String borrowerContactNumber = request.getParameter( "borrowerContactNumber" );
+        String coBorrowerContactNumber = request.getParameter( "coBorrowerContactNumber" );
+        String buyerAgentContactNumber = request.getParameter( "buyerAgentContactNumber" );
+        String sellerAgentContactNumber = request.getParameter( "sellerAgentContactNumber" );
+        
 
         String version = request.getParameter( "sdk-version-selection-list" );
 
-        Map<String, Object> responseMap = new HashMap<String, Object>();
+        Map<String, Object> responseMap = new HashMap<>();
         String message;
         boolean status = true;
         List<String> mailIdList = new ArrayList<>();
@@ -1110,6 +1179,22 @@ public class OrganizationManagementController
             	encompassCrmInfo.setLoanProcessorEmail(loanProcessorEmail);
             } else {
             	encompassCrmInfo.setLoanProcessorEmail("");            	            	
+            }
+            
+            if(StringUtils.isNotEmpty( borrowerContactNumber )) {
+                encompassCrmInfo.setBorrowerContactNumber( borrowerContactNumber );
+            }
+            
+            if(StringUtils.isNotEmpty( coBorrowerContactNumber )) {
+                encompassCrmInfo.setCoBorrowerContactNumber( coBorrowerContactNumber );
+            }
+            
+            if(StringUtils.isNotEmpty( buyerAgentContactNumber )) {
+                encompassCrmInfo.setBuyerAgentContactNumber( buyerAgentContactNumber );
+            }
+            
+            if(StringUtils.isNotEmpty( sellerAgentContactNumber )) {
+                encompassCrmInfo.setSellerAgentContactNumber( sellerAgentContactNumber );
             }
 
             if(StringUtils.isNotEmpty( alertEmails ) && !alertEmails.contains( "," ) ){
@@ -4946,6 +5031,53 @@ public class OrganizationManagementController
         
         return message;
     }    
+    
+    /**
+     * This controller method will update the particular mongo settings. 
+     * @param request
+     * @param model
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/updatesettings", method = RequestMethod.POST)
+    public String updateSettings( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method updateSettings() started." );
+        
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession();
+        
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String settingName = (String) request.getParameter( "settingName" );
+        String settingStatus = (String) request.getParameter( "settingStatus" );
+        
+        Object ssAdminUserid = session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        Object companyAdminUserid = session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
+        long modifiedBy = 0l;
+        if( ssAdminUserid != null ) {
+        	
+        	modifiedBy = (Long) ssAdminUserid;
+        }
+        else if( companyAdminUserid != null ) {
+        	
+        	modifiedBy = (Long) companyAdminUserid;
+        }
+        else {
+        	
+        	modifiedBy = user.getUserId();
+        }
+        
+        String message = null;
+        
+        if ( organizationManagementService.updateSettings( entityType, entityId, settingName, settingStatus, modifiedBy ) ) {
+        	
+            message = "Successfully updated settings";
+        } else {
+            message = "Some problem occurred while updating settings. Please try again later";
+        }
+        return message;
+    }
 
     @ResponseBody
     @RequestMapping ( value = "/savewidgetconfiguration", method=RequestMethod.POST)
@@ -5128,6 +5260,65 @@ public class OrganizationManagementController
 			LOG.error( "Exception occured in enableIncompleteSurveyDeleteToggle() while updating incomplete survey delete flag. Nested exception is ",error );
 			return "false";
 		}
+	}
+	
+	@ResponseBody
+	@PostMapping ( value = "/settings/manualsmssurveyreminder/toggle")
+    public String toggleManualSmsReminderForAllUsers(HttpServletRequest request )
+    {
+        LOG.info( "Method toggleManualSmsReminderForAllUsers" );
+        boolean isSuccess = toggleSettings( request, CommonConstants.SURVEY_SETTINGS_MANUAL_SMS_SURVEY_REMINDER );
+        
+        LOG.info( "Finished toggleManualSmsReminderForAllUsers" );
+        if(!isSuccess) {
+            return "Failed to update manual sms survey reminder setting";
+        }
+        return "Successfully updated manual sms survey reminder setting";
+    }
+	
+	@ResponseBody
+    @PostMapping ( value = "/settings/automaticsmssurveyreminder/toggle")
+    public String toggleAutomaticSmsReminderForAllUsers(HttpServletRequest request )
+    {
+        LOG.info( "Method toggleAutomaticSmsReminderForAllUsers" );
+        boolean isSuccess = toggleSettings( request, CommonConstants.SURVEY_SETTINGS_AUTOMATIC_SMS_SURVEY_REMINDER );
+        LOG.info( "Finished toggleAutomaticSmsReminderForAllUsers" );
+        
+        if(!isSuccess) {
+            return "Failed update automatic sms survey reminder setting";
+        }
+        return "Successfully updated automatic sms survey reminder setting";
+    }
+	
+	/**
+	 * @param request
+	 * @param mapKey
+	 */
+	private boolean toggleSettings(HttpServletRequest request, String mapKey) {
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        String value = request.getParameter( "value" );
+        
+        if (StringUtils.isNotEmpty( value )) {
+            
+            Map<String, Object> settings = new HashMap<>(); 
+            settings.put( mapKey, Boolean.parseBoolean( value ) );
+            
+            try {
+                final String authorizationHeader = CommonConstants.BASIC + authHeader;
+                ssApiIntergrationBuilder.getIntegrationApi().updateSettings( entityType, entityId, 
+                    settings, authorizationHeader );
+                
+               ssApiIntergrationBuilder.getIntegrationApi().propagateSettingsToLowerHierarchy( entityType, entityId, 
+                        settings, authorizationHeader );
+               
+               return true;
+            } catch ( Exception e ) {
+                LOG.error( "Method toggleSettings has an exception in api : ", e );
+            }
+        }
+        return false;
 	}
 
     @ResponseBody
@@ -5603,6 +5794,52 @@ public class OrganizationManagementController
 
         return unitSurveySettings;
     }
+    
 
+    @ResponseBody
+    @PostMapping ( value = "/updatesmswindow" )
+    public String updateSmsTimeWindow(@RequestBody SMSTimeWindow smsTimeWindow,  HttpServletRequest request )
+    {
+        LOG.info( "Method to update smsWindow for send survey reminder started" );
+        
+        if(smsTimeWindow == null) {
+            return "Request body cann't be empty";
+        } 
+        
+        if(StringUtils.isEmpty(smsTimeWindow.getStartTime()) ) {
+            return "Start time cann't be empty";
+        }
+        
+        if(StringUtils.isEmpty(smsTimeWindow.getEndTime()) ) {
+            return "End time cann't be empty";
+        }
+        
+        if(StringUtils.isEmpty(smsTimeWindow.getTimeZone()) ) {
+            return "TimeZone cann't be empty";
+        }
+        
+        HttpSession session = request.getSession();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
+        final String authorizationHeader = CommonConstants.BASIC + authHeader;
+
+        try {
+            Map<String, Object> unitSettings = new HashMap<>();
+
+            unitSettings.put( CommonConstants.KEY_SMS_TIME_WINDOW_START, smsTimeWindow.getStartTime() );
+            unitSettings.put(  CommonConstants.KEY_SMS_TIME_WINDOW_END, smsTimeWindow.getEndTime() );
+            unitSettings.put( CommonConstants.KEY_SMS_WINDOW_TIMEZONE, smsTimeWindow.getTimeZone() );
+            ssApiIntergrationBuilder.getIntegrationApi().updateSettings( entityType, (int) entityId, unitSettings, authorizationHeader );
+        } catch ( Exception e ) {
+            LOG.error(
+                "Exception occured in updateSmsTimeWindow() while updating smsTimeWindow. Nested exception is ",
+                e );
+            return e.getMessage();
+        }
+
+        LOG.info( "Method to update smsTimeWindow for a send survey reminder finished" );
+        return "Successfully updated the SMS delivery time window";
+    }
 }
 // JIRA: SS-24 BY RM02 EOC

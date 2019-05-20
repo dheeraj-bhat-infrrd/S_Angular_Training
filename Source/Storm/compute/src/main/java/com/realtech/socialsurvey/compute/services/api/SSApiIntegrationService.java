@@ -1,24 +1,26 @@
 package com.realtech.socialsurvey.compute.services.api;
 
-import com.realtech.socialsurvey.compute.entities.*;
-
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.compute.entities.BranchVO;
 import com.realtech.socialsurvey.compute.entities.BulkSurveyPutVO;
 import com.realtech.socialsurvey.compute.entities.FailedFtpRequest;
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.entities.Keyword;
+import com.realtech.socialsurvey.compute.entities.OrganizationUnitIds;
+import com.realtech.socialsurvey.compute.entities.SmsInfo;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.compute.entities.SurveyDetailsVO;
 import com.realtech.socialsurvey.compute.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.compute.entities.response.BulkWriteErrorVO;
 import com.realtech.socialsurvey.compute.entities.response.EntitySurveyStatsVO;
 import com.realtech.socialsurvey.compute.entities.response.FtpSurveyResponse;
+import com.realtech.socialsurvey.compute.entities.response.RebrandlyVO;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
-
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -161,6 +163,22 @@ public interface SSApiIntegrationService
     @GET ( "v1/unsubscribe/isunsubscribed")
     Call<Boolean> isEmailUnsubscribed(@Query("emailId") String recipient,@Query("companyId") long companyId );
 
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/rebrandly/url")
+    Call<RebrandlyVO> getShortenedSurveyUrl(@Query("surveyUrl") String surveyUrl );
+    
+    @Headers ( "Content-Type: application/json")
+    @POST ( "v1/failed/stream/sms")
+    Call<Boolean> addFailedStreamSms( @Body SmsInfo smsInfo );
+    
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/unsubscribe/contact/isunsubscribed")
+    Call<Boolean> isContactrNumberUnsubscribed(@Query("contactNumber") String contactNumber, @Query("companyId") long companyId );
+    
+    @Headers ( "Content-Type: application/json")
+    @POST ( "v1/unsubscribe/contact")
+    Call<Boolean> unsubscribeContact( @Query("contactNumber") String contactNumber, @Query( value = "flag" ) boolean flag,
+    		@Query("modifiedBy") long modifiedBy, @Query("incomingMessageBody") String messageBody );
 
     @GET ( "/v1//checkIfSurveyIsOld")
     Call<String> checkIfSurveyIsOld( @Query ( "customerEmailId") String customerEmailId );

@@ -9,9 +9,11 @@ import com.realtech.socialsurvey.compute.dao.impl.FailedMessagesDaoImpl;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
 import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
+import com.realtech.socialsurvey.compute.entities.FailedSms;
 import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
 import com.realtech.socialsurvey.compute.entities.FailedSurveyProcessor;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
+import com.realtech.socialsurvey.compute.entities.SmsInfo;
 import com.realtech.socialsurvey.compute.entities.SurveyData;
 import com.realtech.socialsurvey.compute.entities.UnsavedUserEvent;
 import com.realtech.socialsurvey.compute.entities.UserEvent;
@@ -51,6 +53,25 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         failedEmailMessage.setThrwStacktrace( ThrowableUtils.controlledStacktrace( thrw ) );
         LOG.debug( "Persisting failed email messages" );
         failedEmailMessagesDao.insertFailedEmailMessages( failedEmailMessage );
+    }
+    
+    @Override
+    public void insertPermanentlyFailedSms( SmsInfo smsInfo, Throwable thrw )
+    {
+        LOG.debug( "Adding a failed sms {}", smsInfo );
+        LOG.trace( "Error encountered: {}", thrw );
+        FailedSms failedSms = new FailedSms();
+        failedSms.setMessageType( FailedMessageConstants.SMS );
+        failedSms.setRetryCounts( 0 );
+        failedSms.setRetrySuccessful( false );
+        failedSms.setWillRetry( false );
+        failedSms.setPermanentFailure( true );
+        failedSms.setSmsEntity( smsInfo );
+        failedSms.setErrorMessage( thrw.getMessage() );
+        failedSms.setThrwStr( thrw.toString() );
+        failedSms.setThrwStacktrace( ThrowableUtils.controlledStacktrace( thrw ) );
+        LOG.debug( "Persisting failed sms" );
+        failedEmailMessagesDao.insertFailedSms( failedSms );
     }
     
     @Override
@@ -100,6 +121,21 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         failedEmailMessage.setData( emailMessage );
         LOG.debug( "Persisting temporarily failed email messages" );
         failedEmailMessagesDao.insertFailedEmailMessages( failedEmailMessage );
+    }
+    
+    @Override
+    public void insertTemporaryFailedSms( SmsInfo smsInfo )
+    {
+        LOG.debug( "Adding a temporary failed sms. This message will be retried" );
+        FailedSms failedSms = new FailedSms();
+        failedSms.setMessageType( FailedMessageConstants.SMS );
+        failedSms.setRetryCounts( 0 );
+        failedSms.setRetrySuccessful( false );
+        failedSms.setWillRetry( true );
+        failedSms.setPermanentFailure( false );
+        failedSms.setSmsEntity( smsInfo );
+        LOG.debug( "Persisting temporarily failed sms" );
+        failedEmailMessagesDao.insertFailedSms( failedSms );
     }
     
     @Override
@@ -154,11 +190,23 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         LOG.debug("Deleting temporary failed email message with randomUUID {}", randomUUID);
         return failedEmailMessagesDao.deleteFailedEmailMessage(randomUUID);
     }
+    
+    @Override
+    public int deleteFailedSms( String randomUUID ) {
+        LOG.debug("Deleting temporary failed sms with randomUUID {}", randomUUID);
+        return failedEmailMessagesDao.deleteFailedSms( randomUUID );
+    }
 
     @Override
     public int updateFailedEmailMessageRetryCount(String randomUUID) {
         LOG.debug("Updating failed email message retry count with randonUUID {}", randomUUID);
         return failedEmailMessagesDao.updatedFailedEmailMessageRetryCount(randomUUID);
+    }
+    
+    @Override
+    public int updateFailedSmsRetryCount( String randomUUID ) {
+        LOG.debug("Updating failed sms retry count with randonUUID {}", randomUUID);
+        return failedEmailMessagesDao.updatedFailedSmsRetryCount(randomUUID);
     }
     
     

@@ -30,6 +30,8 @@ namespace EncompassSocialSurvey.ViewModel
         public string LoanProcessorName { get; set; }
         public string LoanProcessorEmail { get; set; }
 
+        public string ContactNumber { get; set; }
+
         public string customFieldOne { get; set; }
         public string customFieldTwo { get; set; }
         public string customFieldThree { get; set; }

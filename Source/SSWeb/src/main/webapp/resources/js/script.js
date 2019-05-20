@@ -2910,7 +2910,6 @@ function initializeSurveyFormPage() {
 	});
 
 	$('#start-btn').click(function() {
-
 		// Check if the form is valid
 		if (!validateSurveyForm()) {
 			return;
@@ -2918,11 +2917,13 @@ function initializeSurveyFormPage() {
 		firstName = $('#firstName').val().trim();
 		lastName = $('#lastName').val().trim();
 		var email = $('#email').val().trim();
+		var countryCode = $('.dial-country-code').text();
 		var grecaptcharesponse = $('#g-recaptcha-response').val();
 		var agentId = $('#prof-container').attr("data-agentId");
 		var agentName = $('#prof-container').attr("data-agentName");
-		initSurvey(firstName, lastName, email, agentId, agentName, grecaptcharesponse);
 
+		$('#sel-prof-country-code').val(countryCode);
+		initSurvey(firstName, lastName, email, agentId, agentName, grecaptcharesponse);
 		// Google analytics for reviews
 		ga('send', {
 			'hitType' : 'event',
@@ -2965,6 +2966,17 @@ function validateSurveyForm() {
 		showToast();
 		return false;
 	}
+	
+	var elementValue = $('#phone-number-work').val();
+
+	if( elementValue != "" ) {
+
+		if (!validateContactNumber(elementValue, 'phone-number-work')) {
+			$('#overlay-toast').html('Please enter valid Contact Number!');
+			showToast();
+			return false;
+		}
+	}
 
 	var agentEmail = $('#prof-container').attr("data-agent-email");
 	var email = $('#email').val().trim();
@@ -2972,6 +2984,24 @@ function validateSurveyForm() {
 		$('#overlay-toast').html('Agents can not take survey for themselves!');
 		showToast();
 		return false;
+	}
+	return true;
+}
+
+function validateContactNumber( elementValue, elementId ) {
+
+	if ($(window).width() < 768) {
+		if ( elementValue.length < 10 ) {
+			$('#overlay-toast').html('Please enter a valid contact number.');
+			showToast();
+			return false;
+		}
+	} else {
+		if ( elementValue.length < 10 ) {
+			$('#' + elementId).next('.input-error-2').html('Please enter a valid contact number.');
+			$('#' + elementId).next('.input-error-2').show();
+			return false;
+		}
 	}
 	return true;
 }

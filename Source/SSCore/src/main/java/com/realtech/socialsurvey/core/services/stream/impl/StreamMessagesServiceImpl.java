@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.StreamFailureDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.SmsEntity;
 import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.core.entities.ftp.FtpUploadRequest;
@@ -25,6 +26,7 @@ import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectExcepti
 import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
+import com.realtech.socialsurvey.core.vo.SmsVO;
 
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
@@ -76,6 +78,20 @@ public class StreamMessagesServiceImpl implements StreamMessagesService
         LOG.debug( "Saving failed email message" );
         return streamFailureDao.insertFailedEmailMessage( emailEntity );
     }
+    
+    @Override
+    public boolean saveFailedStreamSmsMessages( SmsEntity smsEntity )
+    {
+    	LOG.info( "Saving failed sms message, SmsEntity - {}", smsEntity );
+        return streamFailureDao.insertFailedSmsMessage( smsEntity );
+    }
+    
+    @Override
+    public boolean saveFailedSmsInTopology( SmsVO smsVO ) {
+    	
+    	LOG.debug( "Saving failed sms message" );
+    	return streamFailureDao.insertFailedSmsOfTopology( smsVO );
+    }
 
 
     @Override
@@ -91,6 +107,14 @@ public class StreamMessagesServiceImpl implements StreamMessagesService
     {
         LOG.debug( "Getting all failed stream email messages" );
         return streamFailureDao.getAllFailedStreamEmailMessages( start, batchSize );
+    }
+    
+    @SuppressWarnings("rawtypes")
+	@Override
+    public List<FailedStreamMessage> getAllFailedStreamSms( int start, int batchSize )
+    {
+        LOG.debug( "Getting all failed stream sms" );
+        return streamFailureDao.getAllFailedStreamSms( start, batchSize );
     }
 
 
@@ -108,7 +132,6 @@ public class StreamMessagesServiceImpl implements StreamMessagesService
         LOG.debug( "Deleting stream message with id {}", id );
         streamFailureDao.deleteFailedStreamMsg( id );
     }
-
 
     @Override
     public FailedStreamMessage<FtpUploadRequest> getFailedStreamMsg( String id )
@@ -141,6 +164,56 @@ public class StreamMessagesServiceImpl implements StreamMessagesService
         retryFailedEmailMessages();
         retryFailedFtpUploadMessages();
         LOG.debug( "method startFailedStreamMessagesRetry() finished" );
+    }
+    
+    @Override
+    public void startFailedStreamSmsRetry()
+    {
+        LOG.debug( "method startFailedStreamSmsRetry() called" );
+        retryFailedSms();
+        LOG.debug( "method startFailedStreamSmsRetry() finished" );
+    }
+    
+    @SuppressWarnings("rawtypes")
+	private void retryFailedSms()
+    {
+        LOG.debug( "method retryFailedSms() called" );
+        int startIndex = 0;
+        List<FailedStreamMessage> failedStreamSms = null;
+
+        do {
+            //get failed sms in batch
+        	failedStreamSms = getAllFailedStreamSms( startIndex, CommonConstants.FAILED_STREAM_MSGS_BATCH_SIZE );
+
+            LOG.info( "Processing next {} failed stream sms", ( failedStreamSms != null ? failedStreamSms.size() : null ) );
+            //process each message
+            for ( FailedStreamMessage failedstreamSms : failedStreamSms ) {
+                try {
+                    //send and delete sms to stream api again
+                    LOG.info( "Processing failed sms with id {}", failedstreamSms.getId() );
+                    
+                    Object message = failedstreamSms.getMessage();
+                    
+                    if( message instanceof SmsEntity ) {                    	
+                    	streamApiIntegrationBuilder.getStreamApi().streamSmsMessage( (SmsEntity) message );
+                    }
+                    else {
+                    	streamApiIntegrationBuilder.getStreamApi().streamSmsVoMessage( (SmsVO) message );
+                    }
+
+                    deleteFailedStreamMsg( failedstreamSms.getId() );
+                    LOG.info( "Successfully processed and deleted failed sms with id {}", failedstreamSms.getId() );
+
+                } catch ( StreamApiException | StreamApiConnectException e ) {
+                    LOG.error( "Could not reprocess sms with id {}", failedstreamSms.getId() );
+                    //updated retry failed in database
+                    updateRetryFailedForStreamMsg( failedstreamSms.getId() );
+                    LOG.info( "Successfully updated retry flag for failed sms with id {}", failedstreamSms.getId() );
+                }
+            }
+
+        } while ( failedStreamSms != null && failedStreamSms.size() == CommonConstants.FAILED_STREAM_MSGS_BATCH_SIZE );
+        LOG.debug( "method retryFailedSms() finished" );
     }
 
 

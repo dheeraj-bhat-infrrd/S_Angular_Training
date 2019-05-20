@@ -17,34 +17,43 @@
 					<div class="wc-review-th2 float-left"><spring:message code="label.firstname.key" /></div>
 					<div class="wc-review-th3 float-left"><spring:message code="label.lastname.key" /></div>
 					<div class="wc-review-th4 float-left"><spring:message code="label.emailid.key" /></div>
+					<div class="wc-review-th6 float-left"><spring:message code="label.contactnumber.key" text="Contact Number" />
+					<div class="send-allow-sms" style="font-size: 0.8em;line-height: 6px;">(Survey SMS Reminder)</div>
+					</div>
 					<div class="wc-review-th5 float-left"></div>
 				</div>
-				<div id="survey-1" class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 survey-user  float-left pos-relative">
+				<div id="survey-1" class="wc-review-tr wc-review-data-row clearfix">
+					<div class="wc-review-data-col wc-review-tc1 survey-user  float-left pos-relative">
 						<input data-name="agent-name" class="wc-review-input  wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
 					</div>
-					<div class="wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name" ><div class="validation validationfname hidden"></div></div>
-					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
-					<div class="wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
-					<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn hide"></div></div>
+					<div class="wc-review-data-col wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name" ><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
+					<!-- adding contact number on dashboard (Send a Survey) -->
+					<div class="wc-review-data-col wc-review-tc6 survey-contact float-left"><jsp:include page="country_code.jsp"></jsp:include><div class="validation validationcontact float-left hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc5 last float-left"><div class="wc-review-rmv-icn hide"></div></div>
 				</div>
-				<div id="survey-2" class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 survey-user float-left pos-relative">
+				<div id="survey-2" class="wc-review-tr wc-review-data-row clearfix">
+					<div class="wc-review-data-col wc-review-tc1 survey-user float-left pos-relative">
 						<input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
 					</div>
-					<div class="wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
-					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
-					<div class="wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation  validationemail hidden"></div></div>
-					<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn"></div></div>
+					<div class="wc-review-data-col wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation  validationemail hidden"></div></div>
+					<!-- adding contact number on dashboard (Send a Survey) -->
+					<div class="wc-review-data-col wc-review-tc6 survey-contact float-left"><jsp:include page="country_code.jsp"></jsp:include><div class="validation validationcontact float-left hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc5 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
-				<div id="survey-3" class="wc-review-tr clearfix">
-					<div class="wc-review-tc1 survey-user float-left pos-relative">
+				<div id="survey-3" class="wc-review-tr wc-review-data-row clearfix">
+					<div class="wc-review-data-col wc-review-tc1 survey-user float-left pos-relative">
 						<input data-name="agent-name" class="wc-review-input wc-review-agentname" placeholder="User Name"><div class="validation validationagent hidden"></div>
 					</div>
-					<div class="wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
-					<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
-					<div class="wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
-					<div class="wc-review-tc5 last float-left"><div class="wc-review-rmv-icn"></div></div>
+					<div class="wc-review-data-col wc-review-tc2 survey-fname float-left"><input class="wc-review-input wc-review-fname" placeholder="First Name"><div class="validation validationfname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc3 float-left"><input class="wc-review-input wc-review-lname" placeholder="Last Name"><div class="validation validationlname hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc4 survey-email float-left"><input class="wc-review-input wc-review-email" placeholder="Email"><div class="validation validationemail hidden"></div></div>
+					<!-- adding contact number on dashboard (Send a Survey) -->
+					<div class="wc-review-data-col wc-review-tc6 survey-contact float-left"><jsp:include page="country_code.jsp"></jsp:include><div class="validation validationcontact float-left hidden"></div></div>
+					<div class="wc-review-data-col wc-review-tc5 last float-left"><div class="wc-review-rmv-icn"></div></div>
 				</div>
 			</div>
 		</div>

@@ -598,14 +598,14 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     @Override
     public long updateActionHistory( String mongoId, ActionHistory actionHistory )
     {
-        LOG.debug( "Method updateActionHistory, update for post id {}", mongoId);
+        LOG.info( "Method updateActionHistory, update for post id {}", mongoId);
         Criteria updateCriteria = Criteria.where( KEY_IDENTIFIER ).is( mongoId );
         Query updateQuery = new Query().addCriteria( updateCriteria );
         Update update = new Update();
         update.push( ACTION_HISTORY, actionHistory );
         update.set( UPDATED_TIME, new Date().getTime() );
         WriteResult result = mongoTemplate.updateMulti( updateQuery, update, SOCIAL_FEED_COLLECTION );
-        LOG.debug( "Method updateActionHistory, successfully updated for post id {}", mongoId);
+        LOG.info( "Method updateActionHistory, successfully updated for post id {}", mongoId);
         return  result.getN();
     }
 

@@ -44,6 +44,15 @@ public class KafkaProducerConfig
     @Value ( "${kafka.topic.surveyProcessorTopic}" )
     private String surveyProcessorTopic;
     
+    @Value ( "${kafka.topic.smsTopic}")
+    private String smsTopic;
+    
+    @Value ( "${kafka.topic.smsEventsTopic}")
+    private String smsEventsTopic;
+    
+    @Value ( "${kafka.topic.contactOptTopic}")
+    private String contactOptTopic;
+    
     @Bean
     public ProducerFactory<String, String> producerFactory()
     {
@@ -74,6 +83,42 @@ public class KafkaProducerConfig
         kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
         kafkaTemplate.setDefaultTopic( emailMessageTopic );
         return kafkaTemplate;
+    }
+    
+    /**
+     * Kafka template for sending sms
+     * @return
+     */
+    @Bean(name = "smsTemplate")
+    public KafkaTemplate<String, String> kafkaSmsTemplate(){
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
+        kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
+        kafkaTemplate.setDefaultTopic( smsTopic );
+        return kafkaTemplate;
+    }
+    
+    /**
+     * Kafka template for twilio sms events
+     * @return
+     */
+    @Bean(name = "smsEventsTemplate")
+    public KafkaTemplate<String, String> kafkaSmsEventsTemplate(){
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
+        kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
+        kafkaTemplate.setDefaultTopic( smsEventsTopic );
+        return kafkaTemplate;
+    }
+    
+    /**
+     * Kafka template for unsubscribing/resubscribing contact number
+     * @return
+     */
+    @Bean(name = "contactOptTemplate")
+    public KafkaTemplate<String, String> kafkaContactOptTemplate(){
+        KafkaTemplate<String, String> kafkaContactOptTemplate = new KafkaTemplate<>( producerFactory() );
+        kafkaContactOptTemplate.setMessageConverter( new StringJsonMessageConverter() );
+        kafkaContactOptTemplate.setDefaultTopic( contactOptTopic );
+        return kafkaContactOptTemplate;
     }
     
     /**

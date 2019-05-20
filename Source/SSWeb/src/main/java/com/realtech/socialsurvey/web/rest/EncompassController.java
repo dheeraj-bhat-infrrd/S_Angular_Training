@@ -87,8 +87,15 @@ public class EncompassController extends AbstractController
             	if( companies.contains(company.getIden() ) ) {
 	                CompanyEncompassInfo companyEncompassInfo = new CompanyEncompassInfo();
 	                companyEncompassInfo.setCompanyName( company.getProfileName() );
+	                
+	                boolean smsSurveyReminderEnabled = false;
+	                
+	                if(company.getSurvey_settings() != null) {
+	                    smsSurveyReminderEnabled = company.getSurvey_settings().isSmsSurveyReminderEnabled();
+	                }
+	                
 	                EncompassCrmInfoVO encompassCrmInfoVO = EncompassCrmInfoVO.encompassCrmInfoVOMapper(
-                        (EncompassCrmInfo) company.getCrm_info() , company.isAllowPartnerSurvey());
+                        (EncompassCrmInfo) company.getCrm_info() , company.isAllowPartnerSurvey(), smsSurveyReminderEnabled);
 	                companyEncompassInfo.setEncompassCrmInfo( encompassCrmInfoVO );
 	                crmInfoList.add( companyEncompassInfo );
             	}

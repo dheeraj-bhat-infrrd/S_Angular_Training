@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  
+ This is the Social Survey Solr schema file for core ss-branches. This file should be named "schema.xml" and
+ should be in the conf directory under the solr home
+ (i.e. ./solr/socialsurvey/ss-branches/conf/schema.xml by default) 
+ or located where the classloader for the Solr webapp can find it.
+-->
+
+<schema name="db" version="1.1">
+  <types> 
+   <fieldType name="string"  class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+   <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
+   <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+   <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+   </fieldType>
+   <fieldType name="integer" class="solr.IntField" omitNorms="true"/>
+   <!-- A Trie based date field for faster date range queries and date faceting. -->
+   <fieldType name="tdate" class="solr.TrieDateField" precisionStep="6" positionIncrementGap="0"/>
+  </types>
+
+  <fields>
+  <field name="twilioSmsId" type="text" indexed="true" stored="true" />
+	<field name="randomUUID" type="string" indexed="true" stored="true" required="true" />
+    <field name="recipientContactNumber" type="text" indexed="true" stored="true" required="true"  /> 
+    <field name="recipientName" type="text" indexed="true" stored="true" />
+    <field name="smsText" type="text" indexed="true" stored="true" />
+	<field name="smsStatus" type="text" indexed="true" stored="true" />
+    <field name="surveyUrl" type="text" indexed="true" stored="true"/>
+	<field name="shortenedUrl" type="text" indexed="true" stored="true"/>
+	<field name="smsCost" type="text" indexed="true" stored="true"/>
+	<field name="numberOfSegments" type="long" indexed="true" stored="true" />
+	<field name="agentId" type="long" indexed="true" stored="true" />
+	<field name="companyId" type="long" indexed="true" stored="true" />
+	<field name="spiId" type="long" indexed="true" stored="true" />
+	<field name="isContactNumberUnsubscribed" type="boolean" indexed="false" stored="true" />
+	<field name="smsCreatedDate" type="text" indexed="true" stored="true"/>
+	<field name="smsSentDate" type="text" indexed="true" stored="true"/>
+	<field name="smsDeliveredDate" type="text" indexed="true" stored="true"/>
+	<field name="smsUpdatedDate" type="text" indexed="true" stored="true"/>
+	<field name="errorCode" type="text" indexed="true" stored="true"/>
+	<field name="errorMessage" type="text" indexed="true" stored="true"/>
+	<field name="rebrandlyErrorCode" type="text" indexed="true" stored="true"/>
+	<field name="rebrandlyErrorMessage" type="text" indexed="true" stored="true"/>
+	<field name="isRetried" type="boolean" indexed="false" stored="true" />
+	<field name="smsCategory" type="text" indexed="true" stored="true"/>
+	<field name="incomingMessageBody" type="text" indexed="true" stored="true"/>
+	<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
+  </fields>
+
+ <uniqueKey>randomUUID</uniqueKey>
+
+ <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+ <defaultSearchField>randomUUID</defaultSearchField>
+
+ <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
+ <solrQueryParser defaultOperator="OR"/>
+
+</schema>
+

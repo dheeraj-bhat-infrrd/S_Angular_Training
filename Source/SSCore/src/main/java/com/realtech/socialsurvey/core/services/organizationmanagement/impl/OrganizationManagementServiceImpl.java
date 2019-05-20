@@ -69,7 +69,6 @@ import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.MongoApplicationSettingsDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RedisDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
@@ -80,7 +79,6 @@ import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
 import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import static com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl.*;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -89,6 +87,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.factories.ApplicationSettingsInstanceProvider;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -130,12 +129,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private static final Logger LOG = LoggerFactory.getLogger( OrganizationManagementServiceImpl.class );
     private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
     public static final String SUCCESS_MESSAGE = "Organization Settings updated Successfully";
+    
 
     private static final Map<String, Object> APPROVED_SETTINGS_MAP = new HashMap<>();
     static{
         APPROVED_SETTINGS_MAP.put( KEY_IS_REVIEW_REPLY_ENABLED_FOR_COMPANY, Boolean.class );
         APPROVED_SETTINGS_MAP.put( KEY_IS_REVIEW_REPLY_ENABLED, Boolean.class );
         APPROVED_SETTINGS_MAP.put( KEY_REVIEW_REPLY_SCORE, Double.class );
+        APPROVED_SETTINGS_MAP.put( CommonConstants.SURVEY_SETTINGS_MANUAL_SMS_SURVEY_REMINDER, Boolean.class );
+        APPROVED_SETTINGS_MAP.put( CommonConstants.SURVEY_SETTINGS_AUTOMATIC_SMS_SURVEY_REMINDER, Boolean.class );
+        APPROVED_SETTINGS_MAP.put( CommonConstants.KEY_SMS_TIME_WINDOW_START, String.class );
+        APPROVED_SETTINGS_MAP.put( CommonConstants.KEY_SMS_TIME_WINDOW_END, String.class );
+        APPROVED_SETTINGS_MAP.put( CommonConstants.KEY_SMS_WINDOW_TIMEZONE, String.class );
     }
     
     @Autowired
@@ -367,13 +372,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private SearchEngineManagementServices searchEngineManagementServices;
     
     @Autowired
-    private MongoApplicationSettingsDao mongoApplicationSettingsDao;
-    
-    @Autowired
     private DashboardService dashboardServiceImpl;
     
+    @Autowired
+    private ApplicationSettingsInstanceProvider applicationSettingsInstanceProvider;
+    
     private List<String> keyList = null;
-
+    
     /**
      * This method adds a new company and updates the same for current user and all its user
      * profiles.
@@ -4891,6 +4896,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return companies;
     }
 
+    public List<OrganizationUnitSettings> getSmsSurveyReminderEnabledCompanyList() {
+    	
+    	return organizationUnitSettingsDao.getSmsSurveyReminderEnabledCompanyList();
+    }
 
     /**
      * Method to get a list of all the regions
@@ -5982,7 +5991,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public SurveySettings retrieveDefaultSecondaryWorkflowValues() {
         
         SurveySettings surveySettings = new SurveySettings();
-        ApplicationSettings applicationSettings = mongoApplicationSettingsDao.getApplicationSettings();
+        ApplicationSettings applicationSettings = applicationSettingsInstanceProvider.getApplicationSettings();
         surveySettings.setHappyTextPartner( applicationSettings.getDefaultHappyTextPartner() );
         surveySettings.setNeutralTextPartner( applicationSettings.getDefaultNeutralTextPartner() );
         surveySettings.setSadTextPartner( applicationSettings.getDefaultSadTextPartner() );
@@ -10559,6 +10568,61 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.error( "Invalid Input Exception occurred while updating settings", e );
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "No redords found while updating settings", e );
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean updateSettings( String entityType, long entityId, String flagToBeUpdated, String status, long modifiedBy ) {
+    
+    	try {
+            if ( entityType == null || entityType.isEmpty() ) {
+                throw new InvalidInputException( "Entity type is null" );
+            }
+            if ( flagToBeUpdated == null || flagToBeUpdated.isEmpty() ) {
+                throw new InvalidInputException( "settings flag to be updated is null" );
+            }
+            if ( status == null || status.isEmpty() ) {
+                throw new InvalidInputException( "value to update is null" );
+            }
+            
+            String collection = null;
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                
+                collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                
+                collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                
+                collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                
+                collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            } else {
+                throw new InvalidInputException( "Invalid input exception occurred while updating web addresses.",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+            
+            Object value = null;
+            
+            if( flagToBeUpdated.equals( "allowedToConfigureSMSReminderText" ) || flagToBeUpdated.equals( CommonConstants.SURVEY_SETTINGS_MANUAL_SMS_SURVEY_REMINDER ) || flagToBeUpdated.equals( CommonConstants.SURVEY_SETTINGS_ENABLED_SMS_SURVEY_REMINDER) ||
+            		flagToBeUpdated.equals( CommonConstants.SURVEY_SETTINGS_AUTOMATIC_SMS_SURVEY_REMINDER ) ) {
+            	value = Boolean.parseBoolean(status);
+            }
+            else if( flagToBeUpdated.equals( "smsReminderText" ) ) {
+            	value = status;
+            }
+            else if( flagToBeUpdated.equals(CommonConstants.SURVEY_SETTINGS_MAX_NUMBER_OF_SMS_SURVEY_REMINDERS ) || flagToBeUpdated.equals(CommonConstants.SURVEY_SETTINGS_SMS_SURVEY_REMINDER_INTERVAL ) ) {
+            	value = Integer.parseInt( status );
+            }
+            
+            organizationUnitSettingsDao.updateParticularKeyOfOrganizationUnitSettingsByIden(flagToBeUpdated, value, entityId, collection, modifiedBy);
+            
+            return true;
+        }
+    	catch ( InvalidInputException e ) {
+            LOG.error( "Invalid Input Exception occurred while updating settings", e );
         }
         return false;
     }

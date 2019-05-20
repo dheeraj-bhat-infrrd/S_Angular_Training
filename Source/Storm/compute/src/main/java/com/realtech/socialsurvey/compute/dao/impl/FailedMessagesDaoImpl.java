@@ -44,6 +44,14 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
         mongoDB.datastore().save( failedEmailMessage );
         return true;
     }
+    
+    @Override
+    public boolean insertFailedSms( FailedSms failedSms )
+    {
+        LOG.debug( "Inserting failed sms: {}", failedSms );
+        mongoDB.datastore().save( failedSms );
+        return true;
+    }
 
     @Override
     public boolean insertFailedSocialPost(FailedSocialPost failedSocialPost )
@@ -83,6 +91,16 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
         final WriteResult result = mongoDB.datastore().delete(query);
         return result.getN();
     }
+    
+    @Override
+    public int deleteFailedSms(String randomUUID) {
+        LOG.debug("Deleting failed sms with randomUUID {}", randomUUID);
+        Query<FailedSms> query = mongoDB.datastore().createQuery(FailedSms.class)
+                .field("data.randomUUID").equal(randomUUID)
+                .field("permanentFailure").equal(false);
+        final WriteResult result = mongoDB.datastore().delete(query);
+        return result.getN();
+    }
 
     @Override
     public int updatedFailedEmailMessageRetryCount(String randomUUID) {
@@ -92,6 +110,20 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
                 .field("data.randomUUID").equal(randomUUID)
                 .field("permanentFailure").equal(false);
         final UpdateOperations<FailedEmailMessage> updateOperations = datastore.createUpdateOperations(FailedEmailMessage.class)
+                .inc("retryCounts", 1)
+                .set("data.isRetried", true);
+        final UpdateResults updateResults = datastore.update(query, updateOperations);
+        return updateResults.getUpdatedCount();
+    }
+    
+    @Override
+    public int updatedFailedSmsRetryCount(String randomUUID) {
+        final Datastore datastore = mongoDB.datastore();
+        LOG.debug("Updating retryCount of sms with randomUUID {}", randomUUID);
+        final Query<FailedSms> query = datastore.createQuery(FailedSms.class)
+                .field("data.randomUUID").equal(randomUUID)
+                .field("permanentFailure").equal(false);
+        final UpdateOperations<FailedSms> updateOperations = datastore.createUpdateOperations(FailedSms.class)
                 .inc("retryCounts", 1)
                 .set("data.isRetried", true);
         final UpdateResults updateResults = datastore.update(query, updateOperations);

@@ -26,6 +26,9 @@ kafka:
     userEventTopic: user-event-topic
     transactionIngestionTopic: transaction-ingestion-topic
     surveyProcessorTopic : survey-processor-topic
+    smsTopic: sms-topic
+    smsEventsTopic: sms-events-topic
+    contactOptTopic: contact-opt-topic
 
 ---
 
@@ -56,6 +59,9 @@ kafka:
     userEventTopic: user-event-topic-dev
     transactionIngestionTopic: transaction-ingestion-topic-dev
     surveyProcessorTopic : survey-processor-topic-dev
+    smsTopic: sms-topic-dev
+    smsEventsTopic: sms-events-topic-dev
+    contactOptTopic: contact-opt-topic-dev
 
 api:
   security:
@@ -88,6 +94,9 @@ kafka:
     userEventTopic: user-event-topic-demo
     transactionIngestionTopic: transaction-ingestion-topic-demo
     surveyProcessorTopic : survey-processor-topic-demo
+    smsTopic: sms-topic-demo
+    smsEventsTopic: sms-events-topic-demo
+    contactOptTopic: contact-opt-topic-demo
 
     
 api:
@@ -124,6 +133,9 @@ kafka:
     userEventTopic: user-event-topic-stage
     transactionIngestionTopic: transaction-ingestion-topic-stage
     surveyProcessorTopic : survey-processor-topic-stage
+    smsTopic: sms-topic-stage
+    smsEventsTopic: sms-events-topic-stage
+    contactOptTopic: contact-opt-topic-stage
     
 api:
   security:

@@ -1,15 +1,22 @@
 package com.realtech.socialsurvey.core.utils;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 
 
 @Component
 public class CommonUtils
 {
+	private static final Logger LOG = LoggerFactory.getLogger( CommonUtils.class );
 
     public String getAgentNameForHiddenAgentCompany( String firstName, String lastName )
     {
@@ -65,6 +72,20 @@ public class CommonUtils
         fileName = fileName.replaceAll("[^a-zA-Z0-9 _-]", "");
         fileName = fileName.replaceAll( " ", "_" );
         return fileName;
+    }
+    
+    public static Timestamp getEpochDefaultTime() {
+    	
+    	SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
+    	try {
+    		
+			return new Timestamp(sdf.parse( CommonConstants.EPOCH_REMINDER_TIME ).getTime());
+		}
+		catch ( ParseException pe ) {
+			
+			LOG.error( " ParseException in CommonUtils : getEpochDefaultTime", pe );
+			return new Timestamp( System.currentTimeMillis() ); 
+		}
     }
    
 }

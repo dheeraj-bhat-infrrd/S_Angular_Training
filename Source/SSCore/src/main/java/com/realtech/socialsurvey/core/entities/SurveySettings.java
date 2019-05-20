@@ -37,6 +37,21 @@ public class SurveySettings {
 	private String okUrl;
 	private String sadUrl;
 	
+	// Feature Enable disable - Visible to SS Admin only
+	private boolean smsSurveyReminderEnabled;
+	
+    //Manual reminder - For all hierarchy level - Visible for Company Admin
+	private boolean manualSmsSurveyReminderEnabled;
+    
+    //Automatic SMS reminder - For all hierarchy - Visible to everyone.
+    private boolean optedOutAutomaticSmsSurveyReminder;
+    
+    // Max number of SMS reminder - Company Settings
+	private int maxNumberOfSmsSurveyReminders;
+	private int smsSurveyReminderInterval;
+	private SMSTimeWindow smsTimeWindow;
+	 
+	
     // threshold for sending survey completed mail to agents and admins
     private double surveyCompletedMailThreshold;
 	
@@ -306,8 +321,58 @@ public class SurveySettings {
 	public void setSadUrl(String sadUrl) {
 		this.sadUrl = sadUrl;
 	}
+	
+    public boolean isSmsSurveyReminderEnabled()
+    {
+        return smsSurveyReminderEnabled;
+    }
 
-	public float getReviewReplyScore()
+    public void setSmsSurveyReminderEnabled( boolean smsSurveyReminderEnabled )
+    {
+        this.smsSurveyReminderEnabled = smsSurveyReminderEnabled;
+    }
+
+    public boolean isManualSmsSurveyReminderEnabled()
+    {
+        return manualSmsSurveyReminderEnabled;
+    }
+
+    public void setManualSmsSurveyReminderEnabled( boolean manualSmsSurveyReminderEnabled )
+    {
+        this.manualSmsSurveyReminderEnabled = manualSmsSurveyReminderEnabled;
+    }
+
+    public boolean isOptedOutAutomaticSmsSurveyReminder()
+    {
+        return optedOutAutomaticSmsSurveyReminder;
+    }
+
+    public void setOptedOutAutomaticSmsSurveyReminder( boolean optedOutAutomaticSmsSurveyReminder )
+    {
+        this.optedOutAutomaticSmsSurveyReminder = optedOutAutomaticSmsSurveyReminder;
+    }
+
+    public int getMaxNumberOfSmsSurveyReminders()
+    {
+        return maxNumberOfSmsSurveyReminders;
+    }
+
+    public void setMaxNumberOfSmsSurveyReminders( int maxNumberOfSmsSurveyReminders )
+    {
+        this.maxNumberOfSmsSurveyReminders = maxNumberOfSmsSurveyReminders;
+    }
+
+    public int getSmsSurveyReminderInterval()
+    {
+        return smsSurveyReminderInterval;
+    }
+
+    public void setSmsSurveyReminderInterval( int smsSurveyReminderInterval )
+    {
+        this.smsSurveyReminderInterval = smsSurveyReminderInterval;
+    }
+    
+    public float getReviewReplyScore()
     {
         return reviewReplyScore;
     }
@@ -338,6 +403,14 @@ public class SurveySettings {
         this.isReplyEnabledForCompany = isReplyEnabledForCompany;
     }
 
+    public SMSTimeWindow getSmsTimeWindow() {
+        return smsTimeWindow;
+    }
+
+    public void setSmsTimeWindow( SMSTimeWindow smsTimeWindow ) {
+        this.smsTimeWindow = smsTimeWindow;
+    }
+
     @Override
     public String toString()
     {
@@ -349,11 +422,17 @@ public class SurveySettings {
             + isSocialPostReminderDisabled + ", autoPostEnabled=" + autoPostEnabled + ", autoPostLinkToUserSiteEnabled="
             + autoPostLinkToUserSiteEnabled + ", happyText=" + happyText + ", neutralText=" + neutralText + ", sadText="
             + sadText + ", happyTextComplete=" + happyTextComplete + ", neutralTextComplete=" + neutralTextComplete
-            + ", sadTextComplete=" + sadTextComplete + ", complaint_res_settings=" + complaint_res_settings
+            + ", sadTextComplete=" + sadTextComplete + ", happyTextPartner=" + happyTextPartner + ", neutralTextPartner="
+            + neutralTextPartner + ", sadTextPartner=" + sadTextPartner + ", happyTextCompletePartner="
+            + happyTextCompletePartner + ", neutralTextCompletePartner=" + neutralTextCompletePartner
+            + ", sadTextCompletePartner=" + sadTextCompletePartner + ", complaint_res_settings=" + complaint_res_settings
             + ", abusive_mail_settings=" + abusive_mail_settings + ", happyUrl=" + happyUrl + ", okUrl=" + okUrl + ", sadUrl="
-            + sadUrl + ", surveyCompletedMailThreshold=" + surveyCompletedMailThreshold + ", duplicateSurveyInterval="
-            + duplicateSurveyInterval + ", reviewReplyScore=" + reviewReplyScore + ", isReplyEnabled=" + isReplyEnabled
-            + ", isReplyEnabledForCompany=" + isReplyEnabledForCompany + "]";
+            + sadUrl + ", smsSurveyReminderEnabled=" + smsSurveyReminderEnabled + ", manualSmsSurveyReminderEnabled="
+            + manualSmsSurveyReminderEnabled + ", optedOutAutomaticSmsSurveyReminder=" + optedOutAutomaticSmsSurveyReminder
+            + ", maxNumberOfSmsSurveyReminders=" + maxNumberOfSmsSurveyReminders + ", smsSurveyReminderInterval="
+            + smsSurveyReminderInterval + ", smsTimeWindow=" + smsTimeWindow + ", surveyCompletedMailThreshold="
+            + surveyCompletedMailThreshold + ", duplicateSurveyInterval=" + duplicateSurveyInterval + ", reviewReplyScore="
+            + reviewReplyScore + ", isReplyEnabled=" + isReplyEnabled + ", isReplyEnabledForCompany=" + isReplyEnabledForCompany
+            + "]";
     }
-
 }

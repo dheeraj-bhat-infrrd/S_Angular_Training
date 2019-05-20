@@ -1,10 +1,13 @@
 package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -42,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.contact.ContactUnsubscribeService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -52,6 +56,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNot
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.sms.SmsServices;
+import com.realtech.socialsurvey.core.services.sms.UndeliveredSmsException;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
 
@@ -103,7 +109,13 @@ public class SurveyHandlerImplTest
 
     @Mock
     private EmailServices emailServices;
-
+    
+    @Mock
+	SmsServices smsServices;
+    
+    @Mock
+    ContactUnsubscribeService contactUnsubscribeService;
+    
     private List<SurveyPreInitiation> incompleteSurveyCustomers;
 
     private User user, user2;
@@ -162,7 +174,7 @@ public class SurveyHandlerImplTest
     public void sendSurveyInvitationMailTestFirstNameNull() throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( null, "test", "test", "test", null, false, "test" );
+        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( null, "test", "test", "test", null, false, "test", null );
     }
 
 
@@ -170,7 +182,7 @@ public class SurveyHandlerImplTest
     public void sendSurveyInvitationMailTestFirstNameEmpty() throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( "", "test", "test", "test", null, false, "test" );
+        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( "", "test", "test", "test", null, false, "test", null );
     }
 
 
@@ -178,7 +190,7 @@ public class SurveyHandlerImplTest
     public void sendSurveyInvitationMailTestEmailNull() throws InvalidInputException, SolrException, NoRecordsFetchedException,
         UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( "test", "test", null, "test", null, false, "test" );
+        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( "test", "test", null, "test", null, false, "test", null );
     }
 
 
@@ -186,7 +198,7 @@ public class SurveyHandlerImplTest
     public void sendSurveyInvitationMailTestEmailEmpty() throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( "test", "test", "", "test", null, false, "test" );
+        surveyHandlerImpl.storeSPIandSendSurveyInvitationMail( "test", "test", "", "test", null, false, "test", null );
     }
 
 
@@ -196,7 +208,7 @@ public class SurveyHandlerImplTest
         SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
         ProfileNotFoundException
     {
-        surveyHandlerImpl.initiateSurveyRequest( 0, "test", "test", "test", "test" );
+        surveyHandlerImpl.initiateSurveyRequest( 0, "test", "test", "test", "test", null );
     }
 
 
@@ -205,7 +217,7 @@ public class SurveyHandlerImplTest
         SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
         ProfileNotFoundException
     {
-        surveyHandlerImpl.initiateSurveyRequest( 1, null, "test", "test", "test" );
+        surveyHandlerImpl.initiateSurveyRequest( 1, null, "test", "test", "test", null );
     }
 
 
@@ -214,7 +226,7 @@ public class SurveyHandlerImplTest
         SelfSurveyInitiationException, SolrException, NoRecordsFetchedException, UndeliveredEmailException,
         ProfileNotFoundException
     {
-        surveyHandlerImpl.initiateSurveyRequest( 1, "", "test", "test", "test" );
+        surveyHandlerImpl.initiateSurveyRequest( 1, "", "test", "test", "test", null );
     }
 
 
@@ -223,7 +235,7 @@ public class SurveyHandlerImplTest
         InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException,
         UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", null, null, "test" );
+        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", null, null, "test", null );
     }
 
 
@@ -232,7 +244,7 @@ public class SurveyHandlerImplTest
         InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException,
         UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "", "", "test" );
+        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "", "", "test", null );
     }
 
 
@@ -241,7 +253,7 @@ public class SurveyHandlerImplTest
         InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException,
         UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", null, "", "test" );
+        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", null, "", "test", null );
     }
 
 
@@ -250,7 +262,7 @@ public class SurveyHandlerImplTest
         InvalidInputException, SelfSurveyInitiationException, SolrException, NoRecordsFetchedException,
         UndeliveredEmailException, ProfileNotFoundException
     {
-        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "", null, "test" );
+        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "", null, "test", null );
     }
 
 
@@ -261,7 +273,7 @@ public class SurveyHandlerImplTest
     {
         Mockito.when( userManagementService.getUserObjByUserId( Mockito.anyLong() ) ).thenReturn( user );
         Mockito.when( organizationManagementService.validateEmail( Mockito.anyString() ) ).thenReturn( true );
-        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "test", "test", "test" );
+        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "test", "test", "test", null );
     }
 
 
@@ -281,7 +293,7 @@ public class SurveyHandlerImplTest
         Mockito.when(
             surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail( Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), 
                 Mockito.anyString() ) ).thenReturn( new SurveyDetails() );
-        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "test", "test", "test" );
+        surveyHandlerImpl.initiateSurveyRequest( 1, "test@test.com", "test", "test", "test", null );
     }
 
 
@@ -517,5 +529,30 @@ public class SurveyHandlerImplTest
         Mockito.when( userDao.getUsersForUserIds( Mockito.anyListOf( Long.class ) ) ).thenReturn(
             Arrays.asList( new User[] { fromUser, toUser } ) );
         surveyHandlerImpl.moveSurveysToAnotherUser( 1l, 1l );
+    }
+
+    @Test(expected = NoRecordsFetchedException.class)
+    public void sendMultipleIncompleteSurveyReminderTestForException() throws NoRecordsFetchedException
+    {
+    	Mockito.when(surveyHandlerImpl.getPreInitiatedSurveyById( 0 )).thenReturn(null);
+    }
+    
+    @Test
+    public void sendMultipleIncompleteSurveyReminderUnscubscribedContact() throws InvalidInputException, ProfileNotFoundException, UndeliveredSmsException, NoRecordsFetchedException
+    {
+    			@SuppressWarnings("deprecation")
+				Timestamp lastReminderTime = new Timestamp(2019, 3, 12, 12, 22, 30, 2);
+				SurveyPreInitiation survey = new SurveyPreInitiation();
+				survey.setCompanyId(2);
+				survey.setReminderCountsSms(0);
+				survey.setLastReminderTime( lastReminderTime );
+				survey.setCustomerContactNumber("5443567");
+				
+				OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+				companySettings.setCompanyId(2);
+				Mockito.when(organizationManagementService.getCompanySettings(survey.getCompanyId())).thenReturn(companySettings);
+				
+				Mockito.when(contactUnsubscribeService.isUnsubscribed(survey.getCompanyId(), survey.getCustomerContactNumber())).thenReturn(true);
+				verify(surveyHandlerImpl,never()).updateReminderCountSms(survey.getSurveyPreIntitiationId(),false, true);
     } 
 }

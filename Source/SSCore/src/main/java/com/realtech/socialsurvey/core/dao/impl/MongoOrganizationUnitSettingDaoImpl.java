@@ -1,11 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.util.*;
-import java.util.regex.Pattern;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
 import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CustomAggregationOperation;
@@ -38,6 +34,15 @@ import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.Map.Entry;
 
 /**
@@ -46,7 +51,7 @@ import java.util.Map.Entry;
 @Repository
 public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSettingsDao, InitializingBean
 {
-    
+ 
     private static final Logger LOG = LoggerFactory.getLogger( MongoOrganizationUnitSettingDaoImpl.class );
 
     private static final String ID = "_id";
@@ -200,7 +205,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_CONTACT_DETAILS_ZIP_CODE = "contact_details.zipcode";
     public static final String KEY_CONTACT_DETAILS_UPDATED_BY_SYSTEM = "contact_details.updatedBySystem";
     public static final String KEY_CONTACT_DETAILS_NAME = "contact_details.name";
-    
+    public static final String KEY_CONTACT_DETAILS_FIRST_NAME = "contact_details.firstName";
     
     public static final String KEY_LOCATION = "geoLocation";
     public static final String KEY_DISTANCE_FIELD = "distanceField";
@@ -228,6 +233,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String NOTIFICATION_ISDISABLED = "notification.isDisabled";
 
     public static final String KEY_ALERT_EMAIL = "crm_info.alertEmail";
+    
     public static final String KEY_CUSTOMER_SUCCESS_ID = "customerSuccessId";
     public static final String KEY_CUSTOMER_SUCCESS_NAME = "customerSuccessName";
     public static final String KEY_CUSTOMER_SUCCESS_OWNER = "customerSuccessOwner";
@@ -254,6 +260,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_LAST_CONVERSATION_DATE = "lastConversationDate";
     public static final String KEY_NOTES = "notes";
     
+    
     //survey settings update
     public static final String KEY_REVIEW_REPLY_SCORE = "survey_settings.reviewreplyScore";
     public static final String KEY_SURVEY_SETTINGS_MINIMUM_SOCIAL_POST_SCORE = "survey_settings.auto_post_score";
@@ -261,9 +268,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
-
-    
-
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -330,6 +334,22 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         setCompleteUrlForSettings( settings, CommonConstants.AGENT_SETTINGS_COLLECTION );
         return settings;
     }
+    
+    @Override
+    public OrganizationUnitSettings fetchUnitSettingsById(String collectionName, long identifier, String... fields )
+    {
+        LOG.debug( "Fetch agent settings from Mongo for id: {}", identifier );
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( identifier ) );
+        
+        for ( String field : fields ) {
+            query.fields().include( field );
+        }
+        
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class,
+            collectionName );
+    }
 
 
     @Override
@@ -391,6 +411,20 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Updated the unit setting" );
     }
 
+    @Override
+    public void updateParticularKeyOfOrganizationUnitSettingsByIden( String keyToUpdate, Object updatedRecord, long iden,
+    		String collectionName, long modifiedBy ) {
+
+    	LOG.debug( "Updating unit setting in {} with identifier {} for key: {} wtih value: {} modifiedBy: {}", collectionName, iden,keyToUpdate,  updatedRecord, modifiedBy );
+    	Query query = new Query();
+    	query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
+    	Update update = new Update();
+    	update.set( keyToUpdate, updatedRecord );
+    	update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+    	update.set( KEY_MODIFIED_BY, modifiedBy );
+    	mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
+    	LOG.info( "Updated the {} for id : {}", collectionName,  iden );
+    }
 
     // THIS METHOD TO BE USED WHERE COLLECTION HAS iden FIELD
     @Override
@@ -808,6 +842,32 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
         LOG.debug( "Method getCompanyList() finished." );
+        return unitSettings;
+    }
+    
+
+    @Override
+    public List<OrganizationUnitSettings> getSmsSurveyReminderEnabledCompanyList()
+    {
+        LOG.debug( "Method getSmsEnabledCompanyList() started." );
+
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_STATUS ).ne( CommonConstants.STATUS_DELETED_MONGO ) );
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SETTINGS_ENABLED_SMS_SURVEY_REMINDER ).is( Boolean.TRUE ));
+        
+        // Include field
+        query.fields()
+            .include( CommonConstants.SURVEY_SETTINGS_DUPLICATE_SURVEY_INTERVAL )
+            .include( CommonConstants.SURVEY_SETTINGS_MAX_NUMBER_OF_SMS_SURVEY_REMINDERS )
+            .include( CommonConstants.SURVEY_SETTINGS_SMS_SURVEY_REMINDER_INTERVAL ).include( KEY_IDEN ).exclude( "_id" )
+            .include( CommonConstants.KEY_SMS_TIME_WINDOW_START )
+            .include( CommonConstants.KEY_SMS_TIME_WINDOW_END )
+            .include( CommonConstants.KEY_SMS_WINDOW_TIMEZONE );
+
+        LOG.info( "Method getSmsSurveyReminderEnabledCompanyList - query: {}", query );
+
+        List<OrganizationUnitSettings> unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Method getSmsEnabledCompanyList() finished." );
         return unitSettings;
     }
 
@@ -2660,6 +2720,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
         LOG.debug( "updateOrganizationSettingsByQuery finished" );
     }
+    
 
     /**
      * Unsets a key in the unit organisation settings and also updates the modifiedBy and modifiedBy

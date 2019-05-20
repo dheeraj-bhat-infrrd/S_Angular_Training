@@ -78,5 +78,8 @@ namespace EncompassSocialSurvey.Entity
         [DataMember(Name = "customFieldFive")]
         public string customFieldFive { get; set; }
 
+        [DataMember(Name = "contactNumber")]
+        public string ContactNumber { get; set; }
+
     } 
 }

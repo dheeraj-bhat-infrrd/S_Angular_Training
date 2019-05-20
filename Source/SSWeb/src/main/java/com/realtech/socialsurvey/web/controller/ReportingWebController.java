@@ -379,15 +379,34 @@ public class ReportingWebController
         boolean allowOverrideForSocialMedia = false;
         boolean hiddenSection = false;
         //Code to determine if social media can be overridden during autologin
-        OrganizationUnitSettings companySettings = organizationManagementService
-                .getCompanySettings( user.getCompany().getCompanyId() );
-            allowOverrideForSocialMedia = companySettings.isAllowOverrideForSocialMedia();
-            hiddenSection = companySettings.isHiddenSection();
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+        
+        allowOverrideForSocialMedia = companySettings.isAllowOverrideForSocialMedia();
+        hiddenSection = companySettings.isHiddenSection();
+            
+        boolean smsSurveyOptionEnabled = false;
+        boolean smsSurveyReminderEnabled = false;
+        boolean manualSmsSurveyReminder = false;
+        
+        if(companySettings != null && companySettings.getSurvey_settings() != null ) {
+            smsSurveyReminderEnabled = companySettings.getSurvey_settings().isSmsSurveyReminderEnabled();
+        }
+        
+        if(profileSettings != null && profileSettings.getSurvey_settings() != null) {
+            manualSmsSurveyReminder = profileSettings.getSurvey_settings().isManualSmsSurveyReminderEnabled();
+        }
+        
+        if(smsSurveyReminderEnabled && manualSmsSurveyReminder ) {
+            smsSurveyOptionEnabled = true;
+        }
+        
+        
+        // show sms survey reminder options if 
         
         model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
         model.addAttribute( "hiddenSection", hiddenSection );
-        
-        
+        model.addAttribute( "smsSurveyOptionEnabled", smsSurveyOptionEnabled);
+        session.setAttribute( "smsSurveyOptionEnabled", smsSurveyOptionEnabled );
         model.addAttribute( "profileSettings", profileSettings );
         model.addAttribute( "lastSuccessfulRun", lastSuccessfulRun );
 
