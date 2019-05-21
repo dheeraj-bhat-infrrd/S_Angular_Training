@@ -8342,28 +8342,38 @@ function initSurveyWithUrl(q) {
 				
 				if(customerProfileImageUrl != null && customerProfileImageUrl !=undefined && customerProfileImageUrl != ''){
 					$('#survey-profile-image-url').val(customerProfileImageUrl);
-					$('#ss-survey-prof-img').removeClass('ss-survey-pi-hide');
-					$('#ss-survey-prof-img-def').addClass('ss-survey-pi-hide');
-					$('#ss-survey-prof-img').attr('src', customerProfileImageUrl);
+					$('#ss-survey-prof-img-uploaded').css('background-image','url(' + customerProfileImageUrl + ')');
+
+					$('#ss-survey-prof-img-default').addClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img-clicked').addClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img-hover').addClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img-uploaded').removeClass('ss-survey-pi-hide');
+					
 					$('#ss-survey-pi-act-wrapper').removeClass('ss-survey-pi-hide');
 					$('#ss-survey-img-import-wrapper').addClass('ss-survey-pi-hide');
 					
 					$(document).off('click','#ss-survey-pi-rem-icn');
 					$(document).on('click','#ss-survey-pi-rem-icn',function(e){
 						$('#survey-profile-image-url').val('');
-						$('#ss-survey-prof-img').attr('src', '');
+						$('#ss-survey-prof-img-uploaded').css('background-image','');
 
-						$('#ss-survey-prof-img').addClass('ss-survey-pi-hide');
-						$('#ss-survey-prof-img-def').removeClass('ss-survey-pi-hide');
+						$('#ss-survey-prof-img-default').removeClass('ss-survey-pi-hide');
+						$('#ss-survey-prof-img-clicked').addClass('ss-survey-pi-hide');
+						$('#ss-survey-prof-img-hover').addClass('ss-survey-pi-hide');
+						$('#ss-survey-prof-img-uploaded').addClass('ss-survey-pi-hide');
 						
 						$('#ss-survey-img-import-wrapper').removeClass('ss-survey-pi-hide');
 						$('#ss-survey-pi-act-wrapper').addClass('ss-survey-pi-hide');
 					});
 				}else{
 					$('#survey-profile-image-url').val('');
-					$('#ss-survey-prof-img').addClass('ss-survey-pi-hide');
-					$('#ss-survey-prof-img-def').removeClass('ss-survey-pi-hide');
-					$('#ss-survey-prof-img').attr('src', '');
+					$('#ss-survey-prof-img-uploaded').css('background-image','');
+
+					$('#ss-survey-prof-img-default').removeClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img-clicked').addClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img-hover').addClass('ss-survey-pi-hide');
+					$('#ss-survey-prof-img-uploaded').addClass('ss-survey-pi-hide');					
+
 					$('#ss-survey-pi-act-wrapper').addClass('ss-survey-pi-hide');
 					$('#ss-survey-img-import-wrapper').removeClass('ss-survey-pi-hide');
 				}
@@ -8986,8 +8996,11 @@ function showMasterQuestionPage() {
 		}
 		
 		$('#ss-survey-txt-img-wrapper').addClass('ss-survey-pi-hide');
-		$('#ss-survey-prof-img').addClass('ss-survey-pi-hide');
-		$('#ss-survey-prof-img-def').addClass('ss-survey-pi-hide');
+
+		$('#ss-survey-prof-img-default').addClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-clicked').addClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-hover').addClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-uploaded').addClass('ss-survey-pi-hide');
 		
 		$('#ss-survey-img-import-wrapper').addClass('ss-survey-pi-hide');
 		$('#ss-survey-pi-act-wrapper').addClass('ss-survey-pi-hide');
@@ -24577,10 +24590,12 @@ $(document).on('click','#google-banner-close-btn',function(e){
 
 function showProfileImageForSurvey(profileImage){
 	$('#survey-profile-image-url').val(profileImage);
-	$('#ss-survey-prof-img').attr('src', profileImage);
+	$('#ss-survey-prof-img-uploaded').css('background-image','url(' + profileImage + ')');
 
-	$('#ss-survey-prof-img').removeClass('ss-survey-pi-hide');
-	$('#ss-survey-prof-img-def').addClass('ss-survey-pi-hide');
+	$('#ss-survey-prof-img-default').addClass('ss-survey-pi-hide');
+	$('#ss-survey-prof-img-clicked').addClass('ss-survey-pi-hide');
+	$('#ss-survey-prof-img-hover').addClass('ss-survey-pi-hide');
+	$('#ss-survey-prof-img-uploaded').removeClass('ss-survey-pi-hide');
 	
 	$('#ss-survey-img-import-wrapper').addClass('ss-survey-pi-hide');
 	$('#ss-survey-pi-act-wrapper').removeClass('ss-survey-pi-hide');
@@ -24588,12 +24603,68 @@ function showProfileImageForSurvey(profileImage){
 	$(document).off('click','#ss-survey-pi-rem-icn');
 	$(document).on('click','#ss-survey-pi-rem-icn',function(e){
 		$('#survey-profile-image-url').val('');
-		$('#ss-survey-prof-img').attr('src', '');
+		$('#ss-survey-prof-img-uploaded').css('background-image','');
 
-		$('#ss-survey-prof-img').addClass('ss-survey-pi-hide');
-		$('#ss-survey-prof-img-def').removeClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-default').removeClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-uploaded').addClass('ss-survey-pi-hide');
 		
 		$('#ss-survey-img-import-wrapper').removeClass('ss-survey-pi-hide');
 		$('#ss-survey-pi-act-wrapper').addClass('ss-survey-pi-hide');
+	});
+}
+
+function bindProfileImageForSurveyEvents(){
+	$( '#ss-survey-img-import-wrapper' ).off( 'mouseenter mouseleave' );
+	$( '#ss-survey-img-import-wrapper' ).hover(
+		function() {
+			if(!$('#ss-survey-prof-img-uploaded').hasClass('ss-survey-pi-hide') || !$('#ss-survey-prof-img-clicked').hasClass('ss-survey-pi-hide')){
+				return;
+			}
+			
+			$('#ss-survey-prof-img-default').addClass('ss-survey-pi-hide');
+			$('#ss-survey-prof-img-clicked').addClass('ss-survey-pi-hide');
+			$('#ss-survey-prof-img-hover').removeClass('ss-survey-pi-hide');
+		}, function() {
+			if(!$('#ss-survey-prof-img-uploaded').hasClass('ss-survey-pi-hide') || !$('#ss-survey-prof-img-clicked').hasClass('ss-survey-pi-hide')){
+				return;
+			}
+			
+			$('#ss-survey-prof-img-default').removeClass('ss-survey-pi-hide');
+			$('#ss-survey-prof-img-hover').addClass('ss-survey-pi-hide');
+		}
+	);	
+	
+	$( '.ss-survey-prof-img-common' ).off( 'mouseenter mouseleave' );
+	$( '.ss-survey-prof-img-common' ).hover(
+		function() {
+			if(!$('#ss-survey-prof-img-uploaded').hasClass('ss-survey-pi-hide') || !$('#ss-survey-prof-img-clicked').hasClass('ss-survey-pi-hide')){
+				return;
+			}
+			
+			$('#ss-survey-prof-img-default').addClass('ss-survey-pi-hide');
+			$('#ss-survey-prof-img-clicked').addClass('ss-survey-pi-hide');
+			$('#ss-survey-prof-img-hover').removeClass('ss-survey-pi-hide');
+		}, function() {
+			if(!$('#ss-survey-prof-img-uploaded').hasClass('ss-survey-pi-hide') || !$('#ss-survey-prof-img-clicked').hasClass('ss-survey-pi-hide')){
+				return;
+			}
+			
+			$('#ss-survey-prof-img-default').removeClass('ss-survey-pi-hide');
+			$('#ss-survey-prof-img-hover').addClass('ss-survey-pi-hide');
+		}
+	);	
+	
+	$(document).off('click','#ss-survey-prof-img-default');
+	$(document).on('click','#ss-survey-prof-img-default',function(e){
+		$('#ss-survey-prof-img-default').addClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-clicked').removeClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-hover').addClass('ss-survey-pi-hide');
+	});
+	
+	$(document).off('click','#ss-survey-prof-img-hover');
+	$(document).on('click','#ss-survey-prof-img-hover',function(e){
+		$('#ss-survey-prof-img-default').addClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-clicked').removeClass('ss-survey-pi-hide');
+		$('#ss-survey-prof-img-hover').addClass('ss-survey-pi-hide');
 	});
 }

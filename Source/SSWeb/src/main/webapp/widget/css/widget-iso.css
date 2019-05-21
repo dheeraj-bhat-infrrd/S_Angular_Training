@@ -224,6 +224,7 @@
 #ss-widget-container .ss-widget-prof-pic-cont {
   width: 50px !important;
   height: 50px !important;
+  margin-right: 15px;
 }
 
 #ss-widget-container .ss-widget-prof-pic {

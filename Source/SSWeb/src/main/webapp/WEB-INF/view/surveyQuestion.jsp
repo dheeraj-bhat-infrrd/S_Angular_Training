@@ -310,16 +310,33 @@
 						<div id="ss-survey-txt-img-wrapper" class="ss-survey-txt-img-wrapper ss-survey-pi-hide">
 						    <div class="ss-survey-prof-img-act-wrapper">
 								<div class="ss-survey-prof-img-div">
-									<img id="ss-survey-prof-img-def" class="ss-survey-prof-img" src="/widget/images/person.png">
-									<img id="ss-survey-prof-img" class="ss-survey-prof-img ss-survey-pi-hide" src="/widget/images/person.png">
-								</div>
-								<div id="ss-survey-img-import-wrapper" class="ss-survey-img-import-wrapper ss-survey-pi-hide">
-									<div class="ss-survey-pi-sel-txt">Import Profile Photo </div>
-									<div class="ss-survey-pi-sel-icn-cont">
-										<div class="ss-survey-soc-icon icn-fb" id="import-facebook" onclick="openAuthPageForSurvey(event,'facebook', false, this);"></div>
-										<div class="ss-survey-soc-icon icn-twit" id="import-linkedIn" onclick="openAuthPageForSurvey(event,'twitter', false, this);"></div>
-										<div class="ss-survey-soc-icon icn-lin" id="import-Twitter" onclick="openAuthPageForSurvey(event,'linkedin', false, this);"></div>
+									<div id="ss-survey-prof-img-default" class="ss-survey-prof-img-default ss-survey-prof-img-common">	
+	    								<div class="ss-survey-default-bg"></div>
+	                                    <span class="ss-survey-prof-img-span">Personalize</span>
+	                                     <span class="ss-survey-prof-img-span">Your Review</span>
+	                                     <span class="ss-survey-prof-img-span">(Optional)</span>
 									</div>
+	    							<div id="ss-survey-prof-img-hover" class="ss-survey-prof-img-hover ss-survey-prof-img-common ss-survey-pi-hide">	
+	                                    <span class="ss-survey-prof-img-span">Choose your</span>
+	                                     <span class="ss-survey-prof-img-span">Favorite Profile</span>
+	                                     <span class="ss-survey-prof-img-span">Picture</span>
+									</div>
+	    							<div id="ss-survey-prof-img-clicked" class="ss-survey-prof-img-clicked ss-survey-prof-img-common ss-survey-pi-hide">	
+	                                    <span class="ss-survey-prof-img-span">Select a Social</span>
+	                                     
+	                                     <span class="ss-survey-prof-img-span">Profile Picture</span>
+									</div>
+	    							<div id="ss-survey-prof-img-uploaded" class="ss-survey-prof-img-uploaded ss-survey-prof-img-common ss-survey-pi-hide">
+	    								
+	    							</div>
+								</div>
+								<div id="ss-survey-img-import-wrapper" class="ss-survey-img-import-wrapper">
+									<div class="ss-survey-pi-sel-icn-cont">
+										<div class="ss-survey-soc-icon icn-fb" id="import-facebook-photo" onclick="openAuthPageForSurvey(event,'facebook', false, this);"></div>
+										<div class="ss-survey-soc-icon icn-twit" id="import-linkedIn-photo" onclick="openAuthPageForSurvey(event,'twitter', false, this);"></div>
+										<div class="ss-survey-soc-icon icn-lin" id="import-Twitter-photo" onclick="openAuthPageForSurvey(event,'linkedin', false, this);"></div>
+									</div>
+   									<div class="ss-survey-pi-sel-txt">Add Profile Pic</div>
 								</div>
 								<div id="ss-survey-pi-act-wrapper" class="ss-survey-pi-act-wrapper ss-survey-pi-hide">
 								    <div class="ss-survey-pi-act-txt">
@@ -463,6 +480,7 @@ $(document).ready(function() {
 	initializeTakeSurveyPage();
 	//update google analytics
 	updateGoogleTrackingId();
+	bindProfileImageForSurveyEvents();
 });
 </script>
 </div>

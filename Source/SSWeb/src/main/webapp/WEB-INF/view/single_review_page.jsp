@@ -89,7 +89,7 @@
 				</c:when>
 				<c:otherwise>
 					<div class="ss-reviewer-prof-pic-cont">
-					<img class="ss-reviewer-prof-pic" src="${initParam.resourcesPath}/widget/images/person.png">
+					<img class="ss-reviewer-prof-pic ss-review-prof-pic" src="${initParam.resourcesPath}/widget/images/person.png">
 				</div>
 				</c:otherwise>
 			</c:choose>

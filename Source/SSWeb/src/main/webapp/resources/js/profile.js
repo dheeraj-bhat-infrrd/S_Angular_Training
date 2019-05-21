@@ -769,12 +769,15 @@ function paintReviews(result) {
 
 		reviewsHtml = reviewsHtml +
 			'<div class="' + lastItemClass + ' cursor-pointer"' + ' data-rating=' + reviewItem.score + ' data-review="' + escapeHtml(reviewItem.review) + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
+		
+		reviewsHtml += '<div class="ss-review-img-details-wrapper">';
+		
 		if(reviewItem.profileImageUrl !=null && reviewItem.profileImageUrl != ""){
-		    reviewsHtml +='<div class="ss-reviewer-prof-pic-cont"> <img class="ss-reviewer-prof-pic" src="'+ reviewItem.profileImageUrl +'"></div>';
+		    reviewsHtml +='<div class="ss-reviewer-prof-pic-cont ss-review-prof-pic-cont"> <img class="ss-reviewer-prof-pic" src="'+ reviewItem.profileImageUrl +'"></div>';
 		}else{
-			reviewsHtml +='<div class="ss-reviewer-prof-pic-cont"> <img class="ss-reviewer-prof-pic" src="'+window.location.origin+'/widget/images/person.png"></div>';
+			reviewsHtml +='<div class="ss-reviewer-prof-pic-cont ss-review-prof-pic-cont"> <img class="ss-reviewer-prof-pic ss-review-prof-pic" src="'+window.location.origin+'/widget/images/person.png"></div>';
 		}
-		reviewsHtml += '	<div class="ppl-header-wrapper clearfix review-details">';
+		reviewsHtml += '	<div class="ppl-header-wrapper clearfix ss-review-details-wrapper">';
 		reviewsHtml += '    	<div class="float-left ppl-header-right">';
 		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="' + reviewItem.source + '" data-rating="' + reviewItem.score + '"></div>';
 		reviewsHtml += '		</div>';
@@ -874,7 +877,7 @@ function paintReviews(result) {
 		reviewsHtml += '	</div>';
 		reviewsHtml += '</div>';*/
 
-
+		reviewsHtml += '</div>';
 		var review = escapeHtml(reviewItem.review);
 
 		if (review.length > 250) {

@@ -14687,10 +14687,7 @@ body.ss-not-found-page {
 }
 
 .ss-survey-prof-img-div {
-    width: 170px;
-    height: 170px;
     background: #e2e2e2;
-    margin-bottom: 12px;
 }
 
 .ss-survey-prof-img {
@@ -14700,19 +14697,20 @@ body.ss-not-found-page {
 
 .ss-survey-img-import-wrapper {
     display: grid;
+    padding-top: 10px;
 }
 
 .ss-survey-pi-sel-txt {
-    font-family: OpenSansBold;
+    font-family: OpenSansSemiBold;
     color: #666;
     font-size: 14px;
+    margin-top: 5px;
 }
 
 .ss-survey-pi-sel-icn-cont {
     display: flex;
     align-items: center;
     margin: 0 auto;
-    margin-top: 10px;
 }
 
 .ss-survey-pi-hide {
@@ -14780,4 +14778,92 @@ body.ss-not-found-page {
     height: 30px;
     margin: 0 5px;
     cursor: pointer;
+}
+
+.ss-survey-prof-img-common {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    color: #565656;
+    font-size: 18px;
+}
+
+.ss-survey-prof-img-default {
+    cursor: pointer;
+    width: 170px;
+    height: 170px;
+    color: #212121 !important;
+    position: relative;
+}
+
+.ss-survey-default-bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-image: url(/widget/images/person.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    z-index: 1;
+    opacity: 0.4;
+}
+
+.ss-survey-prof-img-span {
+    font-family: OpenSansBold;
+    width: 100%;
+    z-index: 2;
+}
+
+.ss-survey-prof-img-hover {
+    width: 170px;
+    height: 170px;
+}
+
+.ss-survey-prof-img-clicked {
+    width: 170px;
+    height: 170px;
+    padding: 20px 0;
+}
+
+.ss-survey-prof-img-uploaded {
+    width: 170px;
+    height: 170px;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.ss-survey-soc-icon {
+  animation: shake 0.5s;
+  animation-iteration-count: 2;
+}
+
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.ss-review-img-details-wrapper {
+    display: flex;
+    align-items: flex-start;
+}
+
+.ss-review-details-wrapper{
+	width:100%;
+}
+
+.ss-review-prof-pic-cont{
+	margin-right: 15px;
+}
+
+.ss-review-prof-pic{
+	border: 1px solid #867f86;
 }

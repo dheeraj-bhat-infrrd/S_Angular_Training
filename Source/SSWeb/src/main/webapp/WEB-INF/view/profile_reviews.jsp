@@ -51,163 +51,164 @@
 		<div data-agentid="${reviewItem.agentId}" survey-mongo-id="${reviewItem._id}"
 			data-review="${fn:escapeXml(reviewItem.review)}" data-score="${reviewItem.score}" 
 			 class="ppl-review-item dsh-review-cont hide">
-			 <c:if test="${addPhotosToReview}">
-			<c:choose>
-				<c:when test="${ not empty reviewItem.profileImageUrl }">
-					<div class="ss-widget-prof-pic-cont">
-					<img class="ss-widget-prof-pic" src="${reviewItem.profileImageUrl }">
-				</div>
-				</c:when>
-				<c:otherwise>
-					<div class="ss-widget-prof-pic-cont">
-					<img class="ss-widget-prof-pic" src="${initParam.resourcesPath}/widget/images/person.png">
-				</div>
-				</c:otherwise>
-			</c:choose>
-			</c:if>
-
-			<div class="ppl-header-wrapper clearfix">
-			<div class="float-left ppl-header-right">
-					<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-modified="false" 
-						data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
-					</div>
-				</div>
-				<c:choose>
-					<c:when test="${reviewItem.source == 'verifiedPartner'}">
-						<div class='verified-partner-badge  verify-partner-image float-right'
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${reviewItem.source =='encompass'}">
-						<div class='verified-badge  verify-image float-right'
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${reviewItem.source =='DOTLOOP'}">
-						<div class='verified-badge  verify-image float-right'
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${reviewItem.source =='API'}">
-						<div class='verified-badge  verify-image float-right'
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${reviewItem.source =='FTP'}">
-						<div class='verified-badge  verify-image float-right' 
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${reviewItem.source =='LONEWOLF'}">
-						<div class='verified-badge  verify-image float-right' 
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${reviewItem.source =='Zillow'}">
-						<div class='zillow-badge  verify-image-zillow float-right'></div>
-					</c:when>
-					<c:when test="${reviewItem.source =='facebook'}">
-						<div class='fb-verified-image verify-image-fb float-right'></div>
-					</c:when>
-					<c:when test="${reviewItem.source =='google'}">
-						<div class='google-verified-image verify-image-google float-right'></div>
-					</c:when>
-					<c:otherwise>
-						<div class='unverified-badge  verify-image-ss float-right'></div>
-					</c:otherwise>
-				</c:choose>
-				<div class="ppl-header-left review-sm-screen " >
-				<c:choose>
-						<c:when test="${not empty reviewItem.surveyUpdatedDate and reviewItem.surveyUpdatedDate != reviewItem.surveyCompletedDate }">
-						 	<div class="ppl-head-2 review-detail-profile float-left"> Survey updated on </div> 
-							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
-								data-modified="false"
-								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${reviewItem.surveyUpdatedDate}" />"> 
-							</div>
-						</c:when>
-						<c:when test="${ not empty reviewItem.surveyCompletedDate}">
-						    <div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div>
-							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
-								data-modified="false"
-								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${reviewItem.surveyCompletedDate}" />"> 
+			 <div class="ss-review-img-details-wrapper">
+				 <c:if test="${addPhotosToReview}">
+					<c:choose>
+						<c:when test="${ not empty reviewItem.profileImageUrl }">
+							<div class="ss-widget-prof-pic-cont ss-review-prof-pic-cont">
+								<img class="ss-widget-prof-pic" src="${reviewItem.profileImageUrl }">
 							</div>
 						</c:when>
 						<c:otherwise>
-							<div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div> 				
-							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
-								data-modified="false"
-								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${reviewItem.modifiedOn}" />">
+							<div class="ss-widget-prof-pic-cont ss-review-prof-pic-cont">
+								<img class="ss-widget-prof-pic ss-review-prof-pic" src="${initParam.resourcesPath}/widget/images/person.png">
 							</div>
 						</c:otherwise>
 					</c:choose>
-					<div class="ppl-head-1 review-detail-profile" style="clear:both">
-					<span class="float-left">  Reviewed by </span>
-						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${customerDisplayName}</span>
-						<c:if test="${profilemasterid !=4}">
-							<c:if test="${not empty reviewItem.agentName}">
-							 <span class="float-left" style="margin-left: 5px;">for
-							 <c:if test="${hiddenSection}">
-								 <c:set var="agentName" value="${reviewItem.agentName}" />
-								 <c:set var="agentNameTokens" value="${fn:split(agentName, ' ')}" />
-								 <c:set var="agentName" value="${agentNameTokens[0]}" />
-								 <c:if test="${not empty agentNameTokens[1]}">
-								 	<c:set var="agentName" value="${agentName } ${fn:substring(agentNameTokens[1], 0, 1)}" />
-								 </c:if>
-								${agentName}
-							 </c:if>
-							 <c:if test="${!hiddenSection}">
-							   <a class="cursor-pointer" style="color: #236CAF; font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank">
-								${reviewItem.agentName}</a>
-								</c:if></span>
-							</c:if>
-						</c:if>
-						<c:if test="${ not empty reviewItem.summary }">
-								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
-							</c:if>
+				</c:if>
+				
+				<div class="ppl-header-wrapper clearfix ss-review-details-wrapper">
+					<div class="float-left ppl-header-right">
+							<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-modified="false" 
+								data-rating="${reviewItem.score}" data-source="${reviewItem.source }">
+							</div>
+						</div>
 						<c:choose>
-							<c:when test="${ not empty reviewItem.summary }">
-								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
+							<c:when test="${reviewItem.source == 'verifiedPartner'}">
+								<div class='verified-partner-badge  verify-partner-image float-right'
+									title='Click here to know more'></div>
+							</c:when>
+							<c:when test="${reviewItem.source =='encompass'}">
+								<div class='verified-badge  verify-image float-right'
+									title='Click here to know more'></div>
+							</c:when>
+							<c:when test="${reviewItem.source =='DOTLOOP'}">
+								<div class='verified-badge  verify-image float-right'
+									title='Click here to know more'></div>
+							</c:when>
+							<c:when test="${reviewItem.source =='API'}">
+								<div class='verified-badge  verify-image float-right'
+									title='Click here to know more'></div>
+							</c:when>
+							<c:when test="${reviewItem.source =='FTP'}">
+								<div class='verified-badge  verify-image float-right' 
+									title='Click here to know more'></div>
+							</c:when>
+							<c:when test="${reviewItem.source =='LONEWOLF'}">
+								<div class='verified-badge  verify-image float-right' 
+									title='Click here to know more'></div>
+							</c:when>
+							<c:when test="${reviewItem.source =='Zillow'}">
+								<div class='zillow-badge  verify-image-zillow float-right'></div>
+							</c:when>
+							<c:when test="${reviewItem.source =='facebook'}">
+								<div class='fb-verified-image verify-image-fb float-right'></div>
+							</c:when>
+							<c:when test="${reviewItem.source =='google'}">
+								<div class='google-verified-image verify-image-google float-right'></div>
 							</c:when>
 							<c:otherwise>
-							<c:choose>
-							<c:when
-								test="${not (empty reviewItem.surveyGeoLocation and empty reviewItem.surveyType)}">
-								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.surveyGeoLocation}
-									<span>${reviewItem.surveyType}</span>
-								</div>
-							</c:when>
-							
-							<c:otherwise>
-							    <c:if test="${reviewItem.source ne 'customer'}">
-                                    <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
-                                           <c:choose>
-                                        <c:when test= "${not empty reviewItem.surveyTransactionDate}">
-                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-                            value="${ reviewItem.surveyTransactionDate}" />"></span>
-														<c:choose>
-															<c:when test="${not empty reviewItem.city && not empty reviewItem.state}">
-																<span> in ${reviewItem.city}, ${reviewItem.state}.</span>
-															</c:when>
-														</c:choose>
-													</c:when>
-                                        <c:otherwise>
-                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-                            value="${reviewItem.modifiedOn}" />"></span>
-														<c:choose>
-															<c:when test="${not empty reviewItem.city && not empty reviewItem.state}">
-																<span> in ${reviewItem.city}, ${reviewItem.state}.</span>
-															</c:when>
-														</c:choose>
-													</c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                </c:if>
+								<div class='unverified-badge  verify-image-ss float-right'></div>
 							</c:otherwise>
 						</c:choose>
-							</c:otherwise>
-						</c:choose>
+						<div class="ppl-header-left review-sm-screen " >
+						<c:choose>
+								<c:when test="${not empty reviewItem.surveyUpdatedDate and reviewItem.surveyUpdatedDate != reviewItem.surveyCompletedDate }">
+								 	<div class="ppl-head-2 review-detail-profile float-left"> Survey updated on </div> 
+									<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
+										data-modified="false"
+										data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+								value="${reviewItem.surveyUpdatedDate}" />"> 
+									</div>
+								</c:when>
+								<c:when test="${ not empty reviewItem.surveyCompletedDate}">
+								    <div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div>
+									<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
+										data-modified="false"
+										data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+								value="${reviewItem.surveyCompletedDate}" />"> 
+									</div>
+								</c:when>
+								<c:otherwise>
+									<div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div> 				
+									<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
+										data-modified="false"
+										data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+								value="${reviewItem.modifiedOn}" />">
+									</div>
+								</c:otherwise>
+							</c:choose>
+							<div class="ppl-head-1 review-detail-profile" style="clear:both">
+							<span class="float-left">  Reviewed by </span>
+								<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${customerDisplayName}</span>
+								<c:if test="${profilemasterid !=4}">
+									<c:if test="${not empty reviewItem.agentName}">
+									 <span class="float-left" style="margin-left: 5px;">for
+									 <c:if test="${hiddenSection}">
+										 <c:set var="agentName" value="${reviewItem.agentName}" />
+										 <c:set var="agentNameTokens" value="${fn:split(agentName, ' ')}" />
+										 <c:set var="agentName" value="${agentNameTokens[0]}" />
+										 <c:if test="${not empty agentNameTokens[1]}">
+										 	<c:set var="agentName" value="${agentName } ${fn:substring(agentNameTokens[1], 0, 1)}" />
+										 </c:if>
+										${agentName}
+									 </c:if>
+									 <c:if test="${!hiddenSection}">
+									   <a class="cursor-pointer" style="color: #236CAF; font-weight: 600 !important;" href="${reviewItem.completeProfileUrl}" target="_blank">
+										${reviewItem.agentName}</a>
+										</c:if></span>
+									</c:if>
+								</c:if>
+								<c:if test="${ not empty reviewItem.summary }">
+										<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
+									</c:if>
+								<c:choose>
+									<c:when test="${ not empty reviewItem.summary }">
+										<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.summary}</div>
+									</c:when>
+									<c:otherwise>
+									<c:choose>
+									<c:when
+										test="${not (empty reviewItem.surveyGeoLocation and empty reviewItem.surveyType)}">
+										<div class="ppl-content" style="clear:both;padding-top:0px !important;">${reviewItem.surveyGeoLocation}
+											<span>${reviewItem.surveyType}</span>
+										</div>
+									</c:when>
+									
+									<c:otherwise>
+									    <c:if test="${reviewItem.source ne 'customer'}">
+		                                    <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
+		                                           <c:choose>
+		                                        <c:when test= "${not empty reviewItem.surveyTransactionDate}">
+		                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+		                            value="${ reviewItem.surveyTransactionDate}" />"></span>
+																<c:choose>
+																	<c:when test="${not empty reviewItem.city && not empty reviewItem.state}">
+																		<span> in ${reviewItem.city}, ${reviewItem.state}.</span>
+																	</c:when>
+																</c:choose>
+															</c:when>
+		                                        <c:otherwise>
+		                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+		                            value="${reviewItem.modifiedOn}" />"></span>
+																<c:choose>
+																	<c:when test="${not empty reviewItem.city && not empty reviewItem.state}">
+																		<span> in ${reviewItem.city}, ${reviewItem.state}.</span>
+																	</c:when>
+																</c:choose>
+															</c:otherwise>
+		                                        </c:choose>
+		                                    </div>
+		                                </c:if>
+									</c:otherwise>
+								</c:choose>
+									</c:otherwise>
+								</c:choose>
+							</div>
+						</div>
 					</div>
-				</div>
 			</div>
-
-			
+						
 			<c:set value="${reviewItem.reviewReply}" var="reviewReply"></c:set>
 			<c:choose>
 				<c:when test="${fn:length(review)>250}">

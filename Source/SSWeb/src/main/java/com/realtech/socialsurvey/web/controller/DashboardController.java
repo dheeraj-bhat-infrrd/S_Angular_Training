@@ -613,7 +613,10 @@ public class DashboardController
             model.addAttribute( "allowReplyForCompany", isReplyEnabledForCompany);
             model.addAttribute( "currentSessionUserId", currentSessionUserId);
             
-            if ( !profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            OrganizationUnitSettings companyProfile = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+            model.addAttribute("addPhotosToReview", companyProfile.isAddPhotosToReview());
+            
+            /*if ( !profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
             	long companyId = unitSettings.getCompanyId();
             	if(companyId == 0) {
             		User userTemp = userManagementService.getUserByUserId(unitSettings.getIden());
@@ -625,7 +628,7 @@ public class DashboardController
             } else {
             	model.addAttribute("addPhotosToReview",unitSettings.isAddPhotosToReview());
             	LOG.info("Review tab with profile level company andfeature is {}", unitSettings.isAddPhotosToReview() );
-            }
+            }*/
             
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );

@@ -46,175 +46,178 @@
 			</c:otherwise>
 		</c:choose>
 		<div data-agentid="${feedback.agentId}" data-review="${fn:escapeXml(feedback.review)}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide review-attr">
-			<c:if test="${ addPhotosToReview}">
-			<c:choose>
-				<c:when test="${ not empty feedback.profileImageUrl }">
-					<div class="ss-widget-prof-pic-cont">
-					<img class="ss-widget-prof-pic" src="${feedback.profileImageUrl }">
-				</div>
-				</c:when>
-				<c:otherwise>
-					<div class="ss-widget-prof-pic-cont">
-					<img class="ss-widget-prof-pic" src="${initParam.resourcesPath}/widget/images/person.png">
-				</div>
-				</c:otherwise>
-			</c:choose>
-			</c:if>
-			<div class="ppl-header-wrapper clearfix">
-			<div class="float-left ppl-header-right">
-					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
+			<div class="ss-review-img-details-wrapper">
+				<c:if test="${ addPhotosToReview}">
+					<c:choose>
+						<c:when test="${ not empty feedback.profileImageUrl }">
+							<div class="ss-widget-prof-pic-cont ss-review-prof-pic-cont">
+								<img class="ss-widget-prof-pic" src="${feedback.profileImageUrl }">
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="ss-widget-prof-pic-cont ss-review-prof-pic-cont">
+								<img class="ss-widget-prof-pic ss-review-prof-pic" src="${initParam.resourcesPath}/widget/images/person.png">
+							</div>
+						</c:otherwise>
+					</c:choose>
+				</c:if>
+				
+				<div class="ppl-header-wrapper clearfix ss-review-details-wrapper">
+					<div class="float-left ppl-header-right">
+						<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">
+						</div>
+					</div>
+					<c:choose>
+						<c:when test="${feedback.source == 'verifiedPartner'}">
+							<div class='verified-partner-badge  verify-partner-image float-right'
+								title='Click here to know more'></div>
+						</c:when>
+						<c:when test="${feedback.source =='encompass'}">
+							<div class='verified-badge  verify-image float-right'
+								title='Click here to know more'></div>
+						</c:when>
+						<c:when test="${feedback.source =='DOTLOOP'}">
+							<div class='verified-badge  verify-image float-right'
+								title='Click here to know more'></div>
+						</c:when>
+						<c:when test="${feedback.source =='API'}">
+							<div class='verified-badge  verify-image float-right'
+								title='Click here to know more'></div>
+						</c:when>
+						<c:when test="${feedback.source =='FTP'}">
+							<div class='verified-badge  verify-image float-right' 
+								title='Click here to know more'></div>
+						</c:when>
+						<c:when test="${feedback.source =='LONEWOLF'}">
+							<div class='verified-badge  verify-image float-right' 
+								title='Click here to know more'></div>
+						</c:when>
+						<c:when test="${feedback.source =='Zillow'}">
+							<div class='zillow-badge  verify-image-zillow float-right'></div>
+						</c:when>
+						<c:when test="${feedback.source =='facebook'}">
+							<div class='fb-verified-image verify-image-fb float-right'></div>
+						</c:when>
+						<c:when test="${feedback.source =='google'}">
+							<div class='google-verified-image verify-image-google float-right'></div>
+						</c:when>
+						<c:otherwise>
+							<div class='unverified-badge  verify-image-ss float-right'></div>
+						</c:otherwise>
+					</c:choose>
+						<div class=" ppl-header-left review-sm-screen ">
+		
+						<c:set value="${fn:escapeXml(feedback.review)}" var="review"></c:set>
+						<c:set value="${feedback.reviewReply}" var="reviewReply"></c:set>
+		
+							<c:choose>
+							<c:when test="${ not empty feedback.surveyUpdatedDate and feedback.surveyUpdatedDate != feedback.surveyCompletedDate }">
+							        <div class="ppl-head-2 review-detail-profile float-left"> Survey updated on </div>
+									<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
+										data-modified="false"
+										data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+								value="${feedback.surveyUpdatedDate}" />">
+									</div>
+								</c:when>
+								<c:when test="${ not empty feedback.surveyCompletedDate}">
+								    <div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div>
+									<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
+										data-modified="false"
+										data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+								value="${feedback.surveyCompletedDate}" />">
+									</div>
+								</c:when>
+								<c:otherwise>
+									<div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div> 					
+									<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
+										data-modified="false"
+										data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
+								value="${feedback.modifiedOn}" />">
+									</div>
+								</c:otherwise>
+							</c:choose>
+							<div class="ppl-head-1 " style="clear:both; text-align:left;">
+							<span class="float-left"> Reviewed by </span>
+							<c:choose>
+								<c:when
+									test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
+									<span class="float-left"
+										style="margin-left: 5px; font-weight: 600 !important;">
+										${feedback.customerFirstName} </span>
+								</c:when>
+								<c:otherwise>
+									<span class="float-left"
+										style="margin-left: 5px; font-weight: 600 !important;">
+										${feedback.customerFirstName} ${feedback.customerLastName}</span>
+								</c:otherwise>
+							</c:choose>
+							<c:if test="${profilemasterid !=4}">
+							<c:if test="${not empty feedback.agentName }">
+								<span class="float-left " style="margin-left: 5px;">for
+								<c:if test="${hiddenSection}">
+									 <c:set var="agentName" value="${feedback.agentName}" />
+										 <c:set var="agentNameTokens" value="${fn:split(agentName, ' ')}" />
+										 <c:set var="agentName" value="${agentNameTokens[0]}" />
+										 <c:if test="${not empty agentNameTokens[1]}">
+										 	<c:set var="agentName" value="${agentName } ${fn:substring(agentNameTokens[1], 0, 1)}" />
+										 </c:if>
+										${agentName}
+								</c:if>
+							  <c:if test="${!hiddenSection}">
+								<a style="color: #236CAF; font-weight: 600 !important;"
+									href="${feedback.completeProfileUrl}" target="_blank">
+										${feedback.agentName}</a>
+						     </c:if>
+										</span>
+							</c:if>
+							</c:if>
+		
+								<c:choose>
+									<c:when test="${ not empty feedback.summary }">
+										<div class="ppl-content" style="clear:both;padding-top:0px !important;">${feedback.summary}</div>
+									</c:when>
+									<c:otherwise>
+									<c:choose>
+									<c:when
+										test="${not (empty feedback.surveyGeoLocation and empty feedback.surveyType)}">
+										<div class="ppl-content " style="clear:both;padding-top:0px !important;">${feedback.surveyGeoLocation}
+											<span>${feedback.surveyType}</span>
+										</div>
+									</c:when>
+									<c:otherwise>
+									    <c:if test="${feedback.source ne 'customer'}">
+		                                    <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
+		                                           <c:choose>
+		                                        <c:when test= "${not empty feedback.surveyTransactionDate}">
+		                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+		                            value="${feedback.surveyTransactionDate}" />"></span>
+																<c:choose>
+																	<c:when test="${not empty feedback.city && not empty feedback.state}">
+																		<span> in ${feedback.city}, ${feedback.state}.</span>
+																	</c:when>
+																</c:choose>
+															</c:when>
+		                                        <c:otherwise>
+		                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
+		                            value="${feedback.modifiedOn}" />"></span>
+																<c:choose>
+																	<c:when test="${not empty feedback.city && not empty feedback.state}">
+																		<span> in ${feedback.city}, ${feedback.state}.</span>
+																	</c:when>
+																</c:choose>
+															</c:otherwise>
+		                                        </c:choose>
+		                                    </div>
+		                                </c:if>
+									</c:otherwise>
+								</c:choose>
+									</c:otherwise>
+								</c:choose>
+						</div>
 					</div>
 				</div>
-				<c:choose>
-					<c:when test="${feedback.source == 'verifiedPartner'}">
-						<div class='verified-partner-badge  verify-partner-image float-right'
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${feedback.source =='encompass'}">
-						<div class='verified-badge  verify-image float-right'
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${feedback.source =='DOTLOOP'}">
-						<div class='verified-badge  verify-image float-right'
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${feedback.source =='API'}">
-						<div class='verified-badge  verify-image float-right'
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${feedback.source =='FTP'}">
-						<div class='verified-badge  verify-image float-right' 
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${feedback.source =='LONEWOLF'}">
-						<div class='verified-badge  verify-image float-right' 
-							title='Click here to know more'></div>
-					</c:when>
-					<c:when test="${feedback.source =='Zillow'}">
-						<div class='zillow-badge  verify-image-zillow float-right'></div>
-					</c:when>
-					<c:when test="${feedback.source =='facebook'}">
-						<div class='fb-verified-image verify-image-fb float-right'></div>
-					</c:when>
-					<c:when test="${feedback.source =='google'}">
-						<div class='google-verified-image verify-image-google float-right'></div>
-					</c:when>
-					<c:otherwise>
-						<div class='unverified-badge  verify-image-ss float-right'></div>
-					</c:otherwise>
-				</c:choose>
-				<div class=" ppl-header-left review-sm-screen ">
-
-				<c:set value="${fn:escapeXml(feedback.review)}" var="review"></c:set>
-				<c:set value="${feedback.reviewReply}" var="reviewReply"></c:set>
-
-					<c:choose>
-					<c:when test="${ not empty feedback.surveyUpdatedDate and feedback.surveyUpdatedDate != feedback.surveyCompletedDate }">
-					        <div class="ppl-head-2 review-detail-profile float-left"> Survey updated on </div>
-							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
-								data-modified="false"
-								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${feedback.surveyUpdatedDate}" />">
-							</div>
-						</c:when>
-						<c:when test="${ not empty feedback.surveyCompletedDate}">
-						    <div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div>
-							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
-								data-modified="false"
-								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${feedback.surveyCompletedDate}" />">
-							</div>
-						</c:when>
-						<c:otherwise>
-							<div class="ppl-head-2 review-detail-profile float-left"> Survey completed on </div> 					
-							<div class="ppl-head-2 review-detail-profile float-left" style="margin-left: 5px;"
-								data-modified="false"
-								data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-d-YYYY"
-						value="${feedback.modifiedOn}" />">
-							</div>
-						</c:otherwise>
-					</c:choose>
-					<div class="ppl-head-1 " style="clear:both; text-align:left;">
-					<span class="float-left"> Reviewed by </span>
-					<c:choose>
-						<c:when
-							test="${fn:toLowerCase(feedback.customerLastName) eq 'null'}">
-							<span class="float-left"
-								style="margin-left: 5px; font-weight: 600 !important;">
-								${feedback.customerFirstName} </span>
-						</c:when>
-						<c:otherwise>
-							<span class="float-left"
-								style="margin-left: 5px; font-weight: 600 !important;">
-								${feedback.customerFirstName} ${feedback.customerLastName}</span>
-						</c:otherwise>
-					</c:choose>
-					<c:if test="${profilemasterid !=4}">
-					<c:if test="${not empty feedback.agentName }">
-						<span class="float-left " style="margin-left: 5px;">for
-						<c:if test="${hiddenSection}">
-							 <c:set var="agentName" value="${feedback.agentName}" />
-								 <c:set var="agentNameTokens" value="${fn:split(agentName, ' ')}" />
-								 <c:set var="agentName" value="${agentNameTokens[0]}" />
-								 <c:if test="${not empty agentNameTokens[1]}">
-								 	<c:set var="agentName" value="${agentName } ${fn:substring(agentNameTokens[1], 0, 1)}" />
-								 </c:if>
-								${agentName}
-						</c:if>
-					  <c:if test="${!hiddenSection}">
-						<a style="color: #236CAF; font-weight: 600 !important;"
-							href="${feedback.completeProfileUrl}" target="_blank">
-								${feedback.agentName}</a>
-				     </c:if>
-								</span>
-					</c:if>
-					</c:if>
-
-						<c:choose>
-							<c:when test="${ not empty feedback.summary }">
-								<div class="ppl-content" style="clear:both;padding-top:0px !important;">${feedback.summary}</div>
-							</c:when>
-							<c:otherwise>
-							<c:choose>
-							<c:when
-								test="${not (empty feedback.surveyGeoLocation and empty feedback.surveyType)}">
-								<div class="ppl-content " style="clear:both;padding-top:0px !important;">${feedback.surveyGeoLocation}
-									<span>${feedback.surveyType}</span>
-								</div>
-							</c:when>
-							<c:otherwise>
-							    <c:if test="${feedback.source ne 'customer'}">
-                                    <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
-                                           <c:choose>
-                                        <c:when test= "${not empty feedback.surveyTransactionDate}">
-                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-                            value="${feedback.surveyTransactionDate}" />"></span>
-														<c:choose>
-															<c:when test="${not empty feedback.city && not empty feedback.state}">
-																<span> in ${feedback.city}, ${feedback.state}.</span>
-															</c:when>
-														</c:choose>
-													</c:when>
-                                        <c:otherwise>
-                                            <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-                            value="${feedback.modifiedOn}" />"></span>
-														<c:choose>
-															<c:when test="${not empty feedback.city && not empty feedback.state}">
-																<span> in ${feedback.city}, ${feedback.state}.</span>
-															</c:when>
-														</c:choose>
-													</c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                </c:if>
-							</c:otherwise>
-						</c:choose>
-							</c:otherwise>
-						</c:choose>
-				</div>
 			</div>
-			</div>
-
+			
 			<c:choose>
 				<c:when test="${fn:length(review)>250}">
 					<div class="ppl-content review-height">
